@@ -4,8 +4,16 @@
 
 # 🍲 Project Chicken Soup
 
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active_development-orange.svg" alt="Active Development" />
+</p>
+
 > **A Local-First AI Spacetime Navigation Engine & Lore Knowledge Graph.**
 > Bridging quantum computing simulation (Qiskit, CUDA-Q, PennyLane) with a rich graph of UFO/Alien/Time Travel history.
+
+> [!WARNING]
+> **Active Development**
+> This repository is under constant and rapid development. APIs, schemas, configurations, and user interfaces are subject to frequent breaking changes as new features are integrated.
 
 ---
 
