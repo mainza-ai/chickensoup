@@ -25,11 +25,11 @@ struct TimelineNodeView: View {
     
     private var badgeColor: Color {
         switch event.type.lowercased() {
-        case "crash": return .red
-        case "testimony": return .blue
-        case "anomaly": return .purple
-        case "theory": return .green
-        default: return .orange
+        case "crash": return DesignConstants.systemRed
+        case "testimony": return DesignConstants.systemBlue
+        case "anomaly": return DesignConstants.systemPurple
+        case "theory": return DesignConstants.systemGreen
+        default: return DesignConstants.systemOrange
         }
     }
     
@@ -59,7 +59,7 @@ struct TimelineNodeView: View {
             
             Text(event.eventDescription)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignConstants.secondaryText)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
             
@@ -83,12 +83,12 @@ struct TimelineNodeView: View {
         .frame(width: 260)
         .background(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
-                .fill(.ultraThinMaterial)
+                .fill(Color.white)
         )
         .overlay(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
                 .stroke(
-                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.8) : Color.white.opacity(0.3),
+                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.8) : Color.black.opacity(0.06),
                     lineWidth: isSelected || isHovered ? 2 : 1
                 )
         )

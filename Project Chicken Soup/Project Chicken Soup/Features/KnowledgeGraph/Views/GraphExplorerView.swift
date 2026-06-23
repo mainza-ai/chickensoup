@@ -62,7 +62,7 @@ struct GraphExplorerView: View {
                             }
                         }
                     }
-                    gc.stroke(path, with: .color(DesignConstants.systemOrange.opacity(0.12)), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+                    gc.stroke(path, with: .color(DesignConstants.systemOrange.opacity(0.35)), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
                     
                     // Draw Nodes
                     for entity in entities {
@@ -75,17 +75,17 @@ struct GraphExplorerView: View {
                         
                         // Node outline glow
                         if isSelected {
-                            gc.fill(Path(ellipseIn: rect.insetBy(dx: -4, dy: -4)), with: .color(DesignConstants.systemOrange.opacity(0.15)))
+                            gc.fill(Path(ellipseIn: rect.insetBy(dx: -4, dy: -4)), with: .color(DesignConstants.systemOrange.opacity(0.25)))
                         }
                         
                         // Main node circle
                         let typeColor: Color = {
                             switch entity.type.lowercased() {
-                            case "person": return .blue
-                            case "place": return .green
-                            case "concept": return .purple
-                            case "project": return .orange
-                            default: return .secondary
+                            case "person": return DesignConstants.systemBlue
+                            case "place": return DesignConstants.systemGreen
+                            case "concept": return DesignConstants.systemPurple
+                            case "project": return DesignConstants.systemOrange
+                            default: return DesignConstants.secondaryText
                             }
                         }()
                         
@@ -143,7 +143,7 @@ struct GraphExplorerView: View {
                 }
             }
         }
-        .background(Color.white.opacity(0.5))
+        .background(Color.white)
         .onAppear {
             layoutNodes()
         }
@@ -187,19 +187,19 @@ struct GraphNodeCard: View {
                     .bold()
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
-                    .background(Color.orange.opacity(0.12), in: Capsule())
+                    .background(DesignConstants.systemOrange.opacity(0.12), in: Capsule())
                     .foregroundStyle(DesignConstants.systemOrange)
             }
             
             Text(entity.summary)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignConstants.secondaryText)
                 .lineLimit(3)
             
             HStack {
                 Label("Credibility: \(Int(entity.confidence * 100))%", systemImage: "checkmark.shield.fill")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(DesignConstants.secondaryText)
                 Spacer()
                 Text("Source: \(entity.source)")
                     .font(.caption)

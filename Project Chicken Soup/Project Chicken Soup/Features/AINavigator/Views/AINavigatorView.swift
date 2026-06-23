@@ -32,7 +32,7 @@ struct AINavigatorView: View {
                 Spacer()
                 
                 Circle()
-                    .fill(isThinking ? DesignConstants.systemOrange : Color.green)
+                    .fill(isThinking ? DesignConstants.systemOrange : DesignConstants.systemGreen)
                     .frame(width: 8, height: 8)
                     .scaleEffect(isThinking ? 1.3 : 1.0)
                     .animation(isThinking ? DesignConstants.thinkingAnimation : .default, value: isThinking)
@@ -40,7 +40,7 @@ struct AINavigatorView: View {
                 Text(isThinking ? "SOLVING FIELD" : "ON STANDBY")
                     .font(.caption)
                     .bold()
-                    .foregroundStyle(isThinking ? DesignConstants.systemOrange : .green)
+                    .foregroundStyle(isThinking ? DesignConstants.systemOrange : DesignConstants.systemGreen)
             }
             
             // Models discovery chain visual indicators
@@ -179,11 +179,11 @@ struct StatusIndicator: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(
-                isCurrent ? DesignConstants.systemOrange.opacity(0.15) : (isActive ? Color.green.opacity(0.12) : Color.gray.opacity(0.1)),
+                isCurrent ? DesignConstants.systemOrange.opacity(0.15) : (isActive ? DesignConstants.systemGreen.opacity(0.12) : Color.gray.opacity(0.1)),
                 in: RoundedRectangle(cornerRadius: 4)
             )
             .foregroundStyle(
-                isCurrent ? DesignConstants.systemOrange : (isActive ? Color.green : Color.secondary)
+                isCurrent ? DesignConstants.systemOrange : (isActive ? DesignConstants.systemGreen : Color.secondary)
             )
     }
 }

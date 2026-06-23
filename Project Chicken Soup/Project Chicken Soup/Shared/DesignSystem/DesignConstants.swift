@@ -8,10 +8,17 @@
 import SwiftUI
 
 enum DesignConstants {
-    // MARK: - Colors
-    static let warmBackground = Color(red: 245/255, green: 245/255, blue: 247/255) // Apple F5F5F7
-    static let primaryText = Color(red: 29/255, green: 29/255, blue: 31/255)      // Apple 1D1D1F
-    static let systemOrange = Color.orange // #FF9500 equivalent
+    // MARK: - iOS & Apple.com Style Palette
+    static let warmBackground = Color(red: 242/255, green: 242/255, blue: 247/255) // iOS systemGroupedBackground #F2F2F7
+    static let primaryText = Color(red: 29/255, green: 29/255, blue: 31/255)      // Apple primary text #1D1D1F
+    static let secondaryText = Color(red: 110/255, green: 110/255, blue: 115/255) // Apple secondary text #6E6E73
+    
+    // Pure iOS System Tint Colors
+    static let systemOrange = Color.orange // #FF9500
+    static let systemBlue = Color.blue     // #007AFF
+    static let systemGreen = Color.green   // #34C759
+    static let systemPurple = Color.purple // #AF52DE
+    static let systemRed = Color.red       // #FF3B30
     
     // MARK: - Radius
     static let panelCornerRadius: CGFloat = 16

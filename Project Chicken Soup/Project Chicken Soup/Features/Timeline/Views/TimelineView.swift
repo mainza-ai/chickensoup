@@ -79,7 +79,7 @@ struct CanvasView: View {
                     gridPath.move(to: CGPoint(x: 0, y: y))
                     gridPath.addLine(to: CGPoint(x: size.width, y: y))
                 }
-                gc.stroke(gridPath, with: .color(Color.orange.opacity(0.03)), lineWidth: 1)
+                gc.stroke(gridPath, with: .color(DesignConstants.primaryText.opacity(0.04)), lineWidth: 1)
                 
                 // Draw core Timeline Field line
                 var timelinePath = Path()
@@ -91,7 +91,7 @@ struct CanvasView: View {
                     timelinePath.addLine(to: CGPoint(x: x, y: midY + wave))
                 }
                 
-                let gradient = Gradient(colors: [.orange.opacity(0.1), .orange.opacity(0.4), .purple.opacity(0.3), .orange.opacity(0.1)])
+                let gradient = Gradient(colors: [DesignConstants.systemOrange.opacity(0.15), DesignConstants.systemOrange.opacity(0.5), DesignConstants.systemPurple.opacity(0.4), DesignConstants.systemOrange.opacity(0.15)])
                 gc.stroke(timelinePath, with: .linearGradient(gradient, startPoint: CGPoint(x: 0, y: midY), endPoint: CGPoint(x: size.width, y: midY)), lineWidth: 3)
                 
                 // Draw quantum particle streams flowing along the timeline
@@ -104,7 +104,7 @@ struct CanvasView: View {
                         
                         gc.fill(
                             Path(ellipseIn: CGRect(x: particleX - 3, y: particleY - 3, width: 6, height: 6)),
-                            with: .color(i % 2 == 0 ? .orange : .purple)
+                            with: .color(i % 2 == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue)
                         )
                     }
                 }
