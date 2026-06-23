@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct AINavigatorView: View {
-    @State private var isThinking = false
+    @StateObject private var discoveryService = LLMDiscoveryService.shared
+    @StateObject private var backendService = BackendService.shared
+    
     @State private var logs: [String] = [
         "System initiated. Connecting local LLM...",
         "oMLX discoverable at 127.0.0.1:9000. Fallbacks loaded.",
@@ -31,6 +33,7 @@ struct AINavigatorView: View {
                     .bold()
                 Spacer()
                 
+                let isThinking = backendService.isSolvingSpacetime
                 Circle()
                     .fill(isThinking ? DesignConstants.systemOrange : DesignConstants.systemGreen)
                     .frame(width: 8, height: 8)
@@ -40,57 +43,110 @@ struct AINavigatorView: View {
                 Text(isThinking ? "SOLVING FIELD" : "ON STANDBY")
                     .font(.caption)
                     .bold()
-                    .foregroundStyle(isThinking ? DesignConstants.systemOrange : DesignConstants.systemGreen)
+                    .foregroundStyle(isThinking ? DesignConstants.systemOrangeText : DesignConstants.systemGreenText)
             }
             
             // Models discovery chain visual indicators
             VStack(alignment: .leading, spacing: 6) {
-                Text("DISCOVERY Fallback CHAIN")
-                    .font(.caption)
-                    .bold()
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("DISCOVERY Fallback CHAIN")
+                        .font(.caption)
+                        .bold()
+                        .foregroundStyle(.secondary)
+                    
+                    Spacer()
+                    
+                    if discoveryService.isRefreshing {
+                        ProgressView()
+                            .scaleEffect(0.6)
+                            .frame(width: 12, height: 12)
+                    } else {
+                        Button {
+                            Task {
+                                await discoveryService.discoverActiveModels()
+                            }
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.caption2)
+                                .foregroundStyle(DesignConstants.systemOrangeText)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
                 
                 HStack(spacing: 8) {
-                    StatusIndicator(name: "oMLX (Mac)", isActive: true, isCurrent: true)
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    StatusIndicator(name: "Ollama", isActive: true, isCurrent: false)
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    StatusIndicator(name: "LM Studio", isActive: false, isCurrent: false)
+                    ForEach(Array(discoveryService.discoveryChain.enumerated()), id: \.offset) { index, status in
+                        if index > 0 {
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        StatusIndicator(name: status.modelName, isActive: status.isAvailable, isCurrent: status.isCurrent)
+                    }
                 }
             }
             .padding(10)
-            .background(Color.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 8))
+            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
             
             Divider()
             
             // Live parameters control
-            VStack(alignment: .leading, spacing: DesignConstants.compactPadding) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Spacetime Field Metrics")
                     .font(.caption)
                     .bold()
                     .foregroundStyle(.secondary)
                 
-                LabeledContent("Gravity Distortion") {
-                    Slider(value: $gravityMetric)
-                        .tint(DesignConstants.systemOrange)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Gravity Distortion")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Spacer()
+                        Text(String(format: "%.2f", gravityMetric))
+                            .font(.system(.subheadline, design: .monospaced))
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    PremiumSlider(value: $gravityMetric)
                 }
-                .font(.subheadline)
                 
-                LabeledContent("Travel Velocity (c)") {
-                    Slider(value: $velocityMetric)
-                        .tint(DesignConstants.systemOrange)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Travel Velocity (c)")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Spacer()
+                        Text(String(format: "%.2f", velocityMetric))
+                            .font(.system(.subheadline, design: .monospaced))
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    PremiumSlider(value: $velocityMetric)
                 }
-                .font(.subheadline)
                 
-                LabeledContent("Field Density (Λ)") {
-                    Slider(value: $fieldIntensity)
-                        .tint(DesignConstants.systemOrange)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Field Density (Λ)")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Spacer()
+                        Text(String(format: "%.2f", fieldIntensity))
+                            .font(.system(.subheadline, design: .monospaced))
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    PremiumSlider(value: $fieldIntensity)
                 }
-                .font(.subheadline)
+            }
+            
+            Divider()
+            
+            // RealityKit 3D Grid Layout View
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Spacetime Geodesic Grid")
+                    .font(.caption)
+                    .bold()
+                    .foregroundStyle(.secondary)
+                RealitySpacetimeView(tensor: FieldGeometryTensor(gravity: gravityMetric, velocity: velocityMetric, intensity: fieldIntensity))
             }
             
             Divider()
@@ -108,7 +164,7 @@ struct AINavigatorView: View {
                             HStack(alignment: .top, spacing: 6) {
                                 Text(">")
                                     .font(.system(.caption, design: .monospaced))
-                                    .foregroundStyle(DesignConstants.systemOrange)
+                                    .foregroundStyle(DesignConstants.systemOrangeText)
                                 Text(log)
                                     .font(.system(.caption, design: .monospaced))
                                     .foregroundStyle(DesignConstants.primaryText)
@@ -120,22 +176,38 @@ struct AINavigatorView: View {
                 }
                 .frame(maxHeight: 150)
                 .padding(8)
-                .background(Color.black.opacity(0.03), in: RoundedRectangle(cornerRadius: 8))
+                .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
             }
             
-            // Sim Action Button
-            Button(action: simulateTimeTravel) {
+            // Sim Action Button or Progress view
+            if backendService.isSolvingSpacetime {
                 HStack {
                     Spacer()
-                    Label("Solve Spacetime Geodesic", systemImage: "bolt.fill")
+                    ProgressView()
+                        .tint(.white)
+                    Text("Solving Spacetime Geodesic...")
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(.white)
                     Spacer()
                 }
                 .padding()
-                .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
-                .foregroundStyle(.white)
-                .bold()
+                .background(DesignConstants.systemOrange.opacity(0.7), in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+            } else {
+                Button(action: simulateTimeTravel) {
+                    HStack {
+                        Spacer()
+                        Label("Solve Spacetime Geodesic", systemImage: "bolt.fill")
+                        Spacer()
+                    }
+                    .padding()
+                    .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                    .foregroundStyle(.white)
+                    .bold()
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(DesignConstants.standardPadding)
         .liquidGlass()
@@ -143,24 +215,31 @@ struct AINavigatorView: View {
     }
     
     private func simulateTimeTravel() {
-        guard !isThinking else { return }
+        guard !backendService.isSolvingSpacetime else { return }
         
-        isThinking = true
-        logs.append("Executing PennyLane pathfinding optimization...")
+        logs.append("Executing Qiskit pathfinding solver request...")
         
-        // Simulating async progress updates to display real-time calculations
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            logs.append("Qiskit computed Hamiltonian expectation <H> = 0.724")
-            gravityMetric = Double.random(in: 0.2...0.9)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                logs.append("Entangled state resolved: CTC is navigable.")
-                velocityMetric = Double.random(in: 0.7...0.99)
+        Task {
+            do {
+                let response = try await backendService.solveSpacetimeGeodesic(
+                    gravity: gravityMetric,
+                    velocity: velocityMetric,
+                    intensity: fieldIntensity
+                )
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    logs.append("Geodesic path found! Confidence: 96.8%")
-                    fieldIntensity = Double.random(in: 0.4...0.8)
-                    isThinking = false
+                await MainActor.run {
+                    withAnimation {
+                        self.gravityMetric = response.gravityMetric
+                        self.velocityMetric = response.velocityMetric
+                        self.fieldIntensity = response.fieldIntensity
+                        for log in response.logs {
+                            self.logs.append(log)
+                        }
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.logs.append("Solver failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -183,7 +262,7 @@ struct StatusIndicator: View {
                 in: RoundedRectangle(cornerRadius: 4)
             )
             .foregroundStyle(
-                isCurrent ? DesignConstants.systemOrange : (isActive ? DesignConstants.systemGreen : Color.secondary)
+                isCurrent ? DesignConstants.primaryText : (isActive ? DesignConstants.systemGreenText : Color.secondary)
             )
     }
 }

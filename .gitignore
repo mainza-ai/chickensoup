@@ -21,3 +21,7 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+
+# Project-specific ignores
+development-docs/
+.env

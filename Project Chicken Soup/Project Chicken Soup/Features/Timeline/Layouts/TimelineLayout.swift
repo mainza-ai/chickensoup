@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EventDateKey: LayoutValueKey {
-    static let defaultValue: Date = Date()
+    nonisolated static let defaultValue: Date = Date()
 }
 
 extension View {

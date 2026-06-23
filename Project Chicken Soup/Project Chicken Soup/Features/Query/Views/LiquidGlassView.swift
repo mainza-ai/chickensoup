@@ -9,12 +9,12 @@ import SwiftUI
 
 struct LiquidGlassModifier: ViewModifier {
     var cornerRadius: CGFloat = DesignConstants.panelCornerRadius
-    var strokeColor: Color = Color.white.opacity(0.4)
+    var strokeColor: Color = DesignConstants.glassBorderColor
     var shadowColor: Color = DesignConstants.glassShadowColor
     
     func body(content: Content) -> some View {
         content
-            .background(Color.white.opacity(0.65))
+            .background(DesignConstants.panelBackground)
             .background(.regularMaterial)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
@@ -33,7 +33,7 @@ struct LiquidGlassModifier: ViewModifier {
 extension View {
     func liquidGlass(
         cornerRadius: CGFloat = DesignConstants.panelCornerRadius,
-        strokeColor: Color = Color.white.opacity(0.4),
+        strokeColor: Color = DesignConstants.glassBorderColor,
         shadowColor: Color = DesignConstants.glassShadowColor
     ) -> some View {
         modifier(LiquidGlassModifier(cornerRadius: cornerRadius, strokeColor: strokeColor, shadowColor: shadowColor))

@@ -1,0 +1,28 @@
+[project]
+name = "chickensoup"
+version = "0.1.0"
+description = "Project Chicken Soup backend: local-first AI system simulating spacetime, field manipulation, and AI navigation"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "fastmcp>=0.1.0",
+    "neo4j>=5.18.0",
+    "redis>=5.0.0",
+    "python-dotenv>=1.0.1",
+    "numpy>=1.26.0",
+    "scipy>=1.12.0",
+    "qiskit>=1.0.0",
+    "pennylane>=0.35.0",
+    "pydantic-ai>=1.107.0",
+    "pydantic-graph>=1.107.0",
+    "langgraph>=1.2.6",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+]

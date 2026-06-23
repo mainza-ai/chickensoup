@@ -16,6 +16,17 @@ final class LoreEntity: Identifiable {
     var summary: String
     var confidence: Double
     var source: String
+    var userNotes: String
+    var sourcesRaw: String = ""
+    
+    var sources: [String] {
+        get {
+            sourcesRaw.components(separatedBy: "|||").filter { !$0.isEmpty }
+        }
+        set {
+            sourcesRaw = newValue.joined(separator: "|||")
+        }
+    }
     
     init(
         id: UUID = UUID(),
@@ -23,7 +34,9 @@ final class LoreEntity: Identifiable {
         type: String,
         summary: String,
         confidence: Double,
-        source: String
+        source: String,
+        userNotes: String = "",
+        sources: [String] = []
     ) {
         self.id = id
         self.name = name
@@ -31,5 +44,8 @@ final class LoreEntity: Identifiable {
         self.summary = summary
         self.confidence = confidence
         self.source = source
+        self.userNotes = userNotes
+        let actualSources = sources.isEmpty ? [source] : sources
+        self.sourcesRaw = actualSources.joined(separator: "|||")
     }
 }

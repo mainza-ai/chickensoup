@@ -16,7 +16,8 @@ struct Project_Chicken_SoupApp: App {
             TimelineBranch.self,
             LoreEntity.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: isPreview)
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -26,7 +27,25 @@ struct Project_Chicken_SoupApp: App {
             }
             return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Attempt to clean up old database files to handle schema mismatches gracefully during development
+            if let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+                let dbURL = appSupportURL.appendingPathComponent("default.store")
+                let dbShmURL = appSupportURL.appendingPathComponent("default.store-shm")
+                let dbWalURL = appSupportURL.appendingPathComponent("default.store-wal")
+                try? FileManager.default.removeItem(at: dbURL)
+                try? FileManager.default.removeItem(at: dbShmURL)
+                try? FileManager.default.removeItem(at: dbWalURL)
+            }
+            
+            do {
+                let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+                Task { @MainActor in
+                    Self.seedMockData(context: container.mainContext)
+                }
+                return container
+            } catch {
+                fatalError("Could not create ModelContainer: \(error)")
+            }
         }
     }()
 

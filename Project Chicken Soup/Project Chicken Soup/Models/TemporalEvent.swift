@@ -17,6 +17,17 @@ final class TemporalEvent: Identifiable {
     var confidence: Double
     var source: String
     var type: String // "crash", "testimony", "anomaly", "theory"
+    var userNotes: String
+    var sourcesRaw: String = ""
+    
+    var sources: [String] {
+        get {
+            sourcesRaw.components(separatedBy: "|||").filter { !$0.isEmpty }
+        }
+        set {
+            sourcesRaw = newValue.joined(separator: "|||")
+        }
+    }
     
     var branch: TimelineBranch?
     
@@ -27,7 +38,9 @@ final class TemporalEvent: Identifiable {
         timestamp: Date,
         confidence: Double,
         source: String,
-        type: String
+        type: String,
+        userNotes: String = "",
+        sources: [String] = []
     ) {
         self.id = id
         self.title = title
@@ -36,5 +49,8 @@ final class TemporalEvent: Identifiable {
         self.confidence = confidence
         self.source = source
         self.type = type
+        self.userNotes = userNotes
+        let actualSources = sources.isEmpty ? [source] : sources
+        self.sourcesRaw = actualSources.joined(separator: "|||")
     }
 }

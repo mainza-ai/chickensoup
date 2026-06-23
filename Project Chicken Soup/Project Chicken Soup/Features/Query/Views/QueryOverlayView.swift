@@ -26,7 +26,7 @@ struct QueryOverlayView: View {
         VStack(spacing: DesignConstants.compactPadding) {
             HStack(spacing: DesignConstants.compactPadding) {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(DesignConstants.systemOrange)
+                    .foregroundStyle(DesignConstants.systemOrangeText)
                     .bold()
                 
                 TextField(
@@ -65,18 +65,28 @@ struct QueryOverlayView: View {
                     .buttonStyle(.plain)
                 }
                 
-                Button("Execute", systemImage: "play.fill", action: {
-                    onSubmit()
-                    isFocused = false
-                })
-                .font(.subheadline)
-                .bold()
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
-                .buttonStyle(.plain)
+                if BackendService.shared.isSubmittingQuery {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .frame(width: 24, height: 24)
+                        .padding(.horizontal, 8)
+                } else {
+                    Button("Execute", systemImage: "play.fill", action: {
+                        onSubmit()
+                        isFocused = false
+                    })
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                    .buttonStyle(.plain)
+                }
             }
+            
+            MultimodalInputView(queryText: $text)
+                .padding(.top, 2)
             
             // Expanded Suggestions Panel when focused or active
             if isFocused || isExpanded {
@@ -137,7 +147,7 @@ struct QueryOverlayView: View {
     @Previewable @State var query = ""
     @Previewable @State var structured = false
     ZStack {
-        Color.gray.opacity(0.1).ignoresSafeArea()
+        DesignConstants.warmBackground.ignoresSafeArea()
         QueryOverlayView(text: $query, isStructuredQuery: $structured, onSubmit: {})
     }
 }

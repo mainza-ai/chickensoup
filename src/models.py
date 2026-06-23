@@ -1,0 +1,50 @@
+from typing import Dict, List, Any, Optional
+from pydantic import BaseModel, Field
+
+class QueryRequest(BaseModel):
+    query: str = Field(..., description="The query string to evaluate (e.g. Vatican UFO recovery, 1937)")
+    structured: bool = Field(False, description="Whether to return a structured JSON response instead of free text")
+
+class QueryResponse(BaseModel):
+    query: str
+    answer: str
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    entities: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+
+class NavigateRequest(BaseModel):
+    origin: str = Field(..., description="Origin location or epoch (e.g. Earth-2026)")
+    destination: str = Field(..., description="Destination location or epoch (e.g. Earth-1947)")
+    target_year: int = Field(..., description="Target year to navigate to")
+    energy_level: float = Field(1.0, description="Field energy manipulation scale")
+
+class NavigateResponse(BaseModel):
+    success: bool
+    path: List[str] = Field(default_factory=list, description="Computed path steps through spacetime")
+    warp_factor: float = Field(..., description="Calculated spacetime distortion factor")
+    divergence_risk: float = Field(..., description="Probability of timeline divergence or splitting")
+    geometry_tensor: Dict[str, Any] = Field(..., description="Serialized ADM 3+1 FieldGeometryTensor state")
+
+class IngestRequest(BaseModel):
+    title: str = Field(..., description="Title of the wiki page/source")
+    content: str = Field(..., description="Full text/markdown content to parse")
+    tags: List[str] = Field(default_factory=list, description="Tags associated with the source")
+    sources: List[str] = Field(default_factory=list, description="Document sources cited")
+
+class IngestResponse(BaseModel):
+    success: bool
+    nodes_created: int
+    relationships_created: int
+    confidence_score: float
+
+class StatusResponse(BaseModel):
+    status: str
+    llm_provider: str
+    llm_connected: bool
+    neo4j_connected: bool
+    redis_connected: bool
+    quantum_backend: str
+
+class ModelsResponse(BaseModel):
+    provider: str
+    models: List[str]

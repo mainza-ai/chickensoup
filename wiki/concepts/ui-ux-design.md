@@ -75,9 +75,18 @@ Most apps use dark mode as default. Chicken Soup is different.
 
 - **Background:** #F2F2F7 (iOS systemGroupedBackground — clean and modern)
 - **Text:** #1D1D1F (Apple primary text — charcoal-black)
-- **Accent:** #FF9500 (systemOrange — saffron/orange)
+- **Accent (Fills/Buttons):** #FF9500 (systemOrange — vibrant saffron/orange)
+- **Accent (Text/Labels):** #E65100 (systemOrangeText — high-contrast accessible orange for small labels/text)
 - **Secondary:** #6E6E73 (Apple secondary text — slate gray)
-- **Semantic:** systemBlue (#007AFF), systemGreen (#34C759), systemPurple (#AF52DE), systemRed (#FF3B30)
+- **Semantic Fills:** systemBlue (#007AFF), systemGreen (#34C759), systemPurple (#AF52DE), systemRed (#FF3B30)
+- **Semantic Text/Standby:** #1E6B30 (systemGreenText — high-contrast accessible pine-green)
+
+### Contrast & Separation Standards
+
+- **Panel Shadows:** Glassmorphic overlays and floating panels use deep shadows (radius: `12`, offset: `y: 6`, color: `Color.black.opacity(0.14)`) to separate them clearly from the background canvas.
+- **Card Outlines:** White cards on light gray backgrounds use a clear border stroke of `Color.black.opacity(0.12)` to prevent edge blending.
+- **Sidebar Boundaries:** The sidebar utilizes a 1pt vertical border overlay (`Color.black.opacity(0.12)`) on its trailing edge to demarcate it from the main detail views.
+- **Custom Slider Inputs:** Standard sliders are replaced by a custom `PremiumSlider` featuring a thick progress fill (`systemOrange`) and a highly visible white knob outlined with a sharp `systemOrangeText` stroke and drop shadow.
 
 ### Typography Scale
 

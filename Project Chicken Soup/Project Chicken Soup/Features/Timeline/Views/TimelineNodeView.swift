@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TimelineNodeView: View {
     let event: TemporalEvent
@@ -18,7 +19,7 @@ struct TimelineNodeView: View {
         case "crash": return "exclamationmark.triangle.fill"
         case "testimony": return "person.2.wave.2.fill"
         case "anomaly": return "sparkles"
-        case "theory": return "brain.headprofile.fill"
+        case "theory": return "brain"
         default: return "clock.fill"
         }
     }
@@ -28,8 +29,8 @@ struct TimelineNodeView: View {
         case "crash": return DesignConstants.systemRed
         case "testimony": return DesignConstants.systemBlue
         case "anomaly": return DesignConstants.systemPurple
-        case "theory": return DesignConstants.systemGreen
-        default: return DesignConstants.systemOrange
+        case "theory": return DesignConstants.systemGreenText
+        default: return DesignConstants.systemOrangeText
         }
     }
     
@@ -49,7 +50,7 @@ struct TimelineNodeView: View {
                 Text(String(format: "%.0f%% Match", event.confidence * 100))
                     .font(.caption)
                     .bold()
-                    .foregroundStyle(DesignConstants.systemOrange)
+                    .foregroundStyle(DesignConstants.systemOrangeText)
             }
             
             Text(event.title)
@@ -83,12 +84,12 @@ struct TimelineNodeView: View {
         .frame(width: 260)
         .background(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
-                .fill(Color.white)
+                .fill(DesignConstants.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
                 .stroke(
-                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.8) : Color.black.opacity(0.06),
+                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.8) : DesignConstants.dividerColor,
                     lineWidth: isSelected || isHovered ? 2 : 1
                 )
         )
@@ -104,21 +105,50 @@ struct TimelineNodeView: View {
                 isHovered = hovering
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(event.title), \(event.type) event, \(Int(event.confidence * 100)) percent confidence match. Source: \(event.source). Date: \(event.timestamp.formatted(date: .abbreviated, time: .omitted))")
+        .accessibilityHint(isSelected ? "Currently selected event." : "Double tap to select this event on the timeline.")
     }
 }
 
-#Preview {
-    TimelineNodeView(
-        event: TemporalEvent(
+struct TimelineNodeView_PreviewHelper: View {
+    let container: ModelContainer
+    let mockEvent: TemporalEvent
+    
+    init() {
+        let schema = Schema([
+            TemporalEvent.self,
+            TimelineBranch.self,
+            LoreEntity.self
+        ])
+        let container = try! ModelContainer(for: schema, configurations: [ModelConfiguration(isStoredInMemoryOnly: true)])
+        let context = container.mainContext
+        
+        let mockEvent = TemporalEvent(
             title: "Magenta UFO Crash Recovery",
             eventDescription: "A circular flying craft crash-landed in northern Italy, recovered by Mussolini's secret cabinet.",
             timestamp: Date(),
             confidence: 0.94,
             source: "Vatican Archives",
             type: "crash"
-        ),
-        isSelected: false
-    )
-    .padding()
-    .background(Color.gray.opacity(0.2))
+        )
+        context.insert(mockEvent)
+        
+        self.container = container
+        self.mockEvent = mockEvent
+    }
+    
+    var body: some View {
+        TimelineNodeView(
+            event: mockEvent,
+            isSelected: false
+        )
+        .modelContainer(container)
+        .padding()
+        .background(Color.gray.opacity(0.2))
+    }
+}
+
+#Preview {
+    TimelineNodeView_PreviewHelper()
 }

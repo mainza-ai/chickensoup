@@ -8,13 +8,29 @@
 import SwiftUI
 import SwiftData
 
-struct TimelineView: View {
+struct TemporalTimelineView: View {
     let events: [TemporalEvent]
     @Binding var selectedEvent: TemporalEvent?
     
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var backendService = BackendService.shared
+    
+    @State private var minConfidence: Double = 0.0
+    @State private var selectedTypes: Set<String> = ["crash", "testimony", "anomaly", "theory"]
+    @State private var activeBranchId: UUID? = nil
+    @State private var showFilters = false
+    
+    private var filteredEvents: [TemporalEvent] {
+        events.filter { event in
+            event.confidence >= minConfidence &&
+            selectedTypes.contains(event.type) &&
+            (activeBranchId == nil || event.branch?.id == activeBranchId)
+        }
+    }
+    
     // Compute date boundary for layout
     private var dateRange: (start: Date, end: Date) {
-        let sorted = events.sorted(by: { $0.timestamp < $1.timestamp })
+        let sorted = filteredEvents.sorted(by: { $0.timestamp < $1.timestamp })
         guard let first = sorted.first, let last = sorted.last else {
             let now = Date()
             return (now, now.addingTimeInterval(3600))
@@ -25,28 +41,107 @@ struct TimelineView: View {
     }
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            ZStack(alignment: .leading) {
-                // Background Quantum Entanglement Field Canvas
-                CanvasView(eventsCount: events.count)
-                
-                // Timeline layout containing the interactive nodes
-                TimelineLayout(startDate: dateRange.start, endDate: dateRange.end) {
-                    ForEach(events) { event in
-                        Button {
-                            withAnimation(DesignConstants.hoverAnimation) {
-                                selectedEvent = event
-                            }
-                        } label: {
-                            TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
-                        }
-                        .buttonStyle(.plain)
-                        .eventDate(event.timestamp)
+        ZStack(alignment: .topLeading) {
+            VStack(spacing: 0) {
+                if backendService.isFetchingEvents && events.isEmpty {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .tint(DesignConstants.systemOrange)
+                        Text("Aligning Spacetime Field...")
+                            .font(.headline)
+                            .foregroundStyle(DesignConstants.primaryText)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if filteredEvents.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.secondary)
+                        Text("No Timeline Events Match Filters")
+                            .font(.headline)
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Text("Adjust your advanced filters or perform a new query.")
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                        
+                        Button("Reset Filters") {
+                            withAnimation {
+                                minConfidence = 0.0
+                                selectedTypes = ["crash", "testimony", "anomaly", "theory"]
+                                activeBranchId = nil
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(DesignConstants.systemOrange)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        ZStack(alignment: .leading) {
+                            // Background Quantum Entanglement Field Canvas
+                            CanvasView(eventsCount: filteredEvents.count)
+                            
+                            // Timeline layout containing the interactive nodes
+                            TimelineLayout(startDate: dateRange.start, endDate: dateRange.end) {
+                                ForEach(filteredEvents) { event in
+                                    Button {
+                                        withAnimation(DesignConstants.hoverAnimation) {
+                                            selectedEvent = event
+                                        }
+                                    } label: {
+                                        TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .eventDate(event.timestamp)
+                                }
+                            }
+                            .padding(.horizontal, 100)
+                        }
+                        .frame(minHeight: 450)
+                    }
+                    #if !os(macOS)
+                    .refreshable {
+                        await backendService.fetchTemporalEvents(context: modelContext)
+                    }
+                    #endif
                 }
-                .padding(.horizontal, 100)
             }
-            .frame(minHeight: 450)
+            
+            // Collapsible floating advanced filter controls
+            VStack(alignment: .leading, spacing: 8) {
+                Button {
+                    withAnimation(.spring(duration: 0.3)) {
+                        showFilters.toggle()
+                    }
+                } label: {
+                    Label("Timeline Filters", systemImage: "line.3.horizontal.decrease.circle.fill")
+                        .font(.subheadline)
+                        .bold()
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(DesignConstants.cardBackground.opacity(0.9), in: Capsule())
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                        .shadow(color: DesignConstants.glassShadowColor, radius: 4, x: 0, y: 2)
+                }
+                .buttonStyle(.plain)
+                
+                if showFilters {
+                    AdvancedTimelineFilterView(
+                        minConfidence: $minConfidence,
+                        selectedTypes: $selectedTypes,
+                        activeBranchId: $activeBranchId
+                    )
+                    .frame(width: 300)
+                    .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .top)),
+                        removal: .opacity.combined(with: .move(edge: .top))
+                    ))
+                }
+            }
+            .padding(.leading, 20)
+            .padding(.top, 20)
+            .zIndex(10)
         }
         .background(
             DesignConstants.warmBackground
@@ -114,27 +209,59 @@ struct CanvasView: View {
     }
 }
 
+struct TemporalTimelineView_PreviewHelper: View {
+    @State var selected: TemporalEvent? = nil
+    let container: ModelContainer
+    let events: [TemporalEvent]
+    
+    init() {
+        let schema = Schema([
+            TemporalEvent.self,
+            TimelineBranch.self,
+            LoreEntity.self
+        ])
+        let container = try! ModelContainer(for: schema, configurations: [ModelConfiguration(isStoredInMemoryOnly: true)])
+        let context = container.mainContext
+        
+        let mainBranch = TimelineBranch(name: "Universe Prime", isActive: true)
+        context.insert(mainBranch)
+        
+        let e1 = TemporalEvent(
+            title: "Vatican UFO Crash",
+            eventDescription: "Crash recovery of a highly advanced disc-shaped object in Magenta, Italy.",
+            timestamp: Date().addingTimeInterval(-1000000),
+            confidence: 0.94,
+            source: "Vatican Secrets",
+            type: "crash"
+        )
+        e1.branch = mainBranch
+        
+        let e2 = TemporalEvent(
+            title: "David Grusch Testimony",
+            eventDescription: "Under-oath disclosure of non-human recovery programs to the US Congress.",
+            timestamp: Date(),
+            confidence: 0.98,
+            source: "US Congress",
+            type: "testimony"
+        )
+        e2.branch = mainBranch
+        
+        context.insert(e1)
+        context.insert(e2)
+        
+        self.container = container
+        self.events = [e1, e2]
+    }
+    
+    var body: some View {
+        TemporalTimelineView(
+            events: events,
+            selectedEvent: $selected
+        )
+        .modelContainer(container)
+    }
+}
+
 #Preview {
-    @Previewable @State var selected: TemporalEvent? = nil
-    TimelineView(
-        events: [
-            TemporalEvent(
-                title: "Vatican UFO Crash",
-                eventDescription: "Crash recovery of a highly advanced disc-shaped object in Magenta, Italy.",
-                timestamp: Date().addingTimeInterval(-1000000),
-                confidence: 0.94,
-                source: "Vatican Secrets",
-                type: "crash"
-            ),
-            TemporalEvent(
-                title: "David Grusch Testimony",
-                eventDescription: "Under-oath disclosure of non-human recovery programs to the US Congress.",
-                timestamp: Date(),
-                confidence: 0.98,
-                source: "US Congress",
-                type: "testimony"
-            )
-        ],
-        selectedEvent: $selected
-    )
+    TemporalTimelineView_PreviewHelper()
 }
