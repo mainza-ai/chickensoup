@@ -119,6 +119,17 @@ Created the initial wiki structure with AGENTS.md schema, overview, index, and l
 
 Created comprehensive UI/UX design page. The interface is a window into the temporal reasoning engine. Built with SwiftUI (not React), light mode default (not dark mode), #FF9500 (systemOrange) accent color. macOS-first with iOS support. Key design principles: Liquid Glass, semantic colors, SF Pro typography, material hierarchy, rounded corners, subtle gradients, generous whitespace, restraint.
 
+## [2026-06-22] create | Agent Skills
+
+Installed four twostraws agent skills into `.agents/skills/` for Swift implementation:
+
+- **SwiftUI Pro** — iOS 26+ APIs, deprecated API, VoiceOver, performance, navigation, data flow, animations, design
+- **SwiftData Pro** — @Model, @Query, predicates, indexes, migrations, relationships, iCloud, class inheritance
+- **Swift Concurrency Pro** — async/await, actors, Sendable, task groups, @concurrent, structured concurrency, cancellation, async streams
+- **Swift Testing Pro** — @Test, #expect, #require, parameterized tests, traits, exit tests, confirmations
+
+Each skill has a SKILL.md and references/ directory with detailed rules loaded on demand during code review. Installed via `npx skills add`.
+
 ## [2026-06-22] ingest | Quantum Algorithms
 
 Ingested all quantum algorithms from Wikipedia and other sources. Created comprehensive quantum algorithms page with 24 algorithms organized into three layers (Spacetime Engine, Field Manipulator, AI Navigator) plus cross-layer algorithms.

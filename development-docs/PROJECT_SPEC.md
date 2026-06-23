@@ -272,3 +272,38 @@ The UI is built with **SwiftUI** (not React + Vite), works on **macOS and iOS** 
 - **macOS-first** — windowed layout with NavigationSplitView (sidebar + main content)
 - **iOS** — full-screen, gesture-driven, tab-based navigation
 - **Shared codebase** — SwiftData models, services; different views for each platform
+
+## Agent Skills
+
+Four agent skills from Paul Hudson (twostraws) are installed in `.agents/skills/` and automatically referenced during Swift implementation:
+
+| Skill | Repository | What It Covers |
+|-------|-----------|----------------|
+| **SwiftUI Pro** | twostraws/swiftui-agent-skill | iOS 26+ APIs, deprecated API, VoiceOver, performance, navigation, data flow, animations, design |
+| **SwiftData Pro** | twostraws/SwiftData-Agent-Skill | @Model, @Query, predicates, indexes, migrations, relationships, iCloud, class inheritance |
+| **Swift Concurrency Pro** | twostraws/Swift-Concurrency-Agent-Skill | async/await, actors, Sendable, task groups, @concurrent, structured concurrency, cancellation, async streams |
+| **Swift Testing Pro** | twostraws/Swift-Testing-Agent-Skill | @Test, #expect, #require, parameterized tests, traits, exit tests, confirmations |
+
+### Key Rules from Agent Skills
+
+- **@Query must only be used inside SwiftUI views** — not in classes
+- **isEmpty == false crashes at runtime** — use !isEmpty instead
+- **Don't use @unchecked Sendable** — prefer actors, value types, or sending parameters
+- **Swift Testing does NOT support UI tests** — use XCTest for UI tests
+- **Target iOS 26+ and Swift 6.2+** — new features are current
+- **Prefer async/await over closure-based variants**
+- **Prefer structured concurrency (task groups) over unstructured Task {}**
+- **Break different types into different Swift files** — not multiple structs in one file
+- **Use consistent project structure by feature** — not by type
+
+### Installation
+
+Installed via `npx skills add` into `.agents/skills/`:
+```bash
+npx skills add https://github.com/twostraws/swiftui-agent-skill --skill swiftui-pro
+npx skills add https://github.com/twostraws/SwiftData-Agent-Skill --skill swiftdata-pro
+npx skills add https://github.com/twostraws/Swift-Concurrency-Agent-Skill --skill swift-concurrency-pro
+npx skills add https://github.com/twostraws/Swift-Testing-Agent-Skill --skill swift-testing-pro
+```
+
+Each skill has a `SKILL.md` and `references/` directory with detailed rules loaded on demand during code review.

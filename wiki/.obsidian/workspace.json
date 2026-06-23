@@ -178,6 +178,7 @@
   },
   "active": "04de5102884f8c40",
   "lastOpenFiles": [
+    "concepts/agent-skills.md",
     "concepts/ui-ux-design.md",
     "concepts/evaluation-framework.md",
     "entities/docker-compose.md",
@@ -202,7 +203,6 @@
     "concepts/black-hole-entropy.md",
     "concepts/second-law.md",
     "concepts/arrow-of-time.md",
-    "entities/maxwells-demon.md",
-    "entities/landauer.md"
+    "entities/maxwells-demon.md"
   ]
 }
