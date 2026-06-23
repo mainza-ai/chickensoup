@@ -4,7 +4,7 @@ tags: [quantum, ibm, qiskit]
 created: 2026-06-22
 updated: 2026-06-22
 sources: [Qiskit-2023]
-related: [quantum-systems, time-travel-machinery-architecture]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
 ---
 
 # Qiskit

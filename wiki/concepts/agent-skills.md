@@ -13,7 +13,7 @@ Four agent skills from Paul Hudson (twostraws) are installed in `.agents/skills/
 
 ## Overview
 
-All four skills target **iOS 26+ and Swift 6.2+**, are written by Paul Hudson (who writes actively updated books and tutorials), and are licensed under MIT. They're designed to be installed via `npx skills add` into Claude Code, Codex, Gemini, Cursor, and OpenCode.
+All four skills target **iOS 26+ and Swift 6.4**, are written by Paul Hudson (who writes actively updated books and tutorials), and are licensed under MIT. They're designed to be installed via `npx skills add` into Claude Code, Codex, Gemini, Cursor, and OpenCode.
 
 Each skill has a `SKILL.md` and a `references/` directory with detailed rules loaded on demand during code review. This means the AI only loads what it needs, keeping token usage efficient.
 
@@ -55,7 +55,7 @@ Key rules:
 - Prefer actors, value types, or sending parameters
 - Prefer structured concurrency (task groups) over unstructured Task {}
 - Prefer async/await over closure-based variants
-- Swift 6.2+ strict concurrency checking
+- Swift 6.4 strict concurrency checking
 
 ### Swift Testing Pro
 

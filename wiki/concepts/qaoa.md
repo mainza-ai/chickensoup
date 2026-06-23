@@ -29,6 +29,16 @@ $O(p)$ for $p$ layers, typically $p \approx 10-100$.
 from dwave.system import DWaveSampler
 ```
 
+## Project Chicken Soup Integration
+
+**Layer:** AI Navigator (PennyLane, D-Wave backend)
+
+**Concrete use:** QAOA finds the optimal path through spacetime by encoding the path as a binary optimization problem: which grid points should the path go through? The cost Hamiltonian penalizes paths with high proper time or energy; the mixer Hamiltonian allows transitions between candidate paths. Alternating layers refine the solution.
+
+**Backend:** PennyLane (variational QAOA implementation, differentiable), D-Wave (hardware-native QUBO encoding), IonQ (high-precision QAOA for small instances).
+
+**Known limitations:** QAOA approximation ratio depends on the number of layers p — more layers give better solutions but require deeper circuits. For p = 1, QAOA often finds the global optimum on small instances but degrades on large ones. Our grid sizes (8³ to 64³) require p ≥ 10 for reliable solutions, which is at the edge of current NISQ capabilities.
+
 ## See Also
 
 - [[quantum-algorithms]]

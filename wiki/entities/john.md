@@ -50,7 +50,6 @@ John's vision is one of the most detailed descriptions of a celestial encounter,
 - [[throne-vision]]
 - [[ezekiel]]
 - [[daniel]]
-- [[john]]
 - [[nephilim]]
 - [[heavenly-army]]
 - [[uap]]

@@ -13,6 +13,8 @@ The U.S. government's program for recovering and studying UFOs and UAPs.
 
 ## Timeline
 
+- **1933** — Magenta crash in Italy, recovered by Mussolini's regime
+- **1937** — Vatican recovers a crashed UFO (possibly related to or conflated with Magenta)
 - **1930s** — Program begins (possibly earlier)
 - **1947** — Roswell crash
 - **1950s–1980s** — Project Serpo (alleged)
@@ -50,3 +52,24 @@ The U.S. government's program for recovering and studying UFOs and UAPs.
 - [[bob-lazar]]
 - [[area-51]]
 - [[the-thing]]
+- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
+- [[magenta-ufo-crash]]
+- [[mussolini]]
+- [[italy]]
+- [[t-t-brown]]
+- [[biefeld-brown-effect]]
+- [[antigravity]]
+- [[7-46-hz]]
+- [[ariel-school-ufo-incident]]
+- [[mount-nyangani]]
+- [[lyn-buchanan]]
+- [[zimbabwe]]
+- [[varginha-ufo-crash]]
+- [[aldo-rebelo]]
+- [[brazil]]
+- [[nhcr]]
+- [[jfk-assassination-and-ufo-disclosure]]
+- [[nikola-tesla]]
+- [[wireless-energy]]
+- [[death-ray]]

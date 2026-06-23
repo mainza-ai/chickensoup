@@ -4,7 +4,7 @@ tags: [quantum, qml, ai, platform]
 created: 2026-06-22
 updated: 2026-06-22
 sources: [Xanadu]
-related: [quantum-systems, time-travel-machinery, ai-alien-connection]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture, ai-alien-connection]
 ---
 
 # PennyLane

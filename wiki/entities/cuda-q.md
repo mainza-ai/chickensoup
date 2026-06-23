@@ -4,7 +4,7 @@ tags: [quantum, nvidia, cuda-q]
 created: 2026-06-22
 updated: 2026-06-22
 sources: [CUDA-Q-2023]
-related: [quantum-systems, time-travel-machinery-architecture]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
 ---
 
 # CUDA-Q

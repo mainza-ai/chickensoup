@@ -4,7 +4,7 @@ tags: [quantum, d-wave]
 created: 2026-06-22
 updated: 2026-06-22
 sources: [D-Wave-2023]
-related: [quantum-systems, time-travel-machinery-architecture]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
 ---
 
 # D-Wave

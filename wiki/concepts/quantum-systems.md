@@ -1,5 +1,5 @@
 ---
-title: "Quantum Systems"
+title: "Quantum Systems (Concept)"
 tags: [quantum, ufo, uap]
 created: 2026-06-22
 updated: 2026-06-22

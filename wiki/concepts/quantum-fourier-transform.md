@@ -29,6 +29,16 @@ $O(\log^2 n)$ for $n$ qubits.
 from qiskit.circuit.library import QFT
 ```
 
+## Project Chicken Soup Integration
+
+**Layer:** Spacetime Engine (Qiskit) — used as a subroutine in QPE and HHL
+
+**Concrete use:** The QFT transforms the metric from position space (values at grid points) to momentum/frequency space (periodic components). This reveals the periodic structure of spacetime — closed timelike curves appear as periodic modes in the frequency domain. QFT is also the core subroutine in quantum phase estimation, which extracts eigenvalues of the spacetime Hamiltonian.
+
+**Backend:** Works identically on Qiskit and CUDA-Q (both support QFT circuits). PennyLane has a QFT template for differentiable QFT calculations.
+
+**Known limitations:** QFT scale polynomially with qubit count. For our grid encoding (log₂(N) qubits per dimension), QFT requires O(log²N) gates — negligible compared to the Hamiltonian simulation cost.
+
 ## See Also
 
 - [[quantum-algorithms]]

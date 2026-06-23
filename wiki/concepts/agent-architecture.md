@@ -41,6 +41,18 @@ The agent architecture for Project Chicken Soup uses a hybrid approach with pyda
 - **Navigation Agent** — Runs the AI Navigator (PennyLane) to compute optimal paths through spacetime
 - **Orchestrator Agent** — Coordinates the flow: query → research → navigation → answer
 
+## Data Flow
+
+```
+User Query → Query Agent → Research Agent (Neo4j) → Navigation Agent (PennyLane) → Answer
+                                              ↓
+                                        Knowledge Graph
+                                        (Neo4j source of truth,
+                                         SwiftData local cache)
+```
+
+**Neo4j is the single source of truth** for graph data. SwiftData caches recent results for offline operation and stores user preferences. See [[integration-architecture]].
+
 ## Agent Communication
 
 - **Shared state** — Agents communicate via shared state (Neo4j, Redis)

@@ -290,7 +290,7 @@ Four agent skills from Paul Hudson (twostraws) are installed in `.agents/skills/
 - **isEmpty == false crashes at runtime** — use !isEmpty instead
 - **Don't use @unchecked Sendable** — prefer actors, value types, or sending parameters
 - **Swift Testing does NOT support UI tests** — use XCTest for UI tests
-- **Target iOS 26+ and Swift 6.2+** — new features are current
+- **Target iOS 26+ and Swift 6.4** — Swift 6.4 is the last version and will be used for implementation
 - **Prefer async/await over closure-based variants**
 - **Prefer structured concurrency (task groups) over unstructured Task {}**
 - **Break different types into different Swift files** — not multiple structs in one file

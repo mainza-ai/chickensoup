@@ -29,6 +29,16 @@ $O(\sqrt{N})$ for $N$ entries.
 from qiskit.algorithms import Grover
 ```
 
+## Project Chicken Soup Integration
+
+**Layer:** AI Navigator (PennyLane) — path search acceleration
+
+**Concrete use:** When the AI Navigator needs to select one path from many candidates, Grover's algorithm provides a quadratic speedup: O(√N) evaluations instead of O(N). The "database" is the space of possible trajectories, and the "search" finds the one with optimal cost function. The oracle encodes the path cost threshold — paths below threshold are "marked."
+
+**Backend:** Qiskit (native Grover with custom oracle), PennyLane (differentiable amplitude amplification), CUDA-Q (GPU-accelerated oracle evaluation for large databases).
+
+**Known limitations:** Grover's algorithm requires a quantum oracle that can evaluate the cost function — this oracle must be implementable as a quantum circuit. Continuous cost functions (like proper time) must be discretized for oracle encoding. The quadratic speedup is modest for our candidate path counts (typically 10³-10⁵ paths, so speedup from 10⁵ to ~316 evaluations).
+
 ## See Also
 
 - [[quantum-algorithms]]

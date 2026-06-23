@@ -32,6 +32,18 @@ Quantum machine learning is used in the Temporal Reasoning Engine to:
 - **Detect anomalies** — detect unusual events in temporal data
 - **Fusion** — fuse information from multiple sources
 
+## Project Chicken Soup Integration
+
+**Layer:** AI Navigator (PennyLane) — this is the core learning algorithm for path optimization.
+
+**Concrete use:** The AI Navigator uses a variational quantum circuit (VQC) to model the path cost function over the perturbed metric field. The VQC takes the [[field-geometry-tensor]] components as input features and outputs path quality scores. Classical optimization (COBYLA, SPSA, Adam) updates the circuit parameters based on path evaluation feedback.
+
+**Model architecture:** 4-6 qubits, 2-4 variational layers, data re-uploading for non-linear feature maps. The circuit is shallow enough to run on NISQ hardware.
+
+**Backend:** PennyLane for training (supports autodiff through circuits), D-Wave for discrete optimization of selected path segments, IonQ for high-fidelity final verification.
+
+**Known limitations:** VQC training suffers from barren plateaus (gradient vanishing exponentially in qubit count) for random initializations. Mitigation: problem-inspired initial states, layer-wise training, and classical pre-training. QML generalizes poorly outside the training distribution — retraining is needed for new metric configurations.
+
 ## D-Wave Implementation
 
 ```python

@@ -48,6 +48,13 @@ related: []
 - [[pytest]] — Testing framework
 - [[pyproject-toml]] — Build configuration
 - [[docker-compose]] — Multi-container orchestration
+- [[swiftui-pro]] — Agent skill: SwiftUI best practices (twostraws)
+- [[swiftdata-pro]] — Agent skill: SwiftData best practices (twostraws)
+- [[swift-concurrency-pro]] — Agent skill: Swift concurrency best practices (twostraws)
+- [[swift-testing-pro]] — Agent skill: Swift Testing best practices (twostraws)
+- [[github-actions]] — CI/CD for automated testing, building, deployment
+- [[core-models]] — Core Pydantic models for the system
+- [[logging]] — Logging and observability setup
 - [[ezekiel]] — Prophet with chariot vision (593 BC)
 - [[daniel]] — Prophet with throne vision (605-536 BC)
 - [[john]] — Author of Revelation
@@ -58,9 +65,36 @@ related: []
 - [[beckenstein]] — Bekenstein bound, information in a region
 - [[landauer]] — Erasing information costs energy
 - [[maxwells-demon]] — Information as thermodynamic agent
+- [[s4]] — Area 51 sub-base where Bob Lazar worked on alien craft
+- [[vatican]] — The headquarters of the Catholic Church, recovered a UFO in 1937
+- [[vatican-ufo-crash-recovery]] — 1937 Vatican UFO crash, later transferred to USA
+- [[magenta-ufo-crash]] — 1933 crash in Magenta, Italy, recovered by Mussolini's regime
+- [[mussolini]] — Fascist dictator who recovered the Magenta UFO
+- [[italy]] — Central location for early UFO recoveries
+- [[t-t-brown]] — Physicist who discovered the Biefeld-Brown effect (antigravity)
+- [[biefeld-brown-effect]] — Asymmetric capacitors produce thrust in high-voltage fields
+- [[antigravity]] — Antigravity and field manipulation as mechanisms for UAP propulsion
+- [[7-46-hz]] — The UFO frequency, connection to Schumann resonance, Element 115, and consciousness
+- [[schumann-resonance]] — Earth's electromagnetic resonance, first peak at 7.83 Hz (some cite 7.46 Hz)
+- [[christopher-b-freedman]] — Researcher who wrote "The UFO Frequency" (2021)
+- [[consciousness]] — Connection to theta brain waves, exotic matter, and UAPs
+- [[ariel-school-ufo-incident]] — 1994 incident in Ruwa, Zimbabwe: 60+ children see silver craft and small beings
+- [[mount-nyangani]] — One of four alleged alien bases on Earth, per CIA remote viewer Lyn Buchanan
+- [[lyn-buchanan]] — Former CIA remote viewer who investigated Ariel School and claimed Mount Nyangani is an alien base
+- [[zimbabwe]] — Country with rich UFO history, home to Ariel School and Mount Nyangani
+- [[varginha-ufo-crash]] — 1996 crash in Varginha, Brazil, confirmed by Aldo Rebelo
+- [[aldo-rebelo]] — Former Brazilian Defense Minister who confirmed the Varginha crash and NHI retrieval
+- [[brazil]] — Country with rich UFO history, home to Varginha incident
+- [[nhcr]] — Non-Human Intelligence recovered in Varginha, connected to the U.S. program
+- [[jfk-assassination-and-ufo-disclosure]] — JFK assassination linked to UFO disclosure, with claims that Kennedy was preparing to reveal classified information about UAPs
+- [[nikola-tesla]] — Inventor whose death ray, wireless energy, and Mars signals are connected to UAP propulsion and UFO disclosure
+- [[wireless-energy]] — Tesla's work on wireless energy transmission is seen as the basis for UAP propulsion systems
+- [[death-ray]] — Tesla's particle beam weapon, a precursor to modern UAP energy weapons
 
 ## Concepts (in wiki/concepts/)
 
+- [[integration-architecture]] — How layers compose, graph storage, platform strategy
+- [[quantum-simulation-tier]] — Three simulation modes for CI through production
 - [[uap]] — Unidentified Anomalous Phenomena
 - [[ufos]] — Unidentified Flying Objects
 - [[ufo-retrieval-program]] — U.S. government UFO recovery, 1930s–present
@@ -102,6 +136,7 @@ related: []
 - [[production-readiness]] — Production readiness checklist
 - [[quantum-state-representation]] — Quantum state representation
 - [[quantum-error-model]] — Quantum error model
+- [[agent-skills]] — Four twostraws agent skills for Swift implementation
 - [[temporal-data-model]] — Temporal data model for time travel
 - [[credibility-scoring]] — Credibility scoring for claims
 - [[evaluation-framework]] — Evaluation framework for the system
@@ -127,6 +162,7 @@ related: []
 
 ## Projects (in wiki/projects/)
 
+- [[field-geometry-tensor]] — The contract between quantum layers
 - [[time-travel-machinery]] (in concepts/) — Three-layer architecture for time travel
 - [[time-travel-machinery-architecture]] (in projects/)
 - [[chicken-soup-project]] (in projects/)
@@ -140,5 +176,4 @@ related: []
 - [[project-structure]] — Full directory tree of the project
 - [[technology-stack]] — Layer-to-technology mapping
 - [[key-decisions]] — Key decisions with rationale
-- [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent
-- [[agent-skills]] — Four twostraws agent skills for Swift implementation
+- [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent, custom layout, timeline-first, floating query overlay, integrated AI Navigator, 2D with depth

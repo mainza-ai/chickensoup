@@ -54,3 +54,5 @@ Negative energy density is directly tied to entropy (negative energy can reverse
 - [[quantum-computation]]
 - [[time-travel]]
 - [[entropy]]
+- [[7-46-hz]]
+- [[schumann-resonance]]

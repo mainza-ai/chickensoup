@@ -1,5 +1,5 @@
 ---
-title: "Exponential Quantum Speedup in Coupled Oscillators"
+title: "Exponential Quantum Speedup"
 tags: [quantum, simulation, hamiltonian]
 created: 2026-06-22
 updated: 2026-06-22
@@ -7,7 +7,7 @@ sources: [Babbush-2023]
 related: [hamiltonian-simulation, time-travel-machinery-architecture, field-manipulation]
 ---
 
-# Exponential Quantum Speedup in Coupled Oscillators
+# Exponential Quantum Speedup
 
 **Babbush, Berry, Kothari, Somma, Wiebe. 2023. Physical Review X.**
 

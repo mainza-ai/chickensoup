@@ -43,4 +43,5 @@ This wiki covers:
 - [[ai-alien-connection]]
 - [[local-first-llm]]
 - [[earth-as-space-craft]]
-- [[ui-ux-design]]
+- [[ui-ux-design]] — SwiftUI, light mode default, custom timeline-first layout
+- [[agent-skills]] — Four twostraws agent skills for Swift implementation

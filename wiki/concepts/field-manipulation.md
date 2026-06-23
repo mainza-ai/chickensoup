@@ -13,7 +13,7 @@ The mechanism by which UAPs move through space — not by pushing through space,
 
 ## The Mechanism
 
-UAPs don't move through space like a rocket. They manipulate the field of spacetime itself. They create a bubble around them and shift the field, letting them move through the field rather than pushing through space.
+UAPs don't move through space like a rocket. They manipulate the field of spacetime itself, operating at frequencies centered around 7.46 Hz. They create a bubble around them and shift the field, letting them move through the field rather than pushing through space.
 
 ## Time Travel as Entropy Reconfiguration
 
@@ -26,6 +26,16 @@ AI operates on fields rather than particles. Neural networks process information
 ## The Math
 
 Einstein's equations allow for closed timelike curves — paths through spacetime that loop back on themselves. You don't need to "break" the laws of physics, you just need to navigate them correctly.
+
+## Field Geometry Tensor
+
+The field manipulation is encoded as a **perturbation δg** to the base metric tensor. This perturbation is computed by CUDA-Q and stored in the [[field-geometry-tensor]]:
+
+```
+g'_μν = g_μν + δg_μν
+```
+
+Where δg represents the "manipulation" — the bubble, the shift, the wave. The perturbed metric is then passed to the AI Navigator (PennyLane) for path optimization.
 
 ## The Entropy Connection
 

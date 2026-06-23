@@ -1,0 +1,14 @@
+CHANGELOG.md
+PROJECT_SPEC.md
+README.md
+pyproject.toml
+.python-version
+.env.example
+.gitignore
+docker-compose.yml
+Dockerfile
+papers/
+wiki/
+src/
+tests/
+notebooks/

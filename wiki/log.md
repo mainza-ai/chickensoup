@@ -9,6 +9,42 @@ related: []
 
 # Log
 
+## [2026-06-22] create | CHANGELOG.md
+
+Created CHANGELOG.md with Keep a Changelog format, documenting all major changes from the project inception to the current state (133 wiki pages, 50+ entities, 65+ concepts, 5 projects, 12 key decisions).
+
+## [2026-06-22] ingest | Nikola Tesla — Death, Inventions, and UFO Disclosure
+
+Created three new pages: nikola-tesla (inventor whose work on wireless energy and death ray is connected to UAP propulsion), wireless-energy (Tesla's wireless energy transmission as the basis for UAP propulsion), and death-ray (Tesla's particle beam weapon, precursor to UAP energy weapons). Tesla's mysterious death in 1943 and the FBI seizure of his papers are seen as key moments in the UFO disclosure narrative, connected to the JFK assassination and the broader UAP story. Tesla's claims of receiving signals from Mars in 1899 are also cited as evidence of early alien contact.
+
+## [2026-06-22] ingest | JFK Assassination and UFO Disclosure
+
+Created a new concept page: jfk-assassination-and-ufo-disclosure. The theory suggests that JFK was preparing to reveal classified information about UAPs, alien contact, and recovered craft when he was assassinated in 1963. Kennedy's speeches, the "UFO files," and the "cover-up" are cited as evidence. The theory is connected to David Grusch's 2023 testimony and the broader narrative of the U.S. UFO retrieval program.
+
+## [2026-06-22] ingest | Varginha UFO Crash and Aldo Rebelo
+
+Created four new pages: varginha-ufo-crash (1996 crash in Varginha, Brazil, with dozens of witnesses), aldo-rebelo (former Brazilian Defense Minister who confirmed the crash and NHI retrieval), brazil (country with rich UFO history), and nhcr (Non-Human Intelligence recovered in Varginha). Updated ufo-retrieval-program to include these new entities. Rebelo's confirmation adds significant weight to the Varginha incident as a major UAP event.
+
+## [2026-06-22] ingest | Ariel School and Mount Nyangani
+
+Created four new pages: ariel-school-ufo-incident (1994 incident in Ruwa, Zimbabwe: 60+ children see silver craft and small beings), mount-nyangani (one of four alleged alien bases on Earth per Lyn Buchanan), lyn-buchanan (former CIA remote viewer), and zimbabwe (country with rich UFO history). Updated ufo-retrieval-program to include these new entities. The Ariel School incident is one of the most debated UFO sightings in the world, and Mount Nyangani connects to the broader narrative of alien bases and UAP phenomena.
+
+## [2026-06-22] ingest | 7.46 Hz — The UFO Frequency
+
+Investigated the 7.46 Hz frequency and its connections to the wiki. Created four new pages: 7-46-hz (the UFO frequency, connection to Schumann resonance and Element 115), schumann-resonance (Earth's electromagnetic resonance), christopher-b-freedman (researcher who wrote "The UFO Frequency" in 2021), and consciousness (theta brain waves, exotic matter, UAPs). Updated element-115 with 7.46 Hz resonance claim, field-manipulation with the frequency, and exotic-matter-and-consciousness with 7.46 Hz connection.
+
+## [2026-06-22] ingest | Thomas Townsend Brown — Antigravity and Time Travel
+
+Created four new pages: t-t-brown (physicist who discovered the Biefeld-Brown effect), biefeld-brown-effect (asymmetric capacitors produce thrust), antigravity (manipulating gravitational forces), and element-115 (updated with T.T. Brown connection). Brown's work on antigravity and field manipulation provides a physical mechanism for how UAPs achieve their flight characteristics and how time travel is possible through spacetime curvature changes.
+
+## [2026-06-22] ingest | Magenta and Vatican UFO Crashes
+
+Created three new entity pages: magenta-ufo-crash (1933 crash in Magenta, Italy, recovered by Mussolini), mussolini (dictator who recovered the craft), and italy (central location for early recoveries). Updated ufo-retrieval-program to include both the 1933 Magenta crash and 1937 Vatican crash in its timeline. Grusch alleged the Magenta crash is often conflated with the Vatican crash — may be the same event viewed from different perspectives, or two related recoveries in the same period.
+
+## [2026-06-22] ingest | Vatican UFO Crash Recovery
+
+Created two new entity pages: vatican-ufo-crash-recovery (1937 Vatican recovery, later transferred to USA) and vatican (institutional context). Updated ufo-retrieval-program to include the 1937 Vatican crash in its timeline, supporting the theory that the retrieval program began in the 1930s, predating Roswell by a decade.
+
 ## [2026-06-22] ingest | Entropy — The Universal Thread
 
 Created 6 entity pages (entropy, boltzmann, beckenstein, landauer, maxwells-demon) and 7 concept pages (arrow-of-time, second-law, black-hole-entropy, information-is-physical, decoherence-as-entropy, heat-death, holographic-principle). Updated 4 existing pages (field-manipulation, exotic-matter-and-consciousness, quantum-error-model, ai-alien-connection) with entropy connections.
@@ -137,3 +173,130 @@ Ingested all quantum algorithms from Wikipedia and other sources. Created compre
 ## [2026-06-22] ingest | UFOs and Aliens — Full Wiki Build
 
 Ingested all UFO and alien information into the wiki. Created entity pages for UFOs, UAP, David Grusch, Bob Lazar, Area 51, S-4, Project Serpo, The Thing. Created concept pages for time travel, time travelers, AI-alien connection, field manipulation, quantum systems, time travel machinery. Created project pages for time travel machinery and quantum systems comparison.
+
+## [2026-06-22] update | UI/UX Design — Refined, Five Deep Questions
+
+Refined the UI/UX design page with five deep investigations:
+
+1. **Timeline as primary view, query as floating overlay** — Three functional layers: timeline (base), query overlay (control, Liquid Glass), AI Navigator (thinking). The query interface floats over the timeline without obscuring it.
+
+2. **2D graph with depth (default) vs full 3D (on demand)** — SwiftUI adds visual effects to 2D views. RealityKit volumes for full 3D. Depth used selectively per Apple's guidance.
+
+3. **Linear yet branching** — Horizontal flow (macOS), vertical flow (iOS). Branches as parallel streams (many-worlds). Collapsible, selectable, mergeable.
+
+4. **AI Navigator integrated, not separate** — AI inference appears as overlays on the timeline. AI is the "brain" — always visible, always thinking.
+
+5. **Custom layout (not generic)** — No tabs. No generic sidebar (live knowledge graph instead). No generic bottom bar (floating overlay). Custom timeline layout using SwiftUI's Layout protocol.
+
+## [2026-06-22] update | Wiki Completeness — Spec to Wiki
+
+Fixed gaps between PROJECT_SPEC.md and the wiki. Created 3 new pages (project-structure, technology-stack, key-decisions), updated 4 existing pages (agent-architecture, production-readiness, mcp-server, api-design), and updated index. All spec sections now have corresponding wiki pages.
+
+## [2026-06-22] update | Key Decisions — Added 4 UI Decisions
+
+Updated `key-decisions.md` to include all 12 decisions from the spec. Added 4 missing decisions: SwiftUI, light mode default, #FF9500 accent, SwiftData. Each with detailed rationale.
+
+## [2026-06-22] update | Missing Entity Pages — Created 6 Pages
+
+Created 6 entity pages for items mentioned in the spec but missing from the wiki:
+- **swiftui-pro** — Agent skill: SwiftUI best practices (twostraws)
+- **swiftdata-pro** — Agent skill: SwiftData best practices (twostraws)
+- **swift-concurrency-pro** — Agent skill: Swift concurrency best practices (twostraws)
+- **swift-testing-pro** — Agent skill: Swift Testing best practices (twostraws)
+- **s4** — Area 51 sub-base where Bob Lazar worked on alien craft
+- **github-actions** — CI/CD for automated testing, building, deployment
+
+## [2026-06-22] update | Index — Fixed Organizational Issues
+
+Fixed `time-travel-machinery` and `quantum-systems` references in index (listed under Projects but stored in concepts/). Added new entity pages to index.
+
+## [2026-06-22] design | Integration Architecture & Field Geometry Tensor
+
+Resolved six integration architecture decisions:
+
+1. **Quantum pipeline** — Sequential pipeline with pure functional interfaces (not service bus). Each layer takes and returns a [[field-geometry-tensor]]. Parallelization is additive later.
+
+2. **Graph storage** — Neo4j as source of truth, SwiftData as read-through cache. Delegate graph queries to Neo4j, cache results locally. Entity-level sync with timestamps.
+
+3. **Wiki → Neo4j ingestion** — Two-phase: deterministic parser first (frontmatter + `[[wikiname]]` links = free edges), LLM enrichment second. Phase 1 edges are `RELATED_TO`, promoted to typed edges in Phase 2.
+
+4. **Platform strategy** — 50/50 macOS + iOS. NavigationSplitView on macOS/iPad, TabView + NavigationStack on iPhone. Shared codebase with structural overrides.
+
+5. **Simulation tier** — Three modes: light (8³, 1024 shots, CI), medium (32³, 4096 shots, dev), heavy (64³+, 16384 shots, production). All layers have classical CPU/GPU fallbacks.
+
+6. **Swift version** — Swift 6.4 (latest), aligning project settings and documentation.
+
+Created new pages:
+- [[field-geometry-tensor]] — Formal spec: ADM 3+1 decomposition, shape (N_x, N_y, N_z, N_t, 4, 4), 10 independent components, HDF5 on-disk, base64 JSON wire format, validation rules
+- [[integration-architecture]] — All six decisions with rationale
+- [[quantum-simulation-tier]] — Three simulation modes and classical fallbacks
+
+Updated pages:
+- [[time-travel-machinery-architecture]] — Added tensor data flow between layers
+- [[key-decisions]] — Added 5 new decisions with detailed rationale
+- [[agent-architecture]] — Added data flow diagram showing Neo4j/SwiftData split
+- [[field-manipulation]] — Added perturbation formula g'_μν = g_μν + δg_μν
+- [[ui-ux-design]] — Updated platform strategy from macOS-first to 50/50
+
+## [2026-06-22] clarify | Quantum Simulation Progression — Four Stages
+
+Updated [[quantum-simulation-tier]] to document the explicit simulation → cloud hardware progression path:
+
+| Stage | Backend | Purpose |
+|-------|---------|---------|
+| 1 — Classical fallback | NumPy/SciPy | Correctness reference, zero quantum stack |
+| 2 — Local simulation | Qiskit Aer, PennyLane default.qubit | Algorithm development, CI |
+| 3 — Cloud simulation | IBM/AWS Braket simulators | Large-scale validation, noise models |
+| 4 — Cloud quantum hardware | IBM Quantum, D-Wave Leap, IonQ | Real quantum advantage |
+
+Added quantum advantage measurement formula and graduation criteria. Quantum stack is additive — the system works without it.
+
+## [2026-06-22] enrich | Wiki Depth — 20+ Pages Enriched
+
+Enriched pages across all three tiers as part of a systematic depth audit:
+
+### Tier 3 → Tier 1 (full rewrites, 9 pages)
+- **[[fields-vs-particles]]** (28→80+ lines) — Added core distinction, field-vs-particle comparison table, UAP propulsion connection, AI/neural network field basis, QFT foundations, evidence section, time travel implications, argument section
+- **[[quantum-computation]]** (27→60+ lines) — Added qubit vs bit table, Bloch sphere, gate matrix table, circuit model diagram, layer mapping, NISQ limits table, simulation tier strategy
+- **[[quantum-field-theory]]** (27→50+ lines) — Added Lagrangian, Einstein-Hilbert action, QFT on curved spacetime, coupled oscillator connection, concept table, scope boundary (no quantum gravity needed)
+- **[[simultaneous-time-travel]]** (27→50+ lines) — Added regular vs simultaneous comparison table, evidence from UAP behavior, quantum superposition mechanism, distinction from time-travelers thesis, AI Navigator implications
+- **[[evaluation-framework]]** (29→80+ lines) — Added concrete metrics tables (fidelity, validity, path optimality, LLM accuracy, performance), benchmark suite with 15 test cases, protocol (per-PR/weekly/pre-release), pass/fail criteria
+- **[[wireless-energy]]** (29→55+ lines) — Added Tesla coil theory (parameters table), Wardenclyffe specs, frequency analysis, UAP connection (field-based, frequency matching, no fuel), comparison to modern wireless power
+- **[[death-ray]]** (33→55+ lines) — Added technical claims table, how-it-worked description, FBI seizure details, connection to modern HEL/HPM, distinction from "death ray" myth
+- **[[langgraph-workflows]]** (43→130+ lines) — Added full workflow graph definitions for all 3 workflows: Research (6 nodes, 3 conditional edges, error handling), Navigation (6 nodes, 2 conditional edges), Evaluation (5 nodes). Each with Pydantic state schema, error handling, checkpointing, circuit breaker, human-in-the-loop
+- **[[chicken-soup-spec]]** (38→80+ lines) — Converted from redirect page to full wiki-native specification with architecture, stack, decisions, API, MCP tools, phases
+
+### Tier 2 → Tier 1 (enrichments, 4 pages)
+- **[[antigravity]]** — Added terminology clarification (antigravity vs field manipulation), Alcubierre drive with ADM shift vector connection, energy requirements table, time travel connection
+- **[[llm-discovery]]** — Added response format examples, error states table (5 errors with handling), discovery timing table, caching (TTL 5min), configuration YAML
+- **[[llm-fallback-chain]]** — Added full algorithm (normal flow + provider failure flow with diagram), timeouts (4-phase, 60s total), retry policy (3 attempts, exponential backoff 1/4/16s), circuit breaker (5 failures, 120s reset), health check protocol
+- **[[mcp-server]]** — Added parameter schemas for all 6 tools (simulate_spacetime, analyze_field, find_paths, query_graph, get_evidence, explore_concept) with types, defaults, and JSON response examples. Added error codes table (8 codes with HTTP status)
+
+### Quantum Algorithm Pages (11 enriched)
+Added "Project Chicken Soup Integration" section to all algorithm pages:
+- **[[hhl-algorithm]]** — Solves Einstein equations as linear system in Spacetime Engine
+- **[[hamiltonian-simulation]]** — Core Spacetime Engine algorithm
+- **[[quantum-annealing]]** — AI Navigator optimization backend (D-Wave)
+- **[[quantum-fourier-transform]]** — QFT as subroutine for CTC detection
+- **[[quantum-machine-learning]]** — AI Navigator core with VQC architecture
+- **[[quantum-phase-estimation]]** — Eigenvalue extraction for time dilation
+- **[[quantum-walk]]** — Field Manipulator perturbation propagation
+- **[[qaoa]]** — Path optimization for AI Navigator
+- **[[shors-algorithm]]** — Period finding for CTC structure
+- **[[vqe]]** — Ground state optimization for path stability
+- **[[grovers-algorithm]]** — Quadratic path search acceleration
+
+### Decisions Documented (Q1/Q2/Q3)
+- **MCP tensor summaries** — Server-computed, client-cached (TTL 5min)
+- **Sync merge strategy** — Field-level merge table (6 field categories)
+- **Wiki edge promotion** — Batch post-processing, confidence threshold 0.7
+
+### Architecture Decisions (added to integration-architecture.md)
+Three new sections: MCP summaries (section 6), sync merge strategy (section 7), wiki edge promotion batch processing (section 8). All with rationale, not/decision distinction, and edge cases documented.
+
+### Key decisions updated
+Added 3 new decisions (tensor summaries, sync merge, wiki edge promotion) with detailed rationale.
+
+## [2026-06-22] update | Deep Dive — Fixed Issues
+
+Comprehensive deep dive of wiki vs PROJECT_SPEC.md. Created 6 new entity pages (swiftui-pro, swiftdata-pro, swift-concurrency-pro, swift-testing-pro, s4, github-actions, logging, core-models), updated key-decisions.md to include all 12 decisions, fixed cross-references in pennylane.md, qiskit.md, cuda-q.md, d-wave.md, ionq.md, fixed self-reference in john.md, added key-decisions to ui-ux-design.md related field, fixed exponential-quantum-speedup and quantum-systems titles, moved agent-skills to Concepts section in index.
