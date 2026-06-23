@@ -2,12 +2,16 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-06-23] update | Refine UI/UX Style Guidelines
+
+Updated `wiki/concepts/ui-ux-design.md` with the new Apple/iOS system style colors and clean white background panel styling to match the implemented native client aesthetic.
 
 ## [2026-06-22] create | CHANGELOG.md
 

@@ -2,7 +2,7 @@
 title: "UI/UX Design"
 tags: [ui, ux, design, swiftui, apple-design, liquid-glass]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 sources: [Apple-HIG-2026, SwiftUI-2026, SwiftData-2026]
 related: [temporal-reasoning-engine, temporal-query-language, knowledge-graph-schema, ai-alien-connection, exotic-matter-and-consciousness, field-manipulation, quantum-machine-learning, temporal-query-pipeline, agent-architecture, key-decisions]
 ---
@@ -73,12 +73,11 @@ Most apps use dark mode as default. Chicken Soup is different.
 
 ### Color Palette (Light Mode Default)
 
-- **Background:** #F5F5F7 (Apple's light mode background — not white, not gray)
-- **Text:** #1D1D1F (Apple's light mode text — not pure black)
-- **Accent:** #FF9500 (systemOrange)
-- **Secondary:** #8E8E93 (systemGray)
-- **Tertiary:** #AEAEB2 (systemGray2)
-- **Semantic:** systemBlue (#0A84FF), systemIndigo (#5E5CE6), systemPurple (#AF52DE), systemTeal (#5AC8FA), systemGreen (#34C759)
+- **Background:** #F2F2F7 (iOS systemGroupedBackground — clean and modern)
+- **Text:** #1D1D1F (Apple primary text — charcoal-black)
+- **Accent:** #FF9500 (systemOrange — saffron/orange)
+- **Secondary:** #6E6E73 (Apple secondary text — slate gray)
+- **Semantic:** systemBlue (#007AFF), systemGreen (#34C759), systemPurple (#AF52DE), systemRed (#FF3B30)
 
 ### Typography Scale
 
