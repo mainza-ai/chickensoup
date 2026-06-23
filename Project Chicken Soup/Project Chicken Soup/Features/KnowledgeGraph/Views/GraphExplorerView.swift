@@ -17,6 +17,8 @@ struct GraphExplorerView: View {
     
     @State private var dragOffset = CGSize.zero
     @State private var accumulatedOffset = CGSize.zero
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var initialZoomScale: CGFloat = 1.0
     
     var body: some View {
         GeometryReader { geometry in
@@ -63,7 +65,7 @@ struct GraphExplorerView: View {
                                 ring += 1
                             }
                         }
-                        return 75.0 + CGFloat(ring) * 65.0
+                        return 150.0 + CGFloat(ring) * 125.0
                     }()
                     
                     let topOffset: CGFloat = 40
@@ -74,26 +76,39 @@ struct GraphExplorerView: View {
                                          y: centerY + dragOffset.height + accumulatedOffset.height)
                     
                     // Determine viewport scaling factor to fit all nodes cleanly inside the canvas
+                    // Enforce a minimum automatic scale of 0.65 to ensure spacing is maintained.
                     let availableHeight = geometry.size.height - topOffset - bottomOffset
                     let availableWidth = visibleWidth
                     let minDimension = min(availableWidth, availableHeight)
                     let maxAllowedRadius = max(50.0, minDimension / 2.0 - 54.0)
-                    let scaleFactor = maxRadius > 0 ? min(1.0, maxAllowedRadius / maxRadius) : 1.0
-                    
+                    let baseScale = maxRadius > 0 ? min(1.0, max(0.65, maxAllowedRadius / maxRadius)) : 1.0
+                    let scaleFactor = baseScale * zoomScale
                     
                     let currentPositions = nodePositions.isEmpty ? computeNodePositions(connections: graph.connections) : nodePositions
                     
                     ZStack {
-                        // Connection Lines Canvas underneath the nodes
-                        Canvas { gc, size in
-                            for (index, conn) in graph.connections.enumerated() {
-                                guard let neighborPos = currentPositions[conn.neighbor.id] else { continue }
+                        // Tap background to reset zoom/pan
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture(count: 2) {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
+                                    zoomScale = 1.0
+                                    initialZoomScale = 1.0
+                                    dragOffset = .zero
+                                    accumulatedOffset = .zero
+                                }
+                            }
+                        
+                        // Connection Lines drawn as native SwiftUI views to smoothly interpolate position updates
+                        ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
+                            if let neighborPos = currentPositions[conn.neighbor.id] {
                                 let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
                                 let start = center
                                 let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
                                 
+                                let guessedType = guessTypeForName(conn.neighbor.name, originalType: conn.neighbor.type)
                                 let nodeColor: Color = {
-                                    switch conn.neighbor.type.lowercased() {
+                                    switch guessedType.lowercased() {
                                     case "person": return DesignConstants.systemOrange
                                     case "place": return DesignConstants.systemGreen
                                     case "concept": return DesignConstants.systemPurple
@@ -104,13 +119,14 @@ struct GraphExplorerView: View {
                                     }
                                 }()
                                 
-                                // Draw relationship connecting line
-                                var path = Path()
-                                path.move(to: start)
-                                path.addLine(to: end)
-                                gc.stroke(path, with: .color(nodeColor.opacity(0.35)), lineWidth: 1.5)
+                                // Line Connection Path
+                                Path { path in
+                                    path.move(to: start)
+                                    path.addLine(to: end)
+                                }
+                                .stroke(nodeColor.opacity(0.35), lineWidth: 1.5)
                                 
-                                // Draw staggered relationship label
+                                // Staggered relationship label with readable card backing
                                 let staggerFactor = 0.42 + 0.16 * Double(index % 2)
                                 let mid = CGPoint(
                                     x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
@@ -118,14 +134,16 @@ struct GraphExplorerView: View {
                                 )
                                 
                                 let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ").lowercased()
-                                let text = Text(labelString)
+                                Text(labelString)
                                     .font(.system(size: 7.5, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(nodeColor.opacity(0.7))
-                                
-                                gc.draw(text, at: mid, anchor: .center)
+                                    .foregroundStyle(nodeColor.opacity(0.85))
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2.5)
+                                    .background(DesignConstants.cardBackground.opacity(0.75))
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .position(mid)
                             }
                         }
-                        .clipped()
                         
                         // Neighbor Nodes SwiftUI View Overlays
                         ForEach(graph.connections) { conn in
@@ -160,6 +178,80 @@ struct GraphExplorerView: View {
                                 dragOffset = .zero
                             }
                     )
+                    .simultaneousGesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                zoomScale = max(0.4, min(2.0, initialZoomScale * value))
+                            }
+                            .onEnded { _ in
+                                initialZoomScale = zoomScale
+                            }
+                    )
+                    
+                    // Floating Zoom Controls
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            
+                            HStack(spacing: 8) {
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                        zoomScale = max(0.4, zoomScale - 0.15)
+                                        initialZoomScale = zoomScale
+                                    }
+                                }) {
+                                    Image(systemName: "minus.magnifyingglass")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                }
+                                .buttonStyle(.plain)
+                                .frame(width: 26, height: 26)
+                                .background(DesignConstants.controlBackground, in: Circle())
+                                
+                                Text("\(Int(zoomScale * 100))%")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(DesignConstants.primaryText)
+                                    .frame(width: 40)
+                                
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                        zoomScale = min(2.0, zoomScale + 0.15)
+                                        initialZoomScale = zoomScale
+                                    }
+                                }) {
+                                    Image(systemName: "plus.magnifyingglass")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                }
+                                .buttonStyle(.plain)
+                                .frame(width: 26, height: 26)
+                                .background(DesignConstants.controlBackground, in: Circle())
+                                
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
+                                        zoomScale = 1.0
+                                        initialZoomScale = 1.0
+                                        dragOffset = .zero
+                                        accumulatedOffset = .zero
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .font(.system(size: 11, weight: .semibold))
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                }
+                                .buttonStyle(.plain)
+                                .frame(width: 26, height: 26)
+                                .background(DesignConstants.controlBackground, in: Circle())
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(DesignConstants.cardBackground.opacity(0.85))
+                            .liquidGlass()
+                            .padding(.trailing, DesignConstants.standardPadding)
+                            .padding(.bottom, backendService.showChatHistory ? 20 : 16)
+                        }
+                    }
                 } else {
                     VStack {
                         ProgressView("Mapping Lore Graph...")
@@ -174,8 +266,10 @@ struct GraphExplorerView: View {
                     selectEntity(name: first.name)
                 }
             } else {
-                if let graph = backendService.neighborhood {
-                    nodePositions = computeNodePositions(connections: graph.connections)
+                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
+                    if let graph = backendService.neighborhood {
+                        nodePositions = computeNodePositions(connections: graph.connections)
+                    }
                 }
                 selectEntity(name: backendService.focusedEntityName)
             }
@@ -220,6 +314,31 @@ struct GraphExplorerView: View {
         return lines.joined(separator: "\n")
     }
     
+    private func guessTypeForName(_ name: String, originalType: String) -> String {
+        let cleanType = originalType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
+            return originalType
+        }
+        
+        let lower = name.lowercased()
+        if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
+            return "Person"
+        }
+        if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
+            return "Place"
+        }
+        if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
+            return "Event"
+        }
+        if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
+            return "Project"
+        }
+        if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
+            return "Object"
+        }
+        return "Concept"
+    }
+    
     private func computeNodePositions(connections: [NeighborhoodConnection]) -> [UUID: CGPoint] {
         var newPositions: [UUID: CGPoint] = [:]
         let count = connections.count
@@ -236,7 +355,7 @@ struct GraphExplorerView: View {
         }
         
         func getRingRadius(ring: Int) -> CGFloat {
-            return 75.0 + CGFloat(ring) * 65.0
+            return 150.0 + CGFloat(ring) * 125.0
         }
         
         var rings: [[NeighborhoodConnection]] = [[]]
@@ -300,11 +419,37 @@ struct NodeView: View {
     
     @State private var isHovered = false
     
+    private func guessType(name: String, currentType: String) -> String {
+        let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
+            return currentType
+        }
+        
+        let lower = name.lowercased()
+        if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
+            return "Person"
+        }
+        if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
+            return "Place"
+        }
+        if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
+            return "Event"
+        }
+        if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
+            return "Project"
+        }
+        if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
+            return "Object"
+        }
+        return "Concept"
+    }
+    
     var body: some View {
-        let size = (isFocused ? 48.0 : 36.0) * max(0.85, scaleFactor)
+        let guessedType = guessType(name: name, currentType: type)
+        let size = (isFocused ? 48.0 : 36.0) * max(0.5, min(1.2, scaleFactor))
         
         let nodeColor: Color = {
-            switch type.lowercased() {
+            switch guessedType.lowercased() {
             case "person": return DesignConstants.systemOrange
             case "place": return DesignConstants.systemGreen
             case "concept": return DesignConstants.systemPurple
@@ -316,7 +461,7 @@ struct NodeView: View {
         }()
         
         let symbol: String = {
-            switch type.lowercased() {
+            switch guessedType.lowercased() {
             case "person": return "person.fill"
             case "place": return "mappin.and.ellipse"
             case "concept": return "lightbulb.fill"
@@ -363,7 +508,7 @@ struct NodeView: View {
                     
                     // SF Symbol Icon
                     Image(systemName: symbol)
-                        .font(.system(size: (isFocused ? 18 : 13) * max(0.85, scaleFactor), weight: .bold))
+                        .font(.system(size: (isFocused ? 18 : 13) * max(0.5, min(1.2, scaleFactor)), weight: .bold))
                         .foregroundStyle(.white)
                 }
             }
@@ -376,14 +521,14 @@ struct NodeView: View {
             
             // Multi-line word-wrapped label text
             let formattedName = name.replacingOccurrences(of: "-", with: " ").capitalized
-            let fontSize = (isFocused ? 9.5 : 8.0) * max(0.8, min(1.0, scaleFactor))
+            let fontSize = (isFocused ? 9.5 : 8.0) * max(0.6, min(1.2, scaleFactor))
             Text(formattedName)
                 .font(.system(size: fontSize, weight: isFocused ? .bold : .semibold))
                 .foregroundStyle(DesignConstants.primaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(width: 85 * max(0.85, scaleFactor))
+                .frame(width: 85 * max(0.6, min(1.2, scaleFactor)))
         }
     }
 }
