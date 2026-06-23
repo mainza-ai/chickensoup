@@ -83,13 +83,12 @@ struct TimelineNodeView: View {
         .frame(width: 260)
         .background(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
-                .fill(.thinMaterial)
-                .background(Color.white.opacity(0.55))
+                .fill(Color.white)
         )
         .overlay(
             RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
                 .stroke(
-                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.85) : Color.white.opacity(0.4),
+                    isSelected || isHovered ? DesignConstants.systemOrange.opacity(0.8) : Color.black.opacity(0.06),
                     lineWidth: isSelected || isHovered ? 2 : 1
                 )
         )

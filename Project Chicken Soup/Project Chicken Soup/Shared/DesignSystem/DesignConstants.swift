@@ -9,7 +9,7 @@ import SwiftUI
 
 enum DesignConstants {
     // MARK: - iOS & Apple.com Style Palette
-    static let warmBackground = Color(red: 250/255, green: 248/255, blue: 245/255) // Warm cream/paper #FAF8F5
+    static let warmBackground = Color(red: 242/255, green: 242/255, blue: 247/255) // iOS systemGroupedBackground #F2F2F7
     static let primaryText = Color(red: 29/255, green: 29/255, blue: 31/255)      // Apple primary text #1D1D1F
     static let secondaryText = Color(red: 110/255, green: 110/255, blue: 115/255) // Apple secondary text #6E6E73
     
