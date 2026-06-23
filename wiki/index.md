@@ -1,0 +1,143 @@
+---
+title: "Index"
+tags: [index]
+created: 2026-06-22
+updated: 2026-06-22
+sources: []
+related: []
+---
+
+# Index
+
+## Entities
+
+- [[roswell-crash]] — 1947 crash in New Mexico, possibly alien craft
+- [[david-grusch]] — Former intelligence official, testified 2023
+- [[bob-lazar]] — Claims worked on alien craft at S-4
+- [[area-51]] — Classified U.S. Air Force facility in Nevada
+- [[area-51-and-s4]] — Area 51 and its sub-bases, S-4
+- [[uap-hearings]] — Public hearings on UAPs, 2023
+- [[the-thing]] — Non-human biologics allegedly recovered by the military
+- [[project-serpo]] — Alleged secret program for Americans on Alpha Centauri
+- [[element-115]] — Exotic element for alien craft propulsion
+- [[qiskit]] — IBM's quantum computing framework
+- [[cuda-q]] — NVIDIA's hybrid quantum-classical platform
+- [[pennylane]] — Quantum machine learning framework
+- [[ionq]] — Trapped-ion quantum computing company
+- [[d-wave]] — Quantum annealing for optimization
+- [[microsoft-q]] — Microsoft's quantum programming language
+- [[google-cirq]] — Google's quantum computing framework
+- [[exponential-quantum-speedup]] — Quantum speedup for coupled oscillators
+- [[the-new-science-of-uap]] — Comprehensive UAP review
+- [[implementation-of-quantum-algorithms]] — Concrete quantum implementations
+- [[omlx]] — Optimized LLM inference server for Apple Silicon
+- [[ollama]] — Local LLM runner with OpenAI-compatible API
+- [[lm-studio]] — Desktop app for running LLMs locally
+- [[neo4j]] — Graph database for knowledge graph
+- [[redis]] — In-memory cache for LLM responses and quantum results
+- [[fastapi]] — Modern Python API framework
+- [[fastmcp]] — Model Context Protocol server
+- [[pydantic-ai]] — Python agent framework
+- [[pydantic-graph]] — Graph-based agent orchestration
+- [[langgraph]] — LangGraph for complex sub-workflows
+- [[docker]] — Containerization and orchestration
+- [[celery]] — Distributed task queue
+- [[ray]] — Distributed computing framework
+- [[opentelemetry]] — Observability framework
+- [[pydantic-settings]] — Configuration management
+- [[pytest]] — Testing framework
+- [[pyproject-toml]] — Build configuration
+- [[docker-compose]] — Multi-container orchestration
+- [[ezekiel]] — Prophet with chariot vision (593 BC)
+- [[daniel]] — Prophet with throne vision (605-536 BC)
+- [[john]] — Author of Revelation
+- [[enoch]] — Ancient figure who ascended to heaven
+- [[nephilim]] — Giants, offspring of sons of God and daughters of men
+- [[entropy]] — The measure of disorder and information
+- [[boltzmann]] — Statistical entropy $S = k \log W$
+- [[beckenstein]] — Bekenstein bound, information in a region
+- [[landauer]] — Erasing information costs energy
+- [[maxwells-demon]] — Information as thermodynamic agent
+
+## Concepts (in wiki/concepts/)
+
+- [[uap]] — Unidentified Anomalous Phenomena
+- [[ufos]] — Unidentified Flying Objects
+- [[ufo-retrieval-program]] — U.S. government UFO recovery, 1930s–present
+- [[time-travel]] — Theory and mechanisms of time travel
+- [[closed-timelike-curves]] — Paths through spacetime that loop back
+- [[spacetime]] — The four-dimensional fabric of space and time
+- [[time-dilation]] — Slowing of time at high speeds or in gravity
+- [[fields-vs-particles]] — Field-based vs particle-based physics
+- [[field-manipulation]] — UAP mechanism of moving through fields
+- [[quantum-computation]] — Computing with quantum systems
+- [[quantum-field-theory]] — Theoretical framework for quantum fields
+- [[simultaneous-time-travel]] — Time travel happening now
+- [[many-worlds-interpretation]] — Branching timelines
+- [[ai-alien-connection]] — AI as alien technology
+- [[time-travelers]] — Aliens as time travelers from our future
+- [[backdoor-science]] — The true physics behind UAPs and time travel
+- [[exotic-matter-and-consciousness]] — Exotic matter as the substrate of consciousness
+- [[earth-as-space-craft]] — Earth as the point of entanglement for everything
+- [[quantum-algorithms]] — Comprehensive list of quantum algorithms
+- [[quantum-fourier-transform]] — QFT for position-momentum transform
+- [[quantum-phase-estimation]] — Extract eigenvalues of spacetime Hamiltonian
+- [[shors-algorithm]] — Factorization and discrete logarithm
+- [[grovers-algorithm]] — Quadratic speedup for search
+- [[quantum-annealing]] — Optimization via adiabatic evolution
+- [[vqe]] — Variational quantum eigensolver
+- [[qaoa]] — Quantum approximate optimization algorithm
+- [[quantum-walk]] — Quantum analogue of random walk
+- [[hhl-algorithm]] — Exponential speedup for linear systems
+- [[quantum-machine-learning]] — QML for pattern recognition
+- [[hamiltonian-simulation]] — Simulate spacetime field evolution
+- [[local-first-llm]] — Local-first LLM with auto-discovery
+- [[llm-discovery]] — LLM auto-discovery mechanism
+- [[llm-fallback-chain]] — LLM fallback chain (oMLX → Ollama → LM Studio)
+- [[agent-architecture]] — Multi-agent architecture with pydantic-graph and LangGraph
+- [[knowledge-graph-schema]] — Knowledge graph schema (nodes, relationships, properties)
+- [[api-design]] — API design with FastAPI and Pydantic models
+- [[mcp-server]] — MCP server design and tools
+- [[langgraph-features]] — LangGraph features (checkpointing, human-in-the-loop, etc.)
+- [[production-readiness]] — Production readiness checklist
+- [[quantum-state-representation]] — Quantum state representation
+- [[quantum-error-model]] — Quantum error model
+- [[temporal-data-model]] — Temporal data model for time travel
+- [[credibility-scoring]] — Credibility scoring for claims
+- [[evaluation-framework]] — Evaluation framework for the system
+- [[chariot-vision]] — Ezekiel's chariot vision (Ezekiel 1)
+- [[throne-vision]] — Daniel and John's throne visions
+- [[heavenly-army]] — Chariots of fire and horsemen
+- [[biblical-witnesses]] — The witnesses who saw these things
+- [[bible-ufo-testimonies]] — UFO/UAP testimonies in the Bible
+- [[arrow-of-time]] — Thermodynamic, psychological, cosmological arrows
+- [[second-law]] — Entropy never decreases; the reason time flows forward
+- [[black-hole-entropy]] — $S = A/4$, holographic principle
+- [[information-is-physical]] — Shannon, von Neumann, Landauer unified
+- [[decoherence-as-entropy]] — Decoherence as entropy leakage
+- [[heat-death]] — The end of the universe, maximum entropy
+- [[holographic-principle]] — The universe as information on a surface
+- [[temporal-reasoning-engine]] — The core concept: input information → timelines, destinations, paths
+- [[temporal-query-language]] — How you input information (syntax, semantics)
+- [[temporal-query-pipeline]] — The flow: Query → Research → Navigation → Orchestrator
+- [[temporal-causality]] — Causal relationships across time
+- [[temporal-information-fusion]] — Combining evidence from multiple sources
+- [[temporal-anomaly-detection]] — Detecting unusual patterns
+- [[temporal-quantum-tomography]] — Reconstructing quantum state
+
+## Projects (in wiki/projects/)
+
+- [[time-travel-machinery]] (in concepts/) — Three-layer architecture for time travel
+- [[time-travel-machinery-architecture]] (in projects/)
+- [[chicken-soup-project]] (in projects/)
+- [[chicken-soup-spec]] (in root)
+- [[quantum-systems]] (in concepts/) — Quantum platform comparison
+- [[quantum-systems-comparison]] (in projects/)
+- [[langgraph-workflows]] (in projects/)
+
+## Other Concepts (in wiki/concepts/)
+
+- [[project-structure]] — Full directory tree of the project
+- [[technology-stack]] — Layer-to-technology mapping
+- [[key-decisions]] — Key decisions with rationale
+- [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent

@@ -1,0 +1,23 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/xcschemes/
+*.xcarchive
+*.xcbuild/
+*.xcindex
+*.xcworkspacedata
+*.xcconfig
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Python (future)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
