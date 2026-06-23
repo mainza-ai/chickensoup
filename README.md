@@ -35,6 +35,10 @@ Project Chicken Soup is a production-quality, local-first system that simulates 
 
 Project Chicken Soup implements a decoupled, modern multi-agent architecture:
 
+<p align="center">
+  <img src="assets/images/Spacetime_Navigation_Architecture_Overview.png" alt="Spacetime Navigation Architecture Overview" width="750" />
+</p>
+
 ```mermaid
 graph TD
     UI[SwiftUI macOS/iOS App] <--> API[FastAPI / FastMCP Server]
