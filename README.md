@@ -31,7 +31,7 @@ Project Chicken Soup implements a decoupled, modern multi-agent architecture:
 graph TD
     UI[SwiftUI macOS/iOS App] <--> API[FastAPI / FastMCP Server]
     
-    subgraph AI Orchestration Layer (Python)
+    subgraph AI_Orch ["AI Orchestration Layer (Python)"]
         Orchestrator[Orchestrator Graph: pydantic-graph]
         Query[Query Agent]
         Research[Research Agent: LangGraph]
