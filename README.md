@@ -122,5 +122,11 @@ The knowledge graph is hydrated directly from the structured markdown files loca
 
 ---
 
+## 👥 Author
+
+- **Mainza Kangombe** — [LinkedIn](https://www.linkedin.com/in/mainza-kangombe-6214295/)
+
+---
+
 ## 📝 License
 Proprietary / Research Project.
