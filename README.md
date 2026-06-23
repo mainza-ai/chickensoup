@@ -64,6 +64,37 @@ graph TD
 
 ---
 
+## 📊 Presentation Slide Deck
+
+An in-depth presentation outlining the project vision, quantum architectures, and local AI agent networks:
+
+- 📥 **Download Deck**: [PDF Presentation](assets/other/Project_Chicken_Soup_Quantum_AI.pdf) | [PowerPoint PPTX](assets/other/Project_Chicken_Soup_Quantum_AI.pptx)
+
+### Slides Preview
+
+<p align="center">
+  <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.001.jpeg" alt="Slide 1: Title Slide" width="750" />
+</p>
+
+<details>
+  <summary>🔍 Click to expand and view all 11 slides</summary>
+  <br/>
+  <p align="center">
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.002.jpeg" alt="Slide 2" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.003.jpeg" alt="Slide 3" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.004.jpeg" alt="Slide 4" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.005.jpeg" alt="Slide 5" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.006.jpeg" alt="Slide 6" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.007.jpeg" alt="Slide 7" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.008.jpeg" alt="Slide 8" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.009.jpeg" alt="Slide 9" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.010.jpeg" alt="Slide 10" width="750" /><br/><br/>
+    <img src="assets/images/Project_Chicken_Soup_Quantum_AI-slide-deck/Project_Chicken_Soup_Quantum_AI.011.jpeg" alt="Slide 11" width="750" />
+  </p>
+</details>
+
+---
+
 ## 🛠️ Technology Stack
 
 | Layer | Technologies |
