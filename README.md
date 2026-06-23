@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Project Chicken Soup Logo" width="200" />
+</p>
+
 # 🍲 Project Chicken Soup
 
 > **A Local-First AI Spacetime Navigation Engine & Lore Knowledge Graph.**
