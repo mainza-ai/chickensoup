@@ -8,6 +8,13 @@
 import SwiftUI
 import SwiftData
 
+struct ChatMessage: Identifiable, Codable {
+    var id = UUID()
+    var isUser: Bool
+    var text: String
+    var timestamp = Date()
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TemporalEvent.timestamp) private var events: [TemporalEvent]
@@ -16,8 +23,16 @@ struct ContentView: View {
     @State private var selectedEvent: TemporalEvent?
     @State private var queryText = ""
     @State private var isStructuredQuery = false
-    @State private var showNavigator = true
     @State private var showIngestion = false
+    @State private var messages: [ChatMessage] = []
+    
+    // Desktop Tab Selection picker
+    enum DetailTab: String, CaseIterable, Identifiable {
+        case graph = "Lore Graph"
+        case timeline = "Spacetime Timeline"
+        var id: String { self.rawValue }
+    }
+    @State private var activeDetailTab: DetailTab = .graph
     
     // Inject services
     @StateObject private var backendService = BackendService.shared
@@ -64,45 +79,183 @@ struct ContentView: View {
     // MARK: - Desktop Layout (macOS & iPad)
     private var desktopLayout: some View {
         NavigationSplitView {
-            // Sidebar contains interactive 2D node-link Knowledge Graph
-            GraphExplorerView()
-                .navigationSplitViewColumnWidth(min: 280, ideal: 320, max: 400)
+            // Sidebar contains interactive details panel of the focused entity
+            SidebarDetailsView()
+                .navigationSplitViewColumnWidth(min: 300, ideal: 340, max: 400)
         } detail: {
-            ZStack(alignment: .bottom) {
-                // Base timeline track
-                TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 0) {
+                // Top Segmented Picker to switch modes
+                Picker("View Mode", selection: $activeDetailTab) {
+                    ForEach(DetailTab.allCases) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial)
                 
-                // Floating Query overlay
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
-                        Spacer()
-                        
-                        if showNavigator {
-                            Spacer()
-                                .frame(width: 320 + DesignConstants.standardPadding)
+                // Main Content Viewport ZStack
+                ZStack {
+                    Group {
+                        if activeDetailTab == .graph {
+                            GraphExplorerView()
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .leading).combined(with: .opacity),
+                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                ))
+                        } else {
+                            TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .trailing).combined(with: .opacity)
+                                ))
                         }
                     }
-                    .padding(.bottom, 24)
-                }
-                .frame(maxWidth: .infinity)
-                
-                // Floating AI Navigator overlay
-                if showNavigator {
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                    // Floating AI Navigator overlay (top trailing)
                     VStack {
                         HStack {
                             Spacer()
-                            AINavigatorView()
-                                .padding(.trailing, DesignConstants.standardPadding)
-                                .padding(.top, DesignConstants.standardPadding)
+                            if backendService.showNavigator {
+                                AINavigatorView()
+                                    .padding(.trailing, DesignConstants.standardPadding)
+                                    .padding(.top, DesignConstants.standardPadding)
+                                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                            }
                         }
                         Spacer()
                     }
+                    
+                    // Floating Chat overlay (bottom center)
+                    VStack {
+                        Spacer()
+                        
+                        VStack(spacing: 8) {
+                            if backendService.showChatHistory && !messages.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            Label("Temporal Chat History", systemImage: "sparkles")
+                                                .font(.caption)
+                                                .bold()
+                                                .foregroundStyle(DesignConstants.systemOrangeText)
+                                            
+                                            Spacer()
+                                            
+                                            Button(action: {
+                                                withAnimation(.spring(duration: 0.3)) {
+                                                    messages.removeAll()
+                                                    backendService.showChatHistory = false
+                                                }
+                                            }) {
+                                                Text("Clear")
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.secondary)
+                                                    .padding(.horizontal, 6)
+                                                    .padding(.vertical, 2)
+                                                    .background(Color.secondary.opacity(0.1), in: Capsule())
+                                            }
+                                            .buttonStyle(.plain)
+                                            
+                                            Button(action: {
+                                                withAnimation(.spring(duration: 0.3)) {
+                                                    backendService.showChatHistory = false
+                                                }
+                                            }) {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                        
+                                        ScrollViewReader { scrollProxy in
+                                            ScrollView {
+                                                VStack(spacing: 8) {
+                                                    ForEach(messages) { msg in
+                                                        HStack {
+                                                            if msg.isUser {
+                                                                Spacer()
+                                                                Text(msg.text)
+                                                                    .font(.subheadline)
+                                                                    .padding(.horizontal, 12)
+                                                                    .padding(.vertical, 8)
+                                                                    .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
+                                                                    .foregroundStyle(.white)
+                                                                    .multilineTextAlignment(.leading)
+                                                            } else {
+                                                                Text(msg.text)
+                                                                    .font(.subheadline)
+                                                                    .padding(.horizontal, 12)
+                                                                    .padding(.vertical, 8)
+                                                                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
+                                                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                                                                    .foregroundStyle(DesignConstants.primaryText)
+                                                                    .multilineTextAlignment(.leading)
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                        .id(msg.id)
+                                                    }
+                                                }
+                                                .padding(.vertical, 4)
+                                            }
+                                            .frame(maxHeight: 180)
+                                            .onAppear {
+                                                if let last = messages.last {
+                                                    scrollProxy.scrollTo(last.id, anchor: .bottom)
+                                                }
+                                            }
+                                            .onChange(of: messages.count) { _, _ in
+                                                if let last = messages.last {
+                                                    withAnimation {
+                                                        scrollProxy.scrollTo(last.id, anchor: .bottom)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .padding(12)
+                                    .background(DesignConstants.cardBackground.opacity(0.85))
+                                    .liquidGlass()
+                                    .frame(maxWidth: 640)
+                                    .padding(.horizontal, DesignConstants.standardPadding)
+                                    
+                                    Spacer()
+                                    
+                                    if backendService.showNavigator {
+                                        Spacer()
+                                            .frame(width: 320 + DesignConstants.standardPadding)
+                                    }
+                                }
+                                .transition(.asymmetric(
+                                    insertion: .opacity.combined(with: .move(edge: .bottom)),
+                                    removal: .opacity.combined(with: .move(edge: .bottom))
+                                ))
+                            }
+                            
+                            HStack {
+                                Spacer()
+                                QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
+                                Spacer()
+                                
+                                if backendService.showNavigator {
+                                    Spacer()
+                                        .frame(width: 320 + DesignConstants.standardPadding)
+                                }
+                            }
+                            .padding(.bottom, 16)
+                        }
+                    }
                 }
             }
+            .background(DesignConstants.warmBackground)
+            .navigationTitle("")
+            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: activeDetailTab)
+            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: backendService.showNavigator)
+            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: backendService.showChatHistory)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showIngestion.toggle() }) {
@@ -110,7 +263,7 @@ struct ContentView: View {
                     }
                 }
                 ToolbarItem {
-                    Button(action: { showNavigator.toggle() }) {
+                    Button(action: { backendService.showNavigator.toggle() }) {
                         Label("AI Navigator", systemImage: "brain")
                     }
                 }
@@ -140,6 +293,97 @@ struct ContentView: View {
                     
                     VStack {
                         Spacer()
+                        
+                        if backendService.showChatHistory && !messages.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Label("Temporal Chat History", systemImage: "sparkles")
+                                        .font(.caption)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.systemOrangeText)
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        withAnimation(.spring(duration: 0.3)) {
+                                            messages.removeAll()
+                                            backendService.showChatHistory = false
+                                        }
+                                    }) {
+                                        Text("Clear")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.secondary.opacity(0.1), in: Capsule())
+                                    }
+                                    .buttonStyle(.plain)
+                                    
+                                    Button(action: {
+                                        withAnimation(.spring(duration: 0.3)) {
+                                            backendService.showChatHistory = false
+                                        }
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                
+                                ScrollViewReader { scrollProxy in
+                                    ScrollView {
+                                        VStack(spacing: 8) {
+                                            ForEach(messages) { msg in
+                                                HStack {
+                                                    if msg.isUser {
+                                                        Spacer()
+                                                        Text(msg.text)
+                                                            .font(.subheadline)
+                                                            .padding(.horizontal, 12)
+                                                            .padding(.vertical, 8)
+                                                            .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
+                                                            .foregroundStyle(.white)
+                                                            .multilineTextAlignment(.leading)
+                                                    } else {
+                                                        Text(msg.text)
+                                                            .font(.subheadline)
+                                                            .padding(.horizontal, 12)
+                                                            .padding(.vertical, 8)
+                                                            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
+                                                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                                                            .foregroundStyle(DesignConstants.primaryText)
+                                                            .multilineTextAlignment(.leading)
+                                                        Spacer()
+                                                    }
+                                                }
+                                                .id(msg.id)
+                                            }
+                                        }
+                                        .padding(.vertical, 4)
+                                    }
+                                    .frame(maxHeight: 180)
+                                    .onAppear {
+                                        if let last = messages.last {
+                                            scrollProxy.scrollTo(last.id, anchor: .bottom)
+                                        }
+                                    }
+                                    .onChange(of: messages.count) { _, _ in
+                                        if let last = messages.last {
+                                            withAnimation {
+                                                scrollProxy.scrollTo(last.id, anchor: .bottom)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(DesignConstants.standardPadding)
+                            .background(DesignConstants.cardBackground.opacity(0.95))
+                            .liquidGlass()
+                            .padding(.horizontal, DesignConstants.standardPadding)
+                            .padding(.bottom, 8)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                        }
+                        
                         HStack {
                             Spacer()
                             QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
@@ -192,12 +436,19 @@ struct ContentView: View {
     
     private func handleQuerySubmit() {
         guard !queryText.isEmpty else { return }
+        let currentQuery = queryText
+        
+        withAnimation(.spring(duration: 0.3)) {
+            messages.append(ChatMessage(isUser: true, text: currentQuery))
+            backendService.showChatHistory = true
+            queryText = ""
+        }
         
         Task {
-            _ = await backendService.submitQuery(queryText, isStructured: isStructuredQuery, context: modelContext)
+            let response = await backendService.submitQuery(currentQuery, isStructured: isStructuredQuery, context: modelContext)
             await MainActor.run {
-                withAnimation(DesignConstants.hoverAnimation) {
-                    queryText = ""
+                withAnimation(.spring(duration: 0.4)) {
+                    messages.append(ChatMessage(isUser: false, text: response ?? "No response generated."))
                 }
             }
         }

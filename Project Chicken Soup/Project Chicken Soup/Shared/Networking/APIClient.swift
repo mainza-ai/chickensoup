@@ -38,7 +38,7 @@ public actor APIClient {
     
     private init() {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 10.0
+        configuration.timeoutIntervalForRequest = 90.0
         self.session = URLSession(configuration: configuration)
         // Point to the active FastAPI server port 8000
         self.baseURL = URL(string: "http://127.0.0.1:8000")!
@@ -86,10 +86,20 @@ public actor APIClient {
         decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
             let dateStr = try container.decode(String.self)
+            
+            // Try standard ISO8601
             let dateFormatter = ISO8601DateFormatter()
             if let date = dateFormatter.date(from: dateStr) {
                 return date
             }
+            
+            // Try ISO8601 with fractional seconds
+            let fractionalFormatter = ISO8601DateFormatter()
+            fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = fractionalFormatter.date(from: dateStr) {
+                return date
+            }
+            
             // Fallback to time interval or epoch if parsing fails
             if let doubleVal = Double(dateStr) {
                 return Date(timeIntervalSince1970: doubleVal)

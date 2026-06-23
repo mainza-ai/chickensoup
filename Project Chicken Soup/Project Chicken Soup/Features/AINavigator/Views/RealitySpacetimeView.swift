@@ -35,17 +35,7 @@ struct RealitySpacetimeView: View {
     let tensor: FieldGeometryTensor
     
     var body: some View {
-        #if canImport(RealityKit) && !targetEnvironment(simulator)
-        RealitySpacetimeARViewContainer(tensor: tensor)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
-            )
-        #else
-        // Fallback Premium Canvas rendering for Simulator or platforms without RealityKit support
         SpacetimeCanvasFallback(tensor: tensor)
-        #endif
     }
 }
 

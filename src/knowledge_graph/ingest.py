@@ -95,7 +95,7 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, body: 
             headers={"Content-Type": "application/json"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=3.0) as response:
+        with urllib.request.urlopen(req, timeout=30.0) as response:
             if response.status == 200:
                 res_data = json.loads(response.read().decode("utf-8"))
                 content = res_data["choices"][0]["message"]["content"]

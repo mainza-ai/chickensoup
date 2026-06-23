@@ -62,7 +62,7 @@ class MultiLLMConsensus:
                 headers={"Content-Type": "application/json"},
                 method="POST"
             )
-            with urllib.request.urlopen(req, timeout=5.0) as response:
+            with urllib.request.urlopen(req, timeout=90.0) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
                     content = data["choices"][0]["message"]["content"]

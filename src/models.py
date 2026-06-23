@@ -11,6 +11,8 @@ class QueryResponse(BaseModel):
     confidence: float = Field(..., ge=0.0, le=1.0)
     entities: List[str] = Field(default_factory=list)
     sources: List[str] = Field(default_factory=list)
+    inferred_events: List[Dict[str, Any]] = Field(default_factory=list)
+    inferred_entities: List[Dict[str, Any]] = Field(default_factory=list)
 
 class NavigateRequest(BaseModel):
     origin: str = Field(..., description="Origin location or epoch (e.g. Earth-2026)")

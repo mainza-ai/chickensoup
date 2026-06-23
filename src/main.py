@@ -130,7 +130,9 @@ async def post_query(request: QueryRequest):
                 answer=f"PENDING APPROVAL: {output.get('summary')}",
                 confidence=0.1,
                 entities=[],
-                sources=["System Gatekeeper Thread ID: " + output.get("thread_id", "")]
+                sources=["System Gatekeeper Thread ID: " + output.get("thread_id", "")],
+                inferred_events=[],
+                inferred_entities=[]
             )
             
         return QueryResponse(
@@ -138,7 +140,9 @@ async def post_query(request: QueryRequest):
             answer=output.get("answer", "No response generated."),
             confidence=output.get("confidence", 0.5),
             entities=output.get("entities", []),
-            sources=output.get("sources", ["Orchestrated Search"])
+            sources=output.get("sources", ["Orchestrated Search"]),
+            inferred_events=[],
+            inferred_entities=[]
         )
     except Exception as e:
         logger.error(f"Error handling orchestrated query: {e}")
@@ -148,7 +152,9 @@ async def post_query(request: QueryRequest):
             answer=f"Simulation response: The query '{request.query}' relates to anomalous gravitational field theory.",
             confidence=0.6,
             entities=[],
-            sources=["Simulated Fallback Engine"]
+            sources=["Simulated Fallback Engine"],
+            inferred_events=[],
+            inferred_entities=[]
         )
 
 @app.get("/graph/{entity}")

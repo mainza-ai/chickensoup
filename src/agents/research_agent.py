@@ -287,7 +287,7 @@ class ResearchAgent:
                 headers={"Content-Type": "application/json"},
                 method="POST"
             )
-            with urllib.request.urlopen(req, timeout=10.0) as response:
+            with urllib.request.urlopen(req, timeout=90.0) as response:
                 if response.status == 200:
                     res_data = json.loads(response.read().decode("utf-8"))
                     content = res_data["choices"][0]["message"]["content"]

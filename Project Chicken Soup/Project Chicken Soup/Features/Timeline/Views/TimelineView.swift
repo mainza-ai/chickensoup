@@ -77,28 +77,28 @@ struct TemporalTimelineView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        ZStack(alignment: .leading) {
-                            // Background Quantum Entanglement Field Canvas
-                            CanvasView(eventsCount: filteredEvents.count)
-                            
-                            // Timeline layout containing the interactive nodes
-                            TimelineLayout(startDate: dateRange.start, endDate: dateRange.end) {
-                                ForEach(filteredEvents) { event in
-                                    Button {
-                                        withAnimation(DesignConstants.hoverAnimation) {
-                                            selectedEvent = event
-                                        }
-                                    } label: {
-                                        TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
+                        // Timeline layout containing the interactive nodes
+                        TimelineLayout(startDate: dateRange.start, endDate: dateRange.end) {
+                            ForEach(filteredEvents) { event in
+                                Button {
+                                    withAnimation(DesignConstants.hoverAnimation) {
+                                        selectedEvent = event
                                     }
-                                    .buttonStyle(.plain)
-                                    .eventDate(event.timestamp)
+                                } label: {
+                                    TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
                                 }
+                                .buttonStyle(.plain)
+                                .eventDate(event.timestamp)
                             }
-                            .padding(.horizontal, 100)
                         }
-                        .frame(minHeight: 450)
+                        .padding(.leading, 240)
+                        .padding(.trailing, 120)
+                        .frame(height: 220)
                     }
+                    .background(
+                        CanvasView(eventsCount: filteredEvents.count)
+                            .drawingGroup()
+                    )
                     #if !os(macOS)
                     .refreshable {
                         await backendService.fetchTemporalEvents(context: modelContext)
@@ -205,7 +205,7 @@ struct CanvasView: View {
                 }
             }
         }
-        .frame(minHeight: 450)
+        .frame(height: 220)
     }
 }
 
