@@ -32,6 +32,18 @@ public final class BackendService: ObservableObject {
     @Published public var canGoForward = false
     @Published public var showNavigator = true
     @Published public var showChatHistory = false
+    @Published public var isDarkMode: Bool = {
+        if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: "isDarkMode")
+    }()
+    
+    public func toggleTheme() {
+        isDarkMode.toggle()
+        UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
+    }
+    
     private var backStack: [String] = []
     private var forwardStack: [String] = []
     

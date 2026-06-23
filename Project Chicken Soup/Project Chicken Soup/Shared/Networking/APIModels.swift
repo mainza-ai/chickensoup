@@ -151,7 +151,7 @@ public struct NeighborhoodEntity: Codable, Identifiable, Hashable {
 }
 
 public struct NeighborhoodConnection: Codable, Identifiable {
-    public var id: UUID { UUID() }
+    public var id: UUID { neighbor.id }
     public var relationshipType: String
     public var neighbor: NeighborhoodEntity
     

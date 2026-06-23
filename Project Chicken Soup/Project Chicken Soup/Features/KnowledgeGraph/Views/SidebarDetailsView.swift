@@ -41,6 +41,17 @@ struct SidebarDetailsView: View {
                     .foregroundStyle(DesignConstants.systemOrangeText)
                 
                 Spacer()
+                
+                Button(action: {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        backendService.toggleTheme()
+                    }
+                }) {
+                    Image(systemName: backendService.isDarkMode ? "sun.max.fill" : "moon.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, DesignConstants.standardPadding)
             .padding(.top, DesignConstants.standardPadding)

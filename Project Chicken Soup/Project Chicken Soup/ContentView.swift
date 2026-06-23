@@ -56,6 +56,7 @@ struct ContentView: View {
             .task {
                 await fetchInitialData()
             }
+            .preferredColorScheme(backendService.isDarkMode ? .dark : .light)
         #else
         Group {
             if horizontalSizeClass == .compact {
@@ -67,6 +68,7 @@ struct ContentView: View {
         .task {
             await fetchInitialData()
         }
+        .preferredColorScheme(backendService.isDarkMode ? .dark : .light)
         #endif
     }
     

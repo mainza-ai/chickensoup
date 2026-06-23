@@ -83,77 +83,72 @@ struct GraphExplorerView: View {
                     
                     let currentPositions = nodePositions.isEmpty ? computeNodePositions(connections: graph.connections) : nodePositions
                     
-                    Canvas { gc, size in
-                        // 1. Draw connection lines
-                        for (index, conn) in graph.connections.enumerated() {
-                            guard let neighborPos = currentPositions[conn.neighbor.id] else { continue }
-                            let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
-                            let start = center
-                            let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
-                            
-                            let nodeColor: Color = {
-                                switch conn.neighbor.type.lowercased() {
-                                case "person": return DesignConstants.systemOrange
-                                case "place": return DesignConstants.systemGreen
-                                case "concept": return DesignConstants.systemPurple
-                                case "project": return Color.pink
-                                case "object": return DesignConstants.systemBlue
-                                case "event": return DesignConstants.systemRed
-                                default: return DesignConstants.secondaryText
-                                }
-                            }()
-                            
-                            var path = Path()
-                            path.move(to: start)
-                            path.addLine(to: end)
-                            gc.stroke(path, with: .color(nodeColor.opacity(0.3)), lineWidth: 1.2)
-                            
-                            // Draw label text on the line
-                            let staggerFactor = 0.35 + 0.35 * Double(index % 3) / 2.0
-                            let mid = CGPoint(
-                                x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
-                                y: start.y + (end.y - start.y) * CGFloat(staggerFactor)
-                            )
-                            
-                            let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ")
-                            let text = Text(labelString)
-                                .font(.system(size: 6.5, weight: .bold))
-                                .foregroundStyle(nodeColor.opacity(0.95))
-                            
-                            let width = CGFloat(labelString.count) * 4.2 + 8
-                            let height: CGFloat = 11
-                            let pillRect = CGRect(
-                                x: mid.x - width/2,
-                                y: mid.y - height/2,
-                                width: width,
-                                height: height
-                            )
-                            gc.fill(
-                                Path(roundedRect: pillRect, cornerRadius: 3.5),
-                                with: .color(DesignConstants.cardBackground.opacity(0.95))
-                            )
-                            gc.stroke(
-                                Path(roundedRect: pillRect, cornerRadius: 3.5),
-                                with: .color(nodeColor.opacity(0.3)),
-                                lineWidth: 0.7
-                            )
-                            
-                            gc.draw(text, at: mid, anchor: .center)
+                    ZStack {
+                        // Connection Lines Canvas underneath the nodes
+                        Canvas { gc, size in
+                            for (index, conn) in graph.connections.enumerated() {
+                                guard let neighborPos = currentPositions[conn.neighbor.id] else { continue }
+                                let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
+                                let start = center
+                                let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
+                                
+                                let nodeColor: Color = {
+                                    switch conn.neighbor.type.lowercased() {
+                                    case "person": return DesignConstants.systemOrange
+                                    case "place": return DesignConstants.systemGreen
+                                    case "concept": return DesignConstants.systemPurple
+                                    case "project": return Color.pink
+                                    case "object": return DesignConstants.systemBlue
+                                    case "event": return DesignConstants.systemRed
+                                    default: return DesignConstants.secondaryText
+                                    }
+                                }()
+                                
+                                // Draw relationship connecting line
+                                var path = Path()
+                                path.move(to: start)
+                                path.addLine(to: end)
+                                gc.stroke(path, with: .color(nodeColor.opacity(0.35)), lineWidth: 1.5)
+                                
+                                // Draw staggered relationship label
+                                let staggerFactor = 0.42 + 0.16 * Double(index % 2)
+                                let mid = CGPoint(
+                                    x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
+                                    y: start.y + (end.y - start.y) * CGFloat(staggerFactor)
+                                )
+                                
+                                let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ").lowercased()
+                                let text = Text(labelString)
+                                    .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(nodeColor.opacity(0.7))
+                                
+                                gc.draw(text, at: mid, anchor: .center)
+                            }
                         }
+                        .clipped()
                         
-                        // 2. Draw neighbor nodes
-                        for conn in graph.connections {
+                        // Neighbor Nodes SwiftUI View Overlays
+                        ForEach(graph.connections) { conn in
                             let entity = conn.neighbor
-                            guard let relativePos = currentPositions[entity.id] else { continue }
-                            let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
-                            let pos = CGPoint(x: scaledPos.x + center.x, y: scaledPos.y + center.y)
-                            drawNode(gc: gc, at: pos, name: entity.name, type: entity.type, isFocused: false, scaleFactor: scaleFactor)
+                            if let relativePos = currentPositions[entity.id] {
+                                let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
+                                let pos = CGPoint(x: scaledPos.x + center.x, y: scaledPos.y + center.y)
+                                
+                                NodeView(name: entity.name, type: entity.type, isFocused: false, scaleFactor: scaleFactor) {
+                                    selectEntity(name: entity.name)
+                                }
+                                .position(pos)
+                                .transition(.scale.combined(with: .opacity))
+                            }
                         }
                         
-                        // 3. Draw center focused node
-                        drawNode(gc: gc, at: center, name: graph.entity.name, type: graph.entity.type, isFocused: true, scaleFactor: scaleFactor)
+                        // Center Focused Node view
+                        NodeView(name: graph.entity.name, type: graph.entity.type, isFocused: true, scaleFactor: scaleFactor) {
+                            // Focused node click action
+                        }
+                        .position(center)
+                        .transition(.scale.combined(with: .opacity))
                     }
-                    .clipped()
                     .gesture(
                         DragGesture()
                             .onChanged { gesture in
@@ -165,36 +160,6 @@ struct GraphExplorerView: View {
                                 dragOffset = .zero
                             }
                     )
-                    .onTapGesture(coordinateSpace: .local) { location in
-                        let visibleWidth = geometry.size.width - (backendService.showNavigator ? 320 : 0)
-                        let availableHeight = geometry.size.height - topOffset - bottomOffset
-                        let availableWidth = visibleWidth
-                        let minDimension = min(availableWidth, availableHeight)
-                        let maxAllowedRadius = max(50.0, minDimension / 2.0 - 54.0)
-                        let scaleFactor = maxRadius > 0 ? min(1.0, maxAllowedRadius / maxRadius) : 1.0
-                        
-                        let centerY = topOffset + availableHeight / 2
-                        let centerPos = CGPoint(x: visibleWidth / 2 + accumulatedOffset.width,
-                                                y: centerY + accumulatedOffset.height)
-                        
-                        // Click center?
-                        let distToCenter = sqrt(pow(location.x - centerPos.x, 2) + pow(location.y - centerPos.y, 2))
-                        if distToCenter < 28 {
-                            return
-                        }
-                        
-                        // Click neighbor?
-                        for conn in graph.connections {
-                            guard let relativePos = currentPositions[conn.neighbor.id] else { continue }
-                            let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
-                            let pos = CGPoint(x: scaledPos.x + centerPos.x, y: scaledPos.y + centerPos.y)
-                            let dist = sqrt(pow(location.x - pos.x, 2) + pow(location.y - pos.y, 2))
-                            if dist < 22 {
-                                selectEntity(name: conn.neighbor.name)
-                                break
-                            }
-                        }
-                    }
                 } else {
                     VStack {
                         ProgressView("Mapping Lore Graph...")
@@ -253,73 +218,6 @@ struct GraphExplorerView: View {
             lines.append(currentLine)
         }
         return lines.joined(separator: "\n")
-    }
-    
-    private func drawNode(gc: GraphicsContext, at pos: CGPoint, name: String, type: String, isFocused: Bool, scaleFactor: CGFloat) {
-        let radius: CGFloat = (isFocused ? 24 : 16) * max(0.8, scaleFactor)
-        let rect = CGRect(x: pos.x - radius, y: pos.y - radius, width: radius * 2, height: radius * 2)
-        
-        let nodeColor: Color = {
-            switch type.lowercased() {
-            case "person": return DesignConstants.systemOrange
-            case "place": return DesignConstants.systemGreen
-            case "concept": return DesignConstants.systemPurple
-            case "project": return Color.pink
-            case "object": return DesignConstants.systemBlue
-            case "event": return DesignConstants.systemRed
-            default: return DesignConstants.secondaryText
-            }
-        }()
-        
-        if isFocused {
-            gc.fill(
-                Path(ellipseIn: rect.insetBy(dx: -8 * max(0.8, scaleFactor), dy: -8 * max(0.8, scaleFactor))),
-                with: .radialGradient(
-                    Gradient(colors: [nodeColor.opacity(0.35), nodeColor.opacity(0.0)]),
-                    center: pos,
-                    startRadius: radius - 2,
-                    endRadius: radius + 12 * max(0.8, scaleFactor)
-                )
-            )
-            
-            gc.stroke(
-                Path(ellipseIn: rect.insetBy(dx: -2, dy: -2)),
-                with: .color(nodeColor.opacity(0.4)),
-                lineWidth: 1.0
-            )
-        } else {
-            gc.fill(
-                Path(ellipseIn: rect.insetBy(dx: -4 * max(0.8, scaleFactor), dy: -4 * max(0.8, scaleFactor))),
-                with: .radialGradient(
-                    Gradient(colors: [nodeColor.opacity(0.12), nodeColor.opacity(0.0)]),
-                    center: pos,
-                    startRadius: radius - 2,
-                    endRadius: radius + 6 * max(0.8, scaleFactor)
-                )
-            )
-        }
-        
-        let shading = GraphicsContext.Shading.radialGradient(
-            Gradient(colors: [nodeColor.opacity(0.35), nodeColor]),
-            center: pos,
-            startRadius: 0,
-            endRadius: radius
-        )
-        gc.fill(Path(ellipseIn: rect), with: shading)
-        
-        gc.stroke(
-            Path(ellipseIn: rect),
-            with: .color(isFocused ? .white : nodeColor.opacity(0.7)),
-            lineWidth: isFocused ? 2.0 : 1.0
-        )
-        
-        let formattedName = wrappedText(name).capitalized
-        let fontSize = (isFocused ? 9.5 : 8.0) * max(0.75, min(1.0, scaleFactor))
-        let labelText = Text(formattedName)
-            .font(.system(size: fontSize, weight: isFocused ? .bold : .medium, design: .default))
-            .foregroundStyle(DesignConstants.primaryText)
-        
-        gc.draw(labelText, at: CGPoint(x: pos.x, y: pos.y + radius + 4), anchor: .top)
     }
     
     private func computeNodePositions(connections: [NeighborhoodConnection]) -> [UUID: CGPoint] {
@@ -390,6 +288,103 @@ struct GridBackgroundView: View {
 extension View {
     func zPriority(_ index: Double) -> some View {
         self.zIndex(index)
+    }
+}
+
+struct NodeView: View {
+    let name: String
+    let type: String
+    let isFocused: Bool
+    let scaleFactor: CGFloat
+    let action: () -> Void
+    
+    @State private var isHovered = false
+    
+    var body: some View {
+        let size = (isFocused ? 48.0 : 36.0) * max(0.85, scaleFactor)
+        
+        let nodeColor: Color = {
+            switch type.lowercased() {
+            case "person": return DesignConstants.systemOrange
+            case "place": return DesignConstants.systemGreen
+            case "concept": return DesignConstants.systemPurple
+            case "project": return Color.pink
+            case "object": return DesignConstants.systemBlue
+            case "event": return DesignConstants.systemRed
+            default: return DesignConstants.secondaryText
+            }
+        }()
+        
+        let symbol: String = {
+            switch type.lowercased() {
+            case "person": return "person.fill"
+            case "place": return "mappin.and.ellipse"
+            case "concept": return "lightbulb.fill"
+            case "project": return "gearshape.2.fill"
+            case "object": return "cube.fill"
+            case "event": return "sparkles"
+            default: return "doc.text.fill"
+            }
+        }()
+        
+        VStack(spacing: 4) {
+            Button(action: action) {
+                ZStack {
+                    // Outer glow
+                    Circle()
+                        .fill(nodeColor.opacity(isFocused ? 0.3 : 0.15))
+                        .frame(width: size + 16, height: size + 16)
+                        .blur(radius: 6)
+                        .scaleEffect(isHovered ? 1.15 : 1.0)
+                    
+                    // Glassmorphic border
+                    Circle()
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [.white.opacity(0.4), nodeColor.opacity(0.8), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: isFocused ? 2.5 : 1.5
+                        )
+                        .frame(width: size + 4, height: size + 4)
+                    
+                    // Central type-gradient fill
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [nodeColor, nodeColor.opacity(0.6)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: size, height: size)
+                        .shadow(color: nodeColor.opacity(0.35), radius: 6, x: 0, y: 3)
+                    
+                    // SF Symbol Icon
+                    Image(systemName: symbol)
+                        .font(.system(size: (isFocused ? 18 : 13) * max(0.85, scaleFactor), weight: .bold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .buttonStyle(.plain)
+            .scaleEffect(isHovered ? 1.08 : 1.0)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+            .onHover { hovering in
+                isHovered = hovering
+            }
+            
+            // Multi-line word-wrapped label text
+            let formattedName = name.replacingOccurrences(of: "-", with: " ").capitalized
+            let fontSize = (isFocused ? 9.5 : 8.0) * max(0.8, min(1.0, scaleFactor))
+            Text(formattedName)
+                .font(.system(size: fontSize, weight: isFocused ? .bold : .semibold))
+                .foregroundStyle(DesignConstants.primaryText)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(width: 85 * max(0.85, scaleFactor))
+        }
     }
 }
 
