@@ -11,10 +11,14 @@
             "id": "04de5102884f8c40",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "concepts/agent-skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "agent-skills"
             }
           }
         ]
@@ -49,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "twostraws",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -70,7 +74,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -90,6 +95,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "concepts/agent-skills.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +105,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for agent-skills"
             }
           },
           {
@@ -108,11 +114,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "concepts/agent-skills.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from agent-skills"
             }
           },
           {
@@ -150,12 +157,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "concepts/agent-skills.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of agent-skills"
             }
           }
         ]
@@ -178,9 +186,11 @@
   },
   "active": "04de5102884f8c40",
   "lastOpenFiles": [
+    "projects/field-geometry-tensor.md",
+    "concepts/antigravity.md",
+    "projects/time-travel-machinery-architecture.md",
     "concepts/quantum-simulation-tier.md",
     "concepts/integration-architecture.md",
-    "projects/field-geometry-tensor.md",
     "raw/project-structure-2026-06-22.txt",
     "concepts/death-ray.md",
     "concepts/wireless-energy.md",
@@ -200,10 +210,8 @@
     "entities/christopher-b-freedman.md",
     "concepts/schumann-resonance.md",
     "concepts/7-46-hz.md",
-    "concepts/antigravity.md",
     "concepts/biefeld-brown-effect.md",
     "entities/t-t-brown.md",
-    "entities/italy.md",
-    "entities/mussolini.md"
+    "entities/italy.md"
   ]
 }
