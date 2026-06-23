@@ -1,63 +1,122 @@
-<img src="assets/logo.png" alt="Project Chicken Soup" width="200"/>
+# 🍲 Project Chicken Soup
 
-# Project Chicken Soup 🍜
-
-A local-first AI system that simulates and explores time travel using quantum computation, with a rich knowledge graph of UFO/Alien/Time Travel lore and multi-agent AI orchestration.
-
-## Three-Layer Quantum Pipeline
-
-```
-Spacetime Engine (Qiskit) → Field Manipulator (CUDA-Q) → AI Navigator (PennyLane)
-```
-
-The [[field-geometry-tensor]] is the contract between layers — each is a pure function taking and returning the metric tensor. Development progresses: classical fallback → local simulation → cloud simulation → real quantum hardware via IBM Quantum, D-Wave Leap, and IonQ.
-
-## Multi-Agent System
-
-| Agent | Framework | Role |
-|-------|-----------|------|
-| Orchestrator | pydantic-graph | Coordinates query → research → navigation → answer |
-| Research | LangGraph | Neo4j knowledge graph exploration, evidence scoring |
-| Navigation | pydantic-graph + LangGraph | Path computation via PennyLane QML |
-| Query | pydantic-graph | Intent detection, query decomposition |
-
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| Frontend | SwiftUI / SwiftData (macOS + iOS, Swift 6.4) |
-| API | FastAPI + OpenAPI |
-| Agents | Pydantic AI, pydantic-graph, LangGraph |
-| Graph | Neo4j (source of truth) + SwiftData (offline cache) |
-| Quantum | Qiskit, CUDA-Q, PennyLane, D-Wave, IonQ |
-| LLM | oMLX → Ollama → LM Studio (auto-discovery) |
-| MCP | FastMCP |
-| Infra | Docker, Redis, OpenTelemetry |
-
-## Design
-
-Light mode default with **#FF9500** accent. macOS + iOS from a single codebase. The timeline is the primary view with a floating query overlay using Liquid Glass materials.
-
-## Project Structure
-
-```
-chickensoup/
-├── src/              # Python backend
-├── wiki/             # 150+ page knowledge graph
-├── papers/           # Source documents
-├── assets/           # Logo & favicons
-└── "Project Chicken Soup/"  # Xcode project
-```
-
-## Implementation Phases
-
-| Phase | Focus |
-|-------|-------|
-| 1 — Foundation | KG schema, project structure, FastAPI, Docker |
-| 2 — Core | Quantum circuits, LLM integration, wiki ingestion |
-| 3 — Enhancement | Caching, async, observability, CI/CD |
-| 4 — Advanced | Real quantum hardware, multi-LLM, full UI |
+> **A Local-First AI Spacetime Navigation Engine & Lore Knowledge Graph.**
+> Bridging quantum computing simulation (Qiskit, CUDA-Q, PennyLane) with a rich graph of UFO/Alien/Time Travel history.
 
 ---
 
-**Author:** Mainza Kangombe — [LinkedIn](https://www.linkedin.com/in/mainza-kangombe-6214295/)
+## 🌌 Overview
+
+Project Chicken Soup is a production-quality, local-first system that simulates time travel physics via quantum computation and orchestrates discovery through an AI agent network. The system couples a multi-agent backend with a local knowledge base of extraterrestrial and temporal lore.
+
+### Key Capabilities
+- **Spacetime Simulation**: Computes time dilation, gravity effects, and closed timelike curves (CTCs) using **Qiskit**.
+- **Field Manipulation**: Models field-propulsion metrics using **CUDA-Q**.
+- **QML Navigation**: Plots optimal temporal coordinates via **PennyLane** neural networks, targeting hardware from **D-Wave** and **IonQ**.
+- **Lore Knowledge Graph**: Maps whistleblower claims, historic crashes, and scientific anomalies using a **Neo4j** graph.
+- **Local-First LLMs**: Auto-discovers and falls back across local models (**oMLX** ➔ **Ollama** ➔ **LM Studio**).
+- **Apple SwiftUI Client**: Native macOS & iOS application with a warm, "chicken soup" systemOrange accent theme (`#FF9500`) powered by **SwiftData**.
+
+---
+
+## 🏛️ System Architecture
+
+Project Chicken Soup implements a decoupled, modern multi-agent architecture:
+
+```mermaid
+graph TD
+    UI[SwiftUI macOS/iOS App] <--> API[FastAPI / FastMCP Server]
+    
+    subgraph AI Orchestration Layer (Python)
+        Orchestrator[Orchestrator Graph: pydantic-graph]
+        Query[Query Agent]
+        Research[Research Agent: LangGraph]
+        Navigator[Navigation Agent]
+        
+        Orchestrator --> Query
+        Orchestrator --> Research
+        Orchestrator --> Navigator
+    end
+    
+    API <--> Orchestrator
+    Research <--> Graph[(Neo4j Knowledge Graph)]
+    Navigator <--> QEngine[Quantum Engines: Qiskit, CUDA-Q, PennyLane]
+```
+
+- **Orchestrator**: Managed via `pydantic-graph` for top-level routing.
+- **Sub-workflows**: Complex data fusion and research pipelines orchestrated by `LangGraph` (featuring checkpointing, human-in-the-loop validation, and parallel execution).
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS-first & iOS), SwiftData, Swift Testing |
+| **API Layer** | FastAPI, FastMCP (Model Context Protocol) |
+| **Agent AI** | Pydantic AI, `pydantic-graph`, LangGraph |
+| **Databases** | Neo4j (Knowledge Graph), Redis (Caching) |
+| **Quantum Tier** | Qiskit (Spacetime), CUDA-Q (Field), PennyLane (Pathfinding QML) |
+| **Infrastructure** | Docker, Ray/Celery, OpenTelemetry, pytest |
+
+---
+
+## 📂 Project Structure
+
+```
+chickensoup/
+├── development-docs/       # Project specifications & architecture docs
+│   └── PROJECT_SPEC.md     # Core technical specification
+├── wiki/                   # Markdown wiki (Overview, Index, Logs, Entities)
+├── Project Chicken Soup/   # Native SwiftUI client project (iOS & macOS)
+├── src/                    # Backend source code (FastAPI, Agents, Quantum)
+├── tests/                  # Backend unit and integration tests
+├── AGENTS.md               # LLM Agent instructions & wiki schema
+├── CHANGELOG.md            # Project release log
+└── pyproject.toml          # Python build config & dependencies
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Requirements & Dependencies
+- **Python**: 3.12+ (managed with `uv` or `.python-version`)
+- **Xcode**: 16.0+ (for SwiftUI client)
+- **Services**: Docker (for Neo4j & Redis)
+
+### 2. Backend Setup
+1. Clone this repository and enter the directory.
+2. Initialize environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+3. Boot services:
+   ```bash
+   docker-compose up -d
+   ```
+4. Install Python dependencies and launch the backend API:
+   ```bash
+   uv sync
+   uv run uvicorn src.main:app --reload
+   ```
+
+### 3. SwiftUI Client Setup
+1. Open the Xcode Project:
+   ```bash
+   open "Project Chicken Soup/Project Chicken Soup.xcodeproj"
+   ```
+2. Build and run target `Project Chicken Soup` on **macOS** or **iOS**.
+3. *Optional*: Run unit tests using the modern **Swift Testing** framework (`@Test`).
+
+---
+
+## 📚 The Lore Wiki
+The knowledge graph is hydrated directly from the structured markdown files located in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory.
+- Check the [Overview](file:///Users/mck/Desktop/chickensoup/wiki/overview.md) to explore key concepts.
+- See the [Index](file:///Users/mck/Desktop/chickensoup/wiki/index.md) for a map of historical crashes, physics theories, and whistleblowers.
+
+---
+
+## 📝 License
+Proprietary / Research Project.
