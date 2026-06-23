@@ -179,9 +179,9 @@ struct GraphExplorerView: View {
                             }
                     )
                     .simultaneousGesture(
-                        MagnificationGesture()
+                        MagnifyGesture()
                             .onChanged { value in
-                                zoomScale = max(0.4, min(2.0, initialZoomScale * value))
+                                zoomScale = max(0.4, min(2.0, initialZoomScale * value.magnification))
                             }
                             .onEnded { _ in
                                 initialZoomScale = zoomScale
