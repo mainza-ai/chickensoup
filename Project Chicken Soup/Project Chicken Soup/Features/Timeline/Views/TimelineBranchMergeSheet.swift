@@ -245,7 +245,9 @@ struct TimelineBranchMergeSheet: View {
         }
         .background(DesignConstants.warmBackground)
         .navigationTitle("Timeline Merge Conflicts")
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
     
     @ViewBuilder

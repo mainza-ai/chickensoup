@@ -221,7 +221,9 @@ struct SettingsView: View {
         }
         .background(DesignConstants.warmBackground)
         .navigationTitle("Configuration")
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .onAppear {
             loadCurrentConfig()
         }
