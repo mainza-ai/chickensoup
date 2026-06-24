@@ -177,7 +177,7 @@ struct SidebarDetailsView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
-            .zPriority(10)
+            .zIndex(10)
             
             // Details Scroll Area
             ScrollView {

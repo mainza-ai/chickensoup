@@ -42,17 +42,19 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, body: 
     if provider == "simulated" or not models:
         # Classical heuristic mapping based on content keywords
         body_lower = body.lower()
-        if "work" in body_lower or "employ" in body_lower or "hire" in body_lower:
-            return "WORKED_AT"
-        if "testi" in body_lower or "hear" in body_lower or "congress" in body_lower:
-            return "TESTIFIED_AT"
-        if "claim" in body_lower or "alleg" in body_lower or "say" in body_lower:
+        if source_label == "Person":
+            if "worked at" in body_lower or "employed by" in body_lower or "researcher at" in body_lower or "scientist at" in body_lower:
+                return "WORKED_AT"
+            if "testified" in body_lower or "congressional testimony" in body_lower or "hearing" in body_lower:
+                return "TESTIFIED_AT"
+        if "claimed by" in body_lower or "according to" in body_lower:
             return "CLAIMED_BY"
-        if "part" in body_lower or "member" in body_lower or "inside" in body_lower:
+        if "part of" in body_lower or "division of" in body_lower:
             return "PART_OF"
-        if "use" in body_lower or "utili" in body_lower:
-            return "USES"
-        if "implement" in body_lower or "develop" in body_lower:
+        if source_label in ["Project", "Object"]:
+            if "uses" in body_lower or "utilizes" in body_lower or "based on" in body_lower:
+                return "USES"
+        if "implements" in body_lower or "realizes" in body_lower:
             return "IMPLEMENTS"
         return "RELATED_TO"
 
@@ -106,17 +108,19 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, body: 
 
     # Heuristic fallback if request fails
     body_lower = body.lower()
-    if "work" in body_lower or "employ" in body_lower or "hire" in body_lower:
-        return "WORKED_AT"
-    if "testi" in body_lower or "hear" in body_lower or "congress" in body_lower:
-        return "TESTIFIED_AT"
-    if "claim" in body_lower or "alleg" in body_lower or "say" in body_lower:
+    if source_label == "Person":
+        if "worked at" in body_lower or "employed by" in body_lower or "researcher at" in body_lower or "scientist at" in body_lower:
+            return "WORKED_AT"
+        if "testified" in body_lower or "congressional testimony" in body_lower or "hearing" in body_lower:
+            return "TESTIFIED_AT"
+    if "claimed by" in body_lower or "according to" in body_lower:
         return "CLAIMED_BY"
-    if "part" in body_lower or "member" in body_lower or "inside" in body_lower:
+    if "part of" in body_lower or "division of" in body_lower:
         return "PART_OF"
-    if "use" in body_lower or "utili" in body_lower:
-        return "USES"
-    if "implement" in body_lower or "develop" in body_lower:
+    if source_label in ["Project", "Object"]:
+        if "uses" in body_lower or "utilizes" in body_lower or "based on" in body_lower:
+            return "USES"
+    if "implements" in body_lower or "realizes" in body_lower:
         return "IMPLEMENTS"
     return "RELATED_TO"
 
