@@ -36,6 +36,10 @@ public final class LLMDiscoveryService: ObservableObject {
             self.selectedModel = config.llm_active_model
             self.activeProvider = config.llm_active_provider
             self.providerStates = config.llm_providers.mapValues { $0.available }
+
+            // Sync to BackendService so AINavigatorView displays the active model immediately
+            BackendService.shared.llmActiveModel = config.llm_active_model
+            BackendService.shared.llmActiveProvider = config.llm_active_provider
             
             // Build discovery chain from llm_providers response
             let providerOrder = ["omlx", "ollama", "lmstudio"]

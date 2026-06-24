@@ -31,6 +31,8 @@ public final class BackendService: ObservableObject {
     @Published public var llmActiveModel: String = ""
     @Published public var llmAvailableModels: [String] = []
     @Published public var isSavingLLMConfig = false
+
+    @Published public var conversationId: String? = nil
     
     @Published public var eventsError: Error?
     @Published public var entitiesError: Error?
@@ -147,9 +149,17 @@ public final class BackendService: ObservableObject {
         defer { isSubmittingQuery = false }
         
         do {
-            let bodyDict: [String: Any] = ["query": text, "structured": isStructured]
+            var bodyDict: [String: Any] = ["query": text, "structured": isStructured]
+            if let cid = conversationId {
+                bodyDict["conversation_id"] = cid
+            }
             let bodyData = try JSONSerialization.data(withJSONObject: bodyDict)
             let response: APIQueryResponse = try await APIClient.shared.request(path: "/query", method: "POST", body: bodyData)
+            
+            // Persist conversation ID for follow-up queries
+            if let cid = response.conversationId {
+                conversationId = cid
+            }
             
             // Handle any newly inferred events returned in query response
             for apiEvent in response.inferredEvents {

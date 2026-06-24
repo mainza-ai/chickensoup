@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -6,7 +7,7 @@ import redis
 
 from src.config import settings
 from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery, probe_provider, get_all_providers
-from typing import Dict
+from typing import Any, Dict, List, Optional
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
@@ -274,37 +275,76 @@ async def get_models():
         models=models
     )
 
+def _build_query_response(query: str, output: Dict[str, Any], conversation_id: Optional[str] = None, history: Optional[List[Dict[str, str]]] = None) -> QueryResponse:
+    """Shared helper: extract answer/confidence/entities/sources from orchestrator output,
+    handling paused and error states consistently."""
+    answer = output.get("answer", "No response generated.")
+    if output.get("status") == "paused_for_human_approval":
+        answer = f"PENDING APPROVAL: {output.get('summary', '')}"
+
+    return QueryResponse(
+        query=query,
+        answer=answer,
+        confidence=output.get("confidence", 0.5),
+        entities=output.get("entities", []),
+        sources=output.get("sources", ["Orchestrated Search"]) if not output.get("status") == "paused_for_human_approval" else [],
+        inferred_events=[],
+        inferred_entities=[],
+        conversation_id=conversation_id,
+        history=history or [],
+    )
+
+
+def _conversation_redis_key(conversation_id: str) -> str:
+    return f"conversation:{conversation_id}"
+
+
+@app.get("/conversation/{conversation_id}")
+async def get_conversation(conversation_id: str):
+    """Retrieve conversation history by ID."""
+    try:
+        from src.cache import cache_store
+        raw = cache_store.get(_conversation_redis_key(conversation_id))
+        if raw:
+            return {"conversation_id": conversation_id, "history": json.loads(raw)}
+    except Exception:
+        pass
+    return {"conversation_id": conversation_id, "history": []}
+
+
 @app.post("/query", response_model=QueryResponse)
 async def post_query(request: QueryRequest):
     """Submits a query to search the knowledge graph and generate an answer summary using Orchestrator."""
     try:
-        # Route query through the agent orchestrator graph
+        import uuid
+
+        conversation_id = request.conversation_id or str(uuid.uuid4())
+        history: List[Dict[str, str]] = []
+
+        # Retrieve prior conversation turns from Redis
+        try:
+            from src.cache import cache_store
+            raw = cache_store.get(_conversation_redis_key(conversation_id))
+            if raw:
+                history = json.loads(raw)
+        except Exception:
+            pass
+
         output = await orchestrator.execute(request.query)
-        
-        # If it was paused for human approval, return the intermediate state
-        if output.get("status") == "paused_for_human_approval":
-            return QueryResponse(
-                query=request.query,
-                answer=f"PENDING APPROVAL: {output.get('summary')}",
-                confidence=0.1,
-                entities=[],
-                sources=["System Gatekeeper Thread ID: " + output.get("thread_id", "")],
-                inferred_events=[],
-                inferred_entities=[]
-            )
-            
-        return QueryResponse(
-            query=request.query,
-            answer=output.get("answer", "No response generated."),
-            confidence=output.get("confidence", 0.5),
-            entities=output.get("entities", []),
-            sources=output.get("sources", ["Orchestrated Search"]),
-            inferred_events=[],
-            inferred_entities=[]
-        )
+        response = _build_query_response(request.query, output, conversation_id=conversation_id, history=history)
+
+        # Store updated conversation
+        history.append({"role": "user", "content": request.query})
+        history.append({"role": "assistant", "content": response.answer})
+        try:
+            from src.cache import cache_store
+            cache_store.set(_conversation_redis_key(conversation_id), json.dumps(history[-20:]), ttl=86400)
+        except Exception:
+            pass
+
+        return response
     except Exception as e:
         logger.error(f"Error handling orchestrated query: {e}")
-        # Standard fallback if Neo4j or LLM fails
         return QueryResponse(
             query=request.query,
             answer=f"Simulation response: The query '{request.query}' relates to anomalous gravitational field theory.",
@@ -312,7 +352,8 @@ async def post_query(request: QueryRequest):
             entities=[],
             sources=["Simulated Fallback Engine"],
             inferred_events=[],
-            inferred_entities=[]
+            inferred_entities=[],
+            conversation_id=request.conversation_id,
         )
 
 @app.get("/graph/{entity}")
@@ -570,32 +611,25 @@ async def websocket_agent_endpoint(websocket: WebSocket):
                 
                 # Execute query via orchestrator
                 output = await orchestrator.execute(data)
+                response = _build_query_response(data, output)
                 
                 # Stream parts of the response
-                if output.get("status") == "paused_for_human_approval":
+                answer = response.answer
+                chunks = answer.split(" ")
+                for i, chunk in enumerate(chunks):
                     await websocket.send_json({
-                        "status": "paused_for_human_approval",
-                        "summary": output.get("summary"),
-                        "thread_id": output.get("thread_id")
+                        "status": "streaming",
+                        "chunk": chunk + (" " if i < len(chunks) - 1 else "")
                     })
-                else:
-                    # Mock streaming word by word or chunk by chunk
-                    answer = output.get("answer", "No response generated.")
-                    chunks = answer.split(" ")
-                    for i, chunk in enumerate(chunks):
-                        await websocket.send_json({
-                            "status": "streaming",
-                            "chunk": chunk + (" " if i < len(chunks) - 1 else "")
-                        })
-                        await asyncio.sleep(0.05)
-                        
-                    await websocket.send_json({
-                        "status": "completed",
-                        "answer": answer,
-                        "confidence": output.get("confidence", 0.5),
-                        "entities": output.get("entities", []),
-                        "sources": output.get("sources", [])
-                    })
+                    await asyncio.sleep(0.05)
+                    
+                await websocket.send_json({
+                    "status": "completed",
+                    "answer": answer,
+                    "confidence": response.confidence,
+                    "entities": response.entities,
+                    "sources": response.sources
+                })
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected.")
     except Exception as e:
@@ -784,4 +818,31 @@ async def post_ingest_bulk():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/debug/routing")
+async def debug_routing(query: str = ""):
+    """
+    Debug endpoint: runs the classification step only and returns the routing decision
+    without executing the full pipeline. Useful for understanding why a query
+    routes to a particular agent node.
+    """
+    if not query:
+        return {"error": "Provide a query parameter, e.g. ?query=plot+timelines+element+115"}
+
+    parsed = orchestrator.query_agent.classify_and_parse(query)
+
+    wiki_matches = []
+    try:
+        from src.agents.query_agent import _wiki_entity_lookup
+        wiki_matches = _wiki_entity_lookup(query)
+    except Exception:
+        pass
+
+    return {
+        "query": query,
+        "parsed_query": parsed.model_dump(),
+        "wiki_matches": wiki_matches,
+        "routed_to": "ResearchNode" if parsed.intent != "navigate" and parsed.intent != "status" else
+                     ("NavigateNode" if parsed.intent == "navigate" else "StatusNode"),
+        "confidence_gated": parsed.confidence < 0.6,
+    }
 

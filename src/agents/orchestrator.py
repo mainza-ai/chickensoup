@@ -1,3 +1,5 @@
+import asyncio
+import re
 import logging
 from typing import Dict, Any, List, Union
 from dataclasses import dataclass
@@ -34,6 +36,13 @@ class ClassifyNode(BaseNode[OrchestratorState, OrchestratorDeps]):
         parsed = ctx.deps.query_agent.classify_and_parse(ctx.state.query)
         ctx.state.parsed_query = parsed
         
+        if parsed.confidence < 0.6:
+            logger.info(
+                f"Low classification confidence ({parsed.confidence:.2f}) for intent '{parsed.intent}' — "
+                f"falling back to ResearchNode"
+            )
+            return ResearchNode()
+
         if parsed.intent == "navigate":
             return NavigateNode()
         elif parsed.intent == "status":
@@ -84,13 +93,34 @@ class ResearchNode(BaseNode[OrchestratorState, OrchestratorDeps]):
 class NavigateNode(BaseNode[OrchestratorState, OrchestratorDeps]):
     async def run(self, ctx: GraphRunContext[OrchestratorState, OrchestratorDeps]) -> End[OrchestratorState]:
         logger.info("Orchestrator Graph -> Triggering Navigation Agent...")
-        filters = ctx.state.parsed_query.structured_filters if ctx.state.parsed_query else {}
+        parsed = ctx.state.parsed_query
+        filters = parsed.structured_filters if parsed else {}
+        entities = parsed.entities if parsed else []
         
-        # Pull parameters out of parsed query filters or use defaults
+        # Infer navigation params from filters (highest priority), then entities, then defaults
         origin = filters.get("origin", "Earth-2026")
-        destination = filters.get("destination", "Earth-1947")
-        target_year = int(filters.get("year", filters.get("target_year", 1947)))
+
+        # Try to extract a year from entities (4-digit number)
+        inferred_year = None
+        if entities:
+            for ent in entities:
+                year_match = re.findall(r"\b(1[8-9]\d\d|20[0-3]\d)\b", ent)
+                for ym in year_match:
+                    inferred_year = int(ym)
+                    break
+
+        destination = filters.get("destination")
+        target_year = int(filters.get("year", filters.get("target_year", inferred_year or 1947)))
         energy_level = float(filters.get("energy_level", 1.0))
+
+        # If no explicit destination, try first entity (skip if it's a year)
+        if not destination and entities:
+            first = entities[0]
+            if not re.match(r"^\d{4}$", first):
+                destination = first
+
+        if not destination:
+            destination = "Earth-1947"
         
         nav_res = ctx.deps.navigation_agent.navigate(
             origin=origin,
@@ -100,14 +130,27 @@ class NavigateNode(BaseNode[OrchestratorState, OrchestratorDeps]):
         )
         
         ctx.state.navigation_results = nav_res
+
+        path_str = " → ".join(nav_res["path"]) if nav_res["path"] else "N/A"
+        answer = (
+            f"Navigation from {origin} to {destination} (target year {target_year}): "
+            f"{'Successful' if nav_res['success'] else 'Failed'} | "
+            f"Warp factor {nav_res['warp_factor']:.2f}, "
+            f"divergence risk {nav_res['divergence_risk']:.1%} | "
+            f"Path: {path_str}"
+        )
+
         ctx.state.final_output = {
             "status": "completed",
+            "answer": answer,
             "success": nav_res["success"],
             "path": nav_res["path"],
             "warp_factor": nav_res["warp_factor"],
             "divergence_risk": nav_res["divergence_risk"],
             "geometry_tensor": nav_res["geometry_tensor"],
-            "field_manipulation": nav_res["field_manipulation"]
+            "field_manipulation": nav_res["field_manipulation"],
+            "confidence": 1.0 if nav_res["success"] else 0.5,
+            "sources": ["Navigation Agent"]
         }
         
         return End(ctx.state)
@@ -119,10 +162,20 @@ class StatusNode(BaseNode[OrchestratorState, OrchestratorDeps]):
         
         from src.main import get_status
         status_res = await get_status()
+        status_data = status_res.model_dump()
         
         ctx.state.final_output = {
             "status": "completed",
-            "system_status": status_res.model_dump()
+            "system_status": status_data,
+            "answer": (
+                f"System status: LLM provider={status_data.get('llm_provider', '?')} "
+                f"(connected={status_data.get('llm_connected', False)}), "
+                f"Neo4j={'connected' if status_data.get('neo4j_connected') else 'disconnected'}, "
+                f"Redis={'connected' if status_data.get('redis_connected') else 'disconnected'}, "
+                f"Quantum backend={status_data.get('quantum_backend', '?')}"
+            ),
+            "confidence": 1.0,
+            "sources": ["System Status"]
         }
         
         return End(ctx.state)
@@ -161,5 +214,49 @@ class Orchestrator:
 
     async def execute(self, query: str, thread_id: str = "default_thread", human_approved: bool = False) -> Dict[str, Any]:
         state = OrchestratorState(query=query, thread_id=thread_id, human_approved=human_approved)
-        result_state = await orchestrator_graph.run(state=state, deps=self.deps)
-        return result_state.final_output
+        try:
+            result_state = await asyncio.wait_for(
+                orchestrator_graph.run(state=state, deps=self.deps),
+                timeout=60.0
+            )
+        except asyncio.TimeoutError:
+            logger.error(f"Orchestrator execution timed out for query: {query}")
+            return {
+                "status": "completed",
+                "answer": "The query processing timed out. Try a more specific question or check that the LLM service is running.",
+                "confidence": 0.3,
+                "entities": [],
+                "sources": ["Timeout Fallback"],
+            }
+        output = result_state.final_output or {}
+
+        # Synthesize answer if missing or empty — every endpoint needs an "answer" key
+        if not output.get("answer"):
+            if output.get("status") == "paused_for_human_approval":
+                output["answer"] = output.get("summary", "Query requires human approval to proceed.")
+            elif output.get("navigation_results"):
+                nav = output["navigation_results"]
+                path_str = " → ".join(nav.get("path", [])) if nav.get("path") else "N/A"
+                output["answer"] = (
+                    f"Navigation complete: "
+                    f"{'Successful' if nav.get('success') else 'Failed'} | "
+                    f"Warp factor {nav.get('warp_factor', 0):.2f}, "
+                    f"divergence risk {nav.get('divergence_risk', 0):.1%} | "
+                    f"Path: {path_str}"
+                )
+            elif output.get("system_status"):
+                sd = output["system_status"]
+                output["answer"] = (
+                    f"System status: LLM provider={sd.get('llm_provider', '?')} "
+                    f"(connected={sd.get('llm_connected', False)}), "
+                    f"Neo4j={'connected' if sd.get('neo4j_connected') else 'disconnected'}"
+                )
+            else:
+                output["answer"] = "Processed your request, but no specific answer was generated."
+
+        # Ensure consistent keys
+        output.setdefault("confidence", 0.5)
+        output.setdefault("entities", [])
+        output.setdefault("sources", [])
+
+        return output

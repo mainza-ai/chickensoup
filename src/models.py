@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 class QueryRequest(BaseModel):
     query: str = Field(..., description="The query string to evaluate (e.g. Vatican UFO recovery, 1937)")
     structured: bool = Field(False, description="Whether to return a structured JSON response instead of free text")
+    conversation_id: Optional[str] = Field(None, description="Optional conversation ID for multi-turn context")
 
 class QueryResponse(BaseModel):
     query: str
@@ -13,6 +14,8 @@ class QueryResponse(BaseModel):
     sources: List[str] = Field(default_factory=list)
     inferred_events: List[Dict[str, Any]] = Field(default_factory=list)
     inferred_entities: List[Dict[str, Any]] = Field(default_factory=list)
+    conversation_id: Optional[str] = Field(None, description="Conversation ID for follow-up queries")
+    history: List[Dict[str, str]] = Field(default_factory=list, description="Previous turns in this conversation")
 
 class NavigateRequest(BaseModel):
     origin: str = Field(..., description="Origin location or epoch (e.g. Earth-2026)")

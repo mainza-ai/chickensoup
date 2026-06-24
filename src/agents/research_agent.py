@@ -1,3 +1,5 @@
+import os
+import re
 import logging
 from typing import Dict, Any, List, Optional
 from typing_extensions import TypedDict
@@ -10,6 +12,78 @@ from src.discovery import get_discovered, get_active_model, get_active_base_url,
 from src.cache import cache_decorator
 import urllib.request
 import json
+import yaml
+
+WIKI_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "wiki")
+WIKI_SUBDIRS = ["entities", "concepts", "projects"]
+
+
+def _slugify(name: str) -> str:
+    return name.lower().replace(" ", "-").replace("_", "-")
+
+
+def _read_wiki_file(entity_name: str) -> Optional[Dict[str, Any]]:
+    """Read a wiki markdown file by entity name, return parsed frontmatter + body."""
+    slug = _slugify(entity_name)
+    for subdir in WIKI_SUBDIRS:
+        path = os.path.join(WIKI_DIR, subdir, f"{slug}.md")
+        if os.path.isfile(path):
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+            meta = {}
+            body = content
+            yaml_match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
+            if yaml_match:
+                try:
+                    meta = yaml.safe_load(yaml_match.group(1)) or {}
+                except Exception:
+                    pass
+                body = content[yaml_match.end():]
+            return {
+                "name": entity_name,
+                "file": path,
+                "frontmatter": meta,
+                "body": body[:2000],
+                "content_preview": body[:300],
+                "tags": meta.get("tags", []),
+                "sources": meta.get("sources", []),
+                "related": meta.get("related", []),
+            }
+    return None
+
+
+def _wiki_file_fallback(entities: List[str], query: str) -> List[Dict[str, Any]]:
+    """
+    Fallback when Neo4j is empty/unavailable: read wiki markdown files directly.
+    Returns a list of graph_context-like dicts.
+    """
+    context = []
+    candidates = list(entities)
+    if query:
+        candidates.append(query)
+
+    seen = set()
+    for entity in candidates:
+        if entity.lower() in seen:
+            continue
+        seen.add(entity.lower())
+        page = _read_wiki_file(entity)
+        if page:
+            context.append({
+                "entity": {
+                    "name": page["name"],
+                    "labels": ["Entity"] + [t.capitalize() for t in page["tags"] if t in ("person", "place", "event", "concept", "project")],
+                    "properties": {
+                        "content_preview": page["content_preview"],
+                        "sources": page["sources"],
+                        "tags": page["tags"],
+                    }
+                },
+                "connections": [],
+                "_wiki_file": page["file"],
+                "_body_snippet": page["body"][:500],
+            })
+    return context
 
 logger = logging.getLogger("chickensoup.agents.research_agent")
 
@@ -43,33 +117,53 @@ def extraction_node(state: ResearchState) -> Dict[str, Any]:
     return {"entities": entities}
 
 def neo4j_lookup_node(state: ResearchState) -> Dict[str, Any]:
-    """Node: Query the Neo4j database to find matching entities and their neighborhood context."""
+    """Node: Query the Neo4j database to find matching entities and their neighborhood context.
+    Falls back to reading wiki markdown files directly when Neo4j returns nothing."""
     logger.info("Running ResearchAgent Neo4j Lookup Node...")
-    driver = neo4j_conn.get_driver()
+    driver = None
     entities = state.get("entities", [])
     
     found_nodes = []
     graph_context = []
     
-    for entity in entities:
-        # Fuzzy match
-        matches = search_entities(driver, entity)
-        for match in matches:
-            found_nodes.append(match)
-            # Retrieve neighbor context
-            neighborhood = get_entity_neighborhood(driver, match["name"])
-            if neighborhood and neighborhood.get("entity"):
-                graph_context.append(neighborhood)
-                
-    # If no matches, do a general search with the query
-    if not found_nodes and state.get("query"):
-        matches = search_entities(driver, state["query"])
-        for match in matches:
-            found_nodes.append(match)
-            neighborhood = get_entity_neighborhood(driver, match["name"])
-            if neighborhood and neighborhood.get("entity"):
-                graph_context.append(neighborhood)
-                
+    try:
+        driver = neo4j_conn.get_driver()
+    except Exception as e:
+        logger.warning(f"Neo4j driver unavailable: {e}")
+
+    if driver:
+        for entity in entities:
+            matches = search_entities(driver, entity)
+            for match in matches:
+                found_nodes.append(match)
+                neighborhood = get_entity_neighborhood(driver, match["name"])
+                if neighborhood and neighborhood.get("entity"):
+                    graph_context.append(neighborhood)
+                    
+        if not found_nodes and state.get("query"):
+            matches = search_entities(driver, state["query"])
+            for match in matches:
+                found_nodes.append(match)
+                neighborhood = get_entity_neighborhood(driver, match["name"])
+                if neighborhood and neighborhood.get("entity"):
+                    graph_context.append(neighborhood)
+
+    # Fallback to wiki files when Neo4j returned nothing
+    if not graph_context:
+        logger.info("No Neo4j results — trying wiki file fallback...")
+        file_context = _wiki_file_fallback(entities, state.get("query", ""))
+        if file_context:
+            graph_context = file_context
+            for ctx in file_context:
+                ent = ctx.get("entity", {})
+                found_nodes.append({
+                    "name": ent.get("name", ""),
+                    "labels": ent.get("labels", []),
+                    "confidence": 0.8,
+                    "preview": ent.get("properties", {}).get("content_preview", ""),
+                    "source": "wiki_file_fallback",
+                })
+
     return {
         "found_nodes": found_nodes,
         "graph_context": graph_context
@@ -287,7 +381,7 @@ class ResearchAgent:
                 headers={"Content-Type": "application/json"},
                 method="POST"
             )
-            with urllib.request.urlopen(req, timeout=90.0) as response:
+            with urllib.request.urlopen(req, timeout=30.0) as response:
                 if response.status == 200:
                     res_data = json.loads(response.read().decode("utf-8"))
                     content = res_data["choices"][0]["message"]["content"]
