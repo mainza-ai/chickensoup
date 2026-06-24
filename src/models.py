@@ -70,3 +70,13 @@ class ConfigResponse(BaseModel):
     llm_active_provider: str
     llm_active_model: str
     llm_available_models: List[str]
+
+class LLMConfigRequest(BaseModel):
+    llm_active_provider: Optional[str] = None
+    llm_active_model: Optional[str] = None
+
+class LLMConfigResponse(BaseModel):
+    success: bool
+    llm_active_provider: str
+    llm_active_model: str
+    llm_available_models: List[str]

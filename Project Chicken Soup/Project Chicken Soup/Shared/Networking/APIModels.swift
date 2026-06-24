@@ -220,20 +220,19 @@ public struct APIConfigResponse: Codable {
     }
 }
 
-public struct APILLMConfig: Codable {
-    public var activeProvider: String
-    public var activeModel: String
-    public var availableModels: [String]
+public struct APILLMConfigRequest: Codable {
+    public var llm_active_provider: String?
+    public var llm_active_model: String?
     
-    enum CodingKeys: String, CodingKey {
-        case activeProvider = "llm_active_provider"
-        case activeModel = "llm_active_model"
-        case availableModels = "llm_available_models"
+    public init(llm_active_provider: String? = nil, llm_active_model: String? = nil) {
+        self.llm_active_provider = llm_active_provider
+        self.llm_active_model = llm_active_model
     }
-    
-    public init(activeProvider: String, activeModel: String, availableModels: [String]) {
-        self.activeProvider = activeProvider
-        self.activeModel = activeModel
-        self.availableModels = availableModels
-    }
+}
+
+public struct APILLMConfigResponse: Codable {
+    public var success: Bool
+    public var llm_active_provider: String
+    public var llm_active_model: String
+    public var llm_available_models: [String]
 }

@@ -440,17 +440,12 @@ public final class BackendService: ObservableObject {
         defer { isSavingLLMConfig = false }
         
         do {
-            let req = APIConfigRequest(
-                quantum_backend: self.quantumBackend,
-                ibm_api_token: nil,
-                dwave_api_token: nil,
-                ionq_api_token: nil,
-                quantum_hardware_enabled: self.quantumHardwareEnabled,
+            let req = APILLMConfigRequest(
                 llm_active_provider: provider,
                 llm_active_model: model
             )
             let bodyData = try JSONEncoder().encode(req)
-            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config", method: "POST", body: bodyData)
+            let response: APILLMConfigResponse = try await APIClient.shared.request(path: "/config/llm", method: "POST", body: bodyData)
             
             self.llmActiveProvider = response.llm_active_provider
             self.llmActiveModel = response.llm_active_model

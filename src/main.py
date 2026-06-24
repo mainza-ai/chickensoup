@@ -9,7 +9,7 @@ from src.discovery import discover_active_provider, get_discovered, get_active_m
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
-    ConfigRequest, ConfigResponse
+    ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -41,6 +41,39 @@ async def lifespan(app: FastAPI):
     # Shutdown actions
     logger.info("Shutting down chickensoup API...")
     neo4j_conn.close()
+
+def _update_env_file(updates: dict):
+    """Persist key-value pairs to .env, preserving existing lines."""
+    try:
+        env_path = ".env"
+        lines = []
+        if os.path.exists(env_path):
+            with open(env_path, "r") as f:
+                lines = f.readlines()
+
+        updated_keys = set()
+        new_lines = []
+        for line in lines:
+            line_str = line.strip()
+            if not line_str or line_str.startswith("#"):
+                new_lines.append(line)
+                continue
+            parts = line_str.split("=", 1)
+            key = parts[0].strip()
+            if key in updates:
+                new_lines.append(f"{key}={updates[key]}\n")
+                updated_keys.add(key)
+            else:
+                new_lines.append(line)
+
+        for key, val in updates.items():
+            if key not in updated_keys:
+                new_lines.append(f"{key}={val}\n")
+
+        with open(env_path, "w") as f:
+            f.writelines(new_lines)
+    except Exception as e:
+        logger.error(f"Failed to update .env: {e}")
 
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -111,8 +144,8 @@ async def get_status():
 
 @app.get("/config", response_model=ConfigResponse)
 async def get_config():
-    """Returns current quantum and LLM settings."""
-    provider, _, models = get_discovered()
+    """Returns current quantum and LLM settings (always probes fresh)."""
+    provider, _, models = get_discovered(depth="fresh")
     return ConfigResponse(
         success=True,
         quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
@@ -145,49 +178,20 @@ async def post_config(request: ConfigRequest):
     # Refresh discovery with new config
     provider, _, models = refresh_discovery()
 
-    try:
-        env_path = ".env"
-        lines = []
-        if os.path.exists(env_path):
-            with open(env_path, "r") as f:
-                lines = f.readlines()
+    updates = {
+        "QUANTUM_SIMULATION_BACKEND": settings.QUANTUM_SIMULATION_BACKEND,
+        "QUANTUM_HARDWARE_ENABLED": str(settings.QUANTUM_HARDWARE_ENABLED).lower(),
+        "LLM_ACTIVE_PROVIDER": settings.LLM_ACTIVE_PROVIDER,
+        "LLM_ACTIVE_MODEL": settings.LLM_ACTIVE_MODEL,
+    }
+    if request.ibm_api_token is not None:
+        updates["IBM_API_TOKEN"] = settings.IBM_API_TOKEN
+    if request.dwave_api_token is not None:
+        updates["DWAVE_API_TOKEN"] = settings.DWAVE_API_TOKEN
+    if request.ionq_api_token is not None:
+        updates["IONQ_API_TOKEN"] = settings.IONQ_API_TOKEN
 
-        updates = {
-            "QUANTUM_SIMULATION_BACKEND": settings.QUANTUM_SIMULATION_BACKEND,
-            "QUANTUM_HARDWARE_ENABLED": str(settings.QUANTUM_HARDWARE_ENABLED).lower(),
-            "LLM_ACTIVE_PROVIDER": settings.LLM_ACTIVE_PROVIDER,
-            "LLM_ACTIVE_MODEL": settings.LLM_ACTIVE_MODEL,
-        }
-        if request.ibm_api_token is not None:
-            updates["IBM_API_TOKEN"] = settings.IBM_API_TOKEN
-        if request.dwave_api_token is not None:
-            updates["DWAVE_API_TOKEN"] = settings.DWAVE_API_TOKEN
-        if request.ionq_api_token is not None:
-            updates["IONQ_API_TOKEN"] = settings.IONQ_API_TOKEN
-
-        updated_keys = set()
-        new_lines = []
-        for line in lines:
-            line_str = line.strip()
-            if not line_str or line_str.startswith("#"):
-                new_lines.append(line)
-                continue
-            parts = line_str.split("=", 1)
-            key = parts[0].strip()
-            if key in updates:
-                new_lines.append(f"{key}={updates[key]}\n")
-                updated_keys.add(key)
-            else:
-                new_lines.append(line)
-
-        for key, val in updates.items():
-            if key not in updated_keys:
-                new_lines.append(f"{key}={val}\n")
-
-        with open(env_path, "w") as f:
-            f.writelines(new_lines)
-    except Exception as e:
-        logger.error(f"Failed to update .env: {e}")
+    _update_env_file(updates)
 
     return ConfigResponse(
         success=True,
@@ -196,6 +200,28 @@ async def post_config(request: ConfigRequest):
         ibm_api_token_set=bool(settings.IBM_API_TOKEN),
         dwave_api_token_set=bool(settings.DWAVE_API_TOKEN),
         ionq_api_token_set=bool(settings.IONQ_API_TOKEN),
+        llm_active_provider=get_active_provider(),
+        llm_active_model=get_active_model(),
+        llm_available_models=models,
+    )
+
+@app.post("/config/llm", response_model=LLMConfigResponse)
+async def post_llm_config(request: LLMConfigRequest):
+    """Updates LLM provider/model selection, forces fresh probe, persists to .env."""
+    if request.llm_active_provider is not None:
+        settings.LLM_ACTIVE_PROVIDER = request.llm_active_provider
+    if request.llm_active_model is not None:
+        settings.LLM_ACTIVE_MODEL = request.llm_active_model
+
+    provider, _, models = refresh_discovery()
+
+    _update_env_file({
+        "LLM_ACTIVE_PROVIDER": settings.LLM_ACTIVE_PROVIDER,
+        "LLM_ACTIVE_MODEL": settings.LLM_ACTIVE_MODEL,
+    })
+
+    return LLMConfigResponse(
+        success=True,
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
