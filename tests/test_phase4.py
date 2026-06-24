@@ -7,7 +7,7 @@ from src.spacetime_engine.tensor import FieldGeometryTensor
 
 import time
 
-@patch("src.multi_llm.discover_active_provider")
+@patch("src.multi_llm.get_discovered")
 def test_consensus_mock_matching(mock_discover):
     mock_discover.return_value = ("simulated", "http://localhost:8000/mock/v1", ["mock-gpt-4", "mock-llama-3"])
     consensus = MultiLLMConsensus()
@@ -16,8 +16,9 @@ def test_consensus_mock_matching(mock_discover):
     assert res["agreement_score"] == 0.95
     assert "mock-gpt-4" in res["individual_responses"]
 
-@patch("src.multi_llm.discover_active_provider")
-def test_consensus_active_provider(mock_discover):
+@patch("src.multi_llm.get_active_model", return_value="model-a")
+@patch("src.multi_llm.get_discovered")
+def test_consensus_active_provider(mock_discover, mock_get_active_model):
     # Mocking active provider discovery with multiple models
     mock_discover.return_value = ("omlx", "http://127.0.0.1:9000/v1", ["model-a", "model-b"])
     consensus = MultiLLMConsensus()

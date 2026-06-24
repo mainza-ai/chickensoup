@@ -1,6 +1,23 @@
+import os
 import pytest
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
+
+@pytest.fixture(autouse=True)
+def clear_llm_env_overrides(monkeypatch):
+    """Isolate tests from any LLM_ACTIVE_PROVIDER/MODEL env vars set in CI or dev env."""
+    # Patch both os.environ and the singleton so everything stays consistent
+    monkeypatch.setenv("LLM_ACTIVE_PROVIDER", "")
+    monkeypatch.setenv("LLM_ACTIVE_MODEL", "")
+    import src.config
+    monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_PROVIDER", "")
+    monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_MODEL", "")
+    # Reset the discovery module-level cache so tests start clean
+    import src.discovery as d
+    d._discovered_provider = None
+    d._discovered_base_url = None
+    d._discovered_models = []
+    yield
 
 @pytest.fixture(autouse=True)
 def mock_neo4j():
