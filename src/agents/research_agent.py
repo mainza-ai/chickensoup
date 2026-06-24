@@ -6,7 +6,7 @@ from langgraph.checkpoint.memory import MemorySaver
 
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.queries import search_entities, get_entity_neighborhood
-from src.discovery import get_discovered, get_active_model
+from src.discovery import get_discovered, get_active_model, get_active_base_url
 from src.cache import cache_decorator
 import urllib.request
 import json
@@ -259,7 +259,7 @@ class ResearchAgent:
         if self.provider == "simulated":
             return f"Lore Summary: Detailed report matches query '{query}'."
             
-        url = f"{self.base_url}/chat/completions"
+        url = f"{get_active_base_url()}/chat/completions"
         model_name = get_active_model()
         
         prompt = f"""

@@ -152,5 +152,19 @@ def probe_provider(name: str) -> Tuple[str, str, List[str]]:
 
     return "simulated", clean_url, []
 
+def get_active_base_url() -> str:
+    """Return the base URL for the current active provider (live, not cached)."""
+    if settings.LLM_ACTIVE_PROVIDER:
+        mapping = {
+            "omlx": settings.OMLX_API_URL,
+            "ollama": settings.OLLAMA_API_URL,
+            "lmstudio": settings.LMSTUDIO_API_URL,
+        }
+        url = mapping.get(settings.LLM_ACTIVE_PROVIDER.lower())
+        if url:
+            return url.rstrip("/")
+    _, url, _ = get_discovered()
+    return url
+
 # Backward-compatible alias for existing callers
 discover_active_provider = refresh_discovery

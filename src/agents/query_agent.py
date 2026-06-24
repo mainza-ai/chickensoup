@@ -2,7 +2,7 @@ import re
 import logging
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
-from src.discovery import get_discovered, get_active_model
+from src.discovery import get_discovered, get_active_model, get_active_base_url
 import urllib.request
 import urllib.parse
 import json
@@ -70,7 +70,7 @@ class QueryAgent:
         if self.provider == "simulated":
             return None
         
-        url = f"{self.base_url}/chat/completions"
+        url = f"{get_active_base_url()}/chat/completions"
         model_name = get_active_model()
         
         payload = {

@@ -36,20 +36,22 @@ public final class LLMDiscoveryService: ObservableObject {
             self.selectedModel = config.llm_active_model
             self.activeProvider = config.llm_active_provider
             
-            // Build discovery chain from available models and provider info
-            self.discoveryChain = config.llm_available_models.map { modelName in
-                APIDiscoveryStatus(
-                    modelName: modelName,
+            // Build discovery chain from known providers, mark the active one
+            let knownProviders = ["oMLX", "Ollama", "LM Studio"]
+            self.discoveryChain = knownProviders.map { name in
+                let isActive = name.lowercased().contains(config.llm_active_provider.lowercased())
+                return APIDiscoveryStatus(
+                    modelName: name,
                     isAvailable: true,
-                    isCurrent: modelName == config.llm_active_model,
+                    isCurrent: isActive,
                     latencyMs: 0.0
                 )
             }
         } catch {
-            // Fallback: simulate discovery when server is unreachable
+            // Fallback: use known providers with estimated latencies
             try? await Task.sleep(for: .seconds(0.8))
             var mockStatuses = [
-                APIDiscoveryStatus(modelName: "oMLX (Mac)", isAvailable: true, isCurrent: true, latencyMs: 15.0),
+                APIDiscoveryStatus(modelName: "oMLX", isAvailable: true, isCurrent: true, latencyMs: 15.0),
                 APIDiscoveryStatus(modelName: "Ollama", isAvailable: true, isCurrent: false, latencyMs: 38.0),
                 APIDiscoveryStatus(modelName: "LM Studio", isAvailable: false, isCurrent: false, latencyMs: 0.0)
             ]
