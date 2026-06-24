@@ -2,7 +2,7 @@ import re
 import logging
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
-from src.discovery import discover_active_provider
+from src.discovery import get_discovered, get_active_model
 import urllib.request
 import urllib.parse
 import json
@@ -24,7 +24,7 @@ class QueryAgent:
     """
     
     def __init__(self):
-        self.provider, self.base_url, self.models = discover_active_provider()
+        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
         logger.info(f"QueryAgent initialized with provider: {self.provider} ({self.base_url})")
 
     def parse_tql(self, query: str) -> Optional[ParsedQuery]:
@@ -71,7 +71,7 @@ class QueryAgent:
             return None
         
         url = f"{self.base_url}/chat/completions"
-        model_name = self.models[0] if self.models else "default-model"
+        model_name = get_active_model()
         
         payload = {
             "model": model_name,

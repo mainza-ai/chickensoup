@@ -17,6 +17,12 @@ struct SettingsView: View {
     @State private var saveSuccess = false
     @State private var saveMessage = ""
     
+    @State private var llmSelectedModel: String = ""
+    @State private var llmAvailableModels: [String] = []
+    @State private var isSavingLLM = false
+    @State private var llmSaveSuccess = false
+    @State private var llmSaveMessage = ""
+    
     let backends = [
         ("numpy", "NumPy Simulator (Classical)"),
         ("qiskit", "Qiskit Simulator (Quantum local)"),
@@ -104,7 +110,131 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
                 
-                // Section 2: Hardware Toggles and Credentials
+                // Section 2: LLM Configuration
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("LANGUAGE MODEL CONFIGURATION")
+                        .font(.caption)
+                        .bold()
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                    
+                    VStack(spacing: 16) {
+                        // Active provider label
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Active Provider")
+                                    .font(.body)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.primaryText)
+                                if !backendService.llmActiveProvider.isEmpty {
+                                    Text(backendService.llmActiveProvider)
+                                        .font(.subheadline)
+                                        .foregroundStyle(DesignConstants.systemOrangeText)
+                                } else {
+                                    Text("Auto-discovering...")
+                                        .font(.subheadline)
+                                        .foregroundStyle(DesignConstants.secondaryText)
+                                }
+                            }
+                            Spacer()
+                        }
+                        
+                        Divider()
+                            .background(DesignConstants.dividerColor)
+                        
+                        // Model picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Active Model")
+                                .font(.body)
+                                .bold()
+                                .foregroundStyle(DesignConstants.primaryText)
+                            
+                            if llmAvailableModels.isEmpty {
+                                Text("No models discovered. Refresh or check server status.")
+                                    .font(.caption)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                            } else {
+                                Picker("Model", selection: $llmSelectedModel) {
+                                    ForEach(llmAvailableModels, id: \.self) { model in
+                                        HStack {
+                                            Text(model)
+                                            if model == backendService.llmActiveModel {
+                                                Image(systemName: "checkmark")
+                                                    .foregroundStyle(DesignConstants.systemOrange)
+                                            }
+                                        }
+                                        .tag(model)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .tint(DesignConstants.systemOrange)
+                            }
+                        }
+                        
+                        Divider()
+                            .background(DesignConstants.dividerColor)
+                        
+                        // Refresh models button
+                        Button(action: refreshLLMModels) {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                Text("Refresh Available Models")
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.systemOrangeText)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        // Save LLM config button
+                        if !llmSaveMessage.isEmpty {
+                            HStack {
+                                Image(systemName: llmSaveSuccess ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
+                                    .foregroundStyle(llmSaveSuccess ? DesignConstants.systemGreenText : DesignConstants.systemRed)
+                                Text(llmSaveMessage)
+                                    .font(.caption)
+                                    .foregroundStyle(DesignConstants.primaryText)
+                            }
+                            .padding(8)
+                            .background(llmSaveSuccess ? Color.green.opacity(0.1) : Color.red.opacity(0.1), in: Capsule())
+                            .transition(.scale.combined(with: .opacity))
+                        }
+                        
+                        Button(action: saveLLMSettings) {
+                            HStack {
+                                if isSavingLLM {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .scaleEffect(0.8)
+                                        .padding(.trailing, 4)
+                                } else {
+                                    Image(systemName: "brain")
+                                }
+                                Text(isSavingLLM ? "Saving..." : "Apply Model Selection")
+                                    .bold()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(DesignConstants.systemOrange.opacity(0.15))
+                            .foregroundStyle(DesignConstants.systemOrangeText)
+                            .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius)
+                                    .stroke(DesignConstants.systemOrange.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSavingLLM || llmAvailableModels.isEmpty)
+                    }
+                    .padding(DesignConstants.standardPadding)
+                    .background(DesignConstants.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
+                            .stroke(DesignConstants.glassBorderColor, lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal)
+                
+                // Section 3: Hardware Toggles and Credentials
                 VStack(alignment: .leading, spacing: 12) {
                     Text("QUANTUM HARDWARE CONNECTIVITY")
                         .font(.caption)
@@ -290,6 +420,46 @@ struct SettingsView: View {
             self.ibmToken = ""
             self.dwaveToken = ""
             self.ionqToken = ""
+            self.llmAvailableModels = backendService.llmAvailableModels
+            self.llmSelectedModel = backendService.llmActiveModel
+        }
+    }
+    
+    private func refreshLLMModels() {
+        Task {
+            await backendService.refreshLLMDiscovery()
+            self.llmAvailableModels = backendService.llmAvailableModels
+            self.llmSelectedModel = backendService.llmActiveModel
+        }
+    }
+    
+    private func saveLLMSettings() {
+        guard !llmSelectedModel.isEmpty else { return }
+        isSavingLLM = true
+        llmSaveMessage = ""
+        
+        Task {
+            let success = await backendService.saveLLMConfig(
+                provider: nil,
+                model: llmSelectedModel
+            )
+            
+            await MainActor.run {
+                isSavingLLM = false
+                llmSaveSuccess = success
+                if success {
+                    llmSaveMessage = "Model selection updated successfully."
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        withAnimation {
+                            if llmSaveMessage.contains("success") {
+                                llmSaveMessage = ""
+                            }
+                        }
+                    }
+                } else {
+                    llmSaveMessage = "Failed to update model selection on server."
+                }
+            }
         }
     }
     

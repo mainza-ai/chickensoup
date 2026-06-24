@@ -35,9 +35,18 @@ Models are auto-detected by type (LLM, VLM, OCR, Embedding, Reranker) and suppor
 
 ## Models Served
 
-- `Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-mlx-8bit` — Primary model
+- `Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated-mlx-8bit` — Example model (user-configurable)
 - Other mlx-community models
 - Custom models in the model directory
+
+## Model Selection
+
+The active model is no longer hardcoded. The server discovers all available models via `GET /v1/models` and exposes them through:
+- `GET /config` — Returns `llm_active_provider`, `llm_active_model`, `llm_available_models`
+- `POST /config` — Accepts `llm_active_provider` and `llm_active_model` overrides
+- `GET /models` — Lists all discovered models for the active provider
+
+Users can pick from available models in the Settings panel. The selection persists to `.env` and takes effect immediately — no server restart required.
 
 ## See Also
 

@@ -19,6 +19,10 @@ public final class LLMDiscoveryService: ObservableObject {
     ]
     @Published public private(set) var isRefreshing = false
     
+    @Published public var availableModels: [String] = []
+    @Published public var selectedModel: String = ""
+    @Published public var activeProvider: String = ""
+    
     private init() {}
     
     public func discoverActiveModels() async {
@@ -26,19 +30,29 @@ public final class LLMDiscoveryService: ObservableObject {
         defer { isRefreshing = false }
         
         do {
-            // Attempt to contact server for discovery status
-            let statuses: [APIDiscoveryStatus] = try await APIClient.shared.request(path: "/discovery")
-            self.discoveryChain = statuses
+            // Fetch config from server which includes LLM discovery state
+            let config: APIConfigResponse = try await APIClient.shared.request(path: "/config")
+            self.availableModels = config.llm_available_models
+            self.selectedModel = config.llm_active_model
+            self.activeProvider = config.llm_active_provider
+            
+            // Build discovery chain from available models and provider info
+            self.discoveryChain = config.llm_available_models.map { modelName in
+                APIDiscoveryStatus(
+                    modelName: modelName,
+                    isAvailable: true,
+                    isCurrent: modelName == config.llm_active_model,
+                    latencyMs: 0.0
+                )
+            }
         } catch {
-            // Fallback: simulate discovery request completion with local state when server is unreachable
+            // Fallback: simulate discovery when server is unreachable
             try? await Task.sleep(for: .seconds(0.8))
-            // Ensure local state remains consistent
             var mockStatuses = [
                 APIDiscoveryStatus(modelName: "oMLX (Mac)", isAvailable: true, isCurrent: true, latencyMs: 15.0),
                 APIDiscoveryStatus(modelName: "Ollama", isAvailable: true, isCurrent: false, latencyMs: 38.0),
                 APIDiscoveryStatus(modelName: "LM Studio", isAvailable: false, isCurrent: false, latencyMs: 0.0)
             ]
-            // Randomly toggle one of the status values to make UI testing dynamic
             if let index = mockStatuses.indices.randomElement() {
                 mockStatuses[index].latencyMs = Double.random(in: 10...60)
             }

@@ -27,6 +27,11 @@ public final class BackendService: ObservableObject {
     @Published public var isFetchingConfig = false
     @Published public var isSavingConfig = false
     
+    @Published public var llmActiveProvider: String = ""
+    @Published public var llmActiveModel: String = ""
+    @Published public var llmAvailableModels: [String] = []
+    @Published public var isSavingLLMConfig = false
+    
     @Published public var eventsError: Error?
     @Published public var entitiesError: Error?
     @Published public var queryError: Error?
@@ -377,7 +382,7 @@ public final class BackendService: ObservableObject {
         }
     }
     
-    // MARK: - Quantum Configuration Methods
+    // MARK: - Configuration Methods
     public func fetchConfig() async {
         isFetchingConfig = true
         defer { isFetchingConfig = false }
@@ -389,8 +394,11 @@ public final class BackendService: ObservableObject {
             self.ibmApiTokenSet = response.ibm_api_token_set
             self.dwaveApiTokenSet = response.dwave_api_token_set
             self.ionqApiTokenSet = response.ionq_api_token_set
+            self.llmActiveProvider = response.llm_active_provider
+            self.llmActiveModel = response.llm_active_model
+            self.llmAvailableModels = response.llm_available_models
         } catch {
-            print("Failed to fetch quantum configurations: \(error.localizedDescription)")
+            print("Failed to fetch configurations: \(error.localizedDescription)")
         }
     }
     
@@ -404,7 +412,9 @@ public final class BackendService: ObservableObject {
                 ibm_api_token: (ibmToken?.isEmpty ?? true) ? nil : ibmToken,
                 dwave_api_token: (dwaveToken?.isEmpty ?? true) ? nil : dwaveToken,
                 ionq_api_token: (ionqToken?.isEmpty ?? true) ? nil : ionqToken,
-                quantum_hardware_enabled: hardwareEnabled
+                quantum_hardware_enabled: hardwareEnabled,
+                llm_active_provider: nil,
+                llm_active_model: nil
             )
             let bodyData = try JSONEncoder().encode(req)
             let response: APIConfigResponse = try await APIClient.shared.request(path: "/config", method: "POST", body: bodyData)
@@ -414,10 +424,52 @@ public final class BackendService: ObservableObject {
             self.ibmApiTokenSet = response.ibm_api_token_set
             self.dwaveApiTokenSet = response.dwave_api_token_set
             self.ionqApiTokenSet = response.ionq_api_token_set
+            self.llmActiveProvider = response.llm_active_provider
+            self.llmActiveModel = response.llm_active_model
+            self.llmAvailableModels = response.llm_available_models
             return true
         } catch {
-            print("Failed to save quantum configurations: \(error.localizedDescription)")
+            print("Failed to save configurations: \(error.localizedDescription)")
             return false
+        }
+    }
+    
+    // MARK: - LLM Configuration
+    public func saveLLMConfig(provider: String?, model: String?) async -> Bool {
+        isSavingLLMConfig = true
+        defer { isSavingLLMConfig = false }
+        
+        do {
+            let req = APIConfigRequest(
+                quantum_backend: self.quantumBackend,
+                ibm_api_token: nil,
+                dwave_api_token: nil,
+                ionq_api_token: nil,
+                quantum_hardware_enabled: self.quantumHardwareEnabled,
+                llm_active_provider: provider,
+                llm_active_model: model
+            )
+            let bodyData = try JSONEncoder().encode(req)
+            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config", method: "POST", body: bodyData)
+            
+            self.llmActiveProvider = response.llm_active_provider
+            self.llmActiveModel = response.llm_active_model
+            self.llmAvailableModels = response.llm_available_models
+            return true
+        } catch {
+            print("Failed to save LLM configuration: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    public func refreshLLMDiscovery() async {
+        do {
+            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config")
+            self.llmAvailableModels = response.llm_available_models
+            self.llmActiveProvider = response.llm_active_provider
+            self.llmActiveModel = response.llm_active_model
+        } catch {
+            print("Failed to refresh LLM discovery: \(error.localizedDescription)")
         }
     }
 }

@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, status
 import redis
 
 from src.config import settings
-from src.discovery import discover_active_provider
+from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
@@ -85,7 +85,7 @@ app.add_middleware(ObservabilityAndRateLimitMiddleware)
 async def get_status():
     """Returns system status, showing connectivity of local LLMs, database, and cache."""
     # Check LLM
-    provider, _, models = discover_active_provider()
+    provider, _, _ = get_discovered(depth="fresh")
     llm_connected = provider != "simulated"
 
     # Check Neo4j
@@ -111,7 +111,8 @@ async def get_status():
 
 @app.get("/config", response_model=ConfigResponse)
 async def get_config():
-    """Returns current quantum settings and API credentials setup statuses."""
+    """Returns current quantum and LLM settings."""
+    provider, _, models = get_discovered()
     return ConfigResponse(
         success=True,
         quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
@@ -119,11 +120,14 @@ async def get_config():
         ibm_api_token_set=bool(settings.IBM_API_TOKEN),
         dwave_api_token_set=bool(settings.DWAVE_API_TOKEN),
         ionq_api_token_set=bool(settings.IONQ_API_TOKEN),
+        llm_active_provider=get_active_provider(),
+        llm_active_model=get_active_model(),
+        llm_available_models=models,
     )
 
 @app.post("/config", response_model=ConfigResponse)
 async def post_config(request: ConfigRequest):
-    """Updates active quantum simulation/hardware options and updates the local env config."""
+    """Updates quantum and/or LLM settings and persists to .env."""
     settings.QUANTUM_SIMULATION_BACKEND = request.quantum_backend
     settings.QUANTUM_HARDWARE_ENABLED = request.quantum_hardware_enabled
     if request.ibm_api_token is not None:
@@ -132,17 +136,27 @@ async def post_config(request: ConfigRequest):
         settings.DWAVE_API_TOKEN = request.dwave_api_token
     if request.ionq_api_token is not None:
         settings.IONQ_API_TOKEN = request.ionq_api_token
-        
+
+    if request.llm_active_provider is not None:
+        settings.LLM_ACTIVE_PROVIDER = request.llm_active_provider
+    if request.llm_active_model is not None:
+        settings.LLM_ACTIVE_MODEL = request.llm_active_model
+
+    # Refresh discovery with new config
+    provider, _, models = refresh_discovery()
+
     try:
         env_path = ".env"
         lines = []
         if os.path.exists(env_path):
             with open(env_path, "r") as f:
                 lines = f.readlines()
-                
+
         updates = {
             "QUANTUM_SIMULATION_BACKEND": settings.QUANTUM_SIMULATION_BACKEND,
             "QUANTUM_HARDWARE_ENABLED": str(settings.QUANTUM_HARDWARE_ENABLED).lower(),
+            "LLM_ACTIVE_PROVIDER": settings.LLM_ACTIVE_PROVIDER,
+            "LLM_ACTIVE_MODEL": settings.LLM_ACTIVE_MODEL,
         }
         if request.ibm_api_token is not None:
             updates["IBM_API_TOKEN"] = settings.IBM_API_TOKEN
@@ -150,7 +164,7 @@ async def post_config(request: ConfigRequest):
             updates["DWAVE_API_TOKEN"] = settings.DWAVE_API_TOKEN
         if request.ionq_api_token is not None:
             updates["IONQ_API_TOKEN"] = settings.IONQ_API_TOKEN
-            
+
         updated_keys = set()
         new_lines = []
         for line in lines:
@@ -165,11 +179,11 @@ async def post_config(request: ConfigRequest):
                 updated_keys.add(key)
             else:
                 new_lines.append(line)
-                
+
         for key, val in updates.items():
             if key not in updated_keys:
                 new_lines.append(f"{key}={val}\n")
-                
+
         with open(env_path, "w") as f:
             f.writelines(new_lines)
     except Exception as e:
@@ -182,12 +196,15 @@ async def post_config(request: ConfigRequest):
         ibm_api_token_set=bool(settings.IBM_API_TOKEN),
         dwave_api_token_set=bool(settings.DWAVE_API_TOKEN),
         ionq_api_token_set=bool(settings.IONQ_API_TOKEN),
+        llm_active_provider=get_active_provider(),
+        llm_active_model=get_active_model(),
+        llm_available_models=models,
     )
 
 @app.get("/models", response_model=ModelsResponse)
 async def get_models():
     """Lists available local LLM models discovered on the system fallback chain."""
-    provider, _, models = discover_active_provider()
+    provider, _, models = get_discovered(depth="fresh")
     return ModelsResponse(
         provider=provider,
         models=models

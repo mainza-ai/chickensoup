@@ -37,8 +37,8 @@ FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, or
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET | `/status` | System health (LLM, Neo4j, Redis, quantum) |
-| GET | `/config` | Current quantum settings + token statuses |
-| POST | `/config` | Update quantum backend, hardware toggle, tokens |
+| GET | `/config` | Current quantum + LLM settings (provider, active model, available models) |
+| POST | `/config` | Update quantum backend, hardware toggle, tokens + LLM provider/model selection |
 | GET | `/models` | List available LLM models |
 
 ### Ingestion
@@ -65,8 +65,8 @@ All models in `src/models.py` (~67 lines), typed with Pydantic:
 | `IngestRequest` | `title, content, tags, sources` |
 | `IngestResponse` | `success, nodes_created, relationships_created, confidence_score` |
 | `StatusResponse` | `status, llm_provider, llm_connected, neo4j_connected, redis_connected, quantum_backend` |
-| `ConfigRequest` | `quantum_backend, ibm_api_token?, dwave_api_token?, ionq_api_token?, hardware_enabled` |
-| `ConfigResponse` | `quantum_backend, hardware_enabled, ibm_configured, dwave_configured, ionq_configured` |
+| `ConfigRequest` | `quantum_backend, ibm_api_token?, dwave_api_token?, ionq_api_token?, hardware_enabled, llm_active_provider?, llm_active_model?` |
+| `ConfigResponse` | `quantum_backend, hardware_enabled, ibm/dwave/ionq token_set, llm_active_provider, llm_active_model, llm_available_models` |
 
 ## Middleware
 

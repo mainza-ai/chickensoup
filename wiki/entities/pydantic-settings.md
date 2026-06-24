@@ -11,7 +11,7 @@ related: [pydantic-ai, pydantic-graph, api-design]
 
 Type-safe configuration management using pydantic-settings. Implementation in `src/config.py`.
 
-## Configuration Schema (19 fields)
+## Configuration Schema (21 fields)
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -25,6 +25,8 @@ Type-safe configuration management using pydantic-settings. Implementation in `s
 | `OMLX_API_URL` | str | "http://localhost:8001" | oMLX endpoint |
 | `OLLAMA_API_URL` | str | "http://localhost:11434" | Ollama endpoint |
 | `LMSTUDIO_API_URL` | str | "http://localhost:1234" | LM Studio endpoint |
+| `LLM_ACTIVE_PROVIDER` | str | "" | Override auto-discovered provider |
+| `LLM_ACTIVE_MODEL` | str | "" | Override auto-discovered model |
 | `QUANTUM_SIMULATION_BACKEND` | str | "numpy" | Quantum backend |
 | `IBM_API_TOKEN` | str | "" | IBM Quantum token |
 | `DWAVE_API_TOKEN` | str | "" | D-Wave token |
@@ -34,6 +36,10 @@ Type-safe configuration management using pydantic-settings. Implementation in `s
 ## Computed Properties
 
 `fallback_chain_list` — Parses `LLM_FALLBACK_CHAIN` comma-separated string into a list.
+
+## Runtime Model Selection
+
+When `LLM_ACTIVE_MODEL` is set, all consumers (QueryAgent, ResearchAgent, MultiLLMConsensus) use it instead of the first available model. When `LLM_ACTIVE_PROVIDER` is set, discovery probes only that provider. Both can be updated at runtime via `POST /config` — no server restart needed.
 
 ## Usage
 

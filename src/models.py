@@ -57,6 +57,8 @@ class ConfigRequest(BaseModel):
     dwave_api_token: Optional[str] = None
     ionq_api_token: Optional[str] = None
     quantum_hardware_enabled: bool = False
+    llm_active_provider: Optional[str] = None
+    llm_active_model: Optional[str] = None
 
 class ConfigResponse(BaseModel):
     success: bool
@@ -65,3 +67,6 @@ class ConfigResponse(BaseModel):
     ibm_api_token_set: bool
     dwave_api_token_set: bool
     ionq_api_token_set: bool
+    llm_active_provider: str
+    llm_active_model: str
+    llm_available_models: List[str]

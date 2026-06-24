@@ -6,7 +6,7 @@ from langgraph.checkpoint.memory import MemorySaver
 
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.queries import search_entities, get_entity_neighborhood
-from src.discovery import discover_active_provider
+from src.discovery import get_discovered, get_active_model
 from src.cache import cache_decorator
 import urllib.request
 import json
@@ -202,7 +202,7 @@ class ResearchAgent:
     """
     
     def __init__(self):
-        self.provider, self.base_url, self.models = discover_active_provider()
+        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
         self.graph = research_graph
 
     def run_research(
@@ -260,7 +260,7 @@ class ResearchAgent:
             return f"Lore Summary: Detailed report matches query '{query}'."
             
         url = f"{self.base_url}/chat/completions"
-        model_name = self.models[0] if self.models else "default-model"
+        model_name = get_active_model()
         
         prompt = f"""
         Analyze the following research context and answer the user query: "{query}"

@@ -11,6 +11,13 @@ struct AINavigatorView: View {
     @ObservedObject var discoveryService = LLMDiscoveryService.shared
     @ObservedObject var backendService = BackendService.shared
     
+    private var currentLLMModel: String {
+        if !backendService.llmActiveModel.isEmpty {
+            return backendService.llmActiveModel
+        }
+        return "auto-discover"
+    }
+    
     @State private var logs: [String] = [
         "System initiated. Connecting local LLM...",
         "oMLX discoverable at 127.0.0.1:9000. Fallbacks loaded.",
@@ -88,6 +95,21 @@ struct AINavigatorView: View {
             .padding(10)
             .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+            
+            // Active model display
+            HStack {
+                Text("Active Model:")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(currentLLMModel)
+                    .font(.system(.caption, design: .monospaced))
+                    .bold()
+                    .foregroundStyle(DesignConstants.systemOrangeText)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            .padding(.horizontal, 4)
             
             Divider()
             

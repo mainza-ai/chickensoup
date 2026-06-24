@@ -4,7 +4,7 @@ import json
 import urllib.request
 import urllib.error
 from typing import List, Dict, Any, Tuple
-from src.discovery import discover_active_provider
+from src.discovery import get_discovered, get_active_model, get_active_provider
 from src.cache import cache_decorator
 
 logger = logging.getLogger("chickensoup.multi_llm")
@@ -14,19 +14,24 @@ class MultiLLMConsensus:
     Orchestrates consensus matching and result collation across multiple active LLM provider models.
     """
     def __init__(self):
-        self.provider, self.base_url, self.models = discover_active_provider()
+        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
 
     async def generate_consensus(self, prompt: str, system_instruction: str = "You are an expert consensus analyzer.") -> Dict[str, Any]:
         """
         Queries all discovered models for the prompt, computes agreement consensus scores,
         and collates the final consensus response.
         """
+        # Refresh discovery on each call so config changes take effect immediately
+        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
+
         # If simulated, return standard mocked consensus output
         if self.provider == "simulated" or not self.models:
             return self._generate_mocked_consensus(prompt)
 
-        # We will query up to 3 models from the active provider to keep it fast
-        models_to_query = self.models[:3]
+        # Query the active model + up to 2 additional for consensus
+        active_model = get_active_model()
+        others = [m for m in self.models if m != active_model][:2]
+        models_to_query = [active_model] + others
         tasks = [self._query_model_async(model, prompt, system_instruction) for model in models_to_query]
         responses = await asyncio.gather(*tasks)
 

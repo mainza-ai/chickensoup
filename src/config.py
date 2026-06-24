@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     OLLAMA_API_URL: str = "http://localhost:11434/v1"
     LMSTUDIO_API_URL: str = "http://localhost:1234/v1"
 
+    # Override auto-discovered provider/model (empty = auto-select)
+    LLM_ACTIVE_PROVIDER: str = ""
+    LLM_ACTIVE_MODEL: str = ""
+
     QUANTUM_SIMULATION_BACKEND: str = "numpy"
     IBM_API_TOKEN: str = ""
     DWAVE_API_TOKEN: str = ""

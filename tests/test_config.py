@@ -8,6 +8,8 @@ def test_settings_default_values():
     assert settings.HOST == "0.0.0.0"
     assert settings.NEO4J_URI == "bolt://localhost:7687"
     assert "omlx" in settings.fallback_chain_list
+    assert settings.LLM_ACTIVE_PROVIDER == ""
+    assert settings.LLM_ACTIVE_MODEL == ""
 
 def test_fallback_chain_list_parsing():
     settings = Settings(LLM_FALLBACK_CHAIN="omlx, lmstudio")
@@ -15,6 +17,11 @@ def test_fallback_chain_list_parsing():
 
     settings_empty = Settings(LLM_FALLBACK_CHAIN="")
     assert settings_empty.fallback_chain_list == []
+
+def test_llm_active_overrides():
+    settings = Settings(LLM_ACTIVE_PROVIDER="ollama", LLM_ACTIVE_MODEL="llama3")
+    assert settings.LLM_ACTIVE_PROVIDER == "ollama"
+    assert settings.LLM_ACTIVE_MODEL == "llama3"
 
 def test_env_override():
     with patch.dict(os.environ, {"PORT": "9000", "LLM_FALLBACK_CHAIN": "ollama"}):

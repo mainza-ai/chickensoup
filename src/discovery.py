@@ -7,12 +7,44 @@ from src.config import settings
 
 logger = logging.getLogger("chickensoup.discovery")
 
-def discover_active_provider() -> Tuple[Optional[str], Optional[str], List[str]]:
+# In-memory cache of the last successful discovery
+_discovered_provider: Optional[str] = None
+_discovered_base_url: Optional[str] = None
+_discovered_models: List[str] = []
+
+def refresh_discovery() -> Tuple[str, str, List[str]]:
     """
     Probes local LLM provider endpoints in order of preference: oMLX -> Ollama -> LM Studio.
-    Returns:
-        Tuple of (provider_name, base_url, list_of_models)
+    Updates the in-memory cache and returns (provider_name, base_url, list_of_models).
     """
+    global _discovered_provider, _discovered_base_url, _discovered_models
+
+    # If user has explicitly set a provider override, skip probing entirely
+    if settings.LLM_ACTIVE_PROVIDER:
+        url_mapping = {
+            "omlx": settings.OMLX_API_URL,
+            "ollama": settings.OLLAMA_API_URL,
+            "lmstudio": settings.LMSTUDIO_API_URL
+        }
+        base_url = url_mapping.get(settings.LLM_ACTIVE_PROVIDER.lower())
+        if base_url:
+            clean_url = base_url.rstrip("/")
+            models_url = f"{clean_url}/models"
+            try:
+                req = urllib.request.Request(models_url, method="GET")
+                with urllib.request.urlopen(req, timeout=1.5) as response:
+                    if response.status == 200:
+                        data = json.loads(response.read().decode("utf-8"))
+                        models = _extract_models(data)
+                        logger.info(f"Discovered provider '{settings.LLM_ACTIVE_PROVIDER}' with models: {models}")
+                        _discovered_provider = settings.LLM_ACTIVE_PROVIDER
+                        _discovered_base_url = clean_url
+                        _discovered_models = models
+                        return _discovered_provider, _discovered_base_url, _discovered_models
+            except Exception as e:
+                logger.warning(f"Configured provider '{settings.LLM_ACTIVE_PROVIDER}' unreachable: {e}")
+
+    # Standard fallback chain probing
     providers = settings.fallback_chain_list
     url_mapping = {
         "omlx": settings.OMLX_API_URL,
@@ -24,27 +56,22 @@ def discover_active_provider() -> Tuple[Optional[str], Optional[str], List[str]]
         base_url = url_mapping.get(provider.lower())
         if not base_url:
             continue
-        
-        # Strip trailing slash if present
+
         clean_url = base_url.rstrip("/")
         models_url = f"{clean_url}/models"
-        
+
         logger.info(f"Probing {provider} at {models_url}...")
         try:
             req = urllib.request.Request(models_url, method="GET")
-            # Set a low timeout of 1.5 seconds for discovery
             with urllib.request.urlopen(req, timeout=1.5) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
-                    models = []
-                    # Standard OpenAI /v1/models response contains a 'data' array of objects with 'id'
-                    if isinstance(data, dict) and "data" in data:
-                        models = [m["id"] for m in data["data"] if isinstance(m, dict) and "id" in m]
-                    elif isinstance(data, list):
-                        models = [m.get("id", m.get("name")) for m in data if isinstance(m, dict)]
-                    
+                    models = _extract_models(data)
                     logger.info(f"Successfully discovered {provider} with models: {models}")
-                    return provider, clean_url, models
+                    _discovered_provider = provider
+                    _discovered_base_url = clean_url
+                    _discovered_models = models
+                    return _discovered_provider, _discovered_base_url, _discovered_models
         except (urllib.error.URLError, TimeoutError, ConnectionResetError) as e:
             logger.debug(f"{provider} probe failed: {e}")
             continue
@@ -53,4 +80,46 @@ def discover_active_provider() -> Tuple[Optional[str], Optional[str], List[str]]
             continue
 
     logger.warning("No active local LLM provider discovered. Falling back to simulated/mock provider.")
-    return "simulated", "http://localhost:8000/mock/v1", ["mock-gpt-4", "mock-llama-3"]
+    _discovered_provider = "simulated"
+    _discovered_base_url = "http://localhost:8000/mock/v1"
+    _discovered_models = ["mock-gpt-4", "mock-llama-3"]
+    return _discovered_provider, _discovered_base_url, _discovered_models
+
+
+def _extract_models(data) -> List[str]:
+    """Extract model IDs from OpenAI-compatible /v1/models response."""
+    if isinstance(data, dict) and "data" in data:
+        return [m["id"] for m in data["data"] if isinstance(m, dict) and "id" in m]
+    elif isinstance(data, list):
+        return [m.get("id", m.get("name")) for m in data if isinstance(m, dict)]
+    return []
+
+
+def get_discovered(depth: str = "cached") -> Tuple[str, str, List[str]]:
+    """
+    Returns cached discovery result, re-probing if 'depth' is 'fresh'.
+    This avoids redundant HTTP probes on every status check.
+    """
+    if depth == "fresh" or _discovered_provider is None:
+        return refresh_discovery()
+    return _discovered_provider, _discovered_base_url, _discovered_models
+
+
+def get_active_model() -> str:
+    """Returns the user-configured model, or the first discovered model, or a fallback."""
+    if settings.LLM_ACTIVE_MODEL:
+        return settings.LLM_ACTIVE_MODEL
+    _, _, models = get_discovered()
+    return models[0] if models else "default-model"
+
+
+def get_active_provider() -> str:
+    """Returns the user-configured provider, or the discovered provider."""
+    if settings.LLM_ACTIVE_PROVIDER:
+        return settings.LLM_ACTIVE_PROVIDER
+    provider, _, _ = get_discovered()
+    return provider
+
+
+# Backward-compatible alias for existing callers
+discover_active_provider = refresh_discovery

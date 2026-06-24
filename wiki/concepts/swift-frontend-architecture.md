@@ -35,8 +35,8 @@ Three `@Model` classes stored locally for offline operation:
 
 ### Services (Shared/Services/)
 
-- **BackendService** (@MainActor, 423 lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries, simulates geodesics, fetches graph neighborhoods, manages navigation history stack. Communicates via `APIClient`.
-- **LLMDiscoveryService** (@MainActor ObservableObject singleton) — Probes 3 providers (oMLX, Ollama, LM Studio), displays availability/latency in UI.
+- **BackendService** (@MainActor, 440+ lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries, simulates geodesics, fetches graph neighborhoods, manages navigation history stack, handles LLM config (model selection, discovery refresh). Communicates via `APIClient`.
+- **LLMDiscoveryService** (@MainActor ObservableObject singleton) — Probes providers (oMLX, Ollama, LM Studio), displays availability in UI. Now also tracks `availableModels`, `selectedModel`, `activeProvider` from backend config.
 - **SyncService** (@MainActor ObservableObject singleton) — Offline queue (`[SyncOperation]` persisted in UserDefaults), field-level merge resolution.
 
 ### Networking (Shared/Networking/)
@@ -62,7 +62,7 @@ Floating query bar with Natural/TQL toggle, suggestion dropdown, execute button,
 Stats dashboard (avg confidence, total entities, sync queue size), drag-and-drop file zone, file browser, bulk ingest button, AI extraction preview, entity list with edit/delete.
 
 ### Settings (`Features/Settings/`)
-Quantum backend picker (5 options: numpy, qiskit, dwave, ibm, ionq), hardware enable toggle, API credential fields with secure visibility toggle.
+Quantum backend picker (5 options: numpy, qiskit, dwave, ibm, ionq), hardware enable toggle, API credential fields with secure visibility toggle, **LLM Configuration section** with active provider label, model picker (from server-discovered list), refresh models button, apply button.
 
 ## Offline Strategy
 
