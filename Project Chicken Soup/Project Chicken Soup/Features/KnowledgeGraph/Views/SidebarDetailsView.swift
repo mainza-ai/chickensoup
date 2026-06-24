@@ -12,7 +12,7 @@ struct SidebarDetailsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var allEntities: [LoreEntity]
     
-    @StateObject private var backendService = BackendService.shared
+    @ObservedObject var backendService = BackendService.shared
     @State private var searchText = ""
     @State private var showSuggestions = false
     
@@ -42,11 +42,7 @@ struct SidebarDetailsView: View {
                 
                 Spacer()
                 
-                Button(action: {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        backendService.toggleTheme()
-                    }
-                }) {
+                Button(action: toggleTheme) {
                     Image(systemName: backendService.isDarkMode ? "sun.max.fill" : "moon.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(DesignConstants.systemOrangeText)
@@ -62,9 +58,7 @@ struct SidebarDetailsView: View {
             VStack(spacing: 0) {
                 HStack {
                     // Back button
-                    Button(action: {
-                        backendService.navigateBack(context: modelContext)
-                    }) {
+                    Button(action: navigateBack) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(backendService.canGoBack ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
@@ -73,9 +67,7 @@ struct SidebarDetailsView: View {
                     .disabled(!backendService.canGoBack)
                     
                     // Forward button
-                    Button(action: {
-                        backendService.navigateForward(context: modelContext)
-                    }) {
+                    Button(action: navigateForward) {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(backendService.canGoForward ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
@@ -113,15 +105,7 @@ struct SidebarDetailsView: View {
                         ProgressView()
                             .scaleEffect(0.8)
                     } else {
-                        Button(action: {
-                            if !backendService.focusedEntityName.isEmpty {
-                                Task {
-                                    await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
-                                }
-                            } else if let first = allEntities.first {
-                                selectEntity(name: first.name)
-                            }
-                        }) {
+                        Button(action: refreshNeighborhood) {
                             Image(systemName: "arrow.clockwise")
                                 .font(.subheadline)
                                 .foregroundStyle(DesignConstants.systemOrangeText)
@@ -131,51 +115,10 @@ struct SidebarDetailsView: View {
                 }
                 .padding(DesignConstants.standardPadding)
                 .background(.ultraThinMaterial)
-                .overlay(
-                    VStack {
-                        Spacer()
-                        Divider()
-                    }
-                )
-                
-                // Suggestions dropdown floating overlay inside sidebar frame
-                if showSuggestions && !filteredSuggestions.isEmpty {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ForEach(filteredSuggestions) { entity in
-                            Button(action: {
-                                selectEntity(name: entity.name)
-                                searchText = ""
-                                showSuggestions = false
-                            }) {
-                                HStack {
-                                    Text(entity.name.replacingOccurrences(of: "-", with: " ").capitalized)
-                                        .font(.subheadline)
-                                        .foregroundStyle(DesignConstants.primaryText)
-                                    Spacer()
-                                    Text(entity.type)
-                                        .font(.caption2)
-                                        .bold()
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(DesignConstants.systemOrange.opacity(0.12), in: Capsule())
-                                        .foregroundStyle(DesignConstants.systemOrangeText)
-                                }
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 16)
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            Divider()
-                        }
-                    }
-                    .background(DesignConstants.cardBackground.opacity(0.95))
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
-                    .padding(.horizontal, DesignConstants.standardPadding)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                .overlay(alignment: .bottom) {
+                    Divider()
                 }
+                
             }
             .zIndex(10)
             
@@ -289,6 +232,47 @@ struct SidebarDetailsView: View {
             }
         }
         .background(DesignConstants.panelBackground)
+        .overlay(alignment: .top) {
+            if showSuggestions && !filteredSuggestions.isEmpty {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(filteredSuggestions) { entity in
+                            Button(action: {
+                                selectSuggestion(name: entity.name)
+                            }) {
+                                HStack {
+                                    Text(entity.name.replacingOccurrences(of: "-", with: " ").capitalized)
+                                        .font(.subheadline)
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                    Spacer()
+                                    Text(entity.type)
+                                        .font(.caption2)
+                                        .bold()
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(DesignConstants.systemOrange.opacity(0.12), in: Capsule())
+                                        .foregroundStyle(DesignConstants.systemOrangeText)
+                                }
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            Divider()
+                        }
+                    }
+                }
+                .frame(maxHeight: 250)
+                .background(DesignConstants.cardBackground.opacity(0.95))
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+                .padding(.horizontal, DesignConstants.standardPadding)
+                .offset(y: 104)
+                .zIndex(100)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
         .onAppear {
             if backendService.focusedEntityName.isEmpty, let first = allEntities.first {
                 selectEntity(name: first.name)
@@ -298,5 +282,35 @@ struct SidebarDetailsView: View {
     
     private func selectEntity(name: String) {
         backendService.selectEntity(name, context: modelContext)
+    }
+    
+    private func toggleTheme() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+            backendService.toggleTheme()
+        }
+    }
+    
+    private func navigateBack() {
+        backendService.navigateBack(context: modelContext)
+    }
+    
+    private func navigateForward() {
+        backendService.navigateForward(context: modelContext)
+    }
+    
+    private func refreshNeighborhood() {
+        if !backendService.focusedEntityName.isEmpty {
+            Task {
+                await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
+            }
+        } else if let first = allEntities.first {
+            selectEntity(name: first.name)
+        }
+    }
+    
+    private func selectSuggestion(name: String) {
+        selectEntity(name: name)
+        searchText = ""
+        showSuggestions = false
     }
 }

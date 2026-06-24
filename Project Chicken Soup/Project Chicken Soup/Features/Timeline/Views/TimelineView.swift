@@ -13,7 +13,7 @@ struct TemporalTimelineView: View {
     @Binding var selectedEvent: TemporalEvent?
     
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var backendService = BackendService.shared
+    @ObservedObject var backendService = BackendService.shared
     
     @State private var minConfidence: Double = 0.0
     @State private var selectedTypes: Set<String> = ["crash", "testimony", "anomaly", "theory"]
@@ -213,7 +213,7 @@ struct CanvasView: View {
                     
                     // Draw branch labels on the left side
                     let font = Font.system(size: 9, weight: .bold, design: .monospaced)
-                    let text = gc.resolve(Text(branch.uppercased()).font(font).foregroundColor(tintColor.opacity(0.35)))
+                    let text = gc.resolve(Text(branch.uppercased()).font(font).foregroundStyle(tintColor.opacity(0.35)))
                     gc.draw(text, at: CGPoint(x: 10, y: trackCenterY - 14), anchor: .leading)
                 }
                 

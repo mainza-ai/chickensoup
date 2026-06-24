@@ -649,3 +649,58 @@ async def get_events():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/ingest/bulk")
+async def post_ingest_bulk():
+    """Clears the Neo4j database and bulk-ingests all wiki markdown pages."""
+    try:
+        import os
+        wiki_root = "/Users/mck/Desktop/chickensoup/wiki"
+        subdirs = ["concepts", "entities", "projects"]
+        
+        driver = neo4j_conn.get_driver()
+        with driver.session() as session:
+            logger.info("Clearing existing Neo4j database...")
+            session.run("MATCH (n) DETACH DELETE n")
+            
+        total_nodes = 0
+        total_rels = 0
+        pages_ingested = 0
+        
+        for subdir in subdirs:
+            dir_path = os.path.join(wiki_root, subdir)
+            if not os.path.exists(dir_path):
+                logger.warning(f"Directory {dir_path} does not exist. Skipping.")
+                continue
+                
+            for filename in os.listdir(dir_path):
+                if filename.endswith(".md"):
+                    file_path = os.path.join(dir_path, filename)
+                    title = os.path.splitext(filename)[0]
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        
+                        nodes, rels = ingest_wiki_page(driver, title, content)
+                        total_nodes += nodes
+                        total_rels += rels
+                        pages_ingested += 1
+                    except Exception as page_err:
+                        logger.error(f"Failed to ingest page {filename}: {page_err}")
+                        
+        # Invalidate Redis/memory cache
+        from src.cache import cache_store
+        cache_store.invalidate_all()
+        
+        logger.info(f"Bulk ingestion completed. Ingested {pages_ingested} pages. Created {total_nodes} nodes, {total_rels} relationships.")
+        return {
+            "success": True,
+            "pages_ingested": pages_ingested,
+            "nodes_created": total_nodes,
+            "relationships_created": total_rels
+        }
+    except Exception as e:
+        logger.error(f"Bulk ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+

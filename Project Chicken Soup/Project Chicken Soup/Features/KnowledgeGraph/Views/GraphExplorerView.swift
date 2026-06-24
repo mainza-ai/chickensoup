@@ -12,7 +12,7 @@ struct GraphExplorerView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var allEntities: [LoreEntity]
     
-    @StateObject private var backendService = BackendService.shared
+    @ObservedObject var backendService = BackendService.shared
     @State private var nodePositions: [UUID: CGPoint] = [:]
     
     @State private var dragOffset = CGSize.zero
@@ -69,9 +69,9 @@ struct GraphExplorerView: View {
                     }()
                     
                     let topOffset: CGFloat = 40
-                    let bottomOffset: CGFloat = backendService.showChatHistory ? 280 : 100
+                    let bottomOffset: CGFloat = backendService.showChatHistory ? 220 : 90
                     let visibleWidth = geometry.size.width - (backendService.showNavigator ? 320 : 0)
-                    let centerY = topOffset + (geometry.size.height - topOffset - bottomOffset) / 2
+                    let centerY = max(100.0, topOffset + (geometry.size.height - topOffset - bottomOffset) / 2)
                     let center = CGPoint(x: visibleWidth / 2 + dragOffset.width + accumulatedOffset.width,
                                          y: centerY + dragOffset.height + accumulatedOffset.height)
                     
@@ -84,7 +84,8 @@ struct GraphExplorerView: View {
                     let baseScale = maxRadius > 0 ? min(1.0, max(0.65, maxAllowedRadius / maxRadius)) : 1.0
                     let scaleFactor = baseScale * zoomScale
                     
-                    let currentPositions = nodePositions.isEmpty ? computeNodePositions(connections: graph.connections) : nodePositions
+                    let computedPositions = computeNodePositions(connections: graph.connections)
+                    let currentPositions = graph.connections.allSatisfy { nodePositions[$0.neighbor.id] != nil } ? nodePositions : computedPositions
                     
                     ZStack {
                         // Tap background to reset zoom/pan
@@ -167,6 +168,7 @@ struct GraphExplorerView: View {
                         .position(center)
                         .transition(.scale.combined(with: .opacity))
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .gesture(
                         DragGesture()
                             .onChanged { gesture in
@@ -271,7 +273,9 @@ struct GraphExplorerView: View {
                         nodePositions = computeNodePositions(connections: graph.connections)
                     }
                 }
-                selectEntity(name: backendService.focusedEntityName)
+                if backendService.neighborhood?.entity.name.lowercased() != backendService.focusedEntityName.lowercased() {
+                    selectEntity(name: backendService.focusedEntityName)
+                }
             }
         }
         .onChange(of: allEntities.count) { _, _ in

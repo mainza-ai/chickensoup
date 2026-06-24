@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var backendService = BackendService.shared
+    @ObservedObject var backendService = BackendService.shared
     
     @State private var selectedBackend: String = "numpy"
     @State private var ibmToken: String = ""

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AINavigatorView: View {
-    @StateObject private var discoveryService = LLMDiscoveryService.shared
-    @StateObject private var backendService = BackendService.shared
+    @ObservedObject var discoveryService = LLMDiscoveryService.shared
+    @ObservedObject var backendService = BackendService.shared
     
     @State private var logs: [String] = [
         "System initiated. Connecting local LLM...",

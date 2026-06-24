@@ -14,12 +14,14 @@ struct DataIngestionView: View {
     @Query(sort: \LoreEntity.name) private var localEntities: [LoreEntity]
     @Query(sort: \TemporalEvent.timestamp) private var localEvents: [TemporalEvent]
     
-    @StateObject private var syncService = SyncService.shared
+    @ObservedObject var syncService = SyncService.shared
+    @ObservedObject var backendService = BackendService.shared
     
     // States for File Upload Simulation
     @State private var isDraggingOver = false
     @State private var uploadedFiles: [String] = []
     @State private var isExtracting = false
+    @State private var isBulkIngesting = false
     
     // AI Inferred Preview Entities
     @State private var extractedEntities: [LoreEntity] = []
@@ -159,13 +161,35 @@ struct DataIngestionView: View {
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
             
-            Button("Browse Files", systemImage: "folder.fill") {
-                simulateFileSelection()
+            HStack(spacing: 12) {
+                Button("Browse Files", systemImage: "folder.fill") {
+                    simulateFileSelection()
+                }
+                .buttonStyle(.bordered)
+                .disabled(isBulkIngesting)
+                .accessibilityLabel("Browse local files to ingest data")
+                
+                if isBulkIngesting {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Ingesting...")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(DesignConstants.systemOrangeText)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                } else {
+                    Button("Run Bulk Ingest", systemImage: "arrow.triangle.2.circlepath") {
+                        runBulkIngestion()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(DesignConstants.systemOrange)
+                    .accessibilityLabel("Run bulk ingestion script to rebuild database from markdown wiki")
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(DesignConstants.systemOrange)
             .padding(.top, 12)
-            .accessibilityLabel("Browse local files to ingest data")
             
             if !uploadedFiles.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
@@ -408,6 +432,37 @@ struct DataIngestionView: View {
                         LoreEntity(name: "Capistrano Site", type: "Place", summary: "Underground test facility associated with back-engineered propulsion systems.", confidence: 0.84, source: "Bob Lazar diary", userNotes: "")
                     ]
                 }
+            }
+        }
+    }
+    
+    private func runBulkIngestion() {
+        isBulkIngesting = true
+        Task {
+            guard let url = URL(string: "http://127.0.0.1:8000/ingest/bulk") else {
+                await MainActor.run { isBulkIngesting = false }
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                    // Sync backend state into SwiftData
+                    await backendService.fetchLoreEntities(context: modelContext)
+                    await backendService.fetchTemporalEvents(context: modelContext)
+                    if !backendService.focusedEntityName.isEmpty {
+                        await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
+                    }
+                }
+            } catch {
+                print("Failed to run bulk ingestion: \(error.localizedDescription)")
+            }
+            
+            await MainActor.run {
+                isBulkIngesting = false
             }
         }
     }

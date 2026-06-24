@@ -36,8 +36,8 @@ struct ContentView: View {
     @State private var activeDetailTab: DetailTab = .graph
     
     // Inject services
-    @StateObject private var backendService = BackendService.shared
-    @StateObject private var discoveryService = LLMDiscoveryService.shared
+    @ObservedObject var backendService = BackendService.shared
+    @ObservedObject var discoveryService = LLMDiscoveryService.shared
     
     // Support adaptive size classes
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -100,165 +100,138 @@ struct ContentView: View {
                 
                 // Main Content Viewport ZStack
                 ZStack {
-                    Group {
-                        if activeDetailTab == .graph {
-                            GraphExplorerView()
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .leading).combined(with: .opacity),
-                                    removal: .move(edge: .leading).combined(with: .opacity)
-                                ))
-                        } else {
-                            TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                                    removal: .move(edge: .trailing).combined(with: .opacity)
-                                ))
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    GraphExplorerView()
+                        .opacity(activeDetailTab == .graph ? 1 : 0)
+                        .disabled(activeDetailTab != .graph)
+                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
                     
-                    // Floating AI Navigator overlay (top trailing)
-                    VStack {
-                        HStack {
-                            Spacer()
-                            if backendService.showNavigator {
-                                AINavigatorView()
-                                    .padding(.trailing, DesignConstants.standardPadding)
-                                    .padding(.top, DesignConstants.standardPadding)
-                                    .transition(.move(edge: .trailing).combined(with: .opacity))
-                            }
-                        }
-                        Spacer()
+                    TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
+                        .opacity(activeDetailTab == .timeline ? 1 : 0)
+                        .disabled(activeDetailTab != .timeline)
+                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topTrailing) {
+                    if backendService.showNavigator {
+                        AINavigatorView()
+                            .padding(.trailing, DesignConstants.standardPadding)
+                            .padding(.top, DesignConstants.standardPadding)
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
                     }
-                    
-                    // Floating Chat overlay (bottom center)
-                    VStack {
-                        Spacer()
-                        
-                        VStack(spacing: 8) {
-                            if backendService.showChatHistory && !messages.isEmpty {
-                                HStack {
-                                    Spacer()
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        HStack {
-                                            Label("Temporal Chat History", systemImage: "sparkles")
-                                                .font(.caption)
-                                                .bold()
-                                                .foregroundStyle(DesignConstants.systemOrangeText)
-                                            
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                withAnimation(.spring(duration: 0.3)) {
-                                                    messages.removeAll()
-                                                    backendService.showChatHistory = false
-                                                }
-                                            }) {
-                                                Text("Clear")
-                                                    .font(.caption2)
-                                                    .foregroundStyle(.secondary)
-                                                    .padding(.horizontal, 6)
-                                                    .padding(.vertical, 2)
-                                                    .background(Color.secondary.opacity(0.1), in: Capsule())
-                                            }
-                                            .buttonStyle(.plain)
-                                            
-                                            Button(action: {
-                                                withAnimation(.spring(duration: 0.3)) {
-                                                    backendService.showChatHistory = false
-                                                }
-                                            }) {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
+                }
+                .overlay(alignment: .bottom) {
+                    VStack(spacing: 8) {
+                        if backendService.showChatHistory && !messages.isEmpty {
+                            HStack {
+                                Spacer()
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Label("Temporal Chat History", systemImage: "sparkles")
+                                            .font(.caption)
+                                            .bold()
+                                            .foregroundStyle(DesignConstants.systemOrangeText)
                                         
-                                        ScrollViewReader { scrollProxy in
-                                            ScrollView {
-                                                VStack(spacing: 8) {
-                                                    ForEach(messages) { msg in
-                                                        HStack {
-                                                            if msg.isUser {
-                                                                Spacer()
-                                                                Text(msg.text)
-                                                                    .font(.subheadline)
-                                                                    .padding(.horizontal, 12)
-                                                                    .padding(.vertical, 8)
-                                                                    .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
-                                                                    .foregroundStyle(.white)
-                                                                    .multilineTextAlignment(.leading)
-                                                            } else {
-                                                                Text(msg.text)
-                                                                    .font(.subheadline)
-                                                                    .padding(.horizontal, 12)
-                                                                    .padding(.vertical, 8)
-                                                                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
-                                                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
-                                                                    .foregroundStyle(DesignConstants.primaryText)
-                                                                    .multilineTextAlignment(.leading)
-                                                                Spacer()
-                                                            }
-                                                        }
-                                                        .id(msg.id)
-                                                    }
-                                                }
-                                                .padding(.vertical, 4)
+                                        Spacer()
+                                        
+                                        Button(action: {
+                                            withAnimation(.spring(duration: 0.3)) {
+                                                messages.removeAll()
+                                                backendService.showChatHistory = false
                                             }
-                                            .frame(maxHeight: 180)
-                                            .onAppear {
-                                                if let last = messages.last {
+                                        }) {
+                                            Text("Clear")
+                                                .font(.caption2)
+                                                .foregroundStyle(.secondary)
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                                .background(Color.secondary.opacity(0.1), in: Capsule())
+                                        }
+                                        .buttonStyle(.plain)
+                                        
+                                        Button(action: {
+                                            withAnimation(.spring(duration: 0.3)) {
+                                                backendService.showChatHistory = false
+                                            }
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    
+                                    ScrollViewReader { scrollProxy in
+                                        ScrollView {
+                                            VStack(spacing: 8) {
+                                                ForEach(messages) { msg in
+                                                    HStack {
+                                                        if msg.isUser {
+                                                            Spacer()
+                                                            Text(msg.text)
+                                                                .font(.subheadline)
+                                                                .padding(.horizontal, 12)
+                                                                .padding(.vertical, 8)
+                                                                .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
+                                                                .foregroundStyle(.white)
+                                                                .multilineTextAlignment(.leading)
+                                                        } else {
+                                                            Text(msg.text)
+                                                                .font(.subheadline)
+                                                                .padding(.horizontal, 12)
+                                                                .padding(.vertical, 8)
+                                                                .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
+                                                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                                                                .foregroundStyle(DesignConstants.primaryText)
+                                                                .multilineTextAlignment(.leading)
+                                                            Spacer()
+                                                        }
+                                                    }
+                                                    .id(msg.id)
+                                                }
+                                            }
+                                            .padding(.vertical, 4)
+                                        }
+                                        .frame(maxHeight: 180)
+                                        .onAppear {
+                                            if let last = messages.last {
+                                                scrollProxy.scrollTo(last.id, anchor: .bottom)
+                                            }
+                                        }
+                                        .onChange(of: messages.count) { _, _ in
+                                            if let last = messages.last {
+                                                withAnimation {
                                                     scrollProxy.scrollTo(last.id, anchor: .bottom)
                                                 }
                                             }
-                                            .onChange(of: messages.count) { _, _ in
-                                                if let last = messages.last {
-                                                    withAnimation {
-                                                        scrollProxy.scrollTo(last.id, anchor: .bottom)
-                                                    }
-                                                }
-                                            }
                                         }
                                     }
-                                    .padding(12)
-                                    .background(DesignConstants.cardBackground.opacity(0.85))
-                                    .liquidGlass()
-                                    .frame(maxWidth: 640)
-                                    .padding(.horizontal, DesignConstants.standardPadding)
-                                    
-                                    Spacer()
-                                    
-                                    if backendService.showNavigator {
-                                        Spacer()
-                                            .frame(width: 320 + DesignConstants.standardPadding)
-                                    }
                                 }
-                                .transition(.asymmetric(
-                                    insertion: .opacity.combined(with: .move(edge: .bottom)),
-                                    removal: .opacity.combined(with: .move(edge: .bottom))
-                                ))
-                            }
-                            
-                            HStack {
-                                Spacer()
-                                QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
-                                Spacer()
+                                .padding(12)
+                                .background(DesignConstants.cardBackground.opacity(0.85))
+                                .liquidGlass()
+                                .frame(maxWidth: 640)
+                                .padding(.horizontal, DesignConstants.standardPadding)
                                 
-                                if backendService.showNavigator {
-                                    Spacer()
-                                        .frame(width: 320 + DesignConstants.standardPadding)
-                                }
+                                Spacer()
                             }
-                            .padding(.bottom, 16)
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .move(edge: .bottom)),
+                                removal: .opacity.combined(with: .move(edge: .bottom))
+                            ))
                         }
+                        
+                        HStack {
+                            Spacer()
+                            QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
+                            Spacer()
+                        }
+                        .padding(.bottom, 16)
                     }
+                    .padding(.trailing, backendService.showNavigator ? 320 : 0)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(DesignConstants.warmBackground)
             .navigationTitle("")
-            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: activeDetailTab)
-            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: backendService.showNavigator)
-            .animation(.spring(response: 0.45, dampingFraction: 0.85), value: backendService.showChatHistory)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showIngestion.toggle() }) {
@@ -266,7 +239,11 @@ struct ContentView: View {
                     }
                 }
                 ToolbarItem {
-                    Button(action: { backendService.showNavigator.toggle() }) {
+                    Button(action: {
+                        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+                            backendService.showNavigator.toggle()
+                        }
+                    }) {
                         Label("AI Navigator", systemImage: "brain")
                     }
                 }
