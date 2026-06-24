@@ -2,12 +2,58 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-06-23
+updated: 2026-06-24
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-06-24] fix | Comprehensive Production Hardening & "No response generated." Bug
+
+Fixed the "No response generated." bug and implemented systematic production hardening across all 5 architectural layers.
+
+### Root Cause
+
+When users asked "plot timelines connected to element 115", the LLM classified "plot" as `navigate` intent (plotting a course through spacetime). The `NavigateNode` produced output with no `"answer"` key, so `main.py` returned the default `"No response generated."` — a triple-wrong result (wrong intent, missing key, default fallback).
+
+### Phase 1 — Immediate Fix (3 files)
+
+- **Confidence gating** (`orchestrator.py:37-42`): Classifications with confidence < 0.6 are redirected to `ResearchNode` regardless of intent
+- **NavigateNode** (`orchestrator.py:111-131`): Now produces human-readable `answer` key (origin → destination, warp factor, divergence risk, path)
+- **StatusNode** (`orchestrator.py:144-156`): Now produces `answer` key with system status summary
+- **LLM prompt** (`query_agent.py:113-137`): Added few-shot examples including "Plot timelines connected to Element 115" → `query`. Explicitly clarifies that "plot" without course/trajectory is information-seeking, not navigation
+
+### Phase 2 — Entity Improvements (2 files)
+
+- **Wiki file entity lookup** (`query_agent.py:68-100`): Scans `wiki/entities/`, `wiki/concepts/`, `wiki/projects/` filenames for fuzzy matches against query words. "element 115" now correctly matches `element-115.md`. Discovered entities feed into both the LLM prompt and the heuristic fallback
+- **Entity-to-Navigation mapping** (`orchestrator.py:96-106`): 4-digit years extracted from entities → `target_year`, first non-year entity → `destination`
+
+### Phase 3 — Graceful Degradation (3 files)
+
+- **Wiki file fallback** (`research_agent.py:76-120`): When Neo4j returns no results or is offline, reads wiki markdown files directly. Parses YAML frontmatter, returns graph-context-shaped dicts
+- **Synthesize answer** (`orchestrator.py:199-223`): Post-processing ensures `answer` key is always populated, falling back through navigation results → status → generic message
+- **Shared answer extraction** (`main.py:277-290`): `_build_query_response()` helper eliminates duplicated pattern across HTTP and WebSocket handlers
+
+### Phase 4 — Conversation Support (3 files)
+
+- **Backend** (`models.py`, `main.py`): `conversation_id` in `QueryRequest`/`QueryResponse`, Redis storage (last 20 turns, 24h TTL), `GET /conversation/{id}` endpoint
+- **Frontend** (`APIModels.swift`, `BackendService.swift`): `conversationId` in `APIQueryResponse`, BackendService generates/persists conversation ID across queries
+
+### Phase 5 — Production Hardening (all files)
+
+- **Timeouts**: LLM classification 90s→15s, LLM summarization 90s→30s, orchestrator top-level 60s
+- **Observability**: `GET /debug/routing?query=...` returns classification decision without executing pipeline
+- **Sync fix** (`LLMDiscoveryService.swift`): Discovery now syncs `llmActiveModel`/`llmActiveProvider` to BackendService, fixing AI Navigator "auto-discover" bug at launch
+- **Deprecation fix** (`pyproject.toml`): `[tool.uv] dev-dependencies` → `[dependency-groups] dev`
+
+### Pages Updated
+
+- api-design.md — 2 new endpoints (`GET /conversation/{id}`, `GET /debug/routing`), updated 2 models
+- agent-architecture.md — Full rewrite of all 4 sub-agent sections with new features
+- swift-frontend-architecture.md — Conversation support, sync fix
+- key-decisions.md — 5 new decisions (confidence gate, wiki fallback, timeouts, conversation)
+- log.md, index.md
 
 ## [2026-06-24] ingest | Mauro Biglino — Vatican Translator, Elohim as Advanced Civilization
 

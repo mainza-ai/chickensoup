@@ -2,21 +2,22 @@
 title: "API Design"
 tags: [api, fastapi, endpoints]
 created: 2026-06-22
-updated: 2026-06-23
+updated: 2026-06-24
 sources: [fastapi-2026]
 related: [fastapi, local-first-llm, multi-llm-consensus, quantum-job-scheduler, mcp-server, agent-architecture]
 ---
 
 # API Design
 
-FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, organized by function.
+FastAPI server at `src/main.py` (~848 lines). All endpoints live in one file, organized by function.
 
 ## Endpoints
 
 ### Query
 | Method | Path | Purpose | Models |
 |--------|------|---------|--------|
-| POST | `/query` | Submit query to orchestrator | `QueryRequest` → `QueryResponse` |
+| POST | `/query` | Submit query to orchestrator (supports conversation_id for multi-turn context) | `QueryRequest` → `QueryResponse` |
+| GET | `/conversation/{conversation_id}` | Retrieve conversation history (last 20 turns, 24h TTL) | → `{conversation_id, history[]}` |
 | POST | `/consensus/query` | Multi-LLM consensus | `QueryRequest` → `QueryResponse` |
 
 ### Graph
@@ -43,6 +44,11 @@ FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, or
 | POST | `/config/llm/probe` | Probe a specific provider (omlx/ollama/lmstudio) and return its models without changing active config |
 | GET | `/models` | List available LLM models |
 
+### Debug
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/debug/routing` | Run classification only and return routing decision (confidence, intent, wiki matches) without executing full pipeline |
+
 ### Ingestion
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -56,12 +62,12 @@ FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, or
 
 ## Request/Response Models
 
-All models in `src/models.py` (~67 lines), typed with Pydantic:
+All models in `src/models.py` (~96 lines), typed with Pydantic:
 
 | Model | Key Fields |
 |-------|-----------|
-| `QueryRequest` | `query: str`, `structured: bool` |
-| `QueryResponse` | `query, answer, confidence, entities, sources, inferred_events, inferred_entities` |
+| `QueryRequest` | `query: str`, `structured: bool`, `conversation_id?: str` |
+| `QueryResponse` | `query, answer, confidence, entities, sources, inferred_events, inferred_entities, conversation_id?, history[]` |
 | `NavigateRequest` | `origin, destination, target_year, energy_level` |
 | `NavigateResponse` | `success, path, warp_factor, divergence_risk, geometry_tensor` |
 | `IngestRequest` | `title, content, tags, sources` |

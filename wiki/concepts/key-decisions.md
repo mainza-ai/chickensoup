@@ -2,7 +2,7 @@
 title: "Key Decisions"
 tags: [project, decisions, architecture]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-24
 sources: [PROJECT_SPEC-2026]
 related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge-graph-schema, technology-stack]
 ---
@@ -30,6 +30,10 @@ related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge
 | Wiki ingestion | Two-phase (deterministic → LLM) | Free edges from `[[wikiname]]`, LLM enrichment later |
 | Platform | 50/50 macOS + iOS | Single codebase, structural platform overrides |
 | Simulation tier | Three modes (light/medium/heavy) | CI through production, classical fallbacks |
+| Confidence gate | 0.6 threshold for intent routing | Prevents low-confidence LLM misclassifications from reaching wrong sub-agent |
+| Wiki file fallback | Direct file read when Neo4j unavailable | Research agent functional without running Neo4j |
+| Timeout architecture | 3 tiers (15s/30s/60s) | Stops hung LLM calls from blocking the system for 90s |
+| Conversation storage | Redis, last 20 turns, 24h TTL | Enables multi-turn queries without conversation state on the client |
 
 ## Agent Framework
 

@@ -132,9 +132,9 @@ related: []
 - [[local-first-llm]] — Local-first LLM with auto-discovery
 - [[llm-discovery]] — LLM auto-discovery mechanism
 - [[llm-fallback-chain]] — LLM fallback chain (oMLX → Ollama → LM Studio)
-- [[agent-architecture]] — Multi-agent architecture with pydantic-graph and LangGraph
+- [[agent-architecture]] — Multi-agent architecture with confidence gating, wiki file fallback, timeout isolation, and routing observability
 - [[knowledge-graph-schema]] — Knowledge graph schema (nodes, relationships, properties)
-- [[api-design]] — API design with FastAPI and Pydantic models
+- [[api-design]] — 21 endpoints with FastAPI and Pydantic models (includes `/conversation/{id}`, `/debug/routing`)
 - [[mcp-server]] — MCP server design and tools
 - [[langgraph-features]] — LangGraph features (checkpointing, human-in-the-loop, etc.)
 - [[production-readiness]] — Production readiness checklist
@@ -172,7 +172,7 @@ related: []
 - [[weak-measurement]] — Conditional measurements, retrocausality, time symmetry
 - [[multi-llm-consensus]] — Cross-provider LLM consensus with Jaccard agreement scoring
 - [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
-- [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features
+- [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features, conversation support, discovery sync
 - [[elohim]] — The Elohim as plural, physical, advanced civilization in the Hebrew Bible
 
 ## Projects (in wiki/projects/)
@@ -190,5 +190,5 @@ related: []
 
 - [[project-structure]] — Full directory tree of the project
 - [[technology-stack]] — Layer-to-technology mapping
-- [[key-decisions]] — Key decisions with rationale
+- [[key-decisions]] — 21 key decisions including confidence gate, wiki fallback, timeout architecture, conversation storage
 - [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent, custom layout, timeline-first, floating query overlay, integrated AI Navigator, 2D with depth

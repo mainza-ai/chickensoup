@@ -2,7 +2,7 @@
 title: "Swift Frontend Architecture"
 tags: [swift, ios, macos, swiftui, frontend]
 created: 2026-06-23
-updated: 2026-06-23
+updated: 2026-06-24
 sources: []
 related: [ui-ux-design, integration-architecture, project-structure, swiftui-pro, swiftdata-pro, swift-concurrency-pro]
 ---
@@ -35,14 +35,14 @@ Three `@Model` classes stored locally for offline operation:
 
 ### Services (Shared/Services/)
 
-- **BackendService** (@MainActor, 440+ lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries, simulates geodesics, fetches graph neighborhoods, manages navigation history stack, handles LLM config (model selection, discovery refresh). Communicates via `APIClient`.
-- **LLMDiscoveryService** (@MainActor ObservableObject singleton) — Probes providers (oMLX, Ollama, LM Studio), displays availability in UI. Now also tracks `availableModels`, `selectedModel`, `activeProvider` from backend config.
+- **BackendService** (@MainActor, 490+ lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries (now with conversation_id for multi-turn context), simulates geodesics, fetches graph neighborhoods, manages navigation history stack, handles LLM config (model selection, discovery refresh). Stores and persists `conversationId` across queries so follow-ups maintain context. Communicates via `APIClient`.
+- **LLMDiscoveryService** (@MainActor ObservableObject singleton) — Probes providers (oMLX, Ollama, LM Studio), displays availability in UI. Now also tracks `availableModels`, `selectedModel`, `activeProvider` from backend config. **2026-06-24:** Now syncs `llmActiveModel`/`llmActiveProvider` to `BackendService.shared` on every config fetch, fixing the bug where AINavigatorView stayed on "auto-discover" until Settings was visited.
 - **SyncService** (@MainActor ObservableObject singleton) — Offline queue (`[SyncOperation]` persisted in UserDefaults), field-level merge resolution.
 
 ### Networking (Shared/Networking/)
 
 - **APIClient** (actor, singleton) — Generic `request<T: Decodable>` with custom ISO8601 date decoding, 90s timeout, 5 error types (`invalidURL, requestFailed, decodingFailed, serverError, unknown`). Base URL: `http://127.0.0.1:8000`.
-- **APIModels** — 10 Codable structs mirroring backend models: `APITemporalEvent`, `APILoreEntity`, `APITimeTravelSimulationResponse`, `APIQueryResponse`, `APIDiscoveryStatus`, `NeighborhoodEntity/Connection/Response`, `APIConfigRequest/Response`.
+- **APIModels** — 10 Codable structs mirroring backend models: `APITemporalEvent`, `APILoreEntity`, `APITimeTravelSimulationResponse`, `APIQueryResponse` (now includes `conversationId`), `APIDiscoveryStatus`, `NeighborhoodEntity/Connection/Response`, `APIConfigRequest/Response`.
 
 ## Frontend Features
 
