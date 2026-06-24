@@ -93,6 +93,7 @@ related: []
 - [[ralph-larson]] — Former CIA officer and DOE intelligence director who claims time travel to medieval Mount Athos
 - [[neil-turok]] — Physicist working on quadratic gravity and CPT-symmetric universe
 - [[juan-maldacena]] — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior
+- [[mauro-biglino]] — Former Vatican translator, literal Hebrew Bible, Elohim as plural advanced civilization
 
 ## Concepts (in wiki/concepts/)
 
@@ -172,6 +173,7 @@ related: []
 - [[multi-llm-consensus]] — Cross-provider LLM consensus with Jaccard agreement scoring
 - [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
 - [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features
+- [[elohim]] — The Elohim as plural, physical, advanced civilization in the Hebrew Bible
 
 ## Projects (in wiki/projects/)
 

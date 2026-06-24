@@ -9,6 +9,19 @@ related: []
 
 # Log
 
+## [2026-06-24] ingest | Mauro Biglino — Vatican Translator, Elohim as Advanced Civilization
+
+Ingested 1 transcript from development-docs/temp into the wiki:
+
+### New Entity Pages (1)
+- **[[mauro-biglino]]** — Former Vatican Hebrew translator fired after revealing his literal translations show Elohim as a plural, physical, mortal, technologically advanced civilization. Key claims: Elohim are flesh-and-blood colonizers with flying vehicles, Yahweh was one Elohim among many assigned to Jacob's family, human genetic engineering by Elohim, post-exilic priestly editing of polytheistic origins into monotheism, stargates in Psalm 24, Nephilim = Orion constellation.
+
+### New Concept Pages (1)
+- **[[elohim]]** — The Hebrew word Elohim is grammatically plural. Literal reading reveals: physical beings with craft, territorial division among Elohim, mortal nature (Psalm 82), mistranslated key terms (barah ≠ create, olam ≠ eternity, El Shaddai ≠ omnipotent), textual stratification from post-exilic editing, alignment with modern UAP/NHI narrative.
+
+### Enriched Pages (1)
+- **[[vatican]]** — Added Mauro Biglino connection section: Vatican publishing house, firing, theological implications.
+
 ## [2026-06-23] update | Wiki Reflects Actual Codebase
 
 Major wiki update to match the actual code implementation across Python backend and SwiftUI frontend.
