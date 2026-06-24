@@ -20,6 +20,7 @@ dependencies = [
     "pydantic-ai>=1.107.0",
     "pydantic-graph>=1.107.0",
     "langgraph>=1.2.6",
+    "celery>=5.6.3",
 ]
 
 [tool.uv]

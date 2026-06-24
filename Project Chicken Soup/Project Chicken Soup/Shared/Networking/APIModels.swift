@@ -175,3 +175,37 @@ public struct NeighborhoodResponse: Codable {
         self.connections = connections
     }
 }
+
+public struct APIConfigRequest: Codable {
+    public var quantum_backend: String
+    public var ibm_api_token: String?
+    public var dwave_api_token: String?
+    public var ionq_api_token: String?
+    public var quantum_hardware_enabled: Bool
+    
+    public init(quantum_backend: String, ibm_api_token: String? = nil, dwave_api_token: String? = nil, ionq_api_token: String? = nil, quantum_hardware_enabled: Bool) {
+        self.quantum_backend = quantum_backend
+        self.ibm_api_token = ibm_api_token
+        self.dwave_api_token = dwave_api_token
+        self.ionq_api_token = ionq_api_token
+        self.quantum_hardware_enabled = quantum_hardware_enabled
+    }
+}
+
+public struct APIConfigResponse: Codable {
+    public var success: Bool
+    public var quantum_backend: String
+    public var quantum_hardware_enabled: Bool
+    public var ibm_api_token_set: Bool
+    public var dwave_api_token_set: Bool
+    public var ionq_api_token_set: Bool
+    
+    public init(success: Bool, quantum_backend: String, quantum_hardware_enabled: Bool, ibm_api_token_set: Bool, dwave_api_token_set: Bool, ionq_api_token_set: Bool) {
+        self.success = success
+        self.quantum_backend = quantum_backend
+        self.quantum_hardware_enabled = quantum_hardware_enabled
+        self.ibm_api_token_set = ibm_api_token_set
+        self.dwave_api_token_set = dwave_api_token_set
+        self.ionq_api_token_set = ionq_api_token_set
+    }
+}

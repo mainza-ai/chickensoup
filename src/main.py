@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 import redis
@@ -7,7 +8,8 @@ from src.config import settings
 from src.discovery import discover_active_provider
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
-    IngestRequest, IngestResponse, StatusResponse, ModelsResponse
+    IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
+    ConfigRequest, ConfigResponse
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -105,6 +107,81 @@ async def get_status():
         neo4j_connected=neo4j_ok,
         redis_connected=redis_ok,
         quantum_backend=settings.QUANTUM_SIMULATION_BACKEND
+    )
+
+@app.get("/config", response_model=ConfigResponse)
+async def get_config():
+    """Returns current quantum settings and API credentials setup statuses."""
+    return ConfigResponse(
+        success=True,
+        quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
+        quantum_hardware_enabled=settings.QUANTUM_HARDWARE_ENABLED,
+        ibm_api_token_set=bool(settings.IBM_API_TOKEN),
+        dwave_api_token_set=bool(settings.DWAVE_API_TOKEN),
+        ionq_api_token_set=bool(settings.IONQ_API_TOKEN),
+    )
+
+@app.post("/config", response_model=ConfigResponse)
+async def post_config(request: ConfigRequest):
+    """Updates active quantum simulation/hardware options and updates the local env config."""
+    settings.QUANTUM_SIMULATION_BACKEND = request.quantum_backend
+    settings.QUANTUM_HARDWARE_ENABLED = request.quantum_hardware_enabled
+    if request.ibm_api_token is not None:
+        settings.IBM_API_TOKEN = request.ibm_api_token
+    if request.dwave_api_token is not None:
+        settings.DWAVE_API_TOKEN = request.dwave_api_token
+    if request.ionq_api_token is not None:
+        settings.IONQ_API_TOKEN = request.ionq_api_token
+        
+    try:
+        env_path = ".env"
+        lines = []
+        if os.path.exists(env_path):
+            with open(env_path, "r") as f:
+                lines = f.readlines()
+                
+        updates = {
+            "QUANTUM_SIMULATION_BACKEND": settings.QUANTUM_SIMULATION_BACKEND,
+            "QUANTUM_HARDWARE_ENABLED": str(settings.QUANTUM_HARDWARE_ENABLED).lower(),
+        }
+        if request.ibm_api_token is not None:
+            updates["IBM_API_TOKEN"] = settings.IBM_API_TOKEN
+        if request.dwave_api_token is not None:
+            updates["DWAVE_API_TOKEN"] = settings.DWAVE_API_TOKEN
+        if request.ionq_api_token is not None:
+            updates["IONQ_API_TOKEN"] = settings.IONQ_API_TOKEN
+            
+        updated_keys = set()
+        new_lines = []
+        for line in lines:
+            line_str = line.strip()
+            if not line_str or line_str.startswith("#"):
+                new_lines.append(line)
+                continue
+            parts = line_str.split("=", 1)
+            key = parts[0].strip()
+            if key in updates:
+                new_lines.append(f"{key}={updates[key]}\n")
+                updated_keys.add(key)
+            else:
+                new_lines.append(line)
+                
+        for key, val in updates.items():
+            if key not in updated_keys:
+                new_lines.append(f"{key}={val}\n")
+                
+        with open(env_path, "w") as f:
+            f.writelines(new_lines)
+    except Exception as e:
+        logger.error(f"Failed to update .env: {e}")
+
+    return ConfigResponse(
+        success=True,
+        quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
+        quantum_hardware_enabled=settings.QUANTUM_HARDWARE_ENABLED,
+        ibm_api_token_set=bool(settings.IBM_API_TOKEN),
+        dwave_api_token_set=bool(settings.DWAVE_API_TOKEN),
+        ionq_api_token_set=bool(settings.IONQ_API_TOKEN),
     )
 
 @app.get("/models", response_model=ModelsResponse)
@@ -231,10 +308,33 @@ async def get_graph_entity(entity: str):
 
 @app.post("/navigate", response_model=NavigateResponse)
 async def post_navigate(request: NavigateRequest):
-    """Computes the optimal path through the warped spacetime manifold using Navigation Agent."""
+    """Computes the optimal path through the warped spacetime manifold using Navigation Agent (offloaded via Celery)."""
     try:
-        # Format query for orchestrator or call NavigationAgent directly
-        # Directly invoking NavigationAgent here matches FastAPI specification perfectly
+        from src.tasks import async_navigate
+        task = async_navigate.delay(
+            origin=request.origin,
+            destination=request.destination,
+            target_year=request.target_year,
+            energy_level=request.energy_level
+        )
+        try:
+            res = task.get(timeout=5.0)
+            if res.get("success"):
+                return NavigateResponse(
+                    success=True,
+                    path=res["path"],
+                    warp_factor=res["warp_factor"],
+                    divergence_risk=res["divergence_risk"],
+                    geometry_tensor={
+                        "warp_factor": res["warp_factor"],
+                        "metric_tensor": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+                        "extrinsic_curvature": [[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]]
+                    }
+                )
+        except Exception as celery_err:
+            logger.warning(f"Celery task timeout/failure, running synchronous fallback: {celery_err}")
+
+        # Synchronous fallback
         nav_res = orchestrator.navigation_agent.navigate(
             origin=request.origin,
             destination=request.destination,
@@ -316,8 +416,30 @@ async def get_quantum_job(job_id: str):
 
 @app.post("/ingest", response_model=IngestResponse)
 async def post_ingest(request: IngestRequest):
-    """Ingests a new markdown page or document into the Neo4j knowledge graph."""
+    """Ingests a new markdown page or document into the Neo4j knowledge graph (offloaded via Celery)."""
     try:
+        from src.tasks import async_ingest_page
+        task = async_ingest_page.delay(
+            title=request.title,
+            content=request.content,
+            tags=request.tags,
+            sources=request.sources
+        )
+        try:
+            res = task.get(timeout=5.0)
+            if res.get("success"):
+                from src.cache import cache_store
+                cache_store.invalidate_all()
+                return IngestResponse(
+                    success=True,
+                    nodes_created=res["nodes_created"],
+                    relationships_created=res["relationships_created"],
+                    confidence_score=res["confidence_score"]
+                )
+        except Exception as celery_err:
+            logger.warning(f"Celery task timeout/failure, running synchronous fallback: {celery_err}")
+
+        # Synchronous fallback
         driver = neo4j_conn.get_driver()
         nodes, rels = ingest_wiki_page(
             driver,

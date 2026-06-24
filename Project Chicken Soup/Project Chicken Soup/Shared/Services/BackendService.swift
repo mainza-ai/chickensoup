@@ -19,6 +19,14 @@ public final class BackendService: ObservableObject {
     @Published public var isSubmittingQuery = false
     @Published public var isSolvingSpacetime = false
     
+    @Published public var quantumBackend: String = "numpy"
+    @Published public var quantumHardwareEnabled: Bool = false
+    @Published public var ibmApiTokenSet: Bool = false
+    @Published public var dwaveApiTokenSet: Bool = false
+    @Published public var ionqApiTokenSet: Bool = false
+    @Published public var isFetchingConfig = false
+    @Published public var isSavingConfig = false
+    
     @Published public var eventsError: Error?
     @Published public var entitiesError: Error?
     @Published public var queryError: Error?
@@ -366,6 +374,50 @@ public final class BackendService: ObservableObject {
         canGoForward = !forwardStack.isEmpty
         Task {
             await fetchNeighborhood(for: next, context: context)
+        }
+    }
+    
+    // MARK: - Quantum Configuration Methods
+    public func fetchConfig() async {
+        isFetchingConfig = true
+        defer { isFetchingConfig = false }
+        
+        do {
+            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config")
+            self.quantumBackend = response.quantum_backend
+            self.quantumHardwareEnabled = response.quantum_hardware_enabled
+            self.ibmApiTokenSet = response.ibm_api_token_set
+            self.dwaveApiTokenSet = response.dwave_api_token_set
+            self.ionqApiTokenSet = response.ionq_api_token_set
+        } catch {
+            print("Failed to fetch quantum configurations: \(error.localizedDescription)")
+        }
+    }
+    
+    public func saveConfig(backend: String, ibmToken: String?, dwaveToken: String?, ionqToken: String?, hardwareEnabled: Bool) async -> Bool {
+        isSavingConfig = true
+        defer { isSavingConfig = false }
+        
+        do {
+            let req = APIConfigRequest(
+                quantum_backend: backend,
+                ibm_api_token: (ibmToken?.isEmpty ?? true) ? nil : ibmToken,
+                dwave_api_token: (dwaveToken?.isEmpty ?? true) ? nil : dwaveToken,
+                ionq_api_token: (ionqToken?.isEmpty ?? true) ? nil : ionqToken,
+                quantum_hardware_enabled: hardwareEnabled
+            )
+            let bodyData = try JSONEncoder().encode(req)
+            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config", method: "POST", body: bodyData)
+            
+            self.quantumBackend = response.quantum_backend
+            self.quantumHardwareEnabled = response.quantum_hardware_enabled
+            self.ibmApiTokenSet = response.ibm_api_token_set
+            self.dwaveApiTokenSet = response.dwave_api_token_set
+            self.ionqApiTokenSet = response.ionq_api_token_set
+            return true
+        } catch {
+            print("Failed to save quantum configurations: \(error.localizedDescription)")
+            return false
         }
     }
 }

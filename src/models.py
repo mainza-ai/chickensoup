@@ -50,3 +50,18 @@ class StatusResponse(BaseModel):
 class ModelsResponse(BaseModel):
     provider: str
     models: List[str]
+
+class ConfigRequest(BaseModel):
+    quantum_backend: str
+    ibm_api_token: Optional[str] = None
+    dwave_api_token: Optional[str] = None
+    ionq_api_token: Optional[str] = None
+    quantum_hardware_enabled: bool = False
+
+class ConfigResponse(BaseModel):
+    success: bool
+    quantum_backend: str
+    quantum_hardware_enabled: bool
+    ibm_api_token_set: bool
+    dwave_api_token_set: bool
+    ionq_api_token_set: bool

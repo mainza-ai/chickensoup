@@ -24,6 +24,7 @@ struct ContentView: View {
     @State private var queryText = ""
     @State private var isStructuredQuery = false
     @State private var showIngestion = false
+    @State private var showSettings = false
     @State private var messages: [ChatMessage] = []
     
     // Desktop Tab Selection picker
@@ -269,6 +270,11 @@ struct ContentView: View {
                         Label("AI Navigator", systemImage: "brain")
                     }
                 }
+                ToolbarItem {
+                    Button(action: { showSettings.toggle() }) {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
             }
             .sheet(isPresented: $showIngestion) {
                 NavigationStack {
@@ -280,6 +286,17 @@ struct ContentView: View {
                         }
                 }
                 .frame(minWidth: 500, minHeight: 600)
+            }
+            .sheet(isPresented: $showSettings) {
+                NavigationStack {
+                    SettingsView()
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Close") { showSettings = false }
+                            }
+                        }
+                }
+                .frame(minWidth: 450, minHeight: 500)
             }
         }
     }

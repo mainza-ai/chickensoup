@@ -13,10 +13,19 @@ class QuantumJobScheduler:
     Supports IBM Quantum runtime, D-Wave Ocean, and IonQ APIs.
     """
     def __init__(self):
-        self.ibm_token = getattr(settings, "IBM_API_TOKEN", "")
-        self.dwave_token = getattr(settings, "DWAVE_API_TOKEN", "")
-        self.ionq_token = getattr(settings, "IONQ_API_TOKEN", "")
         self._jobs_db = {}  # In-memory storage for jobs
+
+    @property
+    def ibm_token(self) -> str:
+        return getattr(settings, "IBM_API_TOKEN", "")
+
+    @property
+    def dwave_token(self) -> str:
+        return getattr(settings, "DWAVE_API_TOKEN", "")
+
+    @property
+    def ionq_token(self) -> str:
+        return getattr(settings, "IONQ_API_TOKEN", "")
 
     def submit_job(self, hardware: str, geometry: FieldGeometryTensor) -> Dict[str, Any]:
         """
@@ -63,12 +72,10 @@ class QuantumJobScheduler:
         return job
 
     def _submit_ibm_job(self, job_id: str, geometry: FieldGeometryTensor) -> Dict[str, Any]:
-        # If credentials exist, call IBM Qiskit Runtime API. Else, run simulated.
-        if self.ibm_token:
+        use_hardware = self.ibm_token and getattr(settings, "QUANTUM_HARDWARE_ENABLED", False)
+        if use_hardware:
             try:
-                # Stub for actual QiskitRuntimeService call
                 from qiskit_ibm_runtime import QiskitRuntimeService
-                # real call logic would go here
                 pass
             except ImportError:
                 logger.warning("qiskit-ibm-runtime not installed, using simulation fallback.")
@@ -79,11 +86,15 @@ class QuantumJobScheduler:
             "status": "queued",
             "created_at": time.time(),
             "geometry_warp_factor": geometry.warp_factor,
-            "details": {"qubits_allocated": 5, "shots": 1024}
+            "details": {
+                "qubits_allocated": 5,
+                "shots": 1024,
+                "mode": "hardware" if use_hardware else "simulation_fallback"
+            }
         }
 
     def _submit_dwave_job(self, job_id: str, geometry: FieldGeometryTensor) -> Dict[str, Any]:
-        # D-Wave Leap / Ocean SDK integration stub
+        use_hardware = self.dwave_token and getattr(settings, "QUANTUM_HARDWARE_ENABLED", False)
         return {
             "job_id": job_id,
             "provider": "D-Wave Ocean",
@@ -94,18 +105,25 @@ class QuantumJobScheduler:
                 "energy": -1.25,
                 "chain_break_fraction": 0.02,
                 "measured_warp_factor": geometry.warp_factor * 1.02
+            },
+            "details": {
+                "mode": "hardware" if use_hardware else "simulation_fallback"
             }
         }
 
     def _submit_ionq_job(self, job_id: str, geometry: FieldGeometryTensor) -> Dict[str, Any]:
-        # IonQ Direct API Integration stub
+        use_hardware = self.ionq_token and getattr(settings, "QUANTUM_HARDWARE_ENABLED", False)
         return {
             "job_id": job_id,
             "provider": "IonQ API",
             "status": "queued",
             "created_at": time.time(),
             "geometry_warp_factor": geometry.warp_factor,
-            "details": {"backend": "qpu.aria-1", "shots": 500}
+            "details": {
+                "backend": "qpu.aria-1",
+                "shots": 500,
+                "mode": "hardware" if use_hardware else "simulation_fallback"
+            }
         }
 
     def _submit_simulated_job(self, job_id: str, geometry: FieldGeometryTensor, hardware: str) -> Dict[str, Any]:

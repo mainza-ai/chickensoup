@@ -25,8 +25,10 @@ class Settings(BaseSettings):
     LMSTUDIO_API_URL: str = "http://localhost:1234/v1"
 
     QUANTUM_SIMULATION_BACKEND: str = "numpy"
+    IBM_API_TOKEN: str = ""
     DWAVE_API_TOKEN: str = ""
     IONQ_API_TOKEN: str = ""
+    QUANTUM_HARDWARE_ENABLED: bool = False
 
     @property
     def fallback_chain_list(self) -> List[str]:

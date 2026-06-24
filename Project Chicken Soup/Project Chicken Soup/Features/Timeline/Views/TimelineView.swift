@@ -89,14 +89,15 @@ struct TemporalTimelineView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .eventDate(event.timestamp)
+                                .eventBranch(event.branch?.name ?? "Universe Prime")
                             }
                         }
                         .padding(.leading, 240)
                         .padding(.trailing, 120)
-                        .frame(height: 220)
+                        .frame(height: 260)
                     }
                     .background(
-                        CanvasView(eventsCount: filteredEvents.count)
+                        CanvasView(events: filteredEvents, startDate: dateRange.start, endDate: dateRange.end)
                             .drawingGroup()
                     )
                     #if !os(macOS)
@@ -152,20 +153,39 @@ struct TemporalTimelineView: View {
 
 // Separate view for the Animated Canvas to follow the separate View struct rule
 struct CanvasView: View {
-    let eventsCount: Int
+    let events: [TemporalEvent]
+    let startDate: Date
+    let endDate: Date
     
     var body: some View {
         SwiftUI.TimelineView(.animation(minimumInterval: 1/60, paused: false)) { context in
             let time = context.date.timeIntervalSinceReferenceDate
             
             Canvas { gc, size in
-                let midY = size.height / 2
+                let totalDuration = endDate.timeIntervalSince(startDate)
+                guard totalDuration > 0 else { return }
+                
+                // Get unique branches
+                var branches: [String] = []
+                for event in events {
+                    let b = event.branch?.name ?? "Universe Prime"
+                    if !branches.contains(b) {
+                        branches.append(b)
+                    }
+                }
+                branches.sort { b1, b2 in
+                    if b1 == "Universe Prime" { return true }
+                    if b2 == "Universe Prime" { return false }
+                    return b1 < b2
+                }
+                
+                let trackCount = max(branches.count, 1)
+                let trackHeight = size.height / CGFloat(trackCount)
                 
                 // Draw Spacetime Grid lines
                 var gridPath = Path()
                 let gridSpacing: CGFloat = 80
                 let offset = CGFloat(time.truncatingRemainder(dividingBy: Double(gridSpacing)))
-                
                 for x in stride(from: -offset, to: size.width, by: gridSpacing) {
                     gridPath.move(to: CGPoint(x: x, y: 0))
                     gridPath.addLine(to: CGPoint(x: x, y: size.height))
@@ -174,38 +194,91 @@ struct CanvasView: View {
                     gridPath.move(to: CGPoint(x: 0, y: y))
                     gridPath.addLine(to: CGPoint(x: size.width, y: y))
                 }
-                gc.stroke(gridPath, with: .color(DesignConstants.primaryText.opacity(0.04)), lineWidth: 1)
+                gc.stroke(gridPath, with: .color(DesignConstants.primaryText.opacity(0.02)), lineWidth: 1)
                 
-                // Draw core Timeline Field line
-                var timelinePath = Path()
-                timelinePath.move(to: CGPoint(x: 0, y: midY))
-                
-                // Draw wave representing timeline energy state
-                for x in stride(from: 0, to: size.width, by: 10) {
-                    let wave = sin(x * 0.005 + CGFloat(time)) * 8
-                    timelinePath.addLine(to: CGPoint(x: x, y: midY + wave))
+                // Draw parallel track lines
+                for (index, branch) in branches.enumerated() {
+                    let trackCenterY = CGFloat(index) * trackHeight + (trackHeight / 2)
+                    var trackPath = Path()
+                    trackPath.move(to: CGPoint(x: 0, y: trackCenterY))
+                    
+                    // Wave representing spacetime warp/energy on this branch
+                    for x in stride(from: 0, to: size.width, by: 10) {
+                        let wave = sin(x * 0.005 + CGFloat(time) + CGFloat(index * 2)) * 6
+                        trackPath.addLine(to: CGPoint(x: x, y: trackCenterY + wave))
+                    }
+                    
+                    let tintColor = index == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue
+                    gc.stroke(trackPath, with: .color(tintColor.opacity(0.18)), lineWidth: 2)
+                    
+                    // Draw branch labels on the left side
+                    let font = Font.system(size: 9, weight: .bold, design: .monospaced)
+                    let text = gc.resolve(Text(branch.uppercased()).font(font).foregroundColor(tintColor.opacity(0.35)))
+                    gc.draw(text, at: CGPoint(x: 10, y: trackCenterY - 14), anchor: .leading)
                 }
                 
-                let gradient = Gradient(colors: [DesignConstants.systemOrange.opacity(0.15), DesignConstants.systemOrange.opacity(0.5), DesignConstants.systemPurple.opacity(0.4), DesignConstants.systemOrange.opacity(0.15)])
-                gc.stroke(timelinePath, with: .linearGradient(gradient, startPoint: CGPoint(x: 0, y: midY), endPoint: CGPoint(x: size.width, y: midY)), lineWidth: 3)
+                // Draw branching curves
+                for (index, branch) in branches.enumerated() {
+                    if index == 0 { continue }
+                    
+                    let branchEvents = events.filter { ($0.branch?.name ?? "Universe Prime") == branch }
+                        .sorted(by: { $0.timestamp < $1.timestamp })
+                    guard let firstEvent = branchEvents.first else { continue }
+                    
+                    let firstEventOffset = firstEvent.timestamp.timeIntervalSince(startDate)
+                    let targetX = (CGFloat(firstEventOffset / totalDuration) * size.width)
+                    let targetY = CGFloat(index) * trackHeight + (trackHeight / 2)
+                    
+                    // Find a preceding event in "Universe Prime" to branch from
+                    let primeEvents = events.filter { ($0.branch?.name ?? "Universe Prime") == "Universe Prime" }
+                        .sorted(by: { $0.timestamp < $1.timestamp })
+                    
+                    let precedingEvent = primeEvents.last(where: { $0.timestamp <= firstEvent.timestamp }) ?? primeEvents.first
+                    
+                    if let sourceEvent = precedingEvent {
+                        let sourceOffset = sourceEvent.timestamp.timeIntervalSince(startDate)
+                        let sourceX = (CGFloat(sourceOffset / totalDuration) * size.width)
+                        let sourceY = trackHeight / 2 // "Universe Prime" center Y
+                        
+                        var splitPath = Path()
+                        splitPath.move(to: CGPoint(x: sourceX, y: sourceY))
+                        
+                        // Draw smooth Bezier curve from source to target
+                        let control1 = CGPoint(x: sourceX + (targetX - sourceX) * 0.5, y: sourceY)
+                        let control2 = CGPoint(x: sourceX + (targetX - sourceX) * 0.5, y: targetY)
+                        splitPath.addCurve(to: CGPoint(x: targetX, y: targetY), control1: control1, control2: control2)
+                        
+                        let gradient = Gradient(colors: [DesignConstants.systemOrange.opacity(0.5), DesignConstants.systemBlue.opacity(0.5)])
+                        gc.stroke(
+                            splitPath,
+                            with: .linearGradient(
+                                gradient,
+                                startPoint: CGPoint(x: sourceX, y: sourceY),
+                                endPoint: CGPoint(x: targetX, y: targetY)
+                            ),
+                            style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])
+                        )
+                    }
+                }
                 
-                // Draw quantum particle streams flowing along the timeline
-                if eventsCount > 0 {
-                    for i in 0..<12 {
-                        let speed = Double(i + 1) * 0.15
-                        let particleX = CGFloat((time * 100 * speed).truncatingRemainder(dividingBy: Double(size.width)))
-                        let wave = sin(particleX * 0.005 + CGFloat(time * 2)) * 8
-                        let particleY = midY + wave
+                // Particle flow streams along the active tracks
+                if !events.isEmpty {
+                    for i in 0..<8 {
+                        let trackIndex = i % trackCount
+                        let trackCenterY = CGFloat(trackIndex) * trackHeight + (trackHeight / 2)
+                        let speed = Double((i % 3) + 1) * 0.2
+                        let pX = CGFloat((time * 80 * speed).truncatingRemainder(dividingBy: Double(size.width)))
+                        let wave = sin(pX * 0.005 + CGFloat(time)) * 6
                         
                         gc.fill(
-                            Path(ellipseIn: CGRect(x: particleX - 3, y: particleY - 3, width: 6, height: 6)),
-                            with: .color(i % 2 == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue)
+                            Path(ellipseIn: CGRect(x: pX - 2, y: trackCenterY + wave - 2, width: 4, height: 4)),
+                            with: .color((trackIndex == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue).opacity(0.35))
                         )
                     }
                 }
             }
         }
-        .frame(height: 220)
+        .frame(height: 260)
     }
 }
 
