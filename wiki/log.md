@@ -9,6 +9,39 @@ related: []
 
 # Log
 
+## [2026-06-23] ingest | 10 Transcripts to Wiki
+
+Ingested 10 transcript files from development-docs/temp into the wiki:
+
+### New Entity Pages (3)
+- **[[ralph-larson]]** — Former CIA officer/DOE intelligence director who claims physical time travel to medieval Mount Athos, Greece in 1991. Connected to UFO retrieval programs via DOE role.
+- **[[neil-turok]]** — Physicist (Perimeter, Edinburgh), quadratic gravity, CPT-symmetric universe, CMB fluctuations as quantum gravity signal.
+- **[[juan-maldacena]]** — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior/island formula, traversible wormholes.
+
+### New Concept Pages (8)
+- **[[entropic-gravity]]** — Verlinde's theory: gravity emerges from thermodynamics. Derives inertia (F=ma) not just Einstein's equations. Spacetime emergence via entanglement + computational complexity.
+- **[[quadratic-gravity]]** — Turok's renormalizable 4D quantum gravity. Solves Ostrogradsky instability and negative norm ghosts via Krein spaces + modified Born rule.
+- **[[malament-hogarth]]** — Gödel's CTC solution, Malament's causal structure→topology theorem, Malament-Hogarth spacetimes enabling hypercomputation.
+- **[[simulation-escape]]** — Yampolskiy's analysis of escaping nested simulations. Principle of indifference, hacking analogies, acquired savant syndrome.
+- **[[faggin-quantum-consciousness]]** — Faggin's quantum theory: body=classical info, mind=quantum info, spirit=meaning. Spacetime as permanent memory of self-knowing universe.
+- **[[cellular-intelligence]]** — Cells as reinforcement learning agents, neurons as telegraph cells, distributed intelligence across the body.
+- **[[weak-measurement]]** — Aharonov-Albert-Vaidman weak measurements, conditional measurements, time symmetry, retrocausality, arrow of time implications.
+
+### Enriched Pages (1)
+- **[[entropy]]** — Added Myrvold deep dive section: Clausius vs Boltzmann vs Gibbs definitions, subjectivity debate, thermodynamics as resource theory, second law's relationship to entropy definition, reversible processes.
+
+### Sources Used
+- Prof. Wayne Myrvold — 2-hour entropy deep dive
+- Ralph Moat Larson — CIA Chief time travel interview
+- Erik Verlinde — Entropic gravity transcends Jacobson
+- Kurt Gödel/David Malament — Gödel solution, Malament-Hogarth spacetimes
+- Roman Yampolskiy — How to Escape the Simulation
+- Federico Faggin — Spacetime as memory of self-knowing universe
+- Juan Maldacena — Unreasonable effectiveness of AdS/CFT
+- Michael Levin et al. — Why Neuroscience Got Everything Backwards
+- Neil Turok — Quadratic gravity, Krein spaces, CMB quantum gravity signal
+- Yakir Aharonov et al. — Weak measurements, conditional measurements, retrocausality
+
 ## [2026-06-23] update | Refine UI/UX Style Guidelines
 
 Updated `wiki/concepts/ui-ux-design.md` with the new Apple/iOS system style colors and clean white background panel styling to match the implemented native client aesthetic.

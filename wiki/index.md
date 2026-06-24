@@ -90,6 +90,9 @@ related: []
 - [[nikola-tesla]] — Inventor whose death ray, wireless energy, and Mars signals are connected to UAP propulsion and UFO disclosure
 - [[wireless-energy]] — Tesla's work on wireless energy transmission is seen as the basis for UAP propulsion systems
 - [[death-ray]] — Tesla's particle beam weapon, a precursor to modern UAP energy weapons
+- [[ralph-larson]] — Former CIA officer and DOE intelligence director who claims time travel to medieval Mount Athos
+- [[neil-turok]] — Physicist working on quadratic gravity and CPT-symmetric universe
+- [[juan-maldacena]] — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior
 
 ## Concepts (in wiki/concepts/)
 
@@ -159,6 +162,13 @@ related: []
 - [[temporal-information-fusion]] — Combining evidence from multiple sources
 - [[temporal-anomaly-detection]] — Detecting unusual patterns
 - [[temporal-quantum-tomography]] — Reconstructing quantum state
+- [[entropic-gravity]] — Gravity as emergent thermodynamic phenomenon (Verlinde)
+- [[quadratic-gravity]] — Renormalizable 4D quantum gravity without extra dimensions (Turok)
+- [[malament-hogarth]] — Spacetimes enabling hypercomputation via causal structure
+- [[simulation-escape]] — Escaping nested simulations (Yampolskiy)
+- [[faggin-quantum-consciousness]] — Consciousness as fundamental quantum field, spacetime as memory
+- [[cellular-intelligence]] — Every cell as reinforcement learning agent
+- [[weak-measurement]] — Conditional measurements, retrocausality, time symmetry
 
 ## Projects (in wiki/projects/)
 

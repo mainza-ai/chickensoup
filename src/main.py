@@ -310,14 +310,14 @@ async def get_graph_entity(entity: str):
 async def post_navigate(request: NavigateRequest):
     """Computes the optimal path through the warped spacetime manifold using Navigation Agent (offloaded via Celery)."""
     try:
-        from src.tasks import async_navigate
-        task = async_navigate.delay(
-            origin=request.origin,
-            destination=request.destination,
-            target_year=request.target_year,
-            energy_level=request.energy_level
-        )
         try:
+            from src.tasks import async_navigate
+            task = async_navigate.delay(
+                origin=request.origin,
+                destination=request.destination,
+                target_year=request.target_year,
+                energy_level=request.energy_level
+            )
             res = task.get(timeout=5.0)
             if res.get("success"):
                 return NavigateResponse(
@@ -332,7 +332,7 @@ async def post_navigate(request: NavigateRequest):
                     }
                 )
         except Exception as celery_err:
-            logger.warning(f"Celery task timeout/failure, running synchronous fallback: {celery_err}")
+            logger.warning(f"Celery task dispatch/execution failed, running synchronous fallback: {celery_err}")
 
         # Synchronous fallback
         nav_res = orchestrator.navigation_agent.navigate(
@@ -418,14 +418,14 @@ async def get_quantum_job(job_id: str):
 async def post_ingest(request: IngestRequest):
     """Ingests a new markdown page or document into the Neo4j knowledge graph (offloaded via Celery)."""
     try:
-        from src.tasks import async_ingest_page
-        task = async_ingest_page.delay(
-            title=request.title,
-            content=request.content,
-            tags=request.tags,
-            sources=request.sources
-        )
         try:
+            from src.tasks import async_ingest_page
+            task = async_ingest_page.delay(
+                title=request.title,
+                content=request.content,
+                tags=request.tags,
+                sources=request.sources
+            )
             res = task.get(timeout=5.0)
             if res.get("success"):
                 from src.cache import cache_store
@@ -437,7 +437,7 @@ async def post_ingest(request: IngestRequest):
                     confidence_score=res["confidence_score"]
                 )
         except Exception as celery_err:
-            logger.warning(f"Celery task timeout/failure, running synchronous fallback: {celery_err}")
+            logger.warning(f"Celery task dispatch/execution failed, running synchronous fallback: {celery_err}")
 
         # Synchronous fallback
         driver = neo4j_conn.get_driver()
