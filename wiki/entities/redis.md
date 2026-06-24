@@ -1,47 +1,50 @@
 ---
 title: "Redis"
-tags: [cache, redis]
+tags: [cache, redis, infrastructure]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 sources: [redis-2026]
-related: [local-first-llm, ai-alien-connection]
+related: [cache-architecture, local-first-llm, api-design]
 ---
 
 # Redis
 
-Redis is an in-memory data store used as a caching layer for LLM responses, quantum results, and graph queries. It is the industry standard for caching in Python applications.
+Redis provides the caching layer for all LLM responses, quantum results, and graph queries. Implementation in `src/cache.py`.
 
-## Key Features
+## Cache Implementation (`src/cache.py`)
 
-- **In-memory** — Fast, low-latency data access
-- **Persistent** — Optional persistence to disk
-- **Pub/Sub** — Publish/subscribe for real-time updates
-- **Lua scripting** — Atomic operations
-- **TTL** — Time-to-live for keys
-- **Cluster** — Horizontal scaling
-- **Python client** — `redis` package
+### RedisCache Class
+- Async (`aredis`) and sync (`redis`) dual API
+- MD5 key hashing for consistent key lengths
+- `get(key)` / `set(key, value, ttl)` / `delete(key)` / `clear()`
+- `exists(key)` check
+- Pattern-based invalidation via `flush_namespace(namespace)`
+
+### cache_decorator
+A decorator that wraps any function with automatic caching:
+
+```python
+@cache_decorator(prefix="neo4j", ttl=300)
+def get_entity_neighborhood(driver, entity_name): ...
+```
+
+Prefix namespaces:
+- `cache:neo4j:*` — Graph query results (TTL 300s)
+- `cache:llm:*` — LLM responses and classifications (TTL 300s)
+- `cache:mcp:*` — MCP tool results (TTL 300s)
 
 ## Configuration
 
 - **Docker:** `docker-compose up redis`
 - **Port:** `6379`
 - **Connection:** `redis://localhost:6379`
-
-## Use Cases
-
-- **LLM response caching** — Cache LLM responses with TTL
-- **Quantum result caching** — Cache quantum circuit execution results
-- **Graph query caching** — Cache Neo4j query results
-- **Session storage** — Store user sessions
+- **URL env var:** `REDIS_URL`
 
 ## Integration
 
-- **Python client** — `redis` package
-- **FastAPI integration** — Async Redis client
-- **TTL management** — Configurable TTL per cache key
-- **Cache invalidation** — Automatic invalidation on updates
+Used throughout the backend: Neo4j queries, LLM classification, agent responses, MCP tool calls. Every external call goes through `cache_decorator` to minimize redundant work.
 
 ## See Also
 
 - [[local-first-llm]]
-- [[ai-alien-connection]]
+- [[api-design]]

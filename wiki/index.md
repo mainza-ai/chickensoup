@@ -169,6 +169,9 @@ related: []
 - [[faggin-quantum-consciousness]] — Consciousness as fundamental quantum field, spacetime as memory
 - [[cellular-intelligence]] — Every cell as reinforcement learning agent
 - [[weak-measurement]] — Conditional measurements, retrocausality, time symmetry
+- [[multi-llm-consensus]] — Cross-provider LLM consensus with Jaccard agreement scoring
+- [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
+- [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features
 
 ## Projects (in wiki/projects/)
 

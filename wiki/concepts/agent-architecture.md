@@ -1,82 +1,86 @@
 ---
 title: "Agent Architecture"
-tags: [agent, architecture, multi-agent]
+tags: [agent, architecture, multi-agent, pydantic-graph, langgraph]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 sources: []
-related: [pydantic-ai, pydantic-graph, langgraph, local-first-llm, ai-alien-connection]
+related: [pydantic-ai, pydantic-graph, langgraph, local-first-llm, multi-llm-consensus, langgraph-workflows]
 ---
 
 # Agent Architecture
 
-The agent architecture for Project Chicken Soup uses a hybrid approach with pydantic-graph for core orchestration and LangGraph for complex sub-workflows.
+Hybrid: pydantic-graph for top-level orchestration, LangGraph for complex sub-workflows with checkpointing and human-in-the-loop.
 
-## Multi-Agent Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Orchestrator Graph                        │
-│              (pydantic-graph at top level)                   │
-└─────────────────────────────────────────────────────────────┘
-            │
-    ┌───────┴────────┐
-    │                │
-┌───▼───┐      ┌────▼────┐
-│Query  │      │Research │
-│Agent  │      │Agent     │
-│pydantic-graph│ LangGraph │
-└───────┘      └─────────┘
-    │                │
-┌───▼───┐      ┌────▼────┐
-│Nav-   │      │Knowledge│
-│gate   │      │Graph    │
-│pydantic-graph│ pydantic-graph│
-└───────┘      └─────────┘
-```
-
-## Multi-Agent Approach
-
-- **Query Agent** — Receives user queries, determines intent, routes to appropriate sub-agent
-- **Research Agent** — Explores the knowledge graph (Neo4j) for evidence, credibility, and related claims
-- **Navigation Agent** — Runs the AI Navigator (PennyLane) to compute optimal paths through spacetime
-- **Orchestrator Agent** — Coordinates the flow: query → research → navigation → answer
-
-## Data Flow
+## Components
 
 ```
-User Query → Query Agent → Research Agent (Neo4j) → Navigation Agent (PennyLane) → Answer
-                                              ↓
-                                        Knowledge Graph
-                                        (Neo4j source of truth,
-                                         SwiftData local cache)
+                  ┌──────────────────────────────┐
+                  │   Orchestrator (pydantic-graph) │
+                  │   4 nodes: Classify, Research,  │
+                  │   Navigate, Status              │
+                  └──────────┬───────────────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+       ┌──────▼──────┐ ┌────▼────┐  ┌──────▼──────┐
+       │ Query Agent  │ │Research │  │ Navigation   │
+       │ 3-tier parse │ │ Agent   │  │ Agent        │
+       │ TQL→LLM→     │ │LangGraph│  │ pipe: sim→   │
+       │ heuristic     │ │5 nodes │  │ field→path   │
+       └──────┬──────┘ └────┬────┘  └──────┬──────┘
+              │             │              │
+              │        ┌────▼────┐         │
+              │        │ Neo4j   │         │
+              └────────┤ KG     ├─────────┘
+                       │ queries │
+                       └─────────┘
 ```
 
-**Neo4j is the single source of truth** for graph data. SwiftData caches recent results for offline operation and stores user preferences. See [[integration-architecture]].
+## Query Agent (`src/agents/query_agent.py`)
 
-## Agent Communication
+3-tier intent parsing:
+1. **TQL regex parser** — `KEY:VALUE` patterns (TIMELINE, TIME TRAVEL, EVIDENCE, CAUSAL, ANOMALY)
+2. **LLM classifier** — OpenAI-compatible JSON classification via local LLM
+3. **Heuristic fallback** — Keyword-based intent detection when no LLM available
 
-- **Shared state** — Agents communicate via shared state (Neo4j, Redis)
-- **Message passing** — Agents can also communicate via message passing
-- **Hybrid** — Hybrid approach for flexibility
+Returns `ParsedQuery(intent, entities, structured_filters, confidence)`. Response caching via `@cache_decorator(ttl=300)`.
 
-## Agent Lifecycle
+## Research Agent (`src/agents/research_agent.py`)
 
-- **Creation** — Agents are created on demand
-- **Initialization** — Agents are initialized with context
-- **Shutdown** — Agents are shut down when no longer needed
-- **Scaling** — Agents can be scaled horizontally
+LangGraph workflow with 6 nodes:
+1. `extraction_node` — Entity extraction from query
+2. `neo4j_lookup_node` — Fuzzy search + neighborhood traversal
+3. `credibility_scoring_node` — Rule-based confidence (source count, recency, type)
+4. `human_approval_gate` — Pause for human approval (interrupt)
+5. `context_assembly_node` — Synthesize findings into context
+6. `check_human_approval` — Conditional edge routing
 
-## Agent Fault Isolation
+Features: `MemorySaver` checkpointing, human-in-the-loop via LangGraph interrupts.
 
-- **Isolated** — Each agent is isolated
-- **Fault tolerance** — If one agent fails, others continue
-- **Retry** — Agents can retry failed operations
-- **Circuit breaker** — Circuit breaker pattern for external services
+## Navigation Agent (`src/agents/navigation_agent.py`)
+
+Pipelines three quantum layers:
+1. `simulate_spacetime_metrics` (Spacetime Engine / Qiskit)
+2. `manipulate_spacetime_field` (Field Manipulator / CUDA-Q)
+3. `find_optimal_path` (AI Navigator / PennyLane)
+
+Success determined by `bubble_stability > 0.3`.
+
+## Orchestrator (`src/agents/orchestrator.py`)
+
+pydantic-graph `OrchestratorGraph` with:
+- **ClassifyNode** — routes to correct sub-agent
+- **ResearchNode** — delegates to Research Agent
+- **NavigateNode** — delegates to Navigation Agent
+- **StatusNode** — returns system status
+
+Dependency injection via `OrchestratorDeps`, thread-based execution per query.
 
 ## See Also
 
 - [[pydantic-ai]]
 - [[pydantic-graph]]
 - [[langgraph]]
+- [[langgraph-workflows]]
 - [[local-first-llm]]
-- [[ai-alien-connection]]
+- [[multi-llm-consensus]]

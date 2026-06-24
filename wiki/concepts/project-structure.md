@@ -2,107 +2,130 @@
 title: "Project Structure"
 tags: [project, structure, organization]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [PROJECT_SPEC-2026]
+updated: 2026-06-23
+sources: []
 related: [agent-architecture, technology-stack, api-design, mcp-server, knowledge-graph-schema]
 ---
 
 # Project Structure
 
-## Root Files
+## Root
 
 ```
 chickensoup/
-├── AGENTS.md
-├── PROJECT_SPEC.md
-├── README.md
-├── pyproject.toml
-├── .python-version
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-├── Dockerfile
-├── papers/
-├── wiki/
-├── src/
-├── tests/
-└── notebooks/
+├── AGENTS.md               # Wiki schema for LLM agents
+├── CHANGELOG.md            # Project changelog
+├── README.md               # Project overview with logo + architecture
+├── pyproject.toml          # Python dependencies (uv)
+├── uv.lock                 # Python lockfile
+├── skills-lock.json        # Agent skill lockfile
+├── .env.example            # Environment variable documentation
+├── .gitignore              # Xcode, Python, .env, development-docs
+├── Dockerfile              # Container build
+├── docker-compose.yml      # Neo4j + Redis services
+├── assets/                 # Logos, favicons, images, slide decks
+├── development-docs/       # Implementation plan, temp transcripts, videos
+├── papers/                 # 3 academic PDFs
+├── wiki/                   # Obsidian vault (160+ pages)
+├── src/                    # Python backend
+├── tests/                  # Python test suite (8 files, ~30 tests)
+├── Project Chicken Soup/   # SwiftUI macOS/iOS app (Xcode project)
+├── .agents/                # twostraws agent skills
+├── .github/workflows/      # CI pipeline
+└── .headroom/              # LLM memory persistence (SQLite)
 ```
 
-## Source Directory
+## Python Backend (`src/`)
 
 ```
 src/
-├── main.py                 # Entry point
-├── config.py               # Configuration (Pydantic Settings)
-├── discovery.py            # LLM auto-discovery
-├── models.py               # Core Pydantic models
-├── api/                    # FastAPI routes
-│   ├── query.py            # POST /query
-│   ├── graph.py            # GET /graph/{entity}
-│   ├── navigate.py         # POST /navigate
-│   ├── status.py           # GET /status
-│   ├── models.py           # GET /models
-│   └── ingest.py           # POST /ingest
-├── mcp/                    # MCP server
-│   └── server.py           # FastMCP server with tools
-├── agents/                 # Agent framework
-│   ├── query_agent.py      # Query Agent (pydantic-graph)
-│   ├── research_agent.py   # Research Agent (pydantic-graph)
-│   ├── navigation_agent.py # Navigation Agent (pydantic-graph)
-│   └── orchestrator.py     # Orchestrator Agent (pydantic-graph)
-├── langgraph_workflows/    # LangGraph sub-workflows
-│   ├── research_workflow.py
-│   ├── navigation_workflow.py
-│   └── evaluation_workflow.py
-├── knowledge_graph/        # Neo4j integration
-│   ├── schema.py           # Graph schema
-│   ├── queries.py          # Cypher queries
-│   └── ingestion.py        # Graph ingestion from wiki
-├── spacetime_engine/       # Qiskit
-│   ├── engine.py           # Spacetime simulation
-│   ├── dilation.py         # Time dilation calculation
-│   └── curves.py           # Closed timelike curves
-├── field_manipulator/      # CUDA-Q
-│   ├── manipulator.py      # Field manipulation
-│   ├── bubble.py           # Bubble creation
-│   └── circuits.py         # Quantum circuits
-├── ai_navigator/           # PennyLane
-│   ├── navigator.py        # AI Navigator
-│   ├── neural_field.py     # Neural field model
-│   └── qml.py              # Quantum ML
-├── llm/                    # LLM layer
-│   ├── client.py           # LLM client
-│   ├── omlx.py             # oMLX connection
-│   ├── ollama.py           # Ollama connection
-│   └── lm_studio.py        # LM Studio connection
-├── cache/                  # Redis caching
-│   ├── cache.py            # Cache implementation
-│   └── policies.py         # Cache policies
-└── utils/                  # Utilities
-    ├── logging.py          # Logging setup
-    └── telemetry.py        # OpenTelemetry
+├── main.py                 # FastAPI entry point (~706 lines, all routes inline)
+├── config.py               # Pydantic Settings (19 fields)
+├── models.py               # Core request/response Pydantic models (10 models)
+├── discovery.py            # LLM provider auto-discovery
+├── cache.py                # RedisCache + cache_decorator
+├── observability.py        # OpenTelemetry metrics + tracing
+├── multi_llm.py            # Multi-LLM consensus engine
+├── quantum_scheduler.py    # Quantum job scheduler (IBM/D-Wave/IonQ)
+├── tasks.py                # Celery async task definitions
+├── agents/
+│   ├── orchestrator.py     # pydantic-graph orchestration
+│   ├── query_agent.py      # TQL/LLM/heuristic intent parser
+│   ├── research_agent.py   # LangGraph research workflow
+│   └── navigation_agent.py # Quantum pipeline orchestration
+├── knowledge_graph/
+│   ├── connection.py       # Neo4j connection singleton
+│   ├── schema.py           # Constraints + indexes
+│   ├── ingest.py           # Wiki→Neo4j ingestion pipeline
+│   └── queries.py          # Cypher query functions
+├── spacetime_engine/
+│   └── qiskit_simulation.py # 2-qubit circuit simulation + fallback
+├── field_manipulator/
+│   └── cuda_simulation.py   # Bubble stability + resonance model
+├── ai_navigator/
+│   └── pennylane_qml.py     # Variational circuit pathfinding
+├── mcp/
+│   └── tools.py             # FastMCP tools (6 tools)
+└── configuration.py         # (inline in config.py)
 ```
 
-## Tests
+## SwiftUI App (`Project Chicken Soup/`)
+
+```
+Project Chicken Soup/
+├── Project_Chicken_SoupApp.swift
+├── ContentView.swift               # Main orchestrator (541 lines)
+├── Shared/
+│   ├── Models/
+│   │   ├── LoreEntity.swift        # SwiftData @Model
+│   │   ├── TemporalEvent.swift     # SwiftData @Model
+│   │   └── TimelineBranch.swift    # SwiftData @Model
+│   ├── Services/
+│   │   ├── BackendService.swift    # Central service (423 lines)
+│   │   ├── LLMDiscoveryService.swift
+│   │   └── SyncService.swift       # Offline queue + field merge
+│   └── Networking/
+│       ├── APIClient.swift          # Actor-based HTTP client
+│       └── APIModels.swift          # Codable API response models
+└── Features/
+    ├── Timeline/
+    │   └── TimelineView.swift       # Custom Layout timeline
+    ├── KnowledgeGraph/
+    │   ├── GraphExplorerView.swift  # 2D interactive graph
+    │   ├── NodeView.swift
+    │   ├── SidebarDetailsView.swift
+    │   └── EvidenceHistoryView.swift
+    ├── AINavigator/
+    │   ├── AINavigatorView.swift    # Floating control panel
+    │   └── RealitySpacetimeView.swift # 3D visualization
+    ├── Query/
+    │   ├── QueryOverlayView.swift   # Floating query bar
+    │   └── MultimodalInputView.swift # Voice, photo, camera
+    ├── DataIngestion/
+    │   └── DataIngestionView.swift  # Drag-drop + bulk ingest
+    └── Settings/
+        └── SettingsView.swift       # Quantum backend config
+```
+
+## Tests (`tests/`)
 
 ```
 tests/
-├── test_api.py
-├── test_agents.py
-├── test_graph.py
-├── test_llm.py
-└── test_qc.py
+├── conftest.py              # Mock Neo4j + Redis fixtures
+├── test_config.py           # Settings defaults, fallback parsing (3 tests)
+├── test_discovery.py        # Provider discovery cascading (3 tests)
+├── test_spacetime_engine.py # Tensor, classical, Qiskit (3 tests)
+├── test_agents.py           # TQL, research, navigation, orchestrate (4 tests)
+├── test_api.py              # Status, models, navigate, query (4 tests)
+├── test_phase3.py           # WebSocket, cache (2 tests)
+└── test_phase4.py           # Consensus, quantum scheduler (5 tests)
 ```
 
-## Notebooks
+## Infrastructure
 
-```
-notebooks/
-├── spacetime_simulation.ipynb
-├── field_manipulation.ipynb
-└── ai_navigator.ipynb
-```
+- **Docker**: Single Dockerfile, docker-compose for Neo4j + Redis
+- **CI**: GitHub Actions (Python 3.12, uv, pytest)
+- **Agent Skills**: 4 twostraws skills (SwiftUI, SwiftData, Concurrency, Testing)
 
 ## See Also
 

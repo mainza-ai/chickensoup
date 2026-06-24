@@ -9,6 +9,25 @@ related: []
 
 # Log
 
+## [2026-06-23] update | Wiki Reflects Actual Codebase
+
+Major wiki update to match the actual code implementation across Python backend and SwiftUI frontend.
+
+### New Concept Pages (5)
+- **[[multi-llm-consensus]]** — `src/multi_llm.py` consensus engine: Jaccard word overlap, provider pooling, mock fallback, `POST /consensus/query`
+- **[[quantum-job-scheduler]]** — `src/quantum_scheduler.py`: IBM/D-Wave/IonQ job submission, status polling, local simulation fallback, Celery integration
+- **[[swift-frontend-architecture]]** — Full SwiftUI app architecture: 18 files, SwiftData models (LoreEntity, TemporalEvent, TimelineBranch), services (BackendService, SyncService, LLMDiscoveryService), APIClient actor, all 6 feature views
+
+### Rewritten Pages (3)
+- **[[api-design]]** — Expanded from 6 to 15 documented endpoints. Added: `POST /consensus/query`, `POST /quantum/schedule`, `GET /quantum/job/{id}`, `GET /config`, `POST /config`, `GET /entities`, `GET /events`, `POST /ingest/bulk`, `WebSocket /ws/agent`. Full request/response model table (10 models). Middleware and lifecycle.
+- **[[agent-architecture]]** — Rewritten with actual implementation from `src/agents/`. Query Agent: 3-tier TQL→LLM→heuristic parsing. Research Agent: 6 LangGraph nodes with MemorySaver checkpointing. Navigation Agent: 3-layer quantum pipeline. Orchestrator: 4 pydantic-graph nodes with DI.
+- **[[project-structure]]** — Complete rewrite to match actual codebase. Removed aspirational paths (src/api/, langgraph_workflows/). Added actual structure: inline routes in main.py, spacetime_engine/qiskit_simulation.py, field_manipulator/cuda_simulation.py, ai_navigator/pennylane_qml.py, mcp/tools.py, SwiftUI file tree, test file inventory.
+
+### Enriched Entity Pages (3)
+- **[[redis]]** — Added RedisCache class, cache_decorator, 3 namespace prefixes, async/sync dual API, MD5 key hashing
+- **[[opentelemetry]]** — Added 4 custom metrics (agent_loop_counter, quantum_simulation_duration, cache_hits, cache_misses), trace middleware
+- **[[pydantic-settings]]** — Added full 19-field schema table with defaults and descriptions
+
 ## [2026-06-23] ingest | 10 Transcripts to Wiki
 
 Ingested 10 transcript files from development-docs/temp into the wiki:

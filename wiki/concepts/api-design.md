@@ -1,66 +1,88 @@
 ---
 title: "API Design"
-tags: [api, fastapi]
+tags: [api, fastapi, endpoints]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 sources: [fastapi-2026]
-related: [fastapi, local-first-llm, ai-alien-connection]
+related: [fastapi, local-first-llm, multi-llm-consensus, quantum-job-scheduler, mcp-server, agent-architecture]
 ---
 
 # API Design
 
-The API design for Project Chicken Soup uses FastAPI with Pydantic models for request/response schemas.
+FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, organized by function.
 
 ## Endpoints
 
-### POST /query
-Submit a query, get AI interpretation.
+### Query
+| Method | Path | Purpose | Models |
+|--------|------|---------|--------|
+| POST | `/query` | Submit query to orchestrator | `QueryRequest` → `QueryResponse` |
+| POST | `/consensus/query` | Multi-LLM consensus | `QueryRequest` → `QueryResponse` |
 
-### GET /graph/{entity}
-Retrieve entity and related data.
+### Graph
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/graph/{entity}` | Entity + neighbor relationships |
+| GET | `/entities` | List all lore entities |
+| GET | `/events` | List temporal events |
 
-### POST /navigate
-Compute optimal time travel path.
+### Navigation & Quantum
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/navigate` | Compute optimal spacetime path |
+| POST | `/quantum/schedule` | Submit quantum simulation job |
+| GET | `/quantum/job/{job_id}` | Poll job status and results |
 
-### GET /status
-System health (LLM, Neo4j, quantum backends).
+### System
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/status` | System health (LLM, Neo4j, Redis, quantum) |
+| GET | `/config` | Current quantum settings + token statuses |
+| POST | `/config` | Update quantum backend, hardware toggle, tokens |
+| GET | `/models` | List available LLM models |
 
-### GET /models
-List available LLM models.
+### Ingestion
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/ingest` | Ingest single wiki page |
+| POST | `/ingest/bulk` | Clear + bulk ingest all wiki pages |
 
-### POST /ingest
-Ingest new wiki content into knowledge graph.
+### Streaming
+| Type | Path | Purpose |
+|------|------|---------|
+| WebSocket | `/ws/agent` | Streaming agent responses with real-time status updates, chunked text |
 
-## Request/Response
+## Request/Response Models
 
-### All Pydantic, Typed
+All models in `src/models.py` (~67 lines), typed with Pydantic:
 
-All request/response schemas are Pydantic models with Python type hints. Auto-validation with Pydantic.
+| Model | Key Fields |
+|-------|-----------|
+| `QueryRequest` | `query: str`, `structured: bool` |
+| `QueryResponse` | `query, answer, confidence, entities, sources, inferred_events, inferred_entities` |
+| `NavigateRequest` | `origin, destination, target_year, energy_level` |
+| `NavigateResponse` | `success, path, warp_factor, divergence_risk, geometry_tensor` |
+| `IngestRequest` | `title, content, tags, sources` |
+| `IngestResponse` | `success, nodes_created, relationships_created, confidence_score` |
+| `StatusResponse` | `status, llm_provider, llm_connected, neo4j_connected, redis_connected, quantum_backend` |
+| `ConfigRequest` | `quantum_backend, ibm_api_token?, dwave_api_token?, ionq_api_token?, hardware_enabled` |
+| `ConfigResponse` | `quantum_backend, hardware_enabled, ibm_configured, dwave_configured, ionq_configured` |
 
-## Authentication
+## Middleware
 
-- **Local auth** — API key authentication
-- **Rate limiting** — Per-client, per-endpoint rate limiting
+- **CORS** — All origins allowed (development)
+- **OpenTelemetry** — Tracing spans for HTTP requests and WebSocket
+- **ObservabilityAndRateLimitMiddleware** — Custom metrics (4 counters/gauges)
 
-## Error Handling
+## Lifecycle
 
-- **Error taxonomy** — Custom error types
-- **Error propagation** — Errors propagate through layers
-- **Retry logic** — Automatic retry on failure
-
-## Versioning
-
-- **API versioning** — Versioned endpoints (/v1/)
-- **Backward compatible** — Backward compatible changes
-
-## Documentation
-
-- **OpenAPI/Swagger** — Auto-generated OpenAPI specification
-- **Developer docs** — Architecture and design decisions
-- **User docs** — How to use the system
+- **Startup**: Connects Neo4j, initializes constraints/indexes, logs status
+- **Shutdown**: Gracefully closes Neo4j connection
 
 ## See Also
 
 - [[fastapi]]
 - [[local-first-llm]]
-- [[ai-alien-connection]]
+- [[multi-llm-consensus]]
+- [[quantum-job-scheduler]]
+- [[mcp-server]]
