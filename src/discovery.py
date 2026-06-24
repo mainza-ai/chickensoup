@@ -7,77 +7,83 @@ from src.config import settings
 
 logger = logging.getLogger("chickensoup.discovery")
 
-# In-memory cache of the last successful discovery
+# Cache of the active provider (used for agent requests)
 _discovered_provider: Optional[str] = None
 _discovered_base_url: Optional[str] = None
 _discovered_models: List[str] = []
 
+# Cache of ALL providers probed during last discovery
+_discovered_all: Dict[str, dict] = {}
+
+_URL_MAPPING = {
+    "omlx": settings.OMLX_API_URL,
+    "ollama": settings.OLLAMA_API_URL,
+    "lmstudio": settings.LMSTUDIO_API_URL,
+}
+
+_PROBE_TIMEOUT = 5.0
+
+
+def _probe_single(name: str) -> dict:
+    """Probe one provider, return {base_url, models, available}."""
+    base_url = _URL_MAPPING.get(name.lower())
+    if not base_url:
+        return {"base_url": "", "models": [], "available": False}
+
+    clean_url = base_url.rstrip("/")
+    models_url = f"{clean_url}/models"
+
+    try:
+        req = urllib.request.Request(models_url, method="GET")
+        with urllib.request.urlopen(req, timeout=_PROBE_TIMEOUT) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode("utf-8"))
+                models = _extract_models(data)
+                logger.info(f"Probed {name} — available with models: {models}")
+                return {"base_url": clean_url, "models": models, "available": True}
+    except Exception as e:
+        logger.debug(f"Probed {name} — unreachable: {e}")
+
+    return {"base_url": clean_url, "models": [], "available": False}
+
+
 def refresh_discovery() -> Tuple[str, str, List[str]]:
     """
-    Probes local LLM provider endpoints in order of preference: oMLX -> Ollama -> LM Studio.
-    Updates the in-memory cache and returns (provider_name, base_url, list_of_models).
+    Probe ALL providers in the fallback chain and return the first
+    available one (by preference order).  Updates both the active cache
+    and the full provider map.
     """
-    global _discovered_provider, _discovered_base_url, _discovered_models
+    global _discovered_provider, _discovered_base_url, _discovered_models, _discovered_all
 
-    # If user has explicitly set a provider override, skip probing entirely
+    # If user has explicitly set a provider override, probe only that one
     if settings.LLM_ACTIVE_PROVIDER:
-        url_mapping = {
-            "omlx": settings.OMLX_API_URL,
-            "ollama": settings.OLLAMA_API_URL,
-            "lmstudio": settings.LMSTUDIO_API_URL
-        }
-        base_url = url_mapping.get(settings.LLM_ACTIVE_PROVIDER.lower())
-        if base_url:
-            clean_url = base_url.rstrip("/")
-            models_url = f"{clean_url}/models"
-            try:
-                req = urllib.request.Request(models_url, method="GET")
-                with urllib.request.urlopen(req, timeout=1.5) as response:
-                    if response.status == 200:
-                        data = json.loads(response.read().decode("utf-8"))
-                        models = _extract_models(data)
-                        logger.info(f"Discovered provider '{settings.LLM_ACTIVE_PROVIDER}' with models: {models}")
-                        _discovered_provider = settings.LLM_ACTIVE_PROVIDER
-                        _discovered_base_url = clean_url
-                        _discovered_models = models
-                        return _discovered_provider, _discovered_base_url, _discovered_models
-            except Exception as e:
-                logger.warning(f"Configured provider '{settings.LLM_ACTIVE_PROVIDER}' unreachable: {e}")
+        name = settings.LLM_ACTIVE_PROVIDER.lower()
+        result = _probe_single(name)
+        _discovered_all = {name: result}
+        if result["available"]:
+            _discovered_provider = name
+            _discovered_base_url = result["base_url"]
+            _discovered_models = result["models"]
+            return name, result["base_url"], result["models"]
+        logger.warning(f"Configured provider '{name}' unreachable — falling through")
 
-    # Standard fallback chain probing
+    # Probe all providers in the fallback chain
     providers = settings.fallback_chain_list
-    url_mapping = {
-        "omlx": settings.OMLX_API_URL,
-        "ollama": settings.OLLAMA_API_URL,
-        "lmstudio": settings.LMSTUDIO_API_URL
-    }
-
+    all_results: Dict[str, dict] = {}
     for provider in providers:
-        base_url = url_mapping.get(provider.lower())
-        if not base_url:
-            continue
+        all_results[provider] = _probe_single(provider)
 
-        clean_url = base_url.rstrip("/")
-        models_url = f"{clean_url}/models"
+    _discovered_all = all_results
 
-        logger.info(f"Probing {provider} at {models_url}...")
-        try:
-            req = urllib.request.Request(models_url, method="GET")
-            with urllib.request.urlopen(req, timeout=1.5) as response:
-                if response.status == 200:
-                    data = json.loads(response.read().decode("utf-8"))
-                    models = _extract_models(data)
-                    logger.info(f"Successfully discovered {provider} with models: {models}")
-                    _discovered_provider = provider
-                    _discovered_base_url = clean_url
-                    _discovered_models = models
-                    return _discovered_provider, _discovered_base_url, _discovered_models
-        except (urllib.error.URLError, TimeoutError, ConnectionResetError) as e:
-            logger.debug(f"{provider} probe failed: {e}")
-            continue
-        except Exception as e:
-            logger.warning(f"Unexpected error probing {provider}: {e}")
-            continue
+    # Pick the first available from the preference order
+    for provider in providers:
+        entry = all_results.get(provider, {})
+        if entry.get("available"):
+            _discovered_provider = provider
+            _discovered_base_url = entry["base_url"]
+            _discovered_models = entry["models"]
+            logger.info(f"Auto-selected {provider} with models: {entry['models']}")
+            return provider, entry["base_url"], entry["models"]
 
     logger.warning("No active local LLM provider discovered. Falling back to simulated/mock provider.")
     _discovered_provider = "simulated"
@@ -96,17 +102,14 @@ def _extract_models(data) -> List[str]:
 
 
 def get_discovered(depth: str = "cached") -> Tuple[str, str, List[str]]:
-    """
-    Returns cached discovery result, re-probing if 'depth' is 'fresh'.
-    This avoids redundant HTTP probes on every status check.
-    """
+    """Return cached active-provider info, re-probing if 'depth' is 'fresh'."""
     if depth == "fresh" or _discovered_provider is None:
         return refresh_discovery()
     return _discovered_provider, _discovered_base_url, _discovered_models
 
 
 def get_active_model() -> str:
-    """Returns the user-configured model, or the first discovered model, or a fallback."""
+    """Return the user-configured model, or the first model from the active provider."""
     if settings.LLM_ACTIVE_MODEL:
         return settings.LLM_ACTIVE_MODEL
     _, _, models = get_discovered()
@@ -114,57 +117,42 @@ def get_active_model() -> str:
 
 
 def get_active_provider() -> str:
-    """Returns the user-configured provider, or the discovered provider."""
+    """Return the user-configured provider, or the first available from the chain."""
     if settings.LLM_ACTIVE_PROVIDER:
         return settings.LLM_ACTIVE_PROVIDER
     provider, _, _ = get_discovered()
     return provider
 
 
-def probe_provider(name: str) -> Tuple[str, str, List[str]]:
-    """
-    Probe a specific provider by name and return (provider, base_url, models).
-    Does NOT update the global discovery cache — use refresh_discovery() for that.
-    Returns ('simulated', base_url, []) if the provider is unreachable.
-    """
-    url_mapping = {
-        "omlx": settings.OMLX_API_URL,
-        "ollama": settings.OLLAMA_API_URL,
-        "lmstudio": settings.LMSTUDIO_API_URL,
-    }
-    base_url = url_mapping.get(name.lower())
-    if not base_url:
-        return "simulated", "", []
-
-    clean_url = base_url.rstrip("/")
-    models_url = f"{clean_url}/models"
-
-    try:
-        req = urllib.request.Request(models_url, method="GET")
-        with urllib.request.urlopen(req, timeout=3.0) as response:
-            if response.status == 200:
-                data = json.loads(response.read().decode("utf-8"))
-                models = _extract_models(data)
-                logger.info(f"probe_provider: {name} available with models: {models}")
-                return name, clean_url, models
-    except Exception as e:
-        logger.debug(f"probe_provider: {name} unreachable: {e}")
-
-    return "simulated", clean_url, []
-
 def get_active_base_url() -> str:
-    """Return the base URL for the current active provider (live, not cached)."""
+    """Return the base URL for the current active provider (live lookup)."""
     if settings.LLM_ACTIVE_PROVIDER:
-        mapping = {
-            "omlx": settings.OMLX_API_URL,
-            "ollama": settings.OLLAMA_API_URL,
-            "lmstudio": settings.LMSTUDIO_API_URL,
-        }
-        url = mapping.get(settings.LLM_ACTIVE_PROVIDER.lower())
+        name = settings.LLM_ACTIVE_PROVIDER.lower()
+        url = _URL_MAPPING.get(name)
         if url:
             return url.rstrip("/")
     _, url, _ = get_discovered()
     return url
 
-# Backward-compatible alias for existing callers
+
+def get_all_providers() -> Dict[str, dict]:
+    """Return the full map of {provider_name: {base_url, models, available}}.
+    Re-probes if cache is empty."""
+    if not _discovered_all:
+        refresh_discovery()
+    return dict(_discovered_all)
+
+
+def probe_provider(name: str) -> Tuple[str, str, List[str]]:
+    """
+    Probe a specific provider without updating the global cache.
+    Returns (provider, base_url, models) or ('simulated', base_url, []).
+    """
+    result = _probe_single(name)
+    if result["available"]:
+        return name, result["base_url"], result["models"]
+    return "simulated", result["base_url"], []
+
+
+# Alias for backward compatibility
 discover_active_provider = refresh_discovery

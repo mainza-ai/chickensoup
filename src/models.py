@@ -51,6 +51,10 @@ class ModelsResponse(BaseModel):
     provider: str
     models: List[str]
 
+class LLMProviderStatus(BaseModel):
+    available: bool = False
+    models: List[str] = []
+
 class ConfigRequest(BaseModel):
     quantum_backend: str
     ibm_api_token: Optional[str] = None
@@ -70,6 +74,7 @@ class ConfigResponse(BaseModel):
     llm_active_provider: str
     llm_active_model: str
     llm_available_models: List[str]
+    llm_providers: Dict[str, LLMProviderStatus] = {}
 
 class LLMConfigRequest(BaseModel):
     llm_active_provider: Optional[str] = None
@@ -80,6 +85,7 @@ class LLMConfigResponse(BaseModel):
     llm_active_provider: str
     llm_active_model: str
     llm_available_models: List[str]
+    llm_providers: Dict[str, LLMProviderStatus] = {}
 
 class LLMProbeRequest(BaseModel):
     provider_name: str = Field(..., description="Provider to probe: omlx, ollama, lmstudio")

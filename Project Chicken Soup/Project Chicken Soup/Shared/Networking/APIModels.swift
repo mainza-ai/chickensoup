@@ -196,6 +196,11 @@ public struct APIConfigRequest: Codable {
     }
 }
 
+public struct APILLMProviderStatus: Codable {
+    public var available: Bool
+    public var models: [String]
+}
+
 public struct APIConfigResponse: Codable {
     public var success: Bool
     public var quantum_backend: String
@@ -206,8 +211,9 @@ public struct APIConfigResponse: Codable {
     public var llm_active_provider: String
     public var llm_active_model: String
     public var llm_available_models: [String]
+    public var llm_providers: [String: APILLMProviderStatus]
     
-    public init(success: Bool, quantum_backend: String, quantum_hardware_enabled: Bool, ibm_api_token_set: Bool, dwave_api_token_set: Bool, ionq_api_token_set: Bool, llm_active_provider: String, llm_active_model: String, llm_available_models: [String]) {
+    public init(success: Bool, quantum_backend: String, quantum_hardware_enabled: Bool, ibm_api_token_set: Bool, dwave_api_token_set: Bool, ionq_api_token_set: Bool, llm_active_provider: String, llm_active_model: String, llm_available_models: [String], llm_providers: [String: APILLMProviderStatus]) {
         self.success = success
         self.quantum_backend = quantum_backend
         self.quantum_hardware_enabled = quantum_hardware_enabled
@@ -217,6 +223,7 @@ public struct APIConfigResponse: Codable {
         self.llm_active_provider = llm_active_provider
         self.llm_active_model = llm_active_model
         self.llm_available_models = llm_available_models
+        self.llm_providers = llm_providers
     }
 }
 
@@ -235,6 +242,7 @@ public struct APILLMConfigResponse: Codable {
     public var llm_active_provider: String
     public var llm_active_model: String
     public var llm_available_models: [String]
+    public var llm_providers: [String: APILLMProviderStatus]
 }
 
 public struct APILLMProbeRequest: Codable {

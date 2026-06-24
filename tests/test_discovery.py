@@ -71,10 +71,13 @@ def test_get_discovered_caching():
         provider, url, models = get_discovered(depth="fresh")
         assert models == ["cached-model"]
 
+        # refresh_discovery now probes all providers (3 total)
+        assert mock_urlopen.call_count == 3
+
         # Second call with default "cached" should not re-probe
         provider, url, models = get_discovered()
         assert models == ["cached-model"]
-        assert mock_urlopen.call_count == 1
+        assert mock_urlopen.call_count == 3
 
 def test_get_active_model_fallback():
     _clear_discovery_cache()

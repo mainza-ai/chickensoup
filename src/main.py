@@ -5,12 +5,13 @@ from fastapi import FastAPI, HTTPException, status
 import redis
 
 from src.config import settings
-from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery, probe_provider
+from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery, probe_provider, get_all_providers
+from typing import Dict
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
     ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse,
-    LLMProbeRequest, LLMProbeResponse
+    LLMProbeRequest, LLMProbeResponse, LLMProviderStatus
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -42,6 +43,18 @@ async def lifespan(app: FastAPI):
     # Shutdown actions
     logger.info("Shutting down chickensoup API...")
     neo4j_conn.close()
+
+def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
+    """Build the llm_providers dict from the full discovery cache."""
+    from src.discovery import get_all_providers
+    raw = get_all_providers()
+    return {
+        name: LLMProviderStatus(
+            available=info.get("available", False),
+            models=info.get("models", []),
+        )
+        for name, info in raw.items()
+    }
 
 def _update_env_file(updates: dict):
     """Persist key-value pairs to .env, preserving existing lines."""
@@ -147,6 +160,13 @@ async def get_status():
 async def get_config():
     """Returns current quantum and LLM settings (always probes fresh)."""
     provider, _, models = get_discovered(depth="fresh")
+    all_providers_raw = get_all_providers()
+    llm_providers = {}
+    for name, info in all_providers_raw.items():
+        llm_providers[name] = LLMProviderStatus(
+            available=info.get("available", False),
+            models=info.get("models", []),
+        )
     return ConfigResponse(
         success=True,
         quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
@@ -157,6 +177,7 @@ async def get_config():
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
+        llm_providers=llm_providers,
     )
 
 @app.post("/config", response_model=ConfigResponse)
@@ -204,6 +225,7 @@ async def post_config(request: ConfigRequest):
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
+        llm_providers=_build_llm_providers(),
     )
 
 @app.post("/config/llm", response_model=LLMConfigResponse)
@@ -213,6 +235,10 @@ async def post_llm_config(request: LLMConfigRequest):
         settings.LLM_ACTIVE_PROVIDER = request.llm_active_provider
     if request.llm_active_model is not None:
         settings.LLM_ACTIVE_MODEL = request.llm_active_model
+
+    # Invalidate cached LLM responses so they re-fetch with new provider/model
+    cache_store.invalidate_by_pattern("cache:llm:*")
+    cache_store.invalidate_by_pattern("cache:mcp:*")
 
     provider, _, models = refresh_discovery()
 
@@ -226,6 +252,7 @@ async def post_llm_config(request: LLMConfigRequest):
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
+        llm_providers=_build_llm_providers(),
     )
 
 @app.post("/config/llm/probe", response_model=LLMProbeResponse)

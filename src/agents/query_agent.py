@@ -2,7 +2,7 @@ import re
 import logging
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
-from src.discovery import get_discovered, get_active_model, get_active_base_url
+from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
 import urllib.request
 import urllib.parse
 import json
@@ -67,7 +67,7 @@ class QueryAgent:
 
     @cache_decorator(prefix="llm", ttl=300)
     def _query_local_llm(self, prompt: str) -> Optional[str]:
-        if self.provider == "simulated":
+        if get_active_provider() == "simulated":
             return None
         
         url = f"{get_active_base_url()}/chat/completions"
