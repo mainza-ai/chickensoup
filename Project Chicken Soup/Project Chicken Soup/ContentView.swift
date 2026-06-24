@@ -8,13 +8,6 @@
 import SwiftUI
 import SwiftData
 
-struct ChatMessage: Identifiable, Codable {
-    var id = UUID()
-    var isUser: Bool
-    var text: String
-    var timestamp = Date()
-}
-
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TemporalEvent.timestamp) private var events: [TemporalEvent]
@@ -124,93 +117,20 @@ struct ContentView: View {
                         if backendService.showChatHistory && !messages.isEmpty {
                             HStack {
                                 Spacer()
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack {
-                                        Label("Temporal Chat History", systemImage: "sparkles")
-                                            .font(.caption)
-                                            .bold()
-                                            .foregroundStyle(DesignConstants.systemOrangeText)
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            withAnimation(.spring(duration: 0.3)) {
-                                                messages.removeAll()
-                                                backendService.showChatHistory = false
-                                            }
-                                        }) {
-                                            Text("Clear")
-                                                .font(.caption2)
-                                                .foregroundStyle(.secondary)
-                                                .padding(.horizontal, 6)
-                                                .padding(.vertical, 2)
-                                                .background(Color.secondary.opacity(0.1), in: Capsule())
+                                ChatHistoryView(
+                                    messages: $messages,
+                                    onClear: {
+                                        withAnimation(.spring(duration: 0.3)) {
+                                            messages.removeAll()
+                                            backendService.showChatHistory = false
                                         }
-                                        .buttonStyle(.plain)
-                                        
-                                        Button(action: {
-                                            withAnimation(.spring(duration: 0.3)) {
-                                                backendService.showChatHistory = false
-                                            }
-                                        }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                    
-                                    ScrollViewReader { scrollProxy in
-                                        ScrollView {
-                                            VStack(spacing: 8) {
-                                                ForEach(messages) { msg in
-                                                    HStack {
-                                                        if msg.isUser {
-                                                            Spacer()
-                                                            Text(msg.text)
-                                                                .font(.subheadline)
-                                                                .padding(.horizontal, 12)
-                                                                .padding(.vertical, 8)
-                                                                .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
-                                                                .foregroundStyle(.white)
-                                                                .multilineTextAlignment(.leading)
-                                                        } else {
-                                                            Text(msg.text)
-                                                                .font(.subheadline)
-                                                                .padding(.horizontal, 12)
-                                                                .padding(.vertical, 8)
-                                                                .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
-                                                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
-                                                                .foregroundStyle(DesignConstants.primaryText)
-                                                                .multilineTextAlignment(.leading)
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                    .id(msg.id)
-                                                }
-                                            }
-                                            .padding(.vertical, 4)
-                                        }
-                                        .frame(maxHeight: 180)
-                                        .onAppear {
-                                            if let last = messages.last {
-                                                scrollProxy.scrollTo(last.id, anchor: .bottom)
-                                            }
-                                        }
-                                        .onChange(of: messages.count) { _, _ in
-                                            if let last = messages.last {
-                                                withAnimation {
-                                                    scrollProxy.scrollTo(last.id, anchor: .bottom)
-                                                }
-                                            }
+                                    },
+                                    onClose: {
+                                        withAnimation(.spring(duration: 0.3)) {
+                                            backendService.showChatHistory = false
                                         }
                                     }
-                                }
-                                .padding(12)
-                                .background(DesignConstants.cardBackground.opacity(0.85))
-                                .liquidGlass()
-                                .frame(maxWidth: 640)
-                                .padding(.horizontal, DesignConstants.standardPadding)
-                                
+                                )
                                 Spacer()
                             }
                             .transition(.asymmetric(
@@ -291,91 +211,20 @@ struct ContentView: View {
                         Spacer()
                         
                         if backendService.showChatHistory && !messages.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Label("Temporal Chat History", systemImage: "sparkles")
-                                        .font(.caption)
-                                        .bold()
-                                        .foregroundStyle(DesignConstants.systemOrangeText)
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        withAnimation(.spring(duration: 0.3)) {
-                                            messages.removeAll()
-                                            backendService.showChatHistory = false
-                                        }
-                                    }) {
-                                        Text("Clear")
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 2)
-                                            .background(Color.secondary.opacity(0.1), in: Capsule())
+                            ChatHistoryView(
+                                messages: $messages,
+                                onClear: {
+                                    withAnimation(.spring(duration: 0.3)) {
+                                        messages.removeAll()
+                                        backendService.showChatHistory = false
                                     }
-                                    .buttonStyle(.plain)
-                                    
-                                    Button(action: {
-                                        withAnimation(.spring(duration: 0.3)) {
-                                            backendService.showChatHistory = false
-                                        }
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                
-                                ScrollViewReader { scrollProxy in
-                                    ScrollView {
-                                        VStack(spacing: 8) {
-                                            ForEach(messages) { msg in
-                                                HStack {
-                                                    if msg.isUser {
-                                                        Spacer()
-                                                        Text(msg.text)
-                                                            .font(.subheadline)
-                                                            .padding(.horizontal, 12)
-                                                            .padding(.vertical, 8)
-                                                            .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: 12))
-                                                            .foregroundStyle(.white)
-                                                            .multilineTextAlignment(.leading)
-                                                    } else {
-                                                        Text(msg.text)
-                                                            .font(.subheadline)
-                                                            .padding(.horizontal, 12)
-                                                            .padding(.vertical, 8)
-                                                            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
-                                                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
-                                                            .foregroundStyle(DesignConstants.primaryText)
-                                                            .multilineTextAlignment(.leading)
-                                                        Spacer()
-                                                    }
-                                                }
-                                                .id(msg.id)
-                                            }
-                                        }
-                                        .padding(.vertical, 4)
-                                    }
-                                    .frame(maxHeight: 180)
-                                    .onAppear {
-                                        if let last = messages.last {
-                                            scrollProxy.scrollTo(last.id, anchor: .bottom)
-                                        }
-                                    }
-                                    .onChange(of: messages.count) { _, _ in
-                                        if let last = messages.last {
-                                            withAnimation {
-                                                scrollProxy.scrollTo(last.id, anchor: .bottom)
-                                            }
-                                        }
+                                },
+                                onClose: {
+                                    withAnimation(.spring(duration: 0.3)) {
+                                        backendService.showChatHistory = false
                                     }
                                 }
-                            }
-                            .padding(DesignConstants.standardPadding)
-                            .background(DesignConstants.cardBackground.opacity(0.95))
-                            .liquidGlass()
-                            .padding(.horizontal, DesignConstants.standardPadding)
+                            )
                             .padding(.bottom, 8)
                             .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
