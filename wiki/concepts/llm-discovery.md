@@ -88,6 +88,17 @@ llm:
     catalog_ttl: 300
 ```
 
+## Provider Selection
+
+The Settings UI provides a **provider picker** that lets users switch between providers at runtime:
+
+1. **Auto-detect** (default) — Probes fallback chain in order, uses first responsive provider
+2. **oMLX** — Explicitly probes oMLX endpoint, shows its models
+3. **Ollama** — Explicitly probes Ollama endpoint, shows its models
+4. **LM Studio** — Explicitly probes LM Studio endpoint, shows its models
+
+When a provider is selected, `POST /config/llm/probe` probes that specific provider and returns its available models. The user then picks a model and hits Apply, which calls `POST /config/llm` with both `llm_active_provider` and `llm_active_model` to persist the selection.
+
 ## See Also
 
 - [[local-first-llm]] — LLM strategy overview

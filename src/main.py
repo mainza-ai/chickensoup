@@ -5,11 +5,12 @@ from fastapi import FastAPI, HTTPException, status
 import redis
 
 from src.config import settings
-from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery
+from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery, probe_provider
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
-    ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse
+    ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse,
+    LLMProbeRequest, LLMProbeResponse
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -225,6 +226,16 @@ async def post_llm_config(request: LLMConfigRequest):
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
+    )
+
+@app.post("/config/llm/probe", response_model=LLMProbeResponse)
+async def post_llm_probe(request: LLMProbeRequest):
+    """Probe a specific provider and return its models (does not change active config)."""
+    provider, _, models = probe_provider(request.provider_name)
+    return LLMProbeResponse(
+        provider=provider,
+        available=provider != "simulated",
+        models=models,
     )
 
 @app.get("/models", response_model=ModelsResponse)

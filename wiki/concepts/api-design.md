@@ -40,6 +40,7 @@ FastAPI server at `src/main.py` (~706 lines). All endpoints live in one file, or
 | GET | `/config` | Current quantum + LLM settings (always probes fresh) |
 | POST | `/config` | Update quantum backend, hardware toggle, tokens + LLM provider/model selection |
 | POST | `/config/llm` | Update LLM provider/model, probes fresh, persists to `.env` |
+| POST | `/config/llm/probe` | Probe a specific provider (omlx/ollama/lmstudio) and return its models without changing active config |
 | GET | `/models` | List available LLM models |
 
 ### Ingestion
@@ -70,6 +71,8 @@ All models in `src/models.py` (~67 lines), typed with Pydantic:
 | `ConfigResponse` | `quantum_backend, hardware_enabled, ibm/dwave/ionq token_set, llm_active_provider, llm_active_model, llm_available_models` |
 | `LLMConfigRequest` | `llm_active_provider?, llm_active_model?` |
 | `LLMConfigResponse` | `success, llm_active_provider, llm_active_model, llm_available_models` |
+| `LLMProbeRequest` | `provider_name` (omlx/ollama/lmstudio) |
+| `LLMProbeResponse` | `provider, available, models[]` |
 
 ## Middleware
 

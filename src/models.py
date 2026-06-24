@@ -80,3 +80,11 @@ class LLMConfigResponse(BaseModel):
     llm_active_provider: str
     llm_active_model: str
     llm_available_models: List[str]
+
+class LLMProbeRequest(BaseModel):
+    provider_name: str = Field(..., description="Provider to probe: omlx, ollama, lmstudio")
+
+class LLMProbeResponse(BaseModel):
+    provider: str
+    available: bool = False
+    models: List[str] = Field(default_factory=list)

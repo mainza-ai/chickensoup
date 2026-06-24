@@ -121,5 +121,36 @@ def get_active_provider() -> str:
     return provider
 
 
+def probe_provider(name: str) -> Tuple[str, str, List[str]]:
+    """
+    Probe a specific provider by name and return (provider, base_url, models).
+    Does NOT update the global discovery cache — use refresh_discovery() for that.
+    Returns ('simulated', base_url, []) if the provider is unreachable.
+    """
+    url_mapping = {
+        "omlx": settings.OMLX_API_URL,
+        "ollama": settings.OLLAMA_API_URL,
+        "lmstudio": settings.LMSTUDIO_API_URL,
+    }
+    base_url = url_mapping.get(name.lower())
+    if not base_url:
+        return "simulated", "", []
+
+    clean_url = base_url.rstrip("/")
+    models_url = f"{clean_url}/models"
+
+    try:
+        req = urllib.request.Request(models_url, method="GET")
+        with urllib.request.urlopen(req, timeout=3.0) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode("utf-8"))
+                models = _extract_models(data)
+                logger.info(f"probe_provider: {name} available with models: {models}")
+                return name, clean_url, models
+    except Exception as e:
+        logger.debug(f"probe_provider: {name} unreachable: {e}")
+
+    return "simulated", clean_url, []
+
 # Backward-compatible alias for existing callers
 discover_active_provider = refresh_discovery

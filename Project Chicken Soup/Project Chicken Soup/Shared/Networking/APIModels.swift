@@ -236,3 +236,16 @@ public struct APILLMConfigResponse: Codable {
     public var llm_active_model: String
     public var llm_available_models: [String]
 }
+
+public struct APILLMProbeRequest: Codable {
+    public var provider_name: String
+    public init(providerName: String) {
+        self.provider_name = providerName
+    }
+}
+
+public struct APILLMProbeResponse: Codable {
+    public var provider: String
+    public var available: Bool
+    public var models: [String]
+}

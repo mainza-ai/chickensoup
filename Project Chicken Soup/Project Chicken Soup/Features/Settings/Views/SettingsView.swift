@@ -22,6 +22,16 @@ struct SettingsView: View {
     @State private var isSavingLLM = false
     @State private var llmSaveSuccess = false
     @State private var llmSaveMessage = ""
+    @State private var selectedProvider: String = "auto"
+    @State private var providerModels: [String: [String]] = [:]
+    @State private var isProbingProvider = false
+    
+    private let providerOptions = [
+        ("auto", "Auto-detect"),
+        ("omlx", "oMLX"),
+        ("ollama", "Ollama"),
+        ("lmstudio", "LM Studio"),
+    ]
     
     let backends = [
         ("numpy", "NumPy Simulator (Classical)"),
@@ -118,17 +128,22 @@ struct SettingsView: View {
                         .foregroundStyle(DesignConstants.systemOrangeText)
                     
                     VStack(spacing: 16) {
-                        // Active provider label
+                        // Active provider label (read-only)
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Active Provider")
+                                Text("Current Provider")
                                     .font(.body)
                                     .bold()
                                     .foregroundStyle(DesignConstants.primaryText)
                                 if !backendService.llmActiveProvider.isEmpty {
-                                    Text(backendService.llmActiveProvider)
-                                        .font(.subheadline)
-                                        .foregroundStyle(DesignConstants.systemOrangeText)
+                                    HStack(spacing: 6) {
+                                        Circle()
+                                            .fill(backendService.llmActiveProvider != "simulated" ? DesignConstants.systemGreen : DesignConstants.systemRed)
+                                            .frame(width: 8, height: 8)
+                                        Text(backendService.llmActiveProvider)
+                                            .font(.subheadline)
+                                            .foregroundStyle(DesignConstants.systemOrangeText)
+                                    }
                                 } else {
                                     Text("Auto-discovering...")
                                         .font(.subheadline)
@@ -141,15 +156,55 @@ struct SettingsView: View {
                         Divider()
                             .background(DesignConstants.dividerColor)
                         
-                        // Model picker
+                        // Provider picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Active Model")
+                            Text("Select Provider")
                                 .font(.body)
                                 .bold()
                                 .foregroundStyle(DesignConstants.primaryText)
                             
+                            Picker("Provider", selection: $selectedProvider) {
+                                ForEach(providerOptions, id: \.0) { option in
+                                    HStack {
+                                        Text(option.1)
+                                        if option.0 == backendService.llmActiveProvider {
+                                            Image(systemName: "checkmark")
+                                                .foregroundStyle(DesignConstants.systemOrange)
+                                        }
+                                    }
+                                    .tag(option.0)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(DesignConstants.systemOrange)
+                            .onChange(of: selectedProvider) { _, newValue in
+                                if newValue != "auto" {
+                                    probeProvider(newValue)
+                                } else {
+                                    refreshLLMModels()
+                                }
+                            }
+                        }
+                        
+                        Divider()
+                            .background(DesignConstants.dividerColor)
+                        
+                        // Model picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Active Model")
+                                    .font(.body)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.primaryText)
+                                Spacer()
+                                if isProbingProvider {
+                                    ProgressView()
+                                        .scaleEffect(0.7)
+                                }
+                            }
+                            
                             if llmAvailableModels.isEmpty {
-                                Text("No models discovered. Refresh or check server status.")
+                                Text("No models discovered. Select a provider above or check server status.")
                                     .font(.caption)
                                     .foregroundStyle(DesignConstants.secondaryText)
                             } else {
@@ -172,17 +227,6 @@ struct SettingsView: View {
                         
                         Divider()
                             .background(DesignConstants.dividerColor)
-                        
-                        // Refresh models button
-                        Button(action: refreshLLMModels) {
-                            HStack {
-                                Image(systemName: "arrow.clockwise")
-                                Text("Refresh Available Models")
-                            }
-                            .font(.subheadline)
-                            .foregroundStyle(DesignConstants.systemOrangeText)
-                        }
-                        .buttonStyle(.plain)
                         
                         // Save LLM config button
                         if !llmSaveMessage.isEmpty {
@@ -420,6 +464,7 @@ struct SettingsView: View {
             self.ibmToken = ""
             self.dwaveToken = ""
             self.ionqToken = ""
+            self.selectedProvider = "auto"
             self.llmAvailableModels = backendService.llmAvailableModels
             self.llmSelectedModel = backendService.llmActiveModel
         }
@@ -433,14 +478,39 @@ struct SettingsView: View {
         }
     }
     
+    private func probeProvider(_ name: String) {
+        isProbingProvider = true
+        llmAvailableModels = []
+        llmSelectedModel = ""
+        
+        Task {
+            let result = await backendService.probeLLMProvider(name)
+            await MainActor.run {
+                isProbingProvider = false
+                if result.available {
+                    self.llmAvailableModels = result.models
+                    self.llmSelectedModel = result.models.first ?? ""
+                } else {
+                    self.llmAvailableModels = []
+                    self.llmSaveMessage = "Provider '\(name)' is not available."
+                    self.llmSaveSuccess = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        withAnimation { self.llmSaveMessage = "" }
+                    }
+                }
+            }
+        }
+    }
+    
     private func saveLLMSettings() {
         guard !llmSelectedModel.isEmpty else { return }
         isSavingLLM = true
         llmSaveMessage = ""
         
         Task {
+            let providerToUse = selectedProvider == "auto" ? nil : selectedProvider
             let success = await backendService.saveLLMConfig(
-                provider: nil,
+                provider: providerToUse,
                 model: llmSelectedModel
             )
             
