@@ -1,22 +1,10 @@
 ---
+title: "Project Structure"
+tags: [project, structure, organization]
 created: 2026-06-22
-protected: true
-related:
-- agent-architecture
-- technology-stack
-- api-design
-- mcp-server
-- knowledge-graph-schema
-- wiki-file-system
-- chat-to-wiki-pipeline
-- ingestion-pipeline
+updated: 2026-06-25
 sources: []
-tags:
-- project
-- structure
-- organization
-title: Project Structure
-updated: '2026-06-25'
+related: [agent-architecture, technology-stack, api-design, mcp-server, knowledge-graph-schema, wiki-file-system, chat-to-wiki-pipeline, ingestion-pipeline]
 ---
 
 # Project Structure
@@ -171,4 +159,3 @@ tests/
 - [[wiki-file-system]]
 - [[chat-to-wiki-pipeline]]
 - [[ingestion-pipeline]]
-

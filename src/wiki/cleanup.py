@@ -5,6 +5,8 @@ from datetime import date
 from typing import Dict, List, Set, Tuple
 
 from src.config import settings
+from src.wiki.writer import invalidate_index_cache
+from src.cache import cache_store
 
 logger = logging.getLogger("chickensoup.wiki.cleanup")
 
@@ -96,10 +98,18 @@ def _should_preserve(frontmatter: dict, page_type: str, filename: str) -> bool:
     return True
 
 
-def clear_content_pages() -> dict:
+def clear_content_pages(dry_run: bool = True) -> dict:
     preserved_slugs: List[str] = []
     deleted_slugs: List[str] = []
     protected_added: List[str] = []
+
+    if not dry_run:
+        from src.wiki.backup import create_snapshot
+        snapshot_path = create_snapshot()
+        if snapshot_path:
+            logger.info(f"Pre-clear snapshot saved: {snapshot_path}")
+        else:
+            logger.warning("Pre-clear snapshot could not be created — proceeding anyway")
 
     for subdir in SUBDIRS:
         dir_path = os.path.join(WIKI_DIR, subdir)
@@ -118,38 +128,41 @@ def clear_content_pages() -> dict:
 
             if preserve:
                 if not frontmatter.get("protected", False) and frontmatter.get("tags"):
-                    frontmatter["protected"] = True
-                    _write_page_frontmatter(filepath, frontmatter, body)
                     protected_added.append(f"{subdir}/{slug}")
-                    logger.info(f"Added protected flag to {subdir}/{slug}")
+                    if not dry_run:
+                        frontmatter["protected"] = True
+                        _write_page_frontmatter(filepath, frontmatter, body)
+                        logger.info(f"Added protected flag to {subdir}/{slug}")
+                    else:
+                        logger.info(f"[DRY RUN] Would add protected flag to {subdir}/{slug}")
                 preserved_slugs.append(f"{subdir}/{slug}")
             else:
-                try:
-                    os.remove(filepath)
-                    deleted_slugs.append(f"{subdir}/{slug}")
-                    logger.info(f"Deleted content page: {subdir}/{slug}")
-                except Exception as e:
-                    logger.error(f"Failed to delete {filepath}: {e}")
+                deleted_slugs.append(f"{subdir}/{slug}")
+                if not dry_run:
+                    try:
+                        os.remove(filepath)
+                        logger.info(f"Deleted content page: {subdir}/{slug}")
+                    except Exception as e:
+                        logger.error(f"Failed to delete {filepath}: {e}")
+                else:
+                    logger.info(f"[DRY RUN] Would delete content page: {subdir}/{slug}")
 
-    _rebuild_index(preserved_slugs)
-
-    log_text = (
-        f"Wiki content clear: {len(preserved_slugs)} preserved, "
-        f"{len(deleted_slugs)} deleted, "
-        f"{len(protected_added)} pages flagged as protected"
-    )
-    _append_to_log(log_text)
-
-    from src.wiki.writer import invalidate_index_cache
-    invalidate_index_cache()
-
-    from src.cache import cache_store
-    cache_store.invalidate_all()
-
-    logger.info(f"Wiki clear complete: {len(preserved_slugs)} preserved, {len(deleted_slugs)} deleted")
+    if not dry_run:
+        _rebuild_index(preserved_slugs)
+        _append_to_log(
+            f"Wiki content clear: {len(preserved_slugs)} preserved, "
+            f"{len(deleted_slugs)} deleted, "
+            f"{len(protected_added)} pages flagged as protected"
+        )
+        invalidate_index_cache()
+        cache_store.invalidate_all()
+        logger.info(f"Wiki clear complete: {len(preserved_slugs)} preserved, {len(deleted_slugs)} deleted")
+    else:
+        logger.info(f"[DRY RUN] Wiki clear preview: {len(preserved_slugs)} preserved, {len(deleted_slugs)} deleted")
 
     return {
         "success": True,
+        "dry_run": dry_run,
         "preserved_count": len(preserved_slugs),
         "deleted_count": len(deleted_slugs),
         "protected_added_count": len(protected_added),

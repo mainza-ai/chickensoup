@@ -1,18 +1,10 @@
 ---
+title: "Core Models"
+tags: [models, pydantic, schema]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-ai
-- pydantic-graph
-- knowledge-graph-schema
-sources:
-- PROJECT_SPEC
-tags:
-- models
-- pydantic
-- schema
-title: Core Models
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC]
+related: [pydantic-ai, pydantic-graph, knowledge-graph-schema]
 ---
 
 # Core Models
@@ -28,4 +20,3 @@ The core models are Pydantic schemas that define entities, relationships, timeli
 - [[pydantic-ai]]
 - [[pydantic-graph]]
 - [[knowledge-graph-schema]]
-

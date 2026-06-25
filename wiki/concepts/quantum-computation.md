@@ -1,21 +1,10 @@
 ---
+title: "Quantum Computation"
+tags: [quantum, computing, foundation]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- quantum-systems
-- quantum-field-theory
-- field-geometry-tensor
-- integration-architecture
-sources:
-- Nielsen-Chuang-2010
-- Babbush-2023
-tags:
-- quantum
-- computing
-- foundation
-title: Quantum Computation
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010, Babbush-2023]
+related: [quantum-algorithms, quantum-systems, quantum-field-theory, field-geometry-tensor, integration-architecture]
 ---
 
 # Quantum Computation
@@ -95,4 +84,3 @@ The Navigator uses variational quantum circuits — a parameterized quantum circ
 - [[quantum-field-theory]] — The physics behind the circuits
 - [[field-geometry-tensor]] — What the circuits compute
 - [[quantum-simulation-tier]] — Light/medium/heavy modes
-

@@ -1,20 +1,10 @@
 ---
+title: "Technology Stack"
+tags: [project, technology, stack]
 created: 2026-06-22
-protected: true
-related:
-- local-first-llm
-- agent-architecture
-- knowledge-graph-schema
-- api-design
-- mcp-server
-sources:
-- PROJECT_SPEC-2026
-tags:
-- project
-- technology
-- stack
-title: Technology Stack
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [local-first-llm, agent-architecture, knowledge-graph-schema, api-design, mcp-server]
 ---
 
 # Technology Stack
@@ -56,4 +46,3 @@ updated: '2026-06-25'
 - [[api-design]]
 - [[mcp-server]]
 - [[production-readiness]]
-

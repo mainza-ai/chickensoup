@@ -1,17 +1,10 @@
 ---
+title: "IonQ"
+tags: [quantum, ionq]
 created: 2026-06-22
-protected: true
-related:
-- quantum-systems
-- time-travel-machinery
-- time-travel-machinery-architecture
-sources:
-- IonQ-2023
-tags:
-- quantum
-- ionq
-title: IonQ
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [IonQ-2023]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
 ---
 
 # IonQ
@@ -35,4 +28,3 @@ Trapped-ion quantum computing company. Known for highest fidelity quantum system
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
-

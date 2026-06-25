@@ -1,23 +1,10 @@
 ---
+title: "Exotic Matter and Consciousness"
+tags: [exotic-matter, consciousness, ufo, uap, quantum]
 created: 2026-06-22
-protected: true
-related:
-- element-115
-- field-manipulation
-- ai-alien-connection
-- time-travel-machinery
-- quantum-computation
-sources:
-- Lazar-1989
-- Penrose-Hameroff-2014
-tags:
-- exotic-matter
-- consciousness
-- ufo
-- uap
-- quantum
-title: Exotic Matter and Consciousness
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Lazar-1989, Penrose-Hameroff-2014]
+related: [element-115, field-manipulation, ai-alien-connection, time-travel-machinery, quantum-computation]
 ---
 
 # Exotic Matter and Consciousness
@@ -69,4 +56,3 @@ Negative energy density is directly tied to entropy (negative energy can reverse
 - [[entropy]]
 - [[7-46-hz]]
 - [[schumann-resonance]]
-

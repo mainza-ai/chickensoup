@@ -1,20 +1,10 @@
 ---
+title: "LangGraph Workflows"
+tags: [langgraph, workflows, graph, orchestration]
 created: 2026-06-22
-protected: true
-related:
-- langgraph
-- agent-architecture
-- integration-architecture
-- knowledge-graph-schema
-sources:
-- langgraph-2026
-tags:
-- langgraph
-- workflows
-- graph
-- orchestration
-title: LangGraph Workflows
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [langgraph-2026]
+related: [langgraph, agent-architecture, integration-architecture, knowledge-graph-schema]
 ---
 
 # LangGraph Workflows
@@ -203,4 +193,3 @@ workflows:
 - [[evaluation-framework]] — What the evaluation workflow tests
 - [[field-geometry-tensor]] — The data structure flowing through navigation workflows
 - [[knowledge-graph-schema]] — The graph the research workflow queries
-

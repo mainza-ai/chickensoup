@@ -1,24 +1,10 @@
 ---
+title: "Swift Frontend Architecture"
+tags: [swift, ios, macos, swiftui, frontend]
 created: 2026-06-23
-protected: true
-related:
-- ui-ux-design
-- integration-architecture
-- project-structure
-- swiftui-pro
-- swiftdata-pro
-- swift-concurrency-pro
-- api-design
-- chat-to-wiki-pipeline
+updated: 2026-06-25
 sources: []
-tags:
-- swift
-- ios
-- macos
-- swiftui
-- frontend
-title: Swift Frontend Architecture
-updated: '2026-06-25'
+related: [ui-ux-design, integration-architecture, project-structure, swiftui-pro, swiftdata-pro, swift-concurrency-pro, api-design, chat-to-wiki-pipeline]
 ---
 
 # Swift Frontend Architecture
@@ -124,4 +110,3 @@ Three `@Model` classes stored locally for offline operation:
 - [[swift-concurrency-pro]]
 - [[chat-to-wiki-pipeline]]
 - [[api-design]]
-

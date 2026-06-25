@@ -1,22 +1,10 @@
 ---
+title: "Ingestion Pipeline"
+tags: [ingest, files, folders, upload, wiki]
 created: 2026-06-25
-protected: true
-related:
-- wiki-file-system
-- chat-to-wiki-pipeline
-- agent-architecture
-- api-design
-- knowledge-graph-ingestion
-sources:
-- project-structure-2026-06-22
-tags:
-- ingest
-- files
-- folders
-- upload
-- wiki
-title: Ingestion Pipeline
-updated: '2026-06-25'
+updated: 2026-06-25
+sources: [project-structure-2026-06-22]
+related: [wiki-file-system, chat-to-wiki-pipeline, agent-architecture, api-design, knowledge-graph-ingestion]
 ---
 
 # Ingestion Pipeline
@@ -109,4 +97,3 @@ The core pipeline function:
 - [[knowledge-graph-ingestion]]
 - [[api-design]]
 - [[agent-architecture]]
-

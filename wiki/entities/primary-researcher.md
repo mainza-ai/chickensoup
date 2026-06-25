@@ -1,6 +1,5 @@
 ---
 created: '2026-06-25'
-protected: true
 related: []
 sources:
 - chat-system
@@ -22,5 +21,4 @@ _(Interests will appear as the user discusses topics with the AI)_
 ## Conversation History
 
 _(Conversation history will be recorded automatically)_
-
 

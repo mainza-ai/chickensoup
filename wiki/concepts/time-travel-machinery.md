@@ -1,18 +1,10 @@
 ---
+title: "Time Travel Machinery"
+tags: [time-travel, machinery, quantum]
 created: 2026-06-22
-protected: true
-related:
-- time-travel-machinery-architecture
-- quantum-systems
-sources:
-- Grusch-2023
-- Lazar-1989
-tags:
-- time-travel
-- machinery
-- quantum
-title: Time Travel Machinery
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Grusch-2023, Lazar-1989]
+related: [time-travel-machinery-architecture, quantum-systems]
 ---
 
 # Time Travel Machinery
@@ -52,4 +44,3 @@ Many-Worlds. When you travel back in time, you don't change the past — you bra
 - [[quantum-systems]]
 - [[time-travel]]
 - [[field-manipulation]]
-

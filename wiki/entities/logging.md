@@ -1,17 +1,10 @@
 ---
+title: "Logging"
+tags: [logging, observability, tracing]
 created: 2026-06-22
-protected: true
-related:
-- opentelemetry
-- production-readiness
-sources:
-- PROJECT_SPEC
-tags:
-- logging
-- observability
-- tracing
-title: Logging
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC]
+related: [opentelemetry, production-readiness]
 ---
 
 # Logging
@@ -26,4 +19,3 @@ Logging tracks the temporal reasoning pipeline — from query input through rese
 
 - [[opentelemetry]]
 - [[production-readiness]]
-

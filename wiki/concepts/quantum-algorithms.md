@@ -1,20 +1,10 @@
 ---
+title: "Quantum Algorithms for Time Travel"
+tags: [quantum, algorithms, time-travel]
 created: 2026-06-22
-protected: true
-related:
-- time-travel-machinery-architecture
-- quantum-systems
-- quantum-systems-comparison
-sources:
-- Nielsen-Chuang-2010
-- Preskill-2018
-- Montanaro-2016
-tags:
-- quantum
-- algorithms
-- time-travel
-title: Quantum Algorithms for Time Travel
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010, Preskill-2018, Montanaro-2016]
+related: [time-travel-machinery-architecture, quantum-systems, quantum-systems-comparison]
 ---
 
 # Quantum Algorithms for Time Travel
@@ -225,4 +215,3 @@ A comprehensive inventory of the quantum algorithms needed to build the time tra
 - [[quantum-systems-comparison]]
 - [[field-manipulation]]
 - [[closed-timelike-curves]]
-

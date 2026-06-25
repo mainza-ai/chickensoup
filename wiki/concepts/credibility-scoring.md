@@ -1,17 +1,10 @@
 ---
+title: "Credibility Scoring"
+tags: [credibility, scoring]
 created: 2026-06-22
-protected: true
-related:
-- knowledge-graph-schema
-- local-first-llm
-- ai-alien-connection
-sources:
-- ufo-2026
-tags:
-- credibility
-- scoring
-title: Credibility Scoring
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [ufo-2026]
+related: [knowledge-graph-schema, local-first-llm, ai-alien-connection]
 ---
 
 # Credibility Scoring
@@ -43,4 +36,3 @@ The credibility scoring system for Project Chicken Soup defines how claims are s
 - [[knowledge-graph-schema]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

@@ -1,17 +1,10 @@
 ---
+title: "HHL Algorithm"
+tags: [quantum, algorithm, hhl]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- time-travel-machinery-architecture
-sources:
-- Nielsen-Chuang-2010
-tags:
-- quantum
-- algorithm
-- hhl
-title: HHL Algorithm
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010]
+related: [quantum-algorithms, time-travel-machinery-architecture]
 ---
 
 # HHL Algorithm (Harrow-Hassidim-Lloyd)
@@ -50,4 +43,3 @@ from qiskit.algorithms import HHL
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
-

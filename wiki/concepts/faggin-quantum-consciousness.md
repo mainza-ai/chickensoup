@@ -1,21 +1,10 @@
 ---
+title: "Faggin Quantum Consciousness"
+tags: [consciousness, quantum, physics, philosophy]
 created: 2026-06-23
-protected: true
-related:
-- exotic-matter-and-consciousness
-- consciousness
-- spacetime
-- quantum-field-theory
-- holographic-principle
-sources:
-- Faggin-2026
-tags:
-- consciousness
-- quantum
-- physics
-- philosophy
-title: Faggin Quantum Consciousness
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [Faggin-2026]
+related: [exotic-matter-and-consciousness, consciousness, spacetime, quantum-field-theory, holographic-principle]
 ---
 
 # Faggin Quantum Consciousness
@@ -76,4 +65,3 @@ Faggin's theory aligns with:
 - [[holographic-principle]]
 - [[spacetime]]
 - [[ai-alien-connection]]
-

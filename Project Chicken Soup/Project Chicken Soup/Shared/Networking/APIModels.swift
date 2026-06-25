@@ -498,6 +498,44 @@ public struct APIWikiClearResponse: Codable {
     }
 }
 
+// MARK: - Wiki Backup/Restore
+
+public struct APIWikiExportResponse: Codable {
+    public var success: Bool
+    public var filepath: String
+    public var sizeKb: Double
+    public var pageCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case filepath
+        case sizeKb = "size_kb"
+        case pageCount = "page_count"
+    }
+
+    public init(success: Bool, filepath: String, sizeKb: Double, pageCount: Int) {
+        self.success = success
+        self.filepath = filepath
+        self.sizeKb = sizeKb
+        self.pageCount = pageCount
+    }
+}
+
+public struct APIWikiImportResponse: Codable {
+    public var success: Bool
+    public var restoredCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case restoredCount = "restored_count"
+    }
+
+    public init(success: Bool, restoredCount: Int) {
+        self.success = success
+        self.restoredCount = restoredCount
+    }
+}
+
 public struct APIFolderIngestResponse: Codable {
     public var success: Bool
     public var totalFiles: Int

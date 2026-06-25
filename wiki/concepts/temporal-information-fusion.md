@@ -1,19 +1,10 @@
 ---
+title: "Temporal Information Fusion"
+tags: [temporal, information, fusion, quantum]
 created: 2026-06-22
-protected: true
-related:
-- temporal-reasoning-engine
-- temporal-causality
-- temporal-anomaly-detection
-sources:
-- PROJECT_SPEC-2026
-tags:
-- temporal
-- information
-- fusion
-- quantum
-title: Temporal Information Fusion
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [temporal-reasoning-engine, temporal-causality, temporal-anomaly-detection]
 ---
 
 # Temporal Information Fusion
@@ -76,4 +67,3 @@ Temporal Information Fusion uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[temporal-causality]]
 - [[temporal-anomaly-detection]]
-

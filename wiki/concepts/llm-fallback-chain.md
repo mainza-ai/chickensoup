@@ -1,23 +1,10 @@
 ---
+title: "LLM Fallback Chain"
+tags: [llm, fallback, discovery, resilience]
 created: 2026-06-22
-protected: true
-related:
-- local-first-llm
-- llm-discovery
-- omlx
-- ollama
-- lm-studio
-sources:
-- omlx-2026
-- ollama-2026
-- lmstudio-2026
-tags:
-- llm
-- fallback
-- discovery
-- resilience
-title: LLM Fallback Chain
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [omlx-2026, ollama-2026, lmstudio-2026]
+related: [local-first-llm, llm-discovery, omlx, ollama, lm-studio]
 ---
 
 # LLM Fallback Chain
@@ -135,4 +122,3 @@ llm:
 - [[omlx]] — oMLX provider
 - [[ollama]] — Ollama provider
 - [[lm-studio]] — LM Studio provider
-

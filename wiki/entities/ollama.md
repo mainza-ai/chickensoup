@@ -1,19 +1,10 @@
 ---
+title: "Ollama"
+tags: [llm, local, ollama]
 created: 2026-06-22
-protected: true
-related:
-- omlx
-- lm-studio
-- local-first-llm
-- ai-alien-connection
-sources:
-- ollama-2026
-tags:
-- llm
-- local
-- ollama
-title: Ollama
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [ollama-2026]
+related: [omlx, lm-studio, local-first-llm, ai-alien-connection]
 ---
 
 # Ollama
@@ -58,4 +49,3 @@ Ollama supports a wide range of models, including:
 - [[lm-studio]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

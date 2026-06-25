@@ -1,18 +1,10 @@
 ---
+title: "Neo4j"
+tags: [database, graph, neo4j]
 created: 2026-06-22
-protected: true
-related:
-- knowledge-graph-schema
-- local-first-llm
-- ai-alien-connection
-sources:
-- neo4j-2026
-tags:
-- database
-- graph
-- neo4j
-title: Neo4j
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [neo4j-2026]
+related: [knowledge-graph-schema, local-first-llm, ai-alien-connection]
 ---
 
 # Neo4j
@@ -58,4 +50,3 @@ Neo4j is used to store:
 - [[knowledge-graph-schema]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

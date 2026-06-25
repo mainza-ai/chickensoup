@@ -1,19 +1,10 @@
 ---
+title: "Pydantic Graph"
+tags: [agent, pydantic, graph]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-ai
-- langgraph
-- local-first-llm
-- ai-alien-connection
-sources:
-- pydantic-ai-2026
-tags:
-- agent
-- pydantic
-- graph
-title: Pydantic Graph
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [pydantic-ai-2026]
+related: [pydantic-ai, langgraph, local-first-llm, ai-alien-connection]
 ---
 
 # Pydantic Graph
@@ -67,4 +58,3 @@ class MyNode(BaseNode):
 - [[langgraph]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

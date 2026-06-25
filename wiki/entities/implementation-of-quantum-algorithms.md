@@ -1,18 +1,10 @@
 ---
+title: "Implementation of Quantum Algorithms for Simulating Coupled Oscillators"
+tags: [quantum, simulation, implementation]
 created: 2026-06-22
-protected: true
-related:
-- exponential-quantum-speedup
-- hamiltonian-simulation
-- time-travel-machinery-architecture
-sources:
-- WISER-2026
-tags:
-- quantum
-- simulation
-- implementation
-title: Implementation of Quantum Algorithms for Simulating Coupled Oscillators
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [WISER-2026]
+related: [exponential-quantum-speedup, hamiltonian-simulation, time-travel-machinery-architecture]
 ---
 
 # Implementation of Quantum Algorithms for Simulating Coupled Oscillators
@@ -40,4 +32,3 @@ The wave propagation and field dynamics simulated in this paper are directly app
 - [[hamiltonian-simulation]]
 - [[time-travel-machinery-architecture]]
 - [[field-manipulation]]
-

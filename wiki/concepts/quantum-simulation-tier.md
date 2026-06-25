@@ -1,18 +1,10 @@
 ---
+title: "Quantum Simulation Tier"
+tags: [quantum, simulation, testing, ci]
 created: 2026-06-22
-protected: true
-related:
-- field-geometry-tensor
-- integration-architecture
-- quantum-systems
+updated: 2026-06-22
 sources: []
-tags:
-- quantum
-- simulation
-- testing
-- ci
-title: Quantum Simulation Tier
-updated: '2026-06-25'
+related: [field-geometry-tensor, integration-architecture, quantum-systems]
 ---
 
 # Quantum Simulation Tier
@@ -85,4 +77,3 @@ If no layer achieves quantum advantage on real hardware, the system still works 
 - [[field-geometry-tensor]]
 - [[integration-architecture]]
 - [[quantum-systems]]
-

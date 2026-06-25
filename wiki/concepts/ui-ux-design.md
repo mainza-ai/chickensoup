@@ -1,30 +1,10 @@
 ---
+title: "UI/UX Design"
+tags: [ui, ux, design, swiftui, apple-design, liquid-glass]
 created: 2026-06-22
-protected: true
-related:
-- temporal-reasoning-engine
-- temporal-query-language
-- knowledge-graph-schema
-- ai-alien-connection
-- exotic-matter-and-consciousness
-- field-manipulation
-- quantum-machine-learning
-- temporal-query-pipeline
-- agent-architecture
-- key-decisions
-sources:
-- Apple-HIG-2026
-- SwiftUI-2026
-- SwiftData-2026
-tags:
-- ui
-- ux
-- design
-- swiftui
-- apple-design
-- liquid-glass
-title: UI/UX Design
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [Apple-HIG-2026, SwiftUI-2026, SwiftData-2026]
+related: [temporal-reasoning-engine, temporal-query-language, knowledge-graph-schema, ai-alien-connection, exotic-matter-and-consciousness, field-manipulation, quantum-machine-learning, temporal-query-pipeline, agent-architecture, key-decisions]
 ---
 
 # UI/UX Design
@@ -371,4 +351,3 @@ The animation of this process is the "aha moment" — the user feels like they'r
 - [[temporal-query-pipeline]]
 - [[agent-architecture]]
 - [[key-decisions]]
-

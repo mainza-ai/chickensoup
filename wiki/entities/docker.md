@@ -1,17 +1,10 @@
 ---
+title: "Docker"
+tags: [docker, container, devops]
 created: 2026-06-22
-protected: true
-related:
-- local-first-llm
-- ai-alien-connection
-sources:
-- docker-2026
-tags:
-- docker
-- container
-- devops
-title: Docker
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [docker-2026]
+related: [local-first-llm, ai-alien-connection]
 ---
 
 # Docker
@@ -50,4 +43,3 @@ Docker is used for containerization and orchestration of Project Chicken Soup se
 
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

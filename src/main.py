@@ -19,7 +19,7 @@ from src.models import (
     FileIngestResponse, FolderIngestResponse,
     ConversationMetaResponse, ChatIngestStatusResponse,
     SetUserNameRequest, SetUserNameResponse,
-    WikiClearResponse,
+    WikiClearResponse, WikiExportResponse, WikiImportResponse,
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -1153,7 +1153,7 @@ async def post_wiki_clear_content():
     Pages with `protected: true` in frontmatter are never deleted."""
     try:
         from src.wiki.cleanup import clear_content_pages
-        result = clear_content_pages()
+        result = clear_content_pages(dry_run=False)
 
         if result.get("success"):
             try:
@@ -1191,6 +1191,96 @@ async def post_wiki_clear_content():
     except Exception as e:
         logger.error(f"Wiki clear content failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/wiki/export", response_model=WikiExportResponse)
+async def get_wiki_export():
+    """Exports the entire wiki directory as a zip file."""
+    try:
+        from src.wiki.backup import export_wiki
+        filepath = export_wiki()
+        if not filepath:
+            raise HTTPException(status_code=500, detail="Failed to create wiki export")
+        page_count = 0
+        for subdir in ["entities", "concepts", "projects"]:
+            d = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "wiki", subdir)
+            if os.path.isdir(d):
+                page_count += len([f for f in os.listdir(d) if f.endswith(".md")])
+        size_kb = round(os.path.getsize(filepath) / 1024, 1)
+        return WikiExportResponse(success=True, filepath=filepath, size_kb=size_kb, page_count=page_count)
+    except Exception as e:
+        logger.error(f"Wiki export failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/wiki/import", response_model=WikiImportResponse)
+async def post_wiki_import(file: UploadFile = File(...)):
+    """Imports a wiki zip file and restores the wiki directory."""
+    try:
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        from src.wiki.backup import import_wiki
+        restored = import_wiki(tmp_path)
+
+        os.unlink(tmp_path)
+
+        if restored == 0:
+            raise HTTPException(status_code=400, detail="No pages could be restored from the uploaded file. Ensure it is a valid wiki export zip.")
+
+        try:
+            from src.knowledge_graph.connection import neo4j_conn
+            driver = neo4j_conn.get_driver()
+            if driver:
+                with driver.session() as session:
+                    session.run("MATCH (n) DETACH DELETE n")
+                for subdir in ["concepts", "entities", "projects"]:
+                    dir_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "wiki", subdir)
+                    if not os.path.exists(dir_path):
+                        continue
+                    for filename in os.listdir(dir_path):
+                        if filename.endswith(".md"):
+                            title = os.path.splitext(filename)[0]
+                            try:
+                                with open(os.path.join(dir_path, filename), "r") as f:
+                                    content = f.read()
+                                from src.knowledge_graph.ingest import ingest_wiki_page
+                                ingest_wiki_page(driver, title, content)
+                            except Exception as page_err:
+                                logger.warning(f"Re-ingest failed for {filename}: {page_err}")
+        except Exception as neo4j_err:
+            logger.warning(f"Neo4j re-ingest after import skipped: {neo4j_err}")
+
+        from src.wiki.writer import invalidate_index_cache
+        invalidate_index_cache()
+        from src.cache import cache_store
+        cache_store.invalidate_all()
+
+        return WikiImportResponse(success=True, restored_count=restored)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Wiki import failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/wiki/backups")
+async def list_wiki_backups(subdir: str = "auto"):
+    """Lists available wiki backups."""
+    from src.wiki.backup import list_backups
+    return {"backups": list_backups(subdir=subdir)}
+
+
+@app.post("/wiki/backup/now")
+async def create_wiki_backup_now():
+    """Creates an immediate wiki snapshot."""
+    from datetime import datetime
+    from src.wiki.backup import create_snapshot
+    path = create_snapshot(name=f"manual-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
+    return {"success": path is not None, "filepath": path}
 
 
 @app.get("/debug/routing")

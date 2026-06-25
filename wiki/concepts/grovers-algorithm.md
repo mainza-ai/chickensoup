@@ -1,17 +1,10 @@
 ---
+title: "Grover's Algorithm"
+tags: [quantum, algorithm, grover]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- time-travel-machinery-architecture
-sources:
-- Nielsen-Chuang-2010
-tags:
-- quantum
-- algorithm
-- grover
-title: Grover's Algorithm
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010]
+related: [quantum-algorithms, time-travel-machinery-architecture]
 ---
 
 # Grover's Algorithm
@@ -50,4 +43,3 @@ from qiskit.algorithms import Grover
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
-

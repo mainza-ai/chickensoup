@@ -1,21 +1,10 @@
 ---
+title: "Integration Architecture"
+tags: [architecture, integration, decisions]
 created: 2026-06-22
-protected: true
-related:
-- agent-architecture
-- field-geometry-tensor
-- knowledge-graph-schema
-- key-decisions
-- ui-ux-design
-- quantum-simulation-tier
-sources:
-- PROJECT_SPEC-2026
-tags:
-- architecture
-- integration
-- decisions
-title: Integration Architecture
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [agent-architecture, field-geometry-tensor, knowledge-graph-schema, key-decisions, ui-ux-design, quantum-simulation-tier]
 ---
 
 # Integration Architecture
@@ -230,4 +219,3 @@ struct RootNavigationView: View {
 - [[knowledge-graph-schema]] — Graph schema and ingestion
 - [[ui-ux-design]] — UI platform strategy
 - [[quantum-systems-comparison]] — Platform choices
-

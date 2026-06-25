@@ -1,22 +1,10 @@
 ---
+title: "Chat-to-Wiki Pipeline"
+tags: [chat, ingest, scheduler, wiki, automation]
 created: 2026-06-25
-protected: true
-related:
-- ingestion-pipeline
-- wiki-file-system
-- agent-architecture
-- api-design
-- conversation-entity-management
-sources:
-- chat-system
-tags:
-- chat
-- ingest
-- scheduler
-- wiki
-- automation
-title: Chat-to-Wiki Pipeline
-updated: '2026-06-25'
+updated: 2026-06-25
+sources: [chat-system]
+related: [ingestion-pipeline, wiki-file-system, agent-architecture, api-design, conversation-entity-management]
 ---
 
 # Chat-to-Wiki Pipeline
@@ -117,4 +105,3 @@ All settings in `src/config.py`:
 - [[wiki-file-system]]
 - [[agent-architecture]]
 - [[conversation-entity-management]]
-

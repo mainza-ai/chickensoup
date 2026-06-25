@@ -1,20 +1,10 @@
 ---
+title: "Temporal Data Model"
+tags: [temporal, data, model]
 created: 2026-06-22
-protected: true
-related:
-- time-travel
-- local-first-llm
-- ai-alien-connection
-- temporal-reasoning-engine
-- temporal-causality
-sources:
-- time-travel-2026
-tags:
-- temporal
-- data
-- model
-title: Temporal Data Model
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [time-travel-2026]
+related: [time-travel, local-first-llm, ai-alien-connection, temporal-reasoning-engine, temporal-causality]
 ---
 
 # Temporal Data Model
@@ -64,4 +54,3 @@ The temporal data model supports the flow of information through the system:
 - [[ai-alien-connection]]
 - [[temporal-reasoning-engine]]
 - [[temporal-causality]]
-

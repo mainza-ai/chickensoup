@@ -1,18 +1,10 @@
 ---
+title: "Redis"
+tags: [cache, redis, infrastructure]
 created: 2026-06-22
-protected: true
-related:
-- cache-architecture
-- local-first-llm
-- api-design
-sources:
-- redis-2026
-tags:
-- cache
-- redis
-- infrastructure
-title: Redis
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [redis-2026]
+related: [cache-architecture, local-first-llm, api-design]
 ---
 
 # Redis
@@ -56,4 +48,3 @@ Used throughout the backend: Neo4j queries, LLM classification, agent responses,
 
 - [[local-first-llm]]
 - [[api-design]]
-

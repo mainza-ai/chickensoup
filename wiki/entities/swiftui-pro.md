@@ -1,20 +1,10 @@
 ---
+title: "SwiftUI Pro"
+tags: [swift, swiftui, agent-skill, twostraws]
 created: 2026-06-22
-protected: true
-related:
-- swiftui
-- swiftdata-pro
-- swift-concurrency-pro
-- swift-testing-pro
-sources:
-- twostraws-swiftui-pro-2026
-tags:
-- swift
-- swiftui
-- agent-skill
-- twostraws
-title: SwiftUI Pro
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [twostraws-swiftui-pro-2026]
+related: [swiftui, swiftdata-pro, swift-concurrency-pro, swift-testing-pro]
 ---
 
 # SwiftUI Pro
@@ -85,4 +75,3 @@ npx skills add https://github.com/twostraws/swiftui-agent-skill --skill swiftui-
 - [[swift-testing-pro]]
 - [[ui-ux-design]]
 - [[agent-skills]]
-

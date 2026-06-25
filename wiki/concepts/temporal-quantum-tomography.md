@@ -1,19 +1,10 @@
 ---
+title: "Temporal Quantum Tomography"
+tags: [temporal, quantum, tomography, state]
 created: 2026-06-22
-protected: true
-related:
-- temporal-reasoning-engine
-- quantum-state-representation
-- temporal-information-fusion
-sources:
-- PROJECT_SPEC-2026
-tags:
-- temporal
-- quantum
-- tomography
-- state
-title: Temporal Quantum Tomography
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [temporal-reasoning-engine, quantum-state-representation, temporal-information-fusion]
 ---
 
 # Temporal Quantum Tomography
@@ -72,4 +63,3 @@ Temporal Quantum Tomography uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[quantum-state-representation]]
 - [[temporal-information-fusion]]
-

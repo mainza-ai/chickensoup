@@ -1,19 +1,10 @@
 ---
+title: "Temporal Anomaly Detection"
+tags: [temporal, anomaly, detection, quantum]
 created: 2026-06-22
-protected: true
-related:
-- temporal-reasoning-engine
-- temporal-information-fusion
-- temporal-causality
-sources:
-- PROJECT_SPEC-2026
-tags:
-- temporal
-- anomaly
-- detection
-- quantum
-title: Temporal Anomaly Detection
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [temporal-reasoning-engine, temporal-information-fusion, temporal-causality]
 ---
 
 # Temporal Anomaly Detection
@@ -82,4 +73,3 @@ Temporal Anomaly Detection uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[temporal-information-fusion]]
 - [[temporal-causality]]
-

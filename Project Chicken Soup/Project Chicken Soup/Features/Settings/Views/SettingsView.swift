@@ -409,6 +409,62 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
 
+                // Wiki Backup & Restore
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("WIKI BACKUP & RESTORE")
+                        .font(.caption)
+                        .bold()
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+
+                    VStack(spacing: 16) {
+                        if backendService.isExportingWiki {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Exporting wiki...")
+                                    .font(.subheadline)
+                                    .foregroundStyle(DesignConstants.systemOrangeText)
+                            }
+                            .frame(maxWidth: .infinity)
+                        } else {
+                            Button(action: {
+                                Task {
+                                    let result = await backendService.exportWiki()
+                                    await MainActor.run {
+                                        if let r = result, r.success {
+                                            print("Wiki exported: \(r.filepath) (\(r.pageCount) pages, \(r.sizeKb) KB)")
+                                        }
+                                    }
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: "square.and.arrow.down")
+                                    Text("Export Wiki")
+                                        .bold()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(DesignConstants.systemOrange.opacity(0.15))
+                                .foregroundStyle(DesignConstants.systemOrangeText)
+                                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius)
+                                        .stroke(DesignConstants.systemOrange.opacity(0.3), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(DesignConstants.standardPadding)
+                    .background(DesignConstants.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
+                            .stroke(DesignConstants.glassBorderColor, lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal)
+
                 // Hardware Toggles and Credentials
                 VStack(alignment: .leading, spacing: 12) {
                     Text("QUANTUM HARDWARE CONNECTIVITY")

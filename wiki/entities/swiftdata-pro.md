@@ -1,19 +1,10 @@
 ---
+title: "SwiftData Pro"
+tags: [swift, swiftdata, agent-skill, twostraws]
 created: 2026-06-22
-protected: true
-related:
-- swiftui-pro
-- swift-concurrency-pro
-- swift-testing-pro
-sources:
-- twostraws-swiftdata-pro-2026
-tags:
-- swift
-- swiftdata
-- agent-skill
-- twostraws
-title: SwiftData Pro
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [twostraws-swiftdata-pro-2026]
+related: [swiftui-pro, swift-concurrency-pro, swift-testing-pro]
 ---
 
 # SwiftData Pro
@@ -72,4 +63,3 @@ npx skills add https://github.com/twostraws/SwiftData-Agent-Skill --skill swiftd
 - [[swift-testing-pro]]
 - [[ui-ux-design]]
 - [[agent-skills]]
-

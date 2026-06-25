@@ -1,29 +1,10 @@
 ---
+title: "Entropy"
+tags: [physics, thermodynamics, information, quantum]
 created: 2026-06-22
-protected: true
-related:
-- second-law
-- arrow-of-time
-- information-is-physical
-- decoherence-as-entropy
-- black-hole-entropy
-- heat-death
-- entropic-gravity
-- weak-measurement
-sources:
-- boltzmann-1877
-- shannon-1948
-- von-neumann-1932
-- beckenstein-1973
-- landauer-1961
-- Myrvold-TOE-2026
-tags:
-- physics
-- thermodynamics
-- information
-- quantum
-title: Entropy
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [boltzmann-1877, shannon-1948, von-neumann-1932, beckenstein-1973, landauer-1961, Myrvold-TOE-2026]
+related: [second-law, arrow-of-time, information-is-physical, decoherence-as-entropy, black-hole-entropy, heat-death, entropic-gravity, weak-measurement]
 ---
 
 # Entropy
@@ -107,4 +88,3 @@ Carnot's work on reversible heat engines showed the maximum efficiency is indepe
 - [[landauer]]
 - [[boltzmann]]
 - [[beckenstein]]
-

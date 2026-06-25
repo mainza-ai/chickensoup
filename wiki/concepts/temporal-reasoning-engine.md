@@ -1,22 +1,10 @@
 ---
+title: "Temporal Reasoning Engine"
+tags: [temporal, reasoning, engine, quantum]
 created: 2026-06-22
-protected: true
-related:
-- temporal-query-language
-- temporal-query-pipeline
-- temporal-causality
-- temporal-information-fusion
-- temporal-anomaly-detection
-- temporal-quantum-tomography
-sources:
-- PROJECT_SPEC-2026
-tags:
-- temporal
-- reasoning
-- engine
-- quantum
-title: Temporal Reasoning Engine
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [temporal-query-language, temporal-query-pipeline, temporal-causality, temporal-information-fusion, temporal-anomaly-detection, temporal-quantum-tomography]
 ---
 
 # Temporal Reasoning Engine
@@ -118,4 +106,3 @@ The Temporal Reasoning Engine uses four agents:
 - [[quantum-algorithms]]
 - [[knowledge-graph-schema]]
 - [[agent-architecture]]
-

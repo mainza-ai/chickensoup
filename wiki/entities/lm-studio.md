@@ -1,19 +1,10 @@
 ---
+title: "LM Studio"
+tags: [llm, local, lm-studio]
 created: 2026-06-22
-protected: true
-related:
-- omlx
-- ollama
-- local-first-llm
-- ai-alien-connection
-sources:
-- lmstudio-2026
-tags:
-- llm
-- local
-- lm-studio
-title: LM Studio
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [lmstudio-2026]
+related: [omlx, ollama, local-first-llm, ai-alien-connection]
 ---
 
 # LM Studio
@@ -58,4 +49,3 @@ LM Studio supports:
 - [[ollama]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

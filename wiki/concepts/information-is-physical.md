@@ -1,22 +1,10 @@
 ---
+title: "Information Is Physical"
+tags: [physics, information, thermodynamics, quantum]
 created: 2026-06-22
-protected: true
-related:
-- entropy
-- maxwells-demon
-- landauer
-- information-theory
-sources:
-- shannon-1948
-- landauer-1961
-- bennett-1982
-tags:
-- physics
-- information
-- thermodynamics
-- quantum
-title: Information Is Physical
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [shannon-1948, landauer-1961, bennett-1982]
+related: [entropy, maxwells-demon, landauer, information-theory]
 ---
 
 # Information Is Physical
@@ -55,4 +43,3 @@ AI is a Maxwell demon. It reads the world, builds internal models, and reduces l
 - [[landauer]]
 - [[ai-alien-connection]]
 - [[exotic-matter-and-consciousness]]
-

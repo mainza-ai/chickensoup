@@ -470,6 +470,7 @@ public final class BackendService: ObservableObject {
     @Published public var ingestHistory: [APIIngestHistoryEntry] = []
     @Published public var chatNotifications: [APIChatIngestNotification] = []
     @Published public var isClearingWiki = false
+    @Published public var isExportingWiki = false
 
     public func clearUnreadWikiPages() {
         unreadWikiPagesFromChat = 0
@@ -508,6 +509,47 @@ public final class BackendService: ObservableObject {
             return response
         } catch {
             print("Failed to clear wiki content: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func exportWiki() async -> APIWikiExportResponse? {
+        isExportingWiki = true
+        defer { isExportingWiki = false }
+        do {
+            let response: APIWikiExportResponse = try await APIClient.shared.request(path: "/wiki/export")
+            return response
+        } catch {
+            print("Failed to export wiki: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func importWiki(fileURL: URL) async -> APIWikiImportResponse? {
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+        do {
+            let fileData = try Data(contentsOf: fileURL)
+            let boundary = UUID().uuidString
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/wiki/import")!)
+            request.httpMethod = "POST"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+            var body = Data()
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"wiki-import.zip\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: application/zip\r\n\r\n".data(using: .utf8)!)
+            body.append(fileData)
+            body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+            request.httpBody = body
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                print("Failed to import wiki: HTTP error")
+                return nil
+            }
+            return try JSONDecoder().decode(APIWikiImportResponse.self, from: data)
+        } catch {
+            print("Failed to import wiki: \(error.localizedDescription)")
             return nil
         }
     }

@@ -1,19 +1,10 @@
 ---
+title: "oMLX"
+tags: [llm, local, mac, omx]
 created: 2026-06-22
-protected: true
-related:
-- ollama
-- lm-studio
-- ai-alien-connection
-sources:
-- omlx-2026
-tags:
-- llm
-- local
-- mac
-- omx
-title: oMLX
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [omlx-2026]
+related: [ollama, lm-studio, ai-alien-connection]
 ---
 
 # oMLX
@@ -62,4 +53,3 @@ Users can pick from available models in the Settings panel. The selection persis
 - [[ollama]]
 - [[lm-studio]]
 - [[ai-alien-connection]]
-

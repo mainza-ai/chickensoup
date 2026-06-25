@@ -1,19 +1,10 @@
 ---
+title: "Temporal Query Pipeline"
+tags: [temporal, query, pipeline, quantum]
 created: 2026-06-22
-protected: true
-related:
-- temporal-reasoning-engine
-- temporal-query-language
-- agent-architecture
-sources:
-- PROJECT_SPEC-2026
-tags:
-- temporal
-- query
-- pipeline
-- quantum
-title: Temporal Query Pipeline
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [PROJECT_SPEC-2026]
+related: [temporal-reasoning-engine, temporal-query-language, agent-architecture]
 ---
 
 # Temporal Query Pipeline
@@ -103,4 +94,3 @@ The Temporal Query Pipeline uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[temporal-query-language]]
 - [[agent-architecture]]
-

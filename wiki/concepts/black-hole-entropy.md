@@ -1,21 +1,10 @@
 ---
+title: "Black Hole Entropy"
+tags: [physics, thermodynamics, gravity, quantum]
 created: 2026-06-22
-protected: true
-related:
-- entropy
-- beckenstein
-- holographic-principle
-- information-is-physical
-sources:
-- beckenstein-1973
-- hawking-1974
-tags:
-- physics
-- thermodynamics
-- gravity
-- quantum
-title: Black Hole Entropy
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [beckenstein-1973, hawking-1974]
+related: [entropy, beckenstein, holographic-principle, information-is-physical]
 ---
 
 # Black Hole Entropy
@@ -55,4 +44,3 @@ Black holes are natural entropy sinks. If UAPs harness exotic matter (negative e
 - [[holographic-principle]]
 - [[information-is-physical]]
 - [[exotic-matter-and-consciousness]]
-

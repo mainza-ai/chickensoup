@@ -1,18 +1,10 @@
 ---
+title: "Quantum Systems (Concept)"
+tags: [quantum, ufo, uap]
 created: 2026-06-22
-protected: true
-related:
-- quantum-systems-comparison
-- time-travel-machinery
-sources:
-- Grusch-2023
-- Lazar-1989
-tags:
-- quantum
-- ufo
-- uap
-title: Quantum Systems (Concept)
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Grusch-2023, Lazar-1989]
+related: [quantum-systems-comparison, time-travel-machinery]
 ---
 
 # Quantum Systems
@@ -46,4 +38,3 @@ Time travel isn't classical. It's about manipulating the quantum field of spacet
 - [[quantum-systems-comparison]]
 - [[time-travel-machinery]]
 - [[ai-alien-connection]]
-

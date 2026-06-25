@@ -1,19 +1,10 @@
 ---
+title: "Swift Concurrency Pro"
+tags: [swift, concurrency, agent-skill, twostraws]
 created: 2026-06-22
-protected: true
-related:
-- swiftui-pro
-- swiftdata-pro
-- swift-testing-pro
-sources:
-- twostraws-swift-concurrency-pro-2026
-tags:
-- swift
-- concurrency
-- agent-skill
-- twostraws
-title: Swift Concurrency Pro
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [twostraws-swift-concurrency-pro-2026]
+related: [swiftui-pro, swiftdata-pro, swift-testing-pro]
 ---
 
 # Swift Concurrency Pro
@@ -82,4 +73,3 @@ npx skills add https://github.com/twostraws/Swift-Concurrency-Agent-Skill --skil
 - [[swift-testing-pro]]
 - [[ui-ux-design]]
 - [[agent-skills]]
-

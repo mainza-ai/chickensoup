@@ -1,18 +1,10 @@
 ---
+title: "LangGraph"
+tags: [agent, langgraph]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-graph
-- pydantic-ai
-- local-first-llm
-- ai-alien-connection
-sources:
-- langgraph-2026
-tags:
-- agent
-- langgraph
-title: LangGraph
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [langgraph-2026]
+related: [pydantic-graph, pydantic-ai, local-first-llm, ai-alien-connection]
 ---
 
 # LangGraph
@@ -69,4 +61,3 @@ pip install langgraph
 - [[pydantic-ai]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
-

@@ -137,11 +137,22 @@ class FolderIngestResponse(BaseModel):
 
 class WikiClearResponse(BaseModel):
     success: bool
+    dry_run: bool = True
     preserved_count: int = 0
     deleted_count: int = 0
     protected_added_count: int = 0
     preserved_slugs: List[str] = Field(default_factory=list)
     deleted_slugs: List[str] = Field(default_factory=list)
+
+class WikiExportResponse(BaseModel):
+    success: bool
+    filepath: str = ""
+    size_kb: float = 0.0
+    page_count: int = 0
+
+class WikiImportResponse(BaseModel):
+    success: bool
+    restored_count: int = 0
 
 class ConversationMetaResponse(BaseModel):
     id: str

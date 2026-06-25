@@ -1,22 +1,10 @@
 ---
+title: "Project Chicken Soup Specification"
+tags: [project, specification, architecture]
 created: 2026-06-22
-protected: true
-related:
-- integration-architecture
-- field-geometry-tensor
-- agent-architecture
-- knowledge-graph-schema
-- api-design
-- mcp-server
-- ui-ux-design
-- key-decisions
+updated: 2026-06-22
 sources: []
-tags:
-- project
-- specification
-- architecture
-title: Project Chicken Soup Specification
-updated: '2026-06-25'
+related: [integration-architecture, field-geometry-tensor, agent-architecture, knowledge-graph-schema, api-design, mcp-server, ui-ux-design, key-decisions]
 ---
 
 # Project Chicken Soup Specification
@@ -126,4 +114,3 @@ See `development-docs/PROJECT_SPEC.md` for the detailed implementation plan.
 - [[mcp-server]] — MCP tool definitions
 - [[ui-ux-design]] — Frontend design language
 - [[quantum-simulation-tier]] — Simulation modes
-

@@ -1,17 +1,10 @@
 ---
+title: "Quantum Phase Estimation"
+tags: [quantum, algorithm, qpe]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- time-travel-machinery-architecture
-sources:
-- Nielsen-Chuang-2010
-tags:
-- quantum
-- algorithm
-- qpe
-title: Quantum Phase Estimation
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010]
+related: [quantum-algorithms, time-travel-machinery-architecture]
 ---
 
 # Quantum Phase Estimation (QPE)
@@ -51,4 +44,3 @@ from qiskit.circuit.library import QFT
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
-

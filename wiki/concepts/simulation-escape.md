@@ -1,20 +1,10 @@
 ---
+title: "Simulation Escape"
+tags: [simulation, philosophy, ai, consciousness]
 created: 2026-06-23
-protected: true
-related:
-- ai-alien-connection
-- consciousness
-- time-travel
-- backdoor-science
-sources:
-- Yampolskiy-2026
-tags:
-- simulation
-- philosophy
-- ai
-- consciousness
-title: Simulation Escape
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [Yampolskiy-2026]
+related: [ai-alien-connection, consciousness, time-travel, backdoor-science]
 ---
 
 # Simulation Escape
@@ -73,4 +63,3 @@ Simulation escape connects to [[backdoor-science]]: if the universe is a simulat
 - [[consciousness]]
 - [[backdoor-science]]
 - [[time-travel]]
-

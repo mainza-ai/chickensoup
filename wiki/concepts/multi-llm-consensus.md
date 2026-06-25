@@ -1,19 +1,10 @@
 ---
+title: "Multi-LLM Consensus"
+tags: [llm, consensus, multi-llm, reliability]
 created: 2026-06-23
-protected: true
-related:
-- llm-fallback-chain
-- llm-discovery
-- api-design
-- local-first-llm
+updated: 2026-06-23
 sources: []
-tags:
-- llm
-- consensus
-- multi-llm
-- reliability
-title: Multi-LLM Consensus
-updated: '2026-06-25'
+related: [llm-fallback-chain, llm-discovery, api-design, local-first-llm]
 ---
 
 # Multi-LLM Consensus
@@ -57,4 +48,3 @@ When no real LLMs are available, `_generate_mocked_consensus` produces reasonabl
 - [[llm-discovery]]
 - [[local-first-llm]]
 - [[api-design]]
-

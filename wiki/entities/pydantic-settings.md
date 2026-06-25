@@ -1,19 +1,10 @@
 ---
+title: "Pydantic Settings"
+tags: [pydantic, settings, configuration]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-ai
-- pydantic-graph
-- api-design
-- chat-to-wiki-pipeline
-sources:
-- pydantic-2026
-tags:
-- pydantic
-- settings
-- configuration
-title: Pydantic Settings
-updated: '2026-06-25'
+updated: 2026-06-25
+sources: [pydantic-2026]
+related: [pydantic-ai, pydantic-graph, api-design, chat-to-wiki-pipeline]
 ---
 
 # Pydantic Settings
@@ -91,4 +82,3 @@ When `LLM_ACTIVE_MODEL` is set, all consumers (QueryAgent, ResearchAgent, MultiL
 - [[pydantic-graph]]
 - [[api-design]]
 - [[chat-to-wiki-pipeline]]
-

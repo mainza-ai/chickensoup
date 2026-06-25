@@ -1,17 +1,10 @@
 ---
+title: "Quantum Walk"
+tags: [quantum, algorithm, quantum-walk]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- time-travel-machinery-architecture
-sources:
-- Nielsen-Chuang-2010
-tags:
-- quantum
-- algorithm
-- quantum-walk
-title: Quantum Walk
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010]
+related: [quantum-algorithms, time-travel-machinery-architecture]
 ---
 
 # Quantum Walk
@@ -50,4 +43,3 @@ import cudaq
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
-

@@ -1,20 +1,10 @@
 ---
+title: "Juan Maldacena"
+tags: [physics, quantum-gravity, ads-cft, black-holes]
 created: 2026-06-23
-protected: true
-related:
-- holographic-principle
-- black-hole-entropy
-- quantum-gravity
-- spacetime
-sources:
-- Maldacena-1997
-tags:
-- physics
-- quantum-gravity
-- ads-cft
-- black-holes
-title: Juan Maldacena
-updated: '2026-06-25'
+updated: 2026-06-23
+sources: [Maldacena-1997]
+related: [holographic-principle, black-hole-entropy, quantum-gravity, spacetime]
 ---
 
 # Juan Maldacena
@@ -51,4 +41,3 @@ Maldacena emphasizes that in quantum gravity, the observer cannot be outside the
 - [[black-hole-entropy]]
 - [[spacetime]]
 - [[quantum-gravity]]
-

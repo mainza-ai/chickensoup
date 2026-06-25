@@ -1,17 +1,10 @@
 ---
+title: "pytest"
+tags: [testing, pytest, python]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-ai
-- pydantic-graph
-sources:
-- pytest-2026
-tags:
-- testing
-- pytest
-- python
-title: pytest
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [pytest-2026]
+related: [pydantic-ai, pydantic-graph]
 ---
 
 # pytest
@@ -33,4 +26,3 @@ pytest provides a simple, flexible testing framework for Python projects.
 
 - [[pydantic-ai]]
 - [[pydantic-graph]]
-

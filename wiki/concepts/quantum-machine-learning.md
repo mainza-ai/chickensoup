@@ -1,18 +1,10 @@
 ---
+title: "Quantum Machine Learning"
+tags: [quantum, algorithm, qml]
 created: 2026-06-22
-protected: true
-related:
-- quantum-algorithms
-- time-travel-machinery-architecture
-- temporal-reasoning-engine
-sources:
-- Nielsen-Chuang-2010
-tags:
-- quantum
-- algorithm
-- qml
-title: Quantum Machine Learning
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Nielsen-Chuang-2010]
+related: [quantum-algorithms, time-travel-machinery-architecture, temporal-reasoning-engine]
 ---
 
 # Quantum Machine Learning (QML)
@@ -63,4 +55,3 @@ from dwave.system import DWaveSampler
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
 - [[temporal-reasoning-engine]]
-

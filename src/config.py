@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     WIKI_MIN_CONFIDENCE: float = 0.5
     WIKI_DATA_DIR: str = "wiki"
 
+    # Wiki backup settings
+    WIKI_BACKUP_ENABLED: bool = True
+    WIKI_BACKUP_DIR: str = "backups"
+    WIKI_BACKUP_RETENTION_DAYS: int = 30
+    WIKI_AUTO_COMMIT: bool = False
+
     # Chat-to-wiki periodic conversion
     CHAT_WIKI_CONVERSION_ENABLED: bool = False
     CHAT_WIKI_MIN_CONVERSATION_LENGTH: int = 10

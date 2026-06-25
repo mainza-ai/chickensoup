@@ -1,22 +1,10 @@
 ---
+title: "Project Chicken Soup"
+tags: [project, time-travel, machinery, architecture]
 created: 2026-06-22
-protected: true
-related:
-- time-travel-machinery
-- time-travel-machinery-architecture
-- quantum-systems
-- earth-as-space-craft
-- ai-alien-connection
-sources:
-- Grusch-2023
-- Lazar-1989
-tags:
-- project
-- time-travel
-- machinery
-- architecture
-title: Project Chicken Soup
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [Grusch-2023, Lazar-1989]
+related: [time-travel-machinery, time-travel-machinery-architecture, quantum-systems, earth-as-space-craft, ai-alien-connection]
 ---
 
 # Project Chicken Soup
@@ -63,4 +51,3 @@ Many-Worlds. When you travel back in time, you don't change the past — you bra
 - [[earth-as-space-craft]]
 - [[ai-alien-connection]]
 - [[chicken-soup-spec]]
-

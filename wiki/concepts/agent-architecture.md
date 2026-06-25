@@ -1,22 +1,10 @@
 ---
+title: "Agent Architecture"
+tags: [agent, architecture, multi-agent, pydantic-graph, langgraph]
 created: 2026-06-22
-protected: true
-related:
-- pydantic-ai
-- pydantic-graph
-- langgraph
-- local-first-llm
-- multi-llm-consensus
-- langgraph-workflows
+updated: 2026-06-24
 sources: []
-tags:
-- agent
-- architecture
-- multi-agent
-- pydantic-graph
-- langgraph
-title: Agent Architecture
-updated: '2026-06-25'
+related: [pydantic-ai, pydantic-graph, langgraph, local-first-llm, multi-llm-consensus, langgraph-workflows]
 ---
 
 # Agent Architecture
@@ -137,4 +125,3 @@ Dependency injection via `OrchestratorDeps`, thread-based execution per query.
 - [[langgraph-workflows]]
 - [[local-first-llm]]
 - [[multi-llm-consensus]]
-

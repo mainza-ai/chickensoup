@@ -1,18 +1,10 @@
 ---
+title: "CUDA-Q"
+tags: [quantum, nvidia, cuda-q]
 created: 2026-06-22
-protected: true
-related:
-- quantum-systems
-- time-travel-machinery
-- time-travel-machinery-architecture
-sources:
-- CUDA-Q-2023
-tags:
-- quantum
-- nvidia
-- cuda-q
-title: CUDA-Q
-updated: '2026-06-25'
+updated: 2026-06-22
+sources: [CUDA-Q-2023]
+related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
 ---
 
 # CUDA-Q
@@ -38,4 +30,3 @@ NVIDIA's open-source hybrid quantum-classical computing platform. Designed for G
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
-
