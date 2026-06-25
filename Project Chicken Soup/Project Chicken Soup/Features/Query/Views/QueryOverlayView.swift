@@ -14,6 +14,9 @@ struct QueryOverlayView: View {
     
     @State private var isExpanded = false
     @FocusState private var isFocused: Bool
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     private let suggestions = [
         "What happened in northern Italy in 1933?",
@@ -24,38 +27,42 @@ struct QueryOverlayView: View {
     
     var body: some View {
         VStack(spacing: DesignConstants.compactPadding) {
-            HStack(spacing: DesignConstants.compactPadding) {
-                Image(systemName: "sparkles")
-                    .foregroundStyle(DesignConstants.systemOrangeText)
-                    .bold()
+            HStack(spacing: 6) {
+                if !isCompact {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                        .bold()
+                }
                 
                 TextField(
                     isStructuredQuery ? "Enter Temporal Query Language (TQL)..." : "Ask about UFOs, aliens, or time travel...",
                     text: $text
                 )
                 .textFieldStyle(.plain)
-                .font(.headline)
+                .font(isCompact ? .subheadline : .headline)
                 .focused($isFocused)
                 .onSubmit {
                     onSubmit()
                     isFocused = false
                 }
                 
-                Button(action: {
-                    isStructuredQuery.toggle()
-                }) {
-                    Text(isStructuredQuery ? "TQL" : "Natural")
-                        .font(.caption)
-                        .bold()
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            isStructuredQuery ? DesignConstants.systemOrange : Color.secondary.opacity(0.1),
-                            in: RoundedRectangle(cornerRadius: 6)
-                        )
-                        .foregroundStyle(isStructuredQuery ? .white : .primary)
+                if !isCompact {
+                    Button(action: {
+                        isStructuredQuery.toggle()
+                    }) {
+                        Text(isStructuredQuery ? "TQL" : "Natural")
+                            .font(.caption)
+                            .bold()
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                isStructuredQuery ? DesignConstants.systemOrange : Color.secondary.opacity(0.1),
+                                in: RoundedRectangle(cornerRadius: 6)
+                            )
+                            .foregroundStyle(isStructuredQuery ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 
                 if !text.isEmpty {
                     Button(action: { text = "" }) {
@@ -69,24 +76,24 @@ struct QueryOverlayView: View {
                     ProgressView()
                         .scaleEffect(0.8)
                         .frame(width: 24, height: 24)
-                        .padding(.horizontal, 8)
                 } else {
                     Button("Execute", systemImage: "play.fill", action: {
                         onSubmit()
                         isFocused = false
                     })
-                    .font(.subheadline)
-                    .bold()
+                    .font(.system(isCompact ? .caption : .subheadline, design: .rounded).bold())
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, isCompact ? 8 : 12)
                     .padding(.vertical, 8)
                     .background(DesignConstants.systemOrange, in: RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
                     .buttonStyle(.plain)
                 }
             }
             
-            MultimodalInputView(queryText: $text)
-                .padding(.top, 2)
+            if !isCompact {
+                MultimodalInputView(queryText: $text)
+                    .padding(.top, 2)
+            }
             
             // Expanded Suggestions Panel when focused or active
             if isFocused || isExpanded {
@@ -131,10 +138,11 @@ struct QueryOverlayView: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .padding(DesignConstants.standardPadding)
-        .liquidGlass()
-        .frame(maxWidth: 640)
-        .padding(.horizontal, DesignConstants.standardPadding)
+        .padding(isCompact ? 10 : DesignConstants.standardPadding)
+        .background(DesignConstants.cardBackground.opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+        .frame(maxWidth: isCompact ? .infinity : 640)
         .onChange(of: isFocused) { _, newValue in
             withAnimation(DesignConstants.hoverAnimation) {
                 isExpanded = newValue

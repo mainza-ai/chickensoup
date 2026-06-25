@@ -10,6 +10,9 @@ import SwiftUI
 struct AINavigatorView: View {
     @ObservedObject var discoveryService = LLMDiscoveryService.shared
     @ObservedObject var backendService = BackendService.shared
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     private var currentLLMModel: String {
         if !backendService.llmActiveModel.isEmpty {
@@ -68,16 +71,13 @@ struct AINavigatorView: View {
                             .scaleEffect(0.6)
                             .frame(width: 12, height: 12)
                     } else {
-                        Button {
+                        Button("Refresh discovery", systemImage: "arrow.clockwise") {
                             Task {
                                 await discoveryService.discoverActiveModels()
                             }
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.caption2)
-                                .foregroundStyle(DesignConstants.systemOrangeText)
                         }
                         .buttonStyle(.plain)
+                        .labelStyle(.iconOnly)
                     }
                 }
                 
@@ -126,7 +126,7 @@ struct AINavigatorView: View {
                             .font(.subheadline)
                             .foregroundStyle(DesignConstants.primaryText)
                         Spacer()
-                        Text(String(format: "%.2f", gravityMetric))
+                        Text(gravityMetric, format: .number.precision(.fractionLength(2)))
                             .font(.system(.subheadline, design: .monospaced))
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
@@ -139,7 +139,7 @@ struct AINavigatorView: View {
                             .font(.subheadline)
                             .foregroundStyle(DesignConstants.primaryText)
                         Spacer()
-                        Text(String(format: "%.2f", velocityMetric))
+                        Text(velocityMetric, format: .number.precision(.fractionLength(2)))
                             .font(.system(.subheadline, design: .monospaced))
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
@@ -152,7 +152,7 @@ struct AINavigatorView: View {
                             .font(.subheadline)
                             .foregroundStyle(DesignConstants.primaryText)
                         Spacer()
-                        Text(String(format: "%.2f", fieldIntensity))
+                        Text(fieldIntensity, format: .number.precision(.fractionLength(2)))
                             .font(.system(.subheadline, design: .monospaced))
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
@@ -233,7 +233,7 @@ struct AINavigatorView: View {
         }
         .padding(DesignConstants.standardPadding)
         .liquidGlass()
-        .frame(maxWidth: 320)
+        .frame(maxWidth: isCompact ? .infinity : 320)
     }
     
     private func simulateTimeTravel() {
@@ -276,7 +276,7 @@ struct StatusIndicator: View {
     
     var body: some View {
         Text(name)
-            .font(.system(size: 9, weight: .semibold, design: .monospaced))
+            .font(.system(.caption, design: .monospaced)).fontWeight(.semibold)
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(

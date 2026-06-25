@@ -47,10 +47,15 @@ struct TimelineNodeView: View {
                 
                 Spacer()
                 
-                Text(String(format: "%.0f%% Match", event.confidence * 100))
-                    .font(.caption)
-                    .bold()
-                    .foregroundStyle(DesignConstants.systemOrangeText)
+                HStack(spacing: 2) {
+                    Text(event.confidence, format: .percent.precision(.fractionLength(0)))
+                        .font(.caption)
+                        .bold()
+                    Text("Match")
+                        .font(.caption)
+                        .bold()
+                }
+                .foregroundStyle(DesignConstants.systemOrangeText)
             }
             
             Text(event.title)
@@ -106,8 +111,8 @@ struct TimelineNodeView: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(event.title), \(event.type) event, \(Int(event.confidence * 100)) percent confidence match. Source: \(event.source). Date: \(event.timestamp.formatted(date: .abbreviated, time: .omitted))")
-        .accessibilityHint(isSelected ? "Currently selected event." : "Double tap to select this event on the timeline.")
+        .accessibilityLabel("\(event.title), \(event.type), \(Int(event.confidence * 100)) percent confidence, \(event.source)")
+        .accessibilityHint(isSelected ? "Currently selected event." : "Shows event details.")
     }
 }
 

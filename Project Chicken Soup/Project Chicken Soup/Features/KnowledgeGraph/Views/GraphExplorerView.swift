@@ -19,6 +19,15 @@ struct GraphExplorerView: View {
     @State private var accumulatedOffset = CGSize.zero
     @State private var zoomScale: CGFloat = 1.0
     @State private var initialZoomScale: CGFloat = 1.0
+    private struct EntitySheetItem: Identifiable {
+        var id: String { name }
+        let name: String
+    }
+    @State private var selectedEntityItem: EntitySheetItem?
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     var body: some View {
         GeometryReader { geometry in
@@ -26,6 +35,7 @@ struct GraphExplorerView: View {
                 // 1. Grid Background
                 GridBackgroundView()
                     .background(DesignConstants.cardBackground)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
                 // 2. Main Content Canvas
                 if allEntities.isEmpty {
@@ -37,7 +47,7 @@ struct GraphExplorerView: View {
                             .font(.headline)
                             .foregroundStyle(DesignConstants.primaryText)
                         Text("Ingest markdown documents using the sidebar panel first.")
-                            .font(.caption)
+                            .font(.subheadline)
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -70,13 +80,12 @@ struct GraphExplorerView: View {
                     
                     let topOffset: CGFloat = 40
                     let bottomOffset: CGFloat = backendService.showChatHistory ? 220 : 90
-                    let visibleWidth = geometry.size.width - (backendService.showNavigator ? 320 : 0)
+                    let visibleWidth = geometry.size.width - (!isCompact && backendService.showNavigator ? 320 : 0)
                     let centerY = max(100.0, topOffset + (geometry.size.height - topOffset - bottomOffset) / 2)
                     let center = CGPoint(x: visibleWidth / 2 + dragOffset.width + accumulatedOffset.width,
                                          y: centerY + dragOffset.height + accumulatedOffset.height)
                     
                     // Determine viewport scaling factor to fit all nodes cleanly inside the canvas
-                    // Enforce a minimum automatic scale of 0.65 to ensure spacing is maintained.
                     let availableHeight = geometry.size.height - topOffset - bottomOffset
                     let availableWidth = visibleWidth
                     let minDimension = min(availableWidth, availableHeight)
@@ -100,7 +109,7 @@ struct GraphExplorerView: View {
                                 }
                             }
                         
-                        // Connection Lines drawn as native SwiftUI views to smoothly interpolate position updates
+                        // Connection Lines
                         ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
                             if let neighborPos = currentPositions[conn.neighbor.id] {
                                 let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
@@ -120,14 +129,12 @@ struct GraphExplorerView: View {
                                     }
                                 }()
                                 
-                                // Line Connection Path
                                 Path { path in
                                     path.move(to: start)
                                     path.addLine(to: end)
                                 }
                                 .stroke(nodeColor.opacity(0.35), lineWidth: 1.5)
                                 
-                                // Staggered relationship label with readable card backing
                                 let staggerFactor = 0.42 + 0.16 * Double(index % 2)
                                 let mid = CGPoint(
                                     x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
@@ -136,7 +143,7 @@ struct GraphExplorerView: View {
                                 
                                 let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ").lowercased()
                                 Text(labelString)
-                                    .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                                    .font(.system(.caption, design: .monospaced).bold())
                                     .foregroundStyle(nodeColor.opacity(0.85))
                                     .padding(.horizontal, 5)
                                     .padding(.vertical, 2.5)
@@ -146,7 +153,7 @@ struct GraphExplorerView: View {
                             }
                         }
                         
-                        // Neighbor Nodes SwiftUI View Overlays
+                        // Neighbor Nodes
                         ForEach(graph.connections) { conn in
                             let entity = conn.neighbor
                             if let relativePos = currentPositions[entity.id] {
@@ -155,6 +162,11 @@ struct GraphExplorerView: View {
                                 
                                 NodeView(name: entity.name, type: entity.type, isFocused: false, scaleFactor: scaleFactor) {
                                     selectEntity(name: entity.name)
+                                    #if !os(macOS)
+                                    if horizontalSizeClass == .compact {
+                                        selectedEntityItem = EntitySheetItem(name: entity.name)
+                                    }
+                                    #endif
                                 }
                                 .position(pos)
                                 .transition(.scale.combined(with: .opacity))
@@ -163,7 +175,11 @@ struct GraphExplorerView: View {
                         
                         // Center Focused Node view
                         NodeView(name: graph.entity.name, type: graph.entity.type, isFocused: true, scaleFactor: scaleFactor) {
-                            // Focused node click action
+                            #if !os(macOS)
+                            if horizontalSizeClass == .compact {
+                                selectedEntityItem = EntitySheetItem(name: graph.entity.name)
+                            }
+                            #endif
                         }
                         .position(center)
                         .transition(.scale.combined(with: .opacity))
@@ -197,52 +213,43 @@ struct GraphExplorerView: View {
                             Spacer()
                             
                             HStack(spacing: 8) {
-                                Button(action: {
+                                Button("Zoom Out", systemImage: "minus.magnifyingglass") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                                         zoomScale = max(0.4, zoomScale - 0.15)
                                         initialZoomScale = zoomScale
                                     }
-                                }) {
-                                    Image(systemName: "minus.magnifyingglass")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(DesignConstants.primaryText)
                                 }
                                 .buttonStyle(.plain)
+                                .labelStyle(.iconOnly)
                                 .frame(width: 26, height: 26)
                                 .background(DesignConstants.controlBackground, in: Circle())
                                 
                                 Text("\(Int(zoomScale * 100))%")
-                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .font(.system(.caption, design: .monospaced).bold())
                                     .foregroundStyle(DesignConstants.primaryText)
                                     .frame(width: 40)
                                 
-                                Button(action: {
+                                Button("Zoom In", systemImage: "plus.magnifyingglass") {
                                     withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                                         zoomScale = min(2.0, zoomScale + 0.15)
                                         initialZoomScale = zoomScale
                                     }
-                                }) {
-                                    Image(systemName: "plus.magnifyingglass")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(DesignConstants.primaryText)
                                 }
                                 .buttonStyle(.plain)
+                                .labelStyle(.iconOnly)
                                 .frame(width: 26, height: 26)
                                 .background(DesignConstants.controlBackground, in: Circle())
                                 
-                                Button(action: {
+                                Button("Reset Zoom", systemImage: "arrow.counterclockwise") {
                                     withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
                                         zoomScale = 1.0
                                         initialZoomScale = 1.0
                                         dragOffset = .zero
                                         accumulatedOffset = .zero
                                     }
-                                }) {
-                                    Image(systemName: "arrow.counterclockwise")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundStyle(DesignConstants.primaryText)
                                 }
                                 .buttonStyle(.plain)
+                                .labelStyle(.iconOnly)
                                 .frame(width: 26, height: 26)
                                 .background(DesignConstants.controlBackground, in: Circle())
                             }
@@ -263,6 +270,8 @@ struct GraphExplorerView: View {
             }
         }
         .onAppear {
+            dragOffset = .zero
+            accumulatedOffset = .zero
             if backendService.focusedEntityName.isEmpty {
                 if let first = allEntities.first {
                     selectEntity(name: first.name)
@@ -292,6 +301,18 @@ struct GraphExplorerView: View {
                 }
             }
         }
+        #if !os(macOS)
+        .sheet(item: $selectedEntityItem) { item in
+            NavigationStack {
+                EntityDetailView(entityName: item.name, entity: backendService.focusedEntityName == item.name ? backendService.neighborhood?.entity : nil)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { selectedEntityItem = nil }
+                        }
+                    }
+            }
+        }
+        #endif
     }
     
     private func selectEntity(name: String) {
@@ -517,6 +538,8 @@ struct NodeView: View {
                 }
             }
             .buttonStyle(.plain)
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(Rectangle())
             .scaleEffect(isHovered ? 1.08 : 1.0)
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
             .onHover { hovering in
@@ -525,9 +548,8 @@ struct NodeView: View {
             
             // Multi-line word-wrapped label text
             let formattedName = name.replacingOccurrences(of: "-", with: " ").capitalized
-            let fontSize = (isFocused ? 9.5 : 8.0) * max(0.6, min(1.2, scaleFactor))
             Text(formattedName)
-                .font(.system(size: fontSize, weight: isFocused ? .bold : .semibold))
+                .font(.system(.caption, design: .rounded).weight(isFocused ? .bold : .semibold))
                 .foregroundStyle(DesignConstants.primaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(3)

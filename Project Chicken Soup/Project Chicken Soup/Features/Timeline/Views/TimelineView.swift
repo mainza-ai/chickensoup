@@ -11,9 +11,13 @@ import SwiftData
 struct TemporalTimelineView: View {
     let events: [TemporalEvent]
     @Binding var selectedEvent: TemporalEvent?
+    var isPaused: Bool = false
     
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @ObservedObject var backendService = BackendService.shared
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     @State private var minConfidence: Double = 0.0
     @State private var selectedTypes: Set<String> = ["crash", "testimony", "anomaly", "theory"]
@@ -57,10 +61,10 @@ struct TemporalTimelineView: View {
                         Image(systemName: "clock.arrow.circlepath")
                             .font(.system(size: 40))
                             .foregroundStyle(.secondary)
-                        Text("No Timeline Events Match Filters")
+                        Text(events.isEmpty ? "No Events Ingested Yet" : "No Timeline Events Match Filters")
                             .font(.headline)
                             .foregroundStyle(DesignConstants.primaryText)
-                        Text("Adjust your advanced filters or perform a new query.")
+                        Text(events.isEmpty ? "Ingest documents or submit a query to build the lore graph." : "Adjust your advanced filters or perform a new query.")
                             .font(.caption)
                             .foregroundStyle(DesignConstants.secondaryText)
                         
@@ -76,40 +80,59 @@ struct TemporalTimelineView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        // Timeline layout containing the interactive nodes
-                        TimelineLayout(startDate: dateRange.start, endDate: dateRange.end) {
-                            ForEach(filteredEvents) { event in
-                                Button {
-                                    withAnimation(DesignConstants.hoverAnimation) {
-                                        selectedEvent = event
-                                    }
-                                } label: {
-                                    TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
+                    let timelineContent = TimelineLayout(startDate: dateRange.start, endDate: dateRange.end, minWidth: isCompact ? 800 : 1600) {
+                        ForEach(filteredEvents) { event in
+                            Button {
+                                withAnimation(DesignConstants.hoverAnimation) {
+                                    selectedEvent = event
                                 }
-                                .buttonStyle(.plain)
-                                .eventDate(event.timestamp)
-                                .eventBranch(event.branch?.name ?? "Universe Prime")
+                            } label: {
+                                TimelineNodeView(event: event, isSelected: selectedEvent?.id == event.id)
+                            }
+                            .buttonStyle(.plain)
+                            .eventDate(event.timestamp)
+                            .eventBranch(event.branch?.name ?? "Universe Prime")
+                        }
+                    }
+                    .padding(.leading, isCompact ? 120 : 240)
+                    .padding(.trailing, isCompact ? 20 : 120)
+                    
+                    let timelineScroll = ScrollView(.horizontal) {
+                        timelineContent
+                    }
+                    .scrollIndicators(.hidden)
+                    .background(
+                        Group {
+                            if isCompact {
+                                CanvasView(events: filteredEvents, startDate: dateRange.start, endDate: dateRange.end, isPaused: isPaused, isCompact: true)
+                            } else {
+                                CanvasView(events: filteredEvents, startDate: dateRange.start, endDate: dateRange.end, isPaused: isPaused)
+                                    .drawingGroup()
                             }
                         }
-                        .padding(.leading, 240)
-                        .padding(.trailing, 120)
-                        .frame(height: 260)
-                    }
-                    .background(
-                        CanvasView(events: filteredEvents, startDate: dateRange.start, endDate: dateRange.end)
-                            .drawingGroup()
                     )
                     #if !os(macOS)
                     .refreshable {
                         await backendService.fetchTemporalEvents(context: modelContext)
                     }
                     #endif
+                    
+                    if isCompact {
+                        timelineScroll
+                            .frame(maxHeight: .infinity)
+                    } else {
+                        VStack(spacing: 0) {
+                            timelineScroll
+                                .frame(height: 260)
+                            Spacer(minLength: 0)
+                        }
+                        .frame(maxHeight: .infinity)
+                    }
                 }
             }
             
             // Collapsible floating advanced filter controls
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: isCompact ? .trailing : .leading, spacing: 8) {
                 Button {
                     withAnimation(.spring(duration: 0.3)) {
                         showFilters.toggle()
@@ -132,7 +155,7 @@ struct TemporalTimelineView: View {
                         selectedTypes: $selectedTypes,
                         activeBranchId: $activeBranchId
                     )
-                    .frame(width: 300)
+                    .frame(maxWidth: isCompact ? .infinity : 300)
                     .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .move(edge: .top)),
@@ -140,8 +163,9 @@ struct TemporalTimelineView: View {
                     ))
                 }
             }
-            .padding(.leading, 20)
+            .frame(maxWidth: isCompact ? .infinity : nil, alignment: isCompact ? .trailing : .leading)
             .padding(.top, 20)
+            .padding(isCompact ? .trailing : .leading, 20)
             .zIndex(10)
         }
         .background(
@@ -156,9 +180,11 @@ struct CanvasView: View {
     let events: [TemporalEvent]
     let startDate: Date
     let endDate: Date
+    var isPaused: Bool = false
+    var isCompact: Bool = false
     
     var body: some View {
-        SwiftUI.TimelineView(.animation(minimumInterval: 1/60, paused: false)) { context in
+        SwiftUI.TimelineView(.animation(minimumInterval: 1/60, paused: isPaused)) { context in
             let time = context.date.timeIntervalSinceReferenceDate
             
             Canvas { gc, size in
@@ -211,10 +237,10 @@ struct CanvasView: View {
                     let tintColor = index == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue
                     gc.stroke(trackPath, with: .color(tintColor.opacity(0.18)), lineWidth: 2)
                     
-                    // Draw branch labels on the left side
-                    let font = Font.system(size: 9, weight: .bold, design: .monospaced)
+                    // Draw branch labels at the top of each track
+                    let font = Font.system(.caption, design: .monospaced).bold()
                     let text = gc.resolve(Text(branch.uppercased()).font(font).foregroundStyle(tintColor.opacity(0.35)))
-                    gc.draw(text, at: CGPoint(x: 10, y: trackCenterY - 14), anchor: .leading)
+                    gc.draw(text, at: CGPoint(x: 10, y: CGFloat(index) * trackHeight + 14), anchor: .leading)
                 }
                 
                 // Draw branching curves
@@ -278,7 +304,6 @@ struct CanvasView: View {
                 }
             }
         }
-        .frame(height: 260)
     }
 }
 

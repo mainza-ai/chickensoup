@@ -62,6 +62,9 @@ struct DataIngestionView: View {
         }
         .background(DesignConstants.warmBackground.ignoresSafeArea())
         .navigationTitle("Data Ingest")
+        #if !os(macOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .sheet(item: $selectedEntityForEdit) { entity in
             EditAnnotationSheet(entity: entity) { updatedEntity in
                 // Save edit and sync to background service
@@ -70,6 +73,10 @@ struct DataIngestionView: View {
             }
         }
     }
+    
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     // MARK: - Quality & Metadata Statistics Dashboard
     private var statsDashboard: some View {
@@ -80,67 +87,90 @@ struct DataIngestionView: View {
                 .foregroundStyle(DesignConstants.secondaryText)
                 .accessibilityAddTraits(.isHeader)
             
-            HStack(spacing: DesignConstants.standardPadding) {
-                // Quality Metric
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Avg Confidence")
-                        .font(.caption)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    Text(String(format: "%.1f%%", averageConfidence * 100))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(averageConfidence > 0.9 ? DesignConstants.systemGreenText : DesignConstants.systemOrangeText)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(DesignConstants.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
-                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Average extraction confidence is \(Int(averageConfidence * 100)) percent")
-                
-                // Total Ingested
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Total Entities")
-                        .font(.caption)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    Text("\(localEntities.count)")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(DesignConstants.primaryText)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(DesignConstants.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
-                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Total ingested entities is \(localEntities.count)")
-                
-                // Sync status
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Sync Queue")
-                        .font(.caption)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    HStack {
-                        Image(systemName: syncService.isSyncing ? "arrow.triangle.2.circlepath" : "cloud.checkmark.fill")
-                            .foregroundStyle(syncService.isSyncing ? DesignConstants.systemOrange : DesignConstants.systemGreen)
-                            .symbolEffect(.pulse, isActive: syncService.isSyncing)
-                        Text("\(syncService.pendingSyncCount) pending")
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundStyle(DesignConstants.primaryText)
+            Group {
+                if isCompact {
+                    VStack(spacing: DesignConstants.compactPadding) {
+                        statCard(
+                            label: "Avg Confidence",
+                            color: averageConfidence > 0.9 ? DesignConstants.systemGreenText : DesignConstants.systemOrangeText,
+                            accessibilityLabel: "Average extraction confidence is \(Int(averageConfidence * 100)) percent"
+                        ) {
+                            Text(averageConfidence, format: .percent.precision(.fractionLength(1)))
+                        }
+                        statCard(
+                            label: "Total Entities",
+                            color: DesignConstants.primaryText,
+                            accessibilityLabel: "Total ingested entities is \(localEntities.count)"
+                        ) {
+                            Text(localEntities.count, format: .number)
+                        }
+                        syncStatusCard
+                    }
+                } else {
+                    HStack(spacing: DesignConstants.standardPadding) {
+                        statCard(
+                            label: "Avg Confidence",
+                            color: averageConfidence > 0.9 ? DesignConstants.systemGreenText : DesignConstants.systemOrangeText,
+                            accessibilityLabel: "Average extraction confidence is \(Int(averageConfidence * 100)) percent"
+                        ) {
+                            Text(averageConfidence, format: .percent.precision(.fractionLength(1)))
+                        }
+                        statCard(
+                            label: "Total Entities",
+                            color: DesignConstants.primaryText,
+                            accessibilityLabel: "Total ingested entities is \(localEntities.count)"
+                        ) {
+                            Text(localEntities.count, format: .number)
+                        }
+                        syncStatusCard
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(DesignConstants.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
-                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(syncService.pendingSyncCount) entities pending database synchronization")
             }
         }
+    }
+    
+    @ViewBuilder
+    private func statCard(label: String, color: Color, accessibilityLabel: String, @ViewBuilder value: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(DesignConstants.secondaryText)
+            value()
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(DesignConstants.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+        .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+    
+    private var syncStatusCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Sync Queue")
+                .font(.caption)
+                .foregroundStyle(DesignConstants.secondaryText)
+            HStack {
+                Image(systemName: syncService.isSyncing ? "arrow.triangle.2.circlepath" : "cloud.checkmark.fill")
+                    .foregroundStyle(syncService.isSyncing ? DesignConstants.systemOrange : DesignConstants.systemGreen)
+                    .symbolEffect(.pulse, isActive: syncService.isSyncing)
+                Text("\(syncService.pendingSyncCount) pending")
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundStyle(DesignConstants.primaryText)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(DesignConstants.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+        .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(syncService.pendingSyncCount) entities pending database synchronization")
     }
     
     // MARK: - Drop Target View

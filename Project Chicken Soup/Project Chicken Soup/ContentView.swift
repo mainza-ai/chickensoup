@@ -203,40 +203,64 @@ struct ContentView: View {
         TabView(selection: $activeTab) {
             // Tab 1: Timeline
             NavigationStack {
-                ZStack(alignment: .bottom) {
-                    TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
-                        .navigationTitle("Spacetime")
-                    
-                    VStack {
-                        Spacer()
-                        
-                        if backendService.showChatHistory && !messages.isEmpty {
-                            ChatHistoryView(
-                                messages: $messages,
-                                onClear: {
-                                    withAnimation(.spring(duration: 0.3)) {
-                                        messages.removeAll()
-                                        backendService.showChatHistory = false
+                TemporalTimelineView(events: events, selectedEvent: $selectedEvent, isPaused: activeTab != .timeline)
+                    .navigationTitle("Spacetime")
+                    #if !os(macOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        VStack(spacing: 8) {
+                            if backendService.showChatHistory {
+                                if messages.isEmpty {
+                                    HStack {
+                                        Spacer()
+                                        Text("Ask a question to begin exploring the lore...")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
+                                            .background(DesignConstants.cardBackground.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+                                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                                        Spacer()
                                     }
-                                },
-                                onClose: {
-                                    withAnimation(.spring(duration: 0.3)) {
-                                        backendService.showChatHistory = false
-                                    }
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                } else {
+                                    ChatHistoryView(
+                                        messages: $messages,
+                                        onClear: {
+                                            withAnimation(.spring(duration: 0.3)) {
+                                                messages.removeAll()
+                                                backendService.showChatHistory = false
+                                            }
+                                        },
+                                        onClose: {
+                                            withAnimation(.spring(duration: 0.3)) {
+                                                backendService.showChatHistory = false
+                                            }
+                                        }
+                                    )
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 }
-                            )
-                            .padding(.bottom, 8)
-                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            }
+                            
+                            HStack {
+                                Spacer()
+                                QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
+                                Spacer()
+                            }
+                            .padding(.bottom, 12)
                         }
-                        
-                        HStack {
-                            Spacer()
-                            QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
-                            Spacer()
-                        }
-                        .padding(.bottom, 12)
+                        .background(DesignConstants.warmBackground)
                     }
-                    .frame(maxWidth: .infinity)
+                    .sheet(item: $selectedEvent) { event in
+                    NavigationStack {
+                        EventDetailView(event: event)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Close") { selectedEvent = nil }
+                                }
+                            }
+                    }
                 }
             }
             .tabItem {
@@ -248,6 +272,12 @@ struct ContentView: View {
             NavigationStack {
                 GraphExplorerView()
                     .navigationTitle("Lore Graph")
+                    #if !os(macOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .refreshable {
+                        await backendService.fetchLoreEntities(context: modelContext)
+                    }
+                    #endif
             }
             .tabItem {
                 Label("Lore Graph", systemImage: "circle.grid.hex.fill")
@@ -261,6 +291,12 @@ struct ContentView: View {
                         .padding()
                 }
                 .navigationTitle("AI Engine")
+                #if !os(macOS)
+                .navigationBarTitleDisplayMode(.inline)
+                .refreshable {
+                    await discoveryService.discoverActiveModels()
+                }
+                #endif
             }
             .tabItem {
                 Label("AI Navigator", systemImage: "brain.fill")
@@ -270,6 +306,13 @@ struct ContentView: View {
             // Tab 4: Data Ingest
             NavigationStack {
                 DataIngestionView()
+                    #if !os(macOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .refreshable {
+                        await backendService.fetchLoreEntities(context: modelContext)
+                        await backendService.fetchTemporalEvents(context: modelContext)
+                    }
+                    #endif
             }
             .tabItem {
                 Label("Ingest", systemImage: "doc.badge.plus")
@@ -277,6 +320,26 @@ struct ContentView: View {
             .tag(TabSelection.ingest)
         }
         .tint(DesignConstants.systemOrange)
+        .errorBanner(backendService: backendService)
+        #if !os(macOS)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Settings", systemImage: "gearshape") {
+                    showSettings = true
+                }
+            }
+        }
+        #endif
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showSettings = false }
+                        }
+                    }
+            }
+        }
     }
     
     private func handleQuerySubmit() {

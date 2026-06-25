@@ -45,7 +45,7 @@ struct EvidenceHistoryView: View {
                     ForEach(historicalVersions) { version in
                         VStack(spacing: 4) {
                             Text(String(format: "%.0f%%", version.confidence * 100))
-                                .font(.system(size: 10, design: .monospaced))
+                                .font(.caption)
                                 .bold()
                                 .foregroundStyle(DesignConstants.systemOrangeText)
                             
@@ -54,8 +54,8 @@ struct EvidenceHistoryView: View {
                                 .fill(DesignConstants.systemOrange.opacity(0.3 + version.confidence * 0.7))
                                 .frame(width: 28, height: CGFloat(version.confidence * 60))
                             
-                            Text(formatShortDate(version.timestamp))
-                                .font(.system(size: 8))
+                            Text(version.timestamp, format: .dateTime.month().year())
+                                .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -63,7 +63,7 @@ struct EvidenceHistoryView: View {
                     // Current/Latest version column
                     VStack(spacing: 4) {
                         Text(String(format: "%.0f%%", currentConfidence * 100))
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.caption)
                             .bold()
                             .foregroundStyle(DesignConstants.systemOrangeText)
                         
@@ -72,7 +72,7 @@ struct EvidenceHistoryView: View {
                             .frame(width: 28, height: CGFloat(currentConfidence * 60))
                         
                         Text("Current")
-                            .font(.system(size: 8))
+                            .font(.caption2)
                             .bold()
                             .foregroundStyle(DesignConstants.systemOrangeText)
                     }
@@ -106,12 +106,12 @@ struct EvidenceHistoryView: View {
                                             .font(.caption)
                                             .bold()
                                         Spacer()
-                                        Text(String(format: "%.0f%%", version.confidence * 100))
-                                            .font(.caption2)
-                                            .bold()
+                            Text(String(format: "%.0f%%", version.confidence * 100))
+                            .font(.caption)
+                            .bold()
                                     }
                                     Text(version.changeReason)
-                                        .font(.system(size: 9))
+                                        .font(.caption2)
                                         .foregroundStyle(.secondary)
                                         .lineLimit(1)
                                 }
@@ -150,14 +150,14 @@ struct EvidenceHistoryView: View {
                         }
                         
                         Text(old.summary)
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(DesignConstants.primaryText)
                             .lineLimit(4)
                         
                         Spacer()
                         
                         Text("Source: \(old.source)")
-                            .font(.system(size: 8))
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                     .padding(10)
@@ -185,14 +185,14 @@ struct EvidenceHistoryView: View {
                         }
                         
                         Text(currentSummary)
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(DesignConstants.primaryText)
                             .lineLimit(4)
                         
                         Spacer()
                         
                         Text("Source: \(currentSource)")
-                            .font(.system(size: 8))
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                     .padding(10)
@@ -245,11 +245,6 @@ struct EvidenceHistoryView: View {
         selectedOldVersion = historicalVersions.first
     }
     
-    private func formatShortDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/yy"
-        return formatter.string(from: date)
-    }
 }
 
 #Preview {

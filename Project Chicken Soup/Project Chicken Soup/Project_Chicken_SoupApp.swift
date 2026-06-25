@@ -27,16 +27,8 @@ struct Project_Chicken_SoupApp: App {
             }
             return container
         } catch {
-            // Attempt to clean up old database files to handle schema mismatches gracefully during development
-            if let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-                let dbURL = appSupportURL.appendingPathComponent("default.store")
-                let dbShmURL = appSupportURL.appendingPathComponent("default.store-shm")
-                let dbWalURL = appSupportURL.appendingPathComponent("default.store-wal")
-                try? FileManager.default.removeItem(at: dbURL)
-                try? FileManager.default.removeItem(at: dbShmURL)
-                try? FileManager.default.removeItem(at: dbWalURL)
-            }
-            
+            // Log the failure and retry once (lightweight migration should handle schema evolution)
+            print("ModelContainer initialization failed: \(error.localizedDescription). Retrying...")
             do {
                 let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
                 Task { @MainActor in
@@ -44,7 +36,7 @@ struct Project_Chicken_SoupApp: App {
                 }
                 return container
             } catch {
-                fatalError("Could not create ModelContainer: \(error)")
+                fatalError("Could not create ModelContainer after retry: \(error)")
             }
         }
     }()

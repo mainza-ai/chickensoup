@@ -20,7 +20,10 @@ struct AdvancedTimelineFilterView: View {
     @Binding var selectedTypes: Set<String>
     @Binding var activeBranchId: UUID?
     
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Query private var branches: [TimelineBranch]
+    
+    private var isCompact: Bool { horizontalSizeClass == .compact }
     
     // Saved presets stored in AppStorage for persistence
     @State private var presets: [FilterPreset] = []
@@ -59,7 +62,7 @@ struct AdvancedTimelineFilterView: View {
                         .font(.subheadline)
                         .foregroundStyle(DesignConstants.primaryText)
                     Spacer()
-                    Text(String(format: "%.0f%%", minConfidence * 100))
+                    Text(minConfidence, format: .percent.precision(.fractionLength(0)))
                         .font(.system(.subheadline, design: .monospaced))
                         .foregroundStyle(DesignConstants.secondaryText)
                 }
@@ -141,7 +144,7 @@ struct AdvancedTimelineFilterView: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
+                    ScrollView(.horizontal) {
                         HStack(spacing: 8) {
                             ForEach(presets) { preset in
                                 Button {
@@ -155,14 +158,13 @@ struct AdvancedTimelineFilterView: View {
                                             .font(.caption)
                                             .bold()
                                         
-                                        Button {
+                                        Button("Delete \"\(preset.name)\"", systemImage: "xmark") {
                                             presets.removeAll { $0.id == preset.id }
                                             savePresetsToStorage()
-                                        } label: {
-                                            Image(systemName: "xmark")
-                                                .font(.system(size: 8, weight: .bold))
                                         }
                                         .buttonStyle(.plain)
+                                        .labelStyle(.iconOnly)
+                                        .font(.caption)
                                     }
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
@@ -173,6 +175,7 @@ struct AdvancedTimelineFilterView: View {
                             }
                         }
                     }
+                    .scrollIndicators(.hidden)
                 }
             }
         }

@@ -133,9 +133,7 @@ struct TimelineBranchMergeSheet: View {
                         remote: remoteDate,
                         selected: $selectedDate,
                         format: { date in
-                            let formatter = DateFormatter()
-                            formatter.dateStyle = .medium
-                            return formatter.string(from: date)
+                            date.formatted(date: .abbreviated, time: .omitted)
                         }
                     )
                     
@@ -337,9 +335,7 @@ struct TimelineBranchMergeSheet: View {
     }
     
     private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
+        date.formatted(date: .abbreviated, time: .omitted)
     }
 }
 
