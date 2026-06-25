@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     IONQ_API_TOKEN: str = ""
     QUANTUM_HARDWARE_ENABLED: bool = False
 
+    WIKI_AUTO_CREATE: bool = True
+    WIKI_MIN_CONFIDENCE: float = 0.5
+    WIKI_DATA_DIR: str = "wiki"
+
     @property
     def fallback_chain_list(self) -> List[str]:
         return [provider.strip() for provider in self.LLM_FALLBACK_CHAIN.split(",") if provider.strip()]

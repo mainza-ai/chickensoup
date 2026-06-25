@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import io
+import zipfile
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, UploadFile, File
 import redis
 
 from src.config import settings
@@ -12,7 +14,9 @@ from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
     ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse,
-    LLMProbeRequest, LLMProbeResponse, LLMProviderStatus
+    LLMProbeRequest, LLMProbeResponse, LLMProviderStatus,
+    AnalyzeRequest, AnalyzeResponse, SuggestedPageModel,
+    FileIngestResponse, FolderIngestResponse
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -22,7 +26,11 @@ from src.spacetime_engine.qiskit_simulation import simulate_spacetime_metrics
 from src.field_manipulator.cuda_simulation import manipulate_spacetime_field
 from src.ai_navigator.pennylane_qml import find_optimal_path
 from src.agents.orchestrator import Orchestrator
+from src.agents.ingest_agent import IngestAgent
+from src.wiki.writer import write_page, append_to_index, append_to_log, slugify, cross_reference_new_page, invalidate_index_cache
 from src.mcp.tools import mcp
+
+ingest_agent = IngestAgent()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -584,6 +592,192 @@ async def post_ingest(request: IngestRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Ingestion failed: {str(e)}"
         )
+
+def _process_ingested_content(
+    text: str,
+    filename: Optional[str] = None,
+    skip_neo4j: bool = False
+) -> FileIngestResponse:
+    analysis = ingest_agent.analyze_content(text, filename=filename)
+    pages_created = []
+    pages_updated = []
+    total_nodes = 0
+    total_rels = 0
+
+    if not analysis.suggested_pages:
+        return FileIngestResponse(
+            success=True,
+            pages_created=[],
+            pages_updated=[],
+            total_pages=0,
+        )
+
+    for page in analysis.suggested_pages:
+        if page.confidence < settings.WIKI_MIN_CONFIDENCE:
+            logger.info(f"Skipping page '{page.title}' — confidence {page.confidence:.2f} < threshold {settings.WIKI_MIN_CONFIDENCE}")
+            continue
+        if not settings.WIKI_AUTO_CREATE:
+            logger.info(f"Skipping page creation — WIKI_AUTO_CREATE is disabled")
+            break
+        page_type = page.page_type
+        if page_type not in ("entities", "concepts", "projects"):
+            page_type = ingest_agent.classify_page_type(page.title, page.summary, page.tags)
+        slug, is_new = write_page(
+            title=page.title,
+            body=page.body,
+            tags=page.tags,
+            sources=page.sources,
+            related=page.related,
+            page_type=page_type,
+        )
+        try:
+            cross_reference_new_page(slug, page.title, page_type)
+        except Exception as xref_err:
+            logger.warning(f"Cross-reference failed for '{page.title}': {xref_err}")
+
+        if not skip_neo4j:
+            try:
+                driver = neo4j_conn.get_driver()
+                full_content = f"---\ntitle: {page.title}\ntags: {page.tags}\nsources: {page.sources}\nrelated: {page.related}\n---\n\n{page.body}"
+                nodes, rels = ingest_wiki_page(
+                    driver,
+                    title=page.title,
+                    content=full_content,
+                    default_tags=page.tags,
+                    default_sources=page.sources,
+                )
+                total_nodes += nodes
+                total_rels += rels
+            except Exception as neo4j_err:
+                logger.warning(f"Neo4j ingest failed for '{page.title}': {neo4j_err}")
+
+        if is_new:
+            pages_created.append(page.title)
+        else:
+            pages_updated.append(page.title)
+
+    try:
+        index_entries = [(slugify(p.title), p.title, p.page_type) for p in analysis.suggested_pages if p.confidence >= settings.WIKI_MIN_CONFIDENCE]
+        if index_entries:
+            append_to_index(index_entries)
+    except Exception as idx_err:
+        logger.warning(f"Index update failed: {idx_err}")
+
+    try:
+        log_text = f"Uploaded {filename or 'document'}: {len(pages_created)} pages created, {len(pages_updated)} updated"
+        append_to_log(log_text)
+    except Exception as log_err:
+        logger.warning(f"Log update failed: {log_err}")
+
+    invalidate_index_cache()
+    from src.cache import cache_store
+    cache_store.invalidate_all()
+
+    return FileIngestResponse(
+        success=True,
+        pages_created=pages_created,
+        pages_updated=pages_updated,
+        total_pages=len(pages_created) + len(pages_updated),
+        nodes_created=total_nodes,
+        relationships_created=total_rels,
+    )
+
+
+@app.post("/ingest/analyze", response_model=AnalyzeResponse)
+async def post_ingest_analyze(request: AnalyzeRequest):
+    """Analyzes raw text content and returns suggested wiki pages without committing."""
+    try:
+        analysis = ingest_agent.analyze_content(request.content, filename=request.filename)
+        pages = [
+            SuggestedPageModel(
+                title=p.title,
+                page_type=p.page_type,
+                tags=p.tags,
+                sources=p.sources,
+                summary=p.summary,
+                body=p.body,
+                related=p.related,
+                confidence=p.confidence,
+            )
+            for p in analysis.suggested_pages
+        ]
+        return AnalyzeResponse(
+            success=True,
+            suggested_pages=pages,
+            confidence=analysis.confidence,
+            raw_text_preview=analysis.raw_text_preview,
+        )
+    except Exception as e:
+        logger.error(f"Content analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.post("/ingest/file", response_model=FileIngestResponse)
+async def post_ingest_file(file: UploadFile = File(...)):
+    """Uploads a single file, analyzes content via LLM, and creates/updates wiki pages + Neo4j."""
+    try:
+        content_bytes = await file.read()
+        try:
+            text = content_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content_bytes.decode("latin-1")
+
+        response = _process_ingested_content(text, filename=file.filename)
+        return response
+    except Exception as e:
+        logger.error(f"File ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=f"File ingestion failed: {str(e)}")
+
+
+@app.post("/ingest/folder", response_model=FolderIngestResponse)
+async def post_ingest_folder(file: UploadFile = File(...)):
+    """Uploads a zip archive of files, processes each through the ingest pipeline."""
+    try:
+        content_bytes = await file.read()
+        file_results = []
+        total_created = 0
+        total_updated = 0
+        total_nodes = 0
+        total_rels = 0
+        file_count = 0
+
+        with zipfile.ZipFile(io.BytesIO(content_bytes)) as zf:
+            for entry in zf.infolist():
+                if entry.is_dir():
+                    continue
+                if not entry.filename.endswith((".md", ".txt", ".json", ".csv", ".html")):
+                    continue
+                try:
+                    raw = zf.read(entry.filename)
+                    try:
+                        text = raw.decode("utf-8")
+                    except UnicodeDecodeError:
+                        text = raw.decode("latin-1")
+                    result = _process_ingested_content(text, filename=entry.filename)
+                    file_results.append(result)
+                    total_created += len(result.pages_created)
+                    total_updated += len(result.pages_updated)
+                    total_nodes += result.nodes_created
+                    total_rels += result.relationships_created
+                    file_count += 1
+                except Exception as per_file_err:
+                    logger.warning(f"Failed to process {entry.filename}: {per_file_err}")
+
+        return FolderIngestResponse(
+            success=True,
+            total_files=file_count,
+            total_pages_created=total_created,
+            total_pages_updated=total_updated,
+            total_nodes_created=total_nodes,
+            total_relationships_created=total_rels,
+            file_results=file_results,
+        )
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Uploaded file is not a valid zip archive")
+    except Exception as e:
+        logger.error(f"Folder ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Folder ingestion failed: {str(e)}")
+
 
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio

@@ -261,3 +261,105 @@ public struct APILLMProbeResponse: Codable {
     public var available: Bool
     public var models: [String]
 }
+
+// MARK: - Ingest Analysis Models
+
+public struct APIAnalyzedPage: Codable, Identifiable {
+    public var id: String { title }
+    public var title: String
+    public var pageType: String
+    public var tags: [String]
+    public var sources: [String]
+    public var summary: String
+    public var body: String
+    public var related: [String]
+    public var confidence: Double
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case pageType = "page_type"
+        case tags
+        case sources
+        case summary
+        case body
+        case related
+        case confidence
+    }
+
+    public init(title: String, pageType: String, tags: [String], sources: [String], summary: String, body: String, related: [String], confidence: Double) {
+        self.title = title
+        self.pageType = pageType
+        self.tags = tags
+        self.sources = sources
+        self.summary = summary
+        self.body = body
+        self.related = related
+        self.confidence = confidence
+    }
+}
+
+public struct APIAnalyzeResponse: Codable {
+    public var success: Bool
+    public var suggestedPages: [APIAnalyzedPage]
+    public var confidence: Double
+    public var rawTextPreview: String
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case suggestedPages = "suggested_pages"
+        case confidence
+        case rawTextPreview = "raw_text_preview"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.suggestedPages = try container.decodeIfPresent([APIAnalyzedPage].self, forKey: .suggestedPages) ?? []
+        self.confidence = try container.decode(Double.self, forKey: .confidence)
+        self.rawTextPreview = try container.decodeIfPresent(String.self, forKey: .rawTextPreview) ?? ""
+    }
+
+    public init(success: Bool, suggestedPages: [APIAnalyzedPage], confidence: Double, rawTextPreview: String) {
+        self.success = success
+        self.suggestedPages = suggestedPages
+        self.confidence = confidence
+        self.rawTextPreview = rawTextPreview
+    }
+}
+
+public struct APIFileIngestResponse: Codable {
+    public var success: Bool
+    public var pagesCreated: [String]
+    public var pagesUpdated: [String]
+    public var totalPages: Int
+    public var nodesCreated: Int
+    public var relationshipsCreated: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case pagesCreated = "pages_created"
+        case pagesUpdated = "pages_updated"
+        case totalPages = "total_pages"
+        case nodesCreated = "nodes_created"
+        case relationshipsCreated = "relationships_created"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.pagesCreated = try container.decodeIfPresent([String].self, forKey: .pagesCreated) ?? []
+        self.pagesUpdated = try container.decodeIfPresent([String].self, forKey: .pagesUpdated) ?? []
+        self.totalPages = try container.decodeIfPresent(Int.self, forKey: .totalPages) ?? 0
+        self.nodesCreated = try container.decodeIfPresent(Int.self, forKey: .nodesCreated) ?? 0
+        self.relationshipsCreated = try container.decodeIfPresent(Int.self, forKey: .relationshipsCreated) ?? 0
+    }
+
+    public init(success: Bool, pagesCreated: [String], pagesUpdated: [String], totalPages: Int, nodesCreated: Int, relationshipsCreated: Int) {
+        self.success = success
+        self.pagesCreated = pagesCreated
+        self.pagesUpdated = pagesUpdated
+        self.totalPages = totalPages
+        self.nodesCreated = nodesCreated
+        self.relationshipsCreated = relationshipsCreated
+    }
+}

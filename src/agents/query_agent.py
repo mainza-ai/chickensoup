@@ -46,6 +46,15 @@ def _get_wiki_index() -> Dict[str, str]:
     return _get_wiki_index._cache
 
 
+def invalidate_wiki_index():
+    if hasattr(_get_wiki_index, "_cache"):
+        del _get_wiki_index._cache
+
+
+def get_wiki_index() -> Dict[str, str]:
+    return _get_wiki_index()
+
+
 def _wiki_entity_lookup(query: str) -> List[str]:
     """
     Fuzzy-match query words against wiki filenames.

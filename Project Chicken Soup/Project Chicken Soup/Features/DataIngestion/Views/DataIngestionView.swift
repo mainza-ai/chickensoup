@@ -1,10 +1,3 @@
-//
-//  DataIngestionView.swift
-//  Project Chicken Soup
-//
-//  Created by mck on 6/22/26.
-//
-
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
@@ -13,48 +6,60 @@ struct DataIngestionView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LoreEntity.name) private var localEntities: [LoreEntity]
     @Query(sort: \TemporalEvent.timestamp) private var localEvents: [TemporalEvent]
-    
+
     @ObservedObject var syncService = SyncService.shared
     @ObservedObject var backendService = BackendService.shared
-    
-    // States for File Upload Simulation
+
     @State private var isDraggingOver = false
     @State private var uploadedFiles: [String] = []
     @State private var isExtracting = false
     @State private var isBulkIngesting = false
-    
-    // AI Inferred Preview Entities
+    @State private var isImporting = false
+    @State private var isImportingFolder = false
+    @State private var isCommitting = false
+    @State private var selectedFileURL: URL?
+    @State private var selectedFileName: String = ""
+
     @State private var extractedEntities: [LoreEntity] = []
     @State private var selectedEntityForEdit: LoreEntity? = nil
-    
-    // UI layout controls
+
+    @State private var analysisResult: APIAnalyzeResponse? = nil
+    @State private var commitResult: APIFileIngestResponse? = nil
+    @State private var ingestError: String? = nil
+
     @Namespace private var animationNamespace
-    
+
     private var averageConfidence: Double {
         localEntities.isEmpty ? 0.0 : localEntities.map { $0.confidence }.reduce(0.0, +) / Double(localEntities.count)
     }
-    
+
     var body: some View {
         ScrollView {
             VStack(spacing: DesignConstants.loosePadding) {
-                // Quality Dashboard / Stats Row
                 statsDashboard
                     .padding(.horizontal)
-                
-                // File Drop Target Area
+
                 dropTargetView
                     .padding(.horizontal)
-                
-                // AI Entity Extraction Preview Layout
+
+                if let error = ingestError {
+                    errorBanner(error)
+                        .padding(.horizontal)
+                }
+
                 if isExtracting {
                     loadingSkeletonView
                         .padding(.horizontal)
-                } else if !extractedEntities.isEmpty {
-                    extractionPreviewView
+                } else if let analysis = analysisResult {
+                    analysisPreviewView(analysis)
                         .padding(.horizontal)
                 }
-                
-                // Ingested Local Entities List
+
+                if let result = commitResult {
+                    commitResultView(result)
+                        .padding(.horizontal)
+                }
+
                 localIngestOverview
                     .padding(.horizontal)
             }
@@ -65,20 +70,49 @@ struct DataIngestionView: View {
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .fileImporter(
+            isPresented: $isImporting,
+            allowedContentTypes: [.plainText, .text, .json, .commaSeparatedText, .markdown, .yaml],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    selectedFileURL = url
+                    selectedFileName = url.lastPathComponent
+                    analyzeFile(url: url)
+                }
+            case .failure:
+                ingestError = "Failed to open file."
+            }
+        }
+        .fileImporter(
+            isPresented: $isImportingFolder,
+            allowedContentTypes: [.archive, .zip],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    uploadFolder(url: url)
+                }
+            case .failure:
+                ingestError = "Failed to open archive."
+            }
+        }
         .sheet(item: $selectedEntityForEdit) { entity in
             EditAnnotationSheet(entity: entity) { updatedEntity in
-                // Save edit and sync to background service
                 syncService.queueSync(entityId: updatedEntity.id, type: "LoreEntity", action: "update")
                 selectedEntityForEdit = nil
             }
         }
     }
-    
+
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    
     private var isCompact: Bool { horizontalSizeClass == .compact }
-    
-    // MARK: - Quality & Metadata Statistics Dashboard
+
+    // MARK: - Stats Dashboard
+
     private var statsDashboard: some View {
         VStack(alignment: .leading, spacing: DesignConstants.compactPadding) {
             Text("INGEST METRICS & QUALITY")
@@ -86,7 +120,7 @@ struct DataIngestionView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(DesignConstants.secondaryText)
                 .accessibilityAddTraits(.isHeader)
-            
+
             Group {
                 if isCompact {
                     VStack(spacing: DesignConstants.compactPadding) {
@@ -128,7 +162,7 @@ struct DataIngestionView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private func statCard(label: String, color: Color, accessibilityLabel: String, @ViewBuilder value: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -148,7 +182,7 @@ struct DataIngestionView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
     }
-    
+
     private var syncStatusCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Sync Queue")
@@ -172,8 +206,9 @@ struct DataIngestionView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(syncService.pendingSyncCount) entities pending database synchronization")
     }
-    
+
     // MARK: - Drop Target View
+
     private var dropTargetView: some View {
         VStack {
             Image(systemName: "doc.badge.plus")
@@ -182,23 +217,36 @@ struct DataIngestionView: View {
                 .padding(.bottom, 8)
                 .scaleEffect(isDraggingOver ? 1.15 : 1.0)
                 .animation(DesignConstants.hoverAnimation, value: isDraggingOver)
-            
-            Text("Drag & Drop Spacetime Logs")
+
+            Text("Upload Intel Files")
                 .font(.headline)
                 .foregroundStyle(DesignConstants.primaryText)
-            
-            Text("Supports TXT, JSON, or CSV raw intel reports")
+
+            Text("TXT, JSON, CSV, MD, YAML — single files or zip archives")
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
-            
+
             HStack(spacing: 12) {
                 Button("Browse Files", systemImage: "folder.fill") {
-                    simulateFileSelection()
+                    ingestError = nil
+                    analysisResult = nil
+                    commitResult = nil
+                    isImporting = true
                 }
                 .buttonStyle(.bordered)
-                .disabled(isBulkIngesting)
+                .disabled(isExtracting || isCommitting || isBulkIngesting)
                 .accessibilityLabel("Browse local files to ingest data")
-                
+
+                Button("Upload Folder", systemImage: "folder.badge.gearshape") {
+                    ingestError = nil
+                    analysisResult = nil
+                    commitResult = nil
+                    isImportingFolder = true
+                }
+                .buttonStyle(.bordered)
+                .disabled(isExtracting || isCommitting || isBulkIngesting)
+                .accessibilityLabel("Upload a zip archive of files")
+
                 if isBulkIngesting {
                     HStack(spacing: 8) {
                         ProgressView()
@@ -220,14 +268,14 @@ struct DataIngestionView: View {
                 }
             }
             .padding(.top, 12)
-            
+
             if !uploadedFiles.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Uploaded Intel Sources:")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundStyle(DesignConstants.secondaryText)
-                    
+
                     ForEach(uploadedFiles, id: \.self) { file in
                         HStack {
                             Image(systemName: "doc.text.fill")
@@ -253,27 +301,57 @@ struct DataIngestionView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: DesignConstants.panelCornerRadius))
         .onDrop(of: [UTType.item.identifier], isTargeted: $isDraggingOver) { providers in
-            // Handle drops in SwiftUI
-            simulateFileSelection()
+            if let item = providers.first {
+                item.loadItem(forTypeIdentifier: UTType.data.identifier) { data, error in
+                    if let url = data as? URL {
+                        DispatchQueue.main.async {
+                            selectedFileURL = url
+                            selectedFileName = url.lastPathComponent
+                            analyzeFile(url: url)
+                        }
+                    }
+                }
+            }
             return true
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("File drop area. Drag and drop intel files here.")
     }
-    
+
+    // MARK: - Error Banner
+
+    private func errorBanner(_ message: String) -> some View {
+        HStack {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(DesignConstants.systemRed)
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(DesignConstants.primaryText)
+            Spacer()
+            Button(action: { ingestError = nil }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(DesignConstants.secondaryText)
+            }
+        }
+        .padding()
+        .background(DesignConstants.systemRed.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+    }
+
     // MARK: - Loading Skeleton
+
     private var loadingSkeletonView: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("AI Extraction Preview")
                 .font(.headline)
                 .foregroundStyle(DesignConstants.primaryText)
-            
+
             ForEach(0..<3, id: \.self) { _ in
                 HStack {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Simulated Entity Name Placeholder")
+                        Text("Analyzing content...")
                             .font(.body)
-                        Text("Category: Person/Place/Object")
+                        Text("Category: detecting...")
                             .font(.caption)
                     }
                     Spacer()
@@ -285,109 +363,205 @@ struct DataIngestionView: View {
             }
         }
     }
-    
-    // MARK: - AI Inferred Previews
-    private var extractionPreviewView: some View {
+
+    // MARK: - Analysis Preview
+
+    private func analysisPreviewView(_ analysis: APIAnalyzeResponse) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("AI EXTRACTED ENTITIES (PREVIEW)")
+                Text("AI EXTRACTED \(analysis.suggestedPages.count == 1 ? "PAGE" : "PAGES")")
                     .font(.footnote)
                     .fontWeight(.bold)
                     .foregroundStyle(DesignConstants.secondaryText)
-                
+
                 Spacer()
-                
-                Button("Approve and Commit All") {
-                    withAnimation(DesignConstants.hoverAnimation) {
-                        for entity in extractedEntities {
-                            modelContext.insert(entity)
-                            syncService.queueSync(entityId: entity.id, type: "LoreEntity", action: "create")
-                        }
-                        extractedEntities.removeAll()
+
+                if !isCommitting {
+                    Button("Commit to Wiki", systemImage: "arrow.up.doc.fill") {
+                        commitFile()
                     }
+                    .font(.caption)
+                    .buttonStyle(.borderedProminent)
+                    .tint(DesignConstants.systemGreen)
+                    .disabled(isCommitting)
+                    .accessibilityLabel("Commit extracted pages to the wiki")
+
+                    Button("Discard", systemImage: "trash") {
+                        withAnimation {
+                            analysisResult = nil
+                            uploadedFiles.removeAll()
+                        }
+                    }
+                    .font(.caption)
+                    .buttonStyle(.bordered)
+                    .tint(DesignConstants.systemRed)
+                } else {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("Writing wiki pages...")
+                        .font(.caption)
+                        .foregroundStyle(DesignConstants.systemOrangeText)
                 }
-                .font(.caption)
-                .buttonStyle(.bordered)
-                .tint(DesignConstants.systemGreen)
-                .accessibilityLabel("Commit all extracted entities to the timeline lore graph")
             }
-            
+
+            if let fileName = selectedFileName.isEmpty ? nil : selectedFileName {
+                HStack {
+                    Image(systemName: "doc.text")
+                        .foregroundStyle(DesignConstants.systemBlue)
+                    Text(fileName)
+                        .font(.caption)
+                        .foregroundStyle(DesignConstants.secondaryText)
+                }
+                .padding(.bottom, 4)
+            }
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: DesignConstants.standardPadding) {
-                    ForEach(extractedEntities) { entity in
+                    ForEach(analysis.suggestedPages) { page in
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text(entity.name)
+                                Text(page.title)
                                     .font(.headline)
                                     .foregroundStyle(DesignConstants.primaryText)
+                                    .lineLimit(2)
                                 Spacer()
-                                Text(entity.type)
+                                Text(pageTypeLabel(page.pageType))
                                     .font(.caption2)
                                     .fontWeight(.bold)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
-                                    .background(DesignConstants.systemOrange.opacity(0.15))
-                                    .foregroundStyle(DesignConstants.systemOrangeText)
+                                    .background(typeColor(page.pageType).opacity(0.15))
+                                    .foregroundStyle(typeColor(page.pageType))
                                     .clipShape(Capsule())
                             }
-                            
-                            Text(entity.summary)
+
+                            Text(page.summary)
                                 .font(.caption)
                                 .foregroundStyle(DesignConstants.secondaryText)
                                 .lineLimit(3)
-                            
+
                             HStack {
                                 Image(systemName: "percent")
                                     .font(.caption)
-                                Text(String(format: "%.0f%% Confidence", entity.confidence * 100))
+                                Text(page.confidence, format: .percent.precision(.fractionLength(0)))
                                     .font(.caption)
                             }
-                            .foregroundStyle(entity.confidence > 0.9 ? DesignConstants.systemGreenText : DesignConstants.systemOrangeText)
-                            
-                            HStack {
-                                Button(action: {
-                                    selectedEntityForEdit = entity
-                                }) {
-                                    Label("Edit Intel", systemImage: "pencil.line")
-                                        .font(.caption2)
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Spacer()
-                                
-                                Button(action: {
-                                    withAnimation {
-                                        extractedEntities.removeAll { $0.id == entity.id }
+                            .foregroundStyle(page.confidence > 0.9 ? DesignConstants.systemGreenText : DesignConstants.systemOrangeText)
+
+                            if !page.tags.isEmpty {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 4) {
+                                        ForEach(page.tags, id: \.self) { tag in
+                                            Text("#\(tag)")
+                                                .font(.caption2)
+                                                .foregroundStyle(DesignConstants.systemBlue)
+                                        }
                                     }
-                                }) {
-                                    Image(systemName: "trash")
-                                        .foregroundStyle(DesignConstants.systemRed)
-                                        .font(.caption)
                                 }
-                                .accessibilityLabel("Discard \(entity.name)")
+                            }
+
+                            if !page.related.isEmpty {
+                                Text("Related: \(page.related.joined(separator: ", "))")
+                                    .font(.caption2)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                                    .lineLimit(1)
                             }
                         }
-                        .frame(width: 220, height: 180)
+                        .frame(width: 240)
                         .padding()
                         .background(DesignConstants.cardBackground)
                         .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
                         .shadow(color: DesignConstants.glassShadowColor, radius: 6, y: 3)
-                        .matchedGeometryEffect(id: entity.id, in: animationNamespace)
                     }
                 }
                 .padding(.vertical, 6)
             }
+
+            if !analysis.suggestedPages.isEmpty {
+                Button("Commit All (\(analysis.suggestedPages.count) pages)", systemImage: "arrow.up.doc.fill") {
+                    commitFile()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(DesignConstants.systemGreen)
+                .disabled(isCommitting)
+            }
         }
     }
-    
-    // MARK: - Ingested Overview list
+
+    private func pageTypeLabel(_ type: String) -> String {
+        switch type {
+        case "entities": return "Entity"
+        case "concepts": return "Concept"
+        case "projects": return "Project"
+        default: return type.capitalized
+        }
+    }
+
+    private func typeColor(_ type: String) -> Color {
+        switch type {
+        case "entities": return DesignConstants.systemBlue
+        case "concepts": return DesignConstants.systemPurple
+        case "projects": return DesignConstants.systemGreen
+        default: return DesignConstants.systemOrange
+        }
+    }
+
+    // MARK: - Commit Result View
+
+    private func commitResultView(_ result: APIFileIngestResponse) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: result.success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(result.success ? DesignConstants.systemGreen : DesignConstants.systemRed)
+                    .font(.title2)
+                Text(result.success ? "Ingest Complete" : "Ingest Failed")
+                    .font(.headline)
+                    .foregroundStyle(DesignConstants.primaryText)
+                Spacer()
+                Button("Dismiss", systemImage: "xmark") {
+                    withAnimation {
+                        commitResult = nil
+                        analysisResult = nil
+                        uploadedFiles.removeAll()
+                        selectedFileName = ""
+                    }
+                }
+                .font(.caption)
+                .buttonStyle(.bordered)
+            }
+
+            if result.success {
+                VStack(alignment: .leading, spacing: 6) {
+                    if !result.pagesCreated.isEmpty {
+                        Label("Pages created: \(result.pagesCreated.joined(separator: ", "))", systemImage: "plus.circle")
+                            .font(.caption)
+                    }
+                    if !result.pagesUpdated.isEmpty {
+                        Label("Pages updated: \(result.pagesUpdated.joined(separator: ", "))", systemImage: "arrow.triangle.2.circlepath")
+                            .font(.caption)
+                    }
+                    Label("Neo4j nodes: \(result.nodesCreated), relationships: \(result.relationshipsCreated)", systemImage: "point.3.connected.trianglepath.dotted")
+                        .font(.caption)
+                }
+                .foregroundStyle(DesignConstants.secondaryText)
+            }
+        }
+        .padding()
+        .background(DesignConstants.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+        .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    // MARK: - Ingested Overview List
+
     private var localIngestOverview: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("LORE REPOSITORY")
                 .font(.footnote)
                 .fontWeight(.bold)
                 .foregroundStyle(DesignConstants.secondaryText)
-            
+
             if localEntities.isEmpty {
                 VStack(spacing: 8) {
                     Image(systemName: "archivebox")
@@ -408,15 +582,15 @@ struct DataIngestionView: View {
                                     .font(.body)
                                     .fontWeight(.bold)
                                     .foregroundStyle(DesignConstants.primaryText)
-                                
+
                                 Text(entity.summary)
                                     .font(.caption)
                                     .foregroundStyle(DesignConstants.secondaryText)
                                     .lineLimit(2)
                             }
-                            
+
                             Spacer()
-                            
+
                             VStack(alignment: .trailing, spacing: 4) {
                                 Text(entity.type)
                                     .font(.caption2)
@@ -426,7 +600,7 @@ struct DataIngestionView: View {
                                     .background(DesignConstants.systemBlue.opacity(0.15))
                                     .foregroundStyle(DesignConstants.systemBlue)
                                     .clipShape(Capsule())
-                                
+
                                 Text("Notes: \(entity.userNotes.isEmpty ? "None" : entity.userNotes)")
                                     .font(.caption2)
                                     .foregroundStyle(DesignConstants.secondaryText)
@@ -445,27 +619,166 @@ struct DataIngestionView: View {
             }
         }
     }
-    
+
     // MARK: - Actions
-    private func simulateFileSelection() {
-        isExtracting = true
-        uploadedFiles = ["spacetime_log_alpha.txt", "varginha_intel_brief.json"]
-        
-        Task {
-            try? await Task.sleep(for: .seconds(2.0))
-            await MainActor.run {
-                withAnimation(DesignConstants.hoverAnimation) {
-                    isExtracting = false
-                    extractedEntities = [
-                        LoreEntity(name: "Tic Tac Craft", type: "Object", summary: "Oblong white aerial object reported by Commander David Fravor off Nimitz carrier strike group.", confidence: 0.97, source: "USS Nimitz logs", userNotes: "Investigate gravity distortion metric if possible"),
-                        LoreEntity(name: "Cmdr Fravor", type: "Person", summary: "Navy pilot witness who engaged Tic Tac UFO during mock combat training.", confidence: 0.94, source: "Senate hearings", userNotes: "Firsthand witness, high credibility"),
-                        LoreEntity(name: "Capistrano Site", type: "Place", summary: "Underground test facility associated with back-engineered propulsion systems.", confidence: 0.84, source: "Bob Lazar diary", userNotes: "")
-                    ]
+
+    private func analyzeFile(url: URL) {
+        guard url.startAccessingSecurityScopedResource() else {
+            ingestError = "Permission denied for file."
+            return
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        do {
+            let data = try Data(contentsOf: url)
+            guard let text = String(data: data, encoding: .utf8) else {
+                ingestError = "Could not read file as text."
+                return
+            }
+
+            isExtracting = true
+            ingestError = nil
+            analysisResult = nil
+            commitResult = nil
+            let fileName = url.lastPathComponent
+
+            Task {
+                defer {
+                    DispatchQueue.main.async { isExtracting = false }
+                }
+                do {
+                    let bodyDict: [String: Any] = ["content": text, "filename": fileName]
+                    let bodyData = try JSONSerialization.data(withJSONObject: bodyDict)
+                    let response: APIAnalyzeResponse = try await APIClient.shared.request(
+                        path: "/ingest/analyze",
+                        method: "POST",
+                        body: bodyData
+                    )
+                    await MainActor.run {
+                        withAnimation {
+                            analysisResult = response
+                            uploadedFiles = [fileName]
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        ingestError = "Analysis failed: \(error.localizedDescription)"
+                    }
                 }
             }
+        } catch {
+            ingestError = "Failed to read file: \(error.localizedDescription)"
         }
     }
-    
+
+    private func commitFile() {
+        guard let url = selectedFileURL else {
+            ingestError = "No file selected."
+            return
+        }
+        guard url.startAccessingSecurityScopedResource() else {
+            ingestError = "Permission denied for file."
+            return
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        do {
+            let data = try Data(contentsOf: url)
+            isCommitting = true
+            ingestError = nil
+
+            Task {
+                defer {
+                    DispatchQueue.main.async { isCommitting = false }
+                }
+                do {
+                    let boundary = UUID().uuidString
+                    var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/ingest/file")!)
+                    request.httpMethod = "POST"
+                    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+                    var bodyData = Data()
+                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                    bodyData.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(url.lastPathComponent)\"\r\n".data(using: .utf8)!)
+                    bodyData.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+                    bodyData.append(data)
+                    bodyData.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+                    request.httpBody = bodyData
+
+                    let (responseData, response) = try await URLSession.shared.data(for: request)
+                    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                        throw URLError(.badServerResponse)
+                    }
+                    let result = try JSONDecoder().decode(APIFileIngestResponse.self, from: responseData)
+                    await MainActor.run {
+                        withAnimation {
+                            commitResult = result
+                            analysisResult = nil
+                        }
+                        if result.success {
+                            Task {
+                                await backendService.fetchLoreEntities(context: modelContext)
+                                await backendService.fetchTemporalEvents(context: modelContext)
+                            }
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        ingestError = "Commit failed: \(error.localizedDescription)"
+                    }
+                }
+            }
+        } catch {
+            ingestError = "Failed to read file: \(error.localizedDescription)"
+        }
+    }
+
+    private func uploadFolder(url: URL) {
+        guard url.startAccessingSecurityScopedResource() else {
+            ingestError = "Permission denied for archive."
+            return
+        }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        do {
+            let data = try Data(contentsOf: url)
+            isBulkIngesting = true
+            ingestError = nil
+
+            Task {
+                defer {
+                    DispatchQueue.main.async { isBulkIngesting = false }
+                }
+                do {
+                    let boundary = UUID().uuidString
+                    var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/ingest/folder")!)
+                    request.httpMethod = "POST"
+                    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+                    var bodyData = Data()
+                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                    bodyData.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(url.lastPathComponent)\"\r\n".data(using: .utf8)!)
+                    bodyData.append("Content-Type: application/zip\r\n\r\n".data(using: .utf8)!)
+                    bodyData.append(data)
+                    bodyData.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+                    request.httpBody = bodyData
+
+                    let (_, response) = try await URLSession.shared.data(for: request)
+                    if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                        await backendService.fetchLoreEntities(context: modelContext)
+                        await backendService.fetchTemporalEvents(context: modelContext)
+                    }
+                } catch {
+                    await MainActor.run {
+                        ingestError = "Folder upload failed: \(error.localizedDescription)"
+                    }
+                }
+            }
+        } catch {
+            ingestError = "Failed to read archive: \(error.localizedDescription)"
+        }
+    }
+
     private func runBulkIngestion() {
         isBulkIngesting = true
         Task {
@@ -473,14 +786,13 @@ struct DataIngestionView: View {
                 await MainActor.run { isBulkIngesting = false }
                 return
             }
-            
+
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
-            
+
             do {
                 let (_, response) = try await URLSession.shared.data(for: request)
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                    // Sync backend state into SwiftData
                     await backendService.fetchLoreEntities(context: modelContext)
                     await backendService.fetchTemporalEvents(context: modelContext)
                     if !backendService.focusedEntityName.isEmpty {
@@ -490,7 +802,7 @@ struct DataIngestionView: View {
             } catch {
                 print("Failed to run bulk ingestion: \(error.localizedDescription)")
             }
-            
+
             await MainActor.run {
                 isBulkIngesting = false
             }
@@ -499,10 +811,11 @@ struct DataIngestionView: View {
 }
 
 // MARK: - Annotation Adjustment Sheet
+
 struct EditAnnotationSheet: View {
     @Bindable var entity: LoreEntity
     var onSave: (LoreEntity) -> Void
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -510,12 +823,12 @@ struct EditAnnotationSheet: View {
                     TextField("Name", text: $entity.name)
                     TextField("Type", text: $entity.type)
                 }
-                
+
                 Section("Summary") {
                     TextEditor(text: $entity.summary)
                         .frame(height: 100)
                 }
-                
+
                 Section("Manual Adjustments") {
                     VStack(alignment: .leading) {
                         Text("Confidence: \(Int(entity.confidence * 100))%")
@@ -523,7 +836,7 @@ struct EditAnnotationSheet: View {
                     }
                     TextField("User Notes (Client Wins)", text: $entity.userNotes)
                 }
-                
+
                 Section("Sources (Union)") {
                     Text(entity.sources.joined(separator: ", "))
                         .font(.caption)

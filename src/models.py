@@ -97,3 +97,40 @@ class LLMProbeResponse(BaseModel):
     provider: str
     available: bool = False
     models: List[str] = Field(default_factory=list)
+
+class AnalyzeRequest(BaseModel):
+    content: str = Field(..., description="Raw text content to analyze for wiki page extraction")
+    filename: Optional[str] = Field(None, description="Original filename for source attribution")
+
+class SuggestedPageModel(BaseModel):
+    title: str
+    page_type: str = Field(..., pattern=r"^(entities|concepts|projects)$")
+    tags: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+    summary: str = ""
+    body: str = ""
+    related: List[str] = Field(default_factory=list)
+    confidence: float = Field(0.5, ge=0.0, le=1.0)
+
+class AnalyzeResponse(BaseModel):
+    success: bool
+    suggested_pages: List[SuggestedPageModel] = Field(default_factory=list)
+    confidence: float
+    raw_text_preview: str = ""
+
+class FileIngestResponse(BaseModel):
+    success: bool
+    pages_created: List[str] = Field(default_factory=list)
+    pages_updated: List[str] = Field(default_factory=list)
+    total_pages: int = 0
+    nodes_created: int = 0
+    relationships_created: int = 0
+
+class FolderIngestResponse(BaseModel):
+    success: bool
+    total_files: int = 0
+    total_pages_created: int = 0
+    total_pages_updated: int = 0
+    total_nodes_created: int = 0
+    total_relationships_created: int = 0
+    file_results: List[FileIngestResponse] = Field(default_factory=list)
