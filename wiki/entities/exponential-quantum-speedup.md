@@ -1,10 +1,18 @@
 ---
-title: "Exponential Quantum Speedup"
-tags: [quantum, simulation, hamiltonian]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Babbush-2023]
-related: [hamiltonian-simulation, time-travel-machinery-architecture, field-manipulation]
+protected: true
+related:
+- hamiltonian-simulation
+- time-travel-machinery-architecture
+- field-manipulation
+sources:
+- Babbush-2023
+tags:
+- quantum
+- simulation
+- hamiltonian
+title: Exponential Quantum Speedup
+updated: '2026-06-25'
 ---
 
 # Exponential Quantum Speedup
@@ -29,3 +37,4 @@ UAPs appear to manipulate fields and oscillators in spacetime. This paper provid
 - [[hamiltonian-simulation]]
 - [[time-travel-machinery-architecture]]
 - [[field-manipulation]]
+

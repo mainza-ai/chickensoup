@@ -1,10 +1,19 @@
 ---
-title: "OpenTelemetry"
-tags: [observability, opentelemetry, metrics, tracing]
 created: 2026-06-22
-updated: 2026-06-23
-sources: [opentelemetry-2026]
-related: [api-design, production-readiness, local-first-llm]
+protected: true
+related:
+- api-design
+- production-readiness
+- local-first-llm
+sources:
+- opentelemetry-2026
+tags:
+- observability
+- opentelemetry
+- metrics
+- tracing
+title: OpenTelemetry
+updated: '2026-06-25'
 ---
 
 # OpenTelemetry
@@ -45,3 +54,4 @@ Instrumentation initializes at module load time with OpenTelemetry SDK defaults.
 - [[api-design]]
 - [[production-readiness]]
 - [[local-first-llm]]
+

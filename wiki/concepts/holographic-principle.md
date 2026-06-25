@@ -1,10 +1,22 @@
 ---
-title: "Holographic Principle"
-tags: [physics, cosmology, quantum, information]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [t-hooft-1993, susskind-1995, maldecena-1997]
-related: [entropy, black-hole-entropy, beckenstein, information-is-physical]
+protected: true
+related:
+- entropy
+- black-hole-entropy
+- beckenstein
+- information-is-physical
+sources:
+- t-hooft-1993
+- susskind-1995
+- maldecena-1997
+tags:
+- physics
+- cosmology
+- quantum
+- information
+title: Holographic Principle
+updated: '2026-06-25'
 ---
 
 # Holographic Principle
@@ -36,3 +48,4 @@ UAPs may be manipulating the holographic information encoded in spacetime. This 
 - [[beckenstein]]
 - [[information-is-physical]]
 - [[field-manipulation]]
+

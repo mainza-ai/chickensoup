@@ -1,10 +1,19 @@
 ---
-title: "Temporal Query Language"
-tags: [temporal, query, language, quantum]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [PROJECT_SPEC-2026]
-related: [temporal-reasoning-engine, temporal-query-pipeline, temporal-data-model]
+protected: true
+related:
+- temporal-reasoning-engine
+- temporal-query-pipeline
+- temporal-data-model
+sources:
+- PROJECT_SPEC-2026
+tags:
+- temporal
+- query
+- language
+- quantum
+title: Temporal Query Language
+updated: '2026-06-25'
 ---
 
 # Temporal Query Language
@@ -133,3 +142,4 @@ The Temporal Query Language uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[temporal-query-pipeline]]
 - [[temporal-data-model]]
+

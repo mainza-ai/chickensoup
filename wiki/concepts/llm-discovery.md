@@ -1,10 +1,22 @@
 ---
-title: "LLM Auto-Discovery"
-tags: [llm, discovery, local]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [omlx-2026, ollama-2026, lmstudio-2026]
-related: [local-first-llm, omlx, ollama, lm-studio, llm-fallback-chain]
+protected: true
+related:
+- local-first-llm
+- omlx
+- ollama
+- lm-studio
+- llm-fallback-chain
+sources:
+- omlx-2026
+- ollama-2026
+- lmstudio-2026
+tags:
+- llm
+- discovery
+- local
+title: LLM Auto-Discovery
+updated: '2026-06-25'
 ---
 
 # LLM Auto-Discovery
@@ -106,3 +118,4 @@ When a provider is selected, `POST /config/llm/probe` probes that specific provi
 - [[omlx]] — oMLX provider
 - [[ollama]] — Ollama provider
 - [[lm-studio]] — LM Studio provider
+

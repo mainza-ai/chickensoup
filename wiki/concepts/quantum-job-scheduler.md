@@ -1,10 +1,21 @@
 ---
-title: "Quantum Job Scheduler"
-tags: [quantum, scheduling, hardware, ibm, dwave, ionq]
 created: 2026-06-23
-updated: 2026-06-23
+protected: true
+related:
+- quantum-simulation-tier
+- time-travel-machinery-architecture
+- api-design
+- field-geometry-tensor
 sources: []
-related: [quantum-simulation-tier, time-travel-machinery-architecture, api-design, field-geometry-tensor]
+tags:
+- quantum
+- scheduling
+- hardware
+- ibm
+- dwave
+- ionq
+title: Quantum Job Scheduler
+updated: '2026-06-25'
 ---
 
 # Quantum Job Scheduler
@@ -61,3 +72,4 @@ The scheduler is called by the SwiftUI Config screen (`saveConfig`) and the Cele
 - [[time-travel-machinery-architecture]]
 - [[field-geometry-tensor]]
 - [[api-design]]
+

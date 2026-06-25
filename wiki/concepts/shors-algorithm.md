@@ -1,10 +1,17 @@
 ---
-title: "Shor's Algorithm"
-tags: [quantum, algorithm, shor]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Nielsen-Chuang-2010]
-related: [quantum-algorithms, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-algorithms
+- time-travel-machinery-architecture
+sources:
+- Nielsen-Chuang-2010
+tags:
+- quantum
+- algorithm
+- shor
+title: Shor's Algorithm
+updated: '2026-06-25'
 ---
 
 # Shor's Algorithm
@@ -43,3 +50,4 @@ from qiskit.algorithms import Shor
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
+

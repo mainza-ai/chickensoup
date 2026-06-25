@@ -1,10 +1,18 @@
 ---
-title: "Temporal Causality"
-tags: [temporal, causality, quantum]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [PROJECT_SPEC-2026]
-related: [temporal-reasoning-engine, temporal-data-model, temporal-information-fusion]
+protected: true
+related:
+- temporal-reasoning-engine
+- temporal-data-model
+- temporal-information-fusion
+sources:
+- PROJECT_SPEC-2026
+tags:
+- temporal
+- causality
+- quantum
+title: Temporal Causality
+updated: '2026-06-25'
 ---
 
 # Temporal Causality
@@ -87,3 +95,4 @@ The Temporal Causality Engine uses quantum algorithms to:
 - [[temporal-reasoning-engine]]
 - [[temporal-data-model]]
 - [[temporal-information-fusion]]
+

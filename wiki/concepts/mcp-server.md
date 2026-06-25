@@ -1,10 +1,19 @@
 ---
-title: "MCP Server"
-tags: [mcp, fastmcp, tools]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [fastmcp-2026]
-related: [fastmcp, local-first-llm, agent-architecture, field-geometry-tensor]
+protected: true
+related:
+- fastmcp
+- local-first-llm
+- agent-architecture
+- field-geometry-tensor
+sources:
+- fastmcp-2026
+tags:
+- mcp
+- fastmcp
+- tools
+title: MCP Server
+updated: '2026-06-25'
 ---
 
 # MCP Server
@@ -152,3 +161,4 @@ Explore a concept and related claims with depth.
 - [[agent-architecture]] — How agents use MCP tools
 - [[field-geometry-tensor]] — The data structure returned by simulate_spacetime
 - [[api-design]] — REST API design
+

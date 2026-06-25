@@ -1,10 +1,16 @@
 ---
-title: "FastMCP"
-tags: [mcp, fastmcp]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [fastmcp-2026]
-related: [local-first-llm, ai-alien-connection]
+protected: true
+related:
+- local-first-llm
+- ai-alien-connection
+sources:
+- fastmcp-2026
+tags:
+- mcp
+- fastmcp
+title: FastMCP
+updated: '2026-06-25'
 ---
 
 # FastMCP
@@ -46,3 +52,4 @@ FastMCP is the Model Context Protocol (MCP) server implementation for Project Ch
 
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

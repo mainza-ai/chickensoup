@@ -1,10 +1,19 @@
 ---
-title: "Quantum State Representation"
-tags: [quantum, state, representation]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [quantum-2026]
-related: [quantum-systems, local-first-llm, ai-alien-connection, temporal-reasoning-engine]
+protected: true
+related:
+- quantum-systems
+- local-first-llm
+- ai-alien-connection
+- temporal-reasoning-engine
+sources:
+- quantum-2026
+tags:
+- quantum
+- state
+- representation
+title: Quantum State Representation
+updated: '2026-06-25'
 ---
 
 # Quantum State Representation
@@ -41,3 +50,4 @@ Information is not just text — it's quantum states. When you input information
 - [[local-first-llm]]
 - [[ai-alien-connection]]
 - [[temporal-reasoning-engine]]
+

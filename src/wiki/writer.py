@@ -73,6 +73,9 @@ def write_page(
         "related": sorted(set(related)),
     }
 
+    if existing and existing["frontmatter"].get("protected", False):
+        frontmatter["protected"] = True
+
     yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
     full_content = f"---\n{yaml_str}\n---\n\n{body}\n"
 

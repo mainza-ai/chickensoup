@@ -1,10 +1,16 @@
 ---
-title: "docker-compose"
-tags: [docker, compose, container]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [docker-2026]
-related: [docker]
+protected: true
+related:
+- docker
+sources:
+- docker-2026
+tags:
+- docker
+- compose
+- container
+title: docker-compose
+updated: '2026-06-25'
 ---
 
 # docker-compose
@@ -25,3 +31,4 @@ docker-compose uses a YAML file to define services, networks, and volumes for a 
 ## See Also
 
 - [[docker]]
+

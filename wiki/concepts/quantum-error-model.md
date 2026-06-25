@@ -1,10 +1,20 @@
 ---
-title: "Quantum Error Model"
-tags: [quantum, error, model, entropy]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [quantum-2026]
-related: [quantum-systems, local-first-llm, ai-alien-connection, decoherence-as-entropy]
+protected: true
+related:
+- quantum-systems
+- local-first-llm
+- ai-alien-connection
+- decoherence-as-entropy
+sources:
+- quantum-2026
+tags:
+- quantum
+- error
+- model
+- entropy
+title: Quantum Error Model
+updated: '2026-06-25'
 ---
 
 # Quantum Error Model
@@ -41,3 +51,4 @@ Decoherence is an entropy-driven process. When a quantum system interacts with i
 - [[local-first-llm]]
 - [[ai-alien-connection]]
 - [[decoherence-as-entropy]]
+

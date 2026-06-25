@@ -1,10 +1,23 @@
 ---
-title: "API Design"
-tags: [api, fastapi, endpoints]
 created: 2026-06-22
-updated: 2026-06-25
-sources: [fastapi-2026]
-related: [fastapi, local-first-llm, multi-llm-consensus, quantum-job-scheduler, mcp-server, agent-architecture, chat-to-wiki-pipeline, ingestion-pipeline]
+protected: true
+related:
+- fastapi
+- local-first-llm
+- multi-llm-consensus
+- quantum-job-scheduler
+- mcp-server
+- agent-architecture
+- chat-to-wiki-pipeline
+- ingestion-pipeline
+sources:
+- fastapi-2026
+tags:
+- api
+- fastapi
+- endpoints
+title: API Design
+updated: '2026-06-25'
 ---
 
 # API Design
@@ -116,3 +129,4 @@ All models in `src/models.py` (~161 lines), typed with Pydantic:
 - [[mcp-server]]
 - [[ingestion-pipeline]]
 - [[chat-to-wiki-pipeline]]
+

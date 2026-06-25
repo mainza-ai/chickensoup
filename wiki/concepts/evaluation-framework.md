@@ -1,10 +1,20 @@
 ---
-title: "Evaluation Framework"
-tags: [evaluation, framework, testing, ci]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [evaluation-2026]
-related: [production-readiness, quantum-simulation-tier, integration-architecture, field-geometry-tensor]
+protected: true
+related:
+- production-readiness
+- quantum-simulation-tier
+- integration-architecture
+- field-geometry-tensor
+sources:
+- evaluation-2026
+tags:
+- evaluation
+- framework
+- testing
+- ci
+title: Evaluation Framework
+updated: '2026-06-25'
 ---
 
 # Evaluation Framework
@@ -122,3 +132,4 @@ A set of known test cases with analytic solutions. Each layer runs against these
 - [[quantum-simulation-tier]] — Light/medium/heavy modes
 - [[field-geometry-tensor]] — Validation rules for metric tensors
 - [[integration-architecture]] — How layers compose (affects integration tests)
+

@@ -1,10 +1,17 @@
 ---
-title: "D-Wave"
-tags: [quantum, d-wave]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [D-Wave-2023]
-related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-systems
+- time-travel-machinery
+- time-travel-machinery-architecture
+sources:
+- D-Wave-2023
+tags:
+- quantum
+- d-wave
+title: D-Wave
+updated: '2026-06-25'
 ---
 
 # D-Wave
@@ -28,3 +35,4 @@ Quantum annealing company. Designed for optimization problems.
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
+

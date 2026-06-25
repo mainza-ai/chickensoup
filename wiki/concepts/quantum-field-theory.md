@@ -1,10 +1,22 @@
 ---
-title: "Quantum Field Theory"
-tags: [quantum, physics, qft]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Peskin-Schroeder-1995, Carroll-GR-2004, Babbush-2023]
-related: [quantum-computation, field-manipulation, field-geometry-tensor, spacetime, fields-vs-particles]
+protected: true
+related:
+- quantum-computation
+- field-manipulation
+- field-geometry-tensor
+- spacetime
+- fields-vs-particles
+sources:
+- Peskin-Schroeder-1995
+- Carroll-GR-2004
+- Babbush-2023
+tags:
+- quantum
+- physics
+- qft
+title: Quantum Field Theory
+updated: '2026-06-25'
 ---
 
 # Quantum Field Theory
@@ -77,3 +89,4 @@ While Feynman diagrams are the standard QFT visualization (particles as lines, i
 - [[field-geometry-tensor]] — The classical output of quantum field computations
 - [[spacetime]] — The 4D fabric
 - [[field-manipulation]] — The mechanism that perturbs the field
+

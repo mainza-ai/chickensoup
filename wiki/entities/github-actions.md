@@ -1,10 +1,17 @@
 ---
-title: "GitHub Actions"
-tags: [ci-cd, github, automation]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [PROJECT_SPEC-2026]
-related: [docker, fastapi]
+protected: true
+related:
+- docker
+- fastapi
+sources:
+- PROJECT_SPEC-2026
+tags:
+- ci-cd
+- github
+- automation
+title: GitHub Actions
+updated: '2026-06-25'
 ---
 
 # GitHub Actions
@@ -36,3 +43,4 @@ The GitHub Actions configuration is stored in `.github/workflows/` and defines t
 - [[docker]]
 - [[fastapi]]
 - [[key-decisions]]
+

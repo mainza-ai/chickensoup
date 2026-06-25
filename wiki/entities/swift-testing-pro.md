@@ -1,10 +1,19 @@
 ---
-title: "Swift Testing Pro"
-tags: [swift, testing, agent-skill, twostraws]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [twostraws-swift-testing-pro-2026]
-related: [swiftui-pro, swiftdata-pro, swift-concurrency-pro]
+protected: true
+related:
+- swiftui-pro
+- swiftdata-pro
+- swift-concurrency-pro
+sources:
+- twostraws-swift-testing-pro-2026
+tags:
+- swift
+- testing
+- agent-skill
+- twostraws
+title: Swift Testing Pro
+updated: '2026-06-25'
 ---
 
 # Swift Testing Pro
@@ -67,3 +76,4 @@ npx skills add https://github.com/twostraws/Swift-Testing-Agent-Skill --skill sw
 - [[swift-concurrency-pro]]
 - [[ui-ux-design]]
 - [[agent-skills]]
+

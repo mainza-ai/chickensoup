@@ -1,10 +1,17 @@
 ---
-title: "pyproject.toml"
-tags: [build, python, pyproject]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [pyproject-2026]
-related: [pydantic-ai, pydantic-graph]
+protected: true
+related:
+- pydantic-ai
+- pydantic-graph
+sources:
+- pyproject-2026
+tags:
+- build
+- python
+- pyproject
+title: pyproject.toml
+updated: '2026-06-25'
 ---
 
 # pyproject.toml
@@ -26,3 +33,4 @@ pyproject.toml defines the build system, dependencies, and metadata for a Python
 
 - [[pydantic-ai]]
 - [[pydantic-graph]]
+

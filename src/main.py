@@ -19,6 +19,7 @@ from src.models import (
     FileIngestResponse, FolderIngestResponse,
     ConversationMetaResponse, ChatIngestStatusResponse,
     SetUserNameRequest, SetUserNameResponse,
+    WikiClearResponse,
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -1142,6 +1143,53 @@ async def post_ingest_bulk():
         }
     except Exception as e:
         logger.error(f"Bulk ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/wiki/clear-content", response_model=WikiClearResponse)
+async def post_wiki_clear_content():
+    """Deletes all CONTENT/SUBJECT wiki pages (UFO/alien/time-travel knowledge),
+    preserves CODE/ENGINEERING pages (project architecture, tools, infrastructure).
+    Pages with `protected: true` in frontmatter are never deleted."""
+    try:
+        from src.wiki.cleanup import clear_content_pages
+        result = clear_content_pages()
+
+        if result.get("success"):
+            try:
+                from src.knowledge_graph.connection import neo4j_conn
+                driver = neo4j_conn.get_driver()
+                if driver:
+                    import os
+                    wiki_root = settings.WIKI_DATA_DIR
+                    if not os.path.isabs(wiki_root):
+                        wiki_root = os.path.join(
+                            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root
+                        )
+                    subdirs = ["concepts", "entities", "projects"]
+                    with driver.session() as session:
+                        session.run("MATCH (n) DETACH DELETE n")
+                    for subdir in subdirs:
+                        dir_path = os.path.join(wiki_root, subdir)
+                        if not os.path.exists(dir_path):
+                            continue
+                        for filename in os.listdir(dir_path):
+                            if filename.endswith(".md"):
+                                file_path = os.path.join(dir_path, filename)
+                                title = os.path.splitext(filename)[0]
+                                try:
+                                    with open(file_path, "r", encoding="utf-8") as f:
+                                        content = f.read()
+                                    from src.knowledge_graph.ingest import ingest_wiki_page
+                                    ingest_wiki_page(driver, title, content)
+                                except Exception as page_err:
+                                    logger.warning(f"Re-ingest failed for {filename}: {page_err}")
+            except Exception as neo4j_err:
+                logger.warning(f"Neo4j re-ingest skipped: {neo4j_err}")
+
+        return WikiClearResponse(**result)
+    except Exception as e:
+        logger.error(f"Wiki clear content failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

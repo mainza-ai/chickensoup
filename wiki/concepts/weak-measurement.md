@@ -1,10 +1,21 @@
 ---
-title: "Weak Measurement"
-tags: [quantum, measurement, retrocausality, time]
 created: 2026-06-23
-updated: 2026-06-23
-sources: [Aharonov-Albert-Vaidman-1988]
-related: [arrow-of-time, temporal-quantum-tomography, closed-timelike-curves, time-travel, quantum-computation]
+protected: true
+related:
+- arrow-of-time
+- temporal-quantum-tomography
+- closed-timelike-curves
+- time-travel
+- quantum-computation
+sources:
+- Aharonov-Albert-Vaidman-1988
+tags:
+- quantum
+- measurement
+- retrocausality
+- time
+title: Weak Measurement
+updated: '2026-06-25'
 ---
 
 # Weak Measurement
@@ -52,3 +63,4 @@ Weak measurement provides a mathematical framework for:
 - [[quantum-computation]]
 - [[time-travel]]
 - [[closed-timelike-curves]]
+

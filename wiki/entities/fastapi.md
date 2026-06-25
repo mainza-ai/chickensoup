@@ -1,10 +1,16 @@
 ---
-title: "FastAPI"
-tags: [api, fastapi]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [fastapi-2026]
-related: [local-first-llm, ai-alien-connection]
+protected: true
+related:
+- local-first-llm
+- ai-alien-connection
+sources:
+- fastapi-2026
+tags:
+- api
+- fastapi
+title: FastAPI
+updated: '2026-06-25'
 ---
 
 # FastAPI
@@ -48,3 +54,4 @@ FastAPI is a modern, fast (high-performance) web framework for building APIs wit
 
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

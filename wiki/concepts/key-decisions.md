@@ -1,10 +1,21 @@
 ---
-title: "Key Decisions"
-tags: [project, decisions, architecture]
 created: 2026-06-22
-updated: 2026-06-24
-sources: [PROJECT_SPEC-2026]
-related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge-graph-schema, technology-stack]
+protected: true
+related:
+- agent-architecture
+- local-first-llm
+- api-design
+- mcp-server
+- knowledge-graph-schema
+- technology-stack
+sources:
+- PROJECT_SPEC-2026
+tags:
+- project
+- decisions
+- architecture
+title: Key Decisions
+updated: '2026-06-25'
 ---
 
 # Key Decisions
@@ -165,3 +176,4 @@ related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge
 - [[knowledge-graph-schema]]
 - [[production-readiness]]
 - [[ui-ux-design]]
+

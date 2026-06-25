@@ -1,10 +1,17 @@
 ---
-title: "Quantum Fourier Transform"
-tags: [quantum, algorithm, qft]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Nielsen-Chuang-2010]
-related: [quantum-algorithms, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-algorithms
+- time-travel-machinery-architecture
+sources:
+- Nielsen-Chuang-2010
+tags:
+- quantum
+- algorithm
+- qft
+title: Quantum Fourier Transform
+updated: '2026-06-25'
 ---
 
 # Quantum Fourier Transform (QFT)
@@ -43,3 +50,4 @@ from qiskit.circuit.library import QFT
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
+

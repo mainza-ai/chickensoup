@@ -1,10 +1,21 @@
 ---
-title: "Decoherence as Entropy"
-tags: [physics, quantum, thermodynamics, entropy]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [zurek-2003, zurek-2003-quantum-darwinism]
-related: [entropy, quantum-error-model, quantum-decoherence, quantum-darwinism]
+protected: true
+related:
+- entropy
+- quantum-error-model
+- quantum-decoherence
+- quantum-darwinism
+sources:
+- zurek-2003
+- zurek-2003-quantum-darwinism
+tags:
+- physics
+- quantum
+- thermodynamics
+- entropy
+title: Decoherence as Entropy
+updated: '2026-06-25'
 ---
 
 # Decoherence as Entropy
@@ -39,3 +50,4 @@ Decoherence is the primary error source in quantum computing. It is entropy leak
 - [[quantum-error-model]]
 - [[arrow-of-time]]
 - [[second-law]]
+

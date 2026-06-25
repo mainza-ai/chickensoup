@@ -1,10 +1,18 @@
 ---
-title: "Knowledge Graph Schema"
-tags: [knowledge-graph, schema, neo4j]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [neo4j-2026]
-related: [neo4j, local-first-llm, ai-alien-connection]
+protected: true
+related:
+- neo4j
+- local-first-llm
+- ai-alien-connection
+sources:
+- neo4j-2026
+tags:
+- knowledge-graph
+- schema
+- neo4j
+title: Knowledge Graph Schema
+updated: '2026-06-25'
 ---
 
 # Knowledge Graph Schema
@@ -79,3 +87,4 @@ The knowledge graph schema for Project Chicken Soup defines the nodes, relations
 - [[neo4j]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

@@ -1,10 +1,16 @@
 ---
-title: "Celery"
-tags: [batch, celery]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [celery-2026]
-related: [local-first-llm, ai-alien-connection]
+protected: true
+related:
+- local-first-llm
+- ai-alien-connection
+sources:
+- celery-2026
+tags:
+- batch
+- celery
+title: Celery
+updated: '2026-06-25'
 ---
 
 # Celery
@@ -44,3 +50,4 @@ Celery is a distributed task queue for processing batch jobs asynchronously. It 
 
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

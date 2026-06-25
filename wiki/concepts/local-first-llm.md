@@ -1,10 +1,23 @@
 ---
-title: "Local-First LLM"
-tags: [llm, local, omx, ollama, lm-studio]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [omlx-2026, ollama-2026, lmstudio-2026]
-related: [omlx, ollama, lm-studio, ai-alien-connection]
+protected: true
+related:
+- omlx
+- ollama
+- lm-studio
+- ai-alien-connection
+sources:
+- omlx-2026
+- ollama-2026
+- lmstudio-2026
+tags:
+- llm
+- local
+- omx
+- ollama
+- lm-studio
+title: Local-First LLM
+updated: '2026-06-25'
 ---
 
 # Local-First LLM
@@ -44,3 +57,4 @@ oMLX → Ollama → LM Studio
 - [[ollama]]
 - [[lm-studio]]
 - [[ai-alien-connection]]
+

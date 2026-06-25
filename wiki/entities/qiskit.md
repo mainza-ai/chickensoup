@@ -1,10 +1,18 @@
 ---
-title: "Qiskit"
-tags: [quantum, ibm, qiskit]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Qiskit-2023]
-related: [quantum-systems, time-travel-machinery, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-systems
+- time-travel-machinery
+- time-travel-machinery-architecture
+sources:
+- Qiskit-2023
+tags:
+- quantum
+- ibm
+- qiskit
+title: Qiskit
+updated: '2026-06-25'
 ---
 
 # Qiskit
@@ -30,3 +38,4 @@ IBM's open-source quantum computing framework. The most mature quantum computing
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
+

@@ -1,10 +1,17 @@
 ---
-title: "Ray"
-tags: [batch, ray]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [ray-2026]
-related: [celery, local-first-llm, ai-alien-connection]
+protected: true
+related:
+- celery
+- local-first-llm
+- ai-alien-connection
+sources:
+- ray-2026
+tags:
+- batch
+- ray
+title: Ray
+updated: '2026-06-25'
 ---
 
 # Ray
@@ -45,3 +52,4 @@ Ray is a distributed computing framework for scaling Python applications. It is 
 - [[celery]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

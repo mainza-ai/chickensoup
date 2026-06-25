@@ -1,10 +1,16 @@
 ---
-title: "Quantum Systems Comparison"
-tags: [project, quantum, comparison]
 created: 2026-06-22
-updated: 2026-06-22
+protected: true
+related:
+- quantum-systems
+- time-travel-machinery
 sources: []
-related: [quantum-systems, time-travel-machinery]
+tags:
+- project
+- quantum
+- comparison
+title: Quantum Systems Comparison
+updated: '2026-06-25'
 ---
 
 # Quantum Systems Comparison
@@ -41,3 +47,4 @@ Comparison of quantum computing platforms for the time travel machinery.
 - [[ionq]]
 - [[microsoft-q]]
 - [[google-cirq]]
+

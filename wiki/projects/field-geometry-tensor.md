@@ -1,10 +1,22 @@
 ---
-title: "Field Geometry Tensor Specification"
-tags: [project, quantum, tensor, integration]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Einstein-1915, ADM-1959, Alcubierre-1994]
-related: [time-travel-machinery-architecture, quantum-systems-comparison, spacetime, field-manipulation]
+protected: true
+related:
+- time-travel-machinery-architecture
+- quantum-systems-comparison
+- spacetime
+- field-manipulation
+sources:
+- Einstein-1915
+- ADM-1959
+- Alcubierre-1994
+tags:
+- project
+- quantum
+- tensor
+- integration
+title: Field Geometry Tensor Specification
+updated: '2026-06-25'
 ---
 
 # Field Geometry Tensor Specification
@@ -318,3 +330,4 @@ Every `FieldGeometryTensor` instance must satisfy these invariants:
 - [[spacetime]] — Spacetime physics
 - [[field-manipulation]] — Field manipulation mechanism
 - [[closed-timelike-curves]] — CTCs and path geometry
+

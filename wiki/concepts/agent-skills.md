@@ -1,10 +1,21 @@
 ---
-title: "Agent Skills"
-tags: [agent, skills, swift, twostraws]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [twostraws-2026]
-related: [ui-ux-design, swiftui-pro, swiftdata-pro, swift-concurrency-pro, swift-testing-pro]
+protected: true
+related:
+- ui-ux-design
+- swiftui-pro
+- swiftdata-pro
+- swift-concurrency-pro
+- swift-testing-pro
+sources:
+- twostraws-2026
+tags:
+- agent
+- skills
+- swift
+- twostraws
+title: Agent Skills
+updated: '2026-06-25'
 ---
 
 # Agent Skills
@@ -97,3 +108,4 @@ The skills are automatically referenced when implementing Swift code. They can a
 - [[swiftdata-pro]]
 - [[swift-concurrency-pro]]
 - [[swift-testing-pro]]
+

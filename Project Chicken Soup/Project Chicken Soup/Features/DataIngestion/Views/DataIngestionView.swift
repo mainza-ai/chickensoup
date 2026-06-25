@@ -26,6 +26,9 @@ struct DataIngestionView: View {
     @State private var commitResult: APIFileIngestResponse? = nil
     @State private var folderResult: APIFolderIngestResponse? = nil
     @State private var ingestError: String? = nil
+    @State private var showClearConfirmation = false
+    @State private var clearResult: APIWikiClearResponse? = nil
+    @State private var showClearResult = false
 
     @Namespace private var animationNamespace
 
@@ -78,6 +81,9 @@ struct DataIngestionView: View {
                 }
 
                 chatContributionsSection
+                    .padding(.horizontal)
+
+                clearContentSection
                     .padding(.horizontal)
 
                 localIngestOverview
@@ -806,6 +812,127 @@ struct DataIngestionView: View {
                     .font(.subheadline)
                     .buttonStyle(.bordered)
                     Spacer()
+                }
+            }
+        }
+    }
+
+    // MARK: - Clear Content Wiki
+
+    private var clearContentSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("CLEAR CONTENT WIKI")
+                .font(.footnote)
+                .fontWeight(.bold)
+                .foregroundStyle(DesignConstants.secondaryText)
+
+            if let result = clearResult, showClearResult {
+                VStack(spacing: 12) {
+                    HStack {
+                        Image(systemName: result.success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(result.success ? DesignConstants.systemGreenText : DesignConstants.systemRed)
+                        Text(result.success ? "Wiki content cleared" : "Clear operation failed")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Spacer()
+                        Button("Dismiss") {
+                            withAnimation { showClearResult = false }
+                        }
+                        .font(.caption)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                    }
+
+                    HStack(spacing: 16) {
+                        statCard(label: "Preserved", color: DesignConstants.systemGreen, accessibilityLabel: "Engineering pages preserved") {
+                            Text("\(result.preservedCount)")
+                                .font(.title3)
+                                .bold()
+                                .foregroundStyle(DesignConstants.systemGreenText)
+                        }
+                        statCard(label: "Deleted", color: DesignConstants.systemRed, accessibilityLabel: "Content pages deleted") {
+                            Text("\(result.deletedCount)")
+                                .font(.title3)
+                                .bold()
+                                .foregroundStyle(DesignConstants.systemRed)
+                        }
+                        statCard(label: "Protected", color: DesignConstants.systemOrange, accessibilityLabel: "Pages flagged as protected") {
+                            Text("\(result.protectedAddedCount)")
+                                .font(.title3)
+                                .bold()
+                                .foregroundStyle(DesignConstants.systemOrangeText)
+                        }
+                    }
+                }
+                .padding()
+                .background(DesignConstants.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+            } else {
+                VStack(spacing: 12) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(DesignConstants.systemRed)
+                        Text("Remove all UFO/alien/time-travel knowledge pages from the wiki. Engineering documentation, code architecture, and your user profile will be preserved.")
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+
+                    if backendService.isClearingWiki {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Clearing wiki content...")
+                                .font(.subheadline)
+                                .foregroundStyle(DesignConstants.systemOrangeText)
+                        }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        Button(role: .destructive) {
+                            showClearConfirmation = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Clear Content Wiki")
+                                    .bold()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red.opacity(0.15))
+                            .foregroundStyle(Color.red)
+                            .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius)
+                                    .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding()
+                .background(DesignConstants.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+                .confirmationDialog(
+                    "Clear Content Wiki",
+                    isPresented: $showClearConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("Clear All Content", role: .destructive) {
+                        Task {
+                            let result = await backendService.clearWikiContent()
+                            await MainActor.run {
+                                clearResult = result
+                                showClearResult = true
+                            }
+                            await backendService.fetchLoreEntities(context: modelContext)
+                            await backendService.fetchTemporalEvents(context: modelContext)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("This will permanently delete all UFO/alien/time-travel knowledge pages from the wiki. Engineering documentation, code architecture pages, your user profile, and the projects folder will be preserved. The knowledge graph will also be cleared and rebuilt from the remaining pages. This cannot be undone.")
                 }
             }
         }

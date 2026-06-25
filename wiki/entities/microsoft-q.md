@@ -1,10 +1,17 @@
 ---
-title: "Microsoft Q#"
-tags: [quantum, microsoft, q#]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Microsoft-Q-2023]
-related: [quantum-systems, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-systems
+- time-travel-machinery-architecture
+sources:
+- Microsoft-Q-2023
+tags:
+- quantum
+- microsoft
+- q#
+title: Microsoft Q#
+updated: '2026-06-25'
 ---
 
 # Microsoft Q#
@@ -28,3 +35,4 @@ Microsoft's quantum programming language. Designed for quantum computing.
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
+

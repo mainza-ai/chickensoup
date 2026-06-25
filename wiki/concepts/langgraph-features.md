@@ -1,10 +1,18 @@
 ---
-title: "LangGraph Features"
-tags: [langgraph, features]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [langgraph-2026]
-related: [langgraph, pydantic-graph, local-first-llm, ai-alien-connection]
+protected: true
+related:
+- langgraph
+- pydantic-graph
+- local-first-llm
+- ai-alien-connection
+sources:
+- langgraph-2026
+tags:
+- langgraph
+- features
+title: LangGraph Features
+updated: '2026-06-25'
 ---
 
 # LangGraph Features
@@ -55,3 +63,4 @@ External commands affect the graph.
 - [[pydantic-graph]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

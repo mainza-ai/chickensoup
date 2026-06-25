@@ -1,10 +1,17 @@
 ---
-title: "Google Cirq"
-tags: [quantum, google, cirq]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Google-Cirq-2023]
-related: [quantum-systems, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-systems
+- time-travel-machinery-architecture
+sources:
+- Google-Cirq-2023
+tags:
+- quantum
+- google
+- cirq
+title: Google Cirq
+updated: '2026-06-25'
 ---
 
 # Google Cirq
@@ -28,3 +35,4 @@ Google's quantum computing framework. Designed for superconducting qubits.
 
 - [[quantum-systems]]
 - [[time-travel-machinery-architecture]]
+

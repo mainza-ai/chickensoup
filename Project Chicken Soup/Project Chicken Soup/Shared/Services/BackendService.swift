@@ -469,6 +469,7 @@ public final class BackendService: ObservableObject {
 
     @Published public var ingestHistory: [APIIngestHistoryEntry] = []
     @Published public var chatNotifications: [APIChatIngestNotification] = []
+    @Published public var isClearingWiki = false
 
     public func clearUnreadWikiPages() {
         unreadWikiPagesFromChat = 0
@@ -493,6 +494,21 @@ public final class BackendService: ObservableObject {
             }
         } catch {
             print("Failed to fetch chat notifications: \(error.localizedDescription)")
+        }
+    }
+
+    public func clearWikiContent() async -> APIWikiClearResponse? {
+        isClearingWiki = true
+        defer { isClearingWiki = false }
+        do {
+            let bodyData = try JSONSerialization.data(withJSONObject: [:])
+            let response: APIWikiClearResponse = try await APIClient.shared.request(
+                path: "/wiki/clear-content", method: "POST", body: bodyData
+            )
+            return response
+        } catch {
+            print("Failed to clear wiki content: \(error.localizedDescription)")
+            return nil
         }
     }
 

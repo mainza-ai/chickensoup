@@ -1,10 +1,18 @@
 ---
-title: "Pydantic AI"
-tags: [agent, pydantic-ai]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [pydantic-ai-2026]
-related: [pydantic-graph, langgraph, local-first-llm, ai-alien-connection]
+protected: true
+related:
+- pydantic-graph
+- langgraph
+- local-first-llm
+- ai-alien-connection
+sources:
+- pydantic-ai-2026
+tags:
+- agent
+- pydantic-ai
+title: Pydantic AI
+updated: '2026-06-25'
 ---
 
 # Pydantic AI
@@ -46,3 +54,4 @@ pip install pydantic-ai
 - [[langgraph]]
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

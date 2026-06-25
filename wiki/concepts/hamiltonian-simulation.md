@@ -1,10 +1,17 @@
 ---
-title: "Hamiltonian Simulation"
-tags: [quantum, algorithm, hamiltonian]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Nielsen-Chuang-2010]
-related: [quantum-algorithms, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-algorithms
+- time-travel-machinery-architecture
+sources:
+- Nielsen-Chuang-2010
+tags:
+- quantum
+- algorithm
+- hamiltonian
+title: Hamiltonian Simulation
+updated: '2026-06-25'
 ---
 
 # Hamiltonian Simulation
@@ -43,3 +50,4 @@ from qiskit.algorithms.evolution import HamiltonianSimulation
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
+

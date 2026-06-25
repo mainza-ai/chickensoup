@@ -1,10 +1,17 @@
 ---
-title: "QAOA (Quantum Approximate Optimization Algorithm)"
-tags: [quantum, algorithm, qaoa]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Nielsen-Chuang-2010]
-related: [quantum-algorithms, time-travel-machinery-architecture]
+protected: true
+related:
+- quantum-algorithms
+- time-travel-machinery-architecture
+sources:
+- Nielsen-Chuang-2010
+tags:
+- quantum
+- algorithm
+- qaoa
+title: QAOA (Quantum Approximate Optimization Algorithm)
+updated: '2026-06-25'
 ---
 
 # Quantum Approximate Optimization Algorithm (QAOA)
@@ -43,3 +50,4 @@ from dwave.system import DWaveSampler
 
 - [[quantum-algorithms]]
 - [[time-travel-machinery-architecture]]
+

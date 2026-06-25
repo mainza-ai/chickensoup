@@ -135,6 +135,14 @@ class FolderIngestResponse(BaseModel):
     total_relationships_created: int = 0
     file_results: List[FileIngestResponse] = Field(default_factory=list)
 
+class WikiClearResponse(BaseModel):
+    success: bool
+    preserved_count: int = 0
+    deleted_count: int = 0
+    protected_added_count: int = 0
+    preserved_slugs: List[str] = Field(default_factory=list)
+    deleted_slugs: List[str] = Field(default_factory=list)
+
 class ConversationMetaResponse(BaseModel):
     id: str
     message_count: int = 0

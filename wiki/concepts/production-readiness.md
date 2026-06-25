@@ -1,10 +1,15 @@
 ---
-title: "Production Readiness"
-tags: [production, readiness]
 created: 2026-06-22
-updated: 2026-06-22
+protected: true
+related:
+- local-first-llm
+- ai-alien-connection
 sources: []
-related: [local-first-llm, ai-alien-connection]
+tags:
+- production
+- readiness
+title: Production Readiness
+updated: '2026-06-25'
 ---
 
 # Production Readiness
@@ -89,3 +94,4 @@ The production readiness checklist for Project Chicken Soup.
 
 - [[local-first-llm]]
 - [[ai-alien-connection]]
+

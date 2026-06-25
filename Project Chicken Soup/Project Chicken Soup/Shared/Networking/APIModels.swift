@@ -469,6 +469,35 @@ public struct APIChatIngestNotification: Codable, Identifiable {
     }
 }
 
+// MARK: - Wiki Clear Content
+
+public struct APIWikiClearResponse: Codable {
+    public var success: Bool
+    public var preservedCount: Int
+    public var deletedCount: Int
+    public var protectedAddedCount: Int
+    public var preservedSlugs: [String]
+    public var deletedSlugs: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case preservedCount = "preserved_count"
+        case deletedCount = "deleted_count"
+        case protectedAddedCount = "protected_added_count"
+        case preservedSlugs = "preserved_slugs"
+        case deletedSlugs = "deleted_slugs"
+    }
+
+    public init(success: Bool, preservedCount: Int, deletedCount: Int, protectedAddedCount: Int, preservedSlugs: [String], deletedSlugs: [String]) {
+        self.success = success
+        self.preservedCount = preservedCount
+        self.deletedCount = deletedCount
+        self.protectedAddedCount = protectedAddedCount
+        self.preservedSlugs = preservedSlugs
+        self.deletedSlugs = deletedSlugs
+    }
+}
+
 public struct APIFolderIngestResponse: Codable {
     public var success: Bool
     public var totalFiles: Int

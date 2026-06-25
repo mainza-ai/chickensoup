@@ -1,10 +1,21 @@
 ---
-title: "Wiki File System"
-tags: [wiki, files, markdown, frontmatter, crud]
 created: 2026-06-25
-updated: 2026-06-25
-sources: [project-structure-2026-06-22]
-related: [ingestion-pipeline, chat-to-wiki-pipeline, knowlege-graph-ingestion, project-structure]
+protected: true
+related:
+- ingestion-pipeline
+- chat-to-wiki-pipeline
+- knowlege-graph-ingestion
+- project-structure
+sources:
+- project-structure-2026-06-22
+tags:
+- wiki
+- files
+- markdown
+- frontmatter
+- crud
+title: Wiki File System
+updated: '2026-06-25'
 ---
 
 # Wiki File System
@@ -96,3 +107,4 @@ Pages created from chat ingests include the conversation ID in `sources`: `["con
 - [[chat-to-wiki-pipeline]]
 - [[knowledge-graph-ingestion]]
 - [[project-structure]]
+

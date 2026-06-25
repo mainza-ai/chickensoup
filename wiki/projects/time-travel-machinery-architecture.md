@@ -1,10 +1,19 @@
 ---
-title: "Project Chicken Soup — Architecture"
-tags: [project, time-travel, machinery, architecture]
 created: 2026-06-22
-updated: 2026-06-22
-sources: [Grusch-2023, Lazar-1989]
-related: [time-travel-machinery, quantum-systems]
+protected: true
+related:
+- time-travel-machinery
+- quantum-systems
+sources:
+- Grusch-2023
+- Lazar-1989
+tags:
+- project
+- time-travel
+- machinery
+- architecture
+title: Project Chicken Soup — Architecture
+updated: '2026-06-25'
 ---
 
 # Project Chicken Soup — Architecture
@@ -75,3 +84,4 @@ Many-Worlds. When you travel back in time, you don't change the past — you bra
 - [[quantum-systems]]
 - [[time-travel]]
 - [[field-manipulation]]
+
