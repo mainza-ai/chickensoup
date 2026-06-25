@@ -15,16 +15,16 @@ struct DataIngestionView: View {
     @State private var isExtracting = false
     @State private var isBulkIngesting = false
     @State private var isImporting = false
-    @State private var isImportingFolder = false
     @State private var isCommitting = false
+    @State private var isProcessingFolder = false
     @State private var selectedFileURL: URL?
     @State private var selectedFileName: String = ""
 
-    @State private var extractedEntities: [LoreEntity] = []
     @State private var selectedEntityForEdit: LoreEntity? = nil
 
     @State private var analysisResult: APIAnalyzeResponse? = nil
     @State private var commitResult: APIFileIngestResponse? = nil
+    @State private var folderResult: APIFolderIngestResponse? = nil
     @State private var ingestError: String? = nil
 
     @Namespace private var animationNamespace
@@ -60,6 +60,23 @@ struct DataIngestionView: View {
                         .padding(.horizontal)
                 }
 
+                if isProcessingFolder {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Processing folder...")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.systemOrangeText)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(DesignConstants.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                } else if let result = folderResult {
+                    folderResultView(result)
+                        .padding(.horizontal)
+                }
+
                 localIngestOverview
                     .padding(.horizontal)
             }
@@ -70,36 +87,35 @@ struct DataIngestionView: View {
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        #if os(macOS)
         .fileImporter(
             isPresented: $isImporting,
-            allowedContentTypes: [.plainText, .text, .json, .commaSeparatedText, .markdown, .yaml],
+            allowedContentTypes: [.folder],
             allowsMultipleSelection: false
         ) { result in
             switch result {
             case .success(let urls):
                 if let url = urls.first {
-                    selectedFileURL = url
-                    selectedFileName = url.lastPathComponent
-                    analyzeFile(url: url)
+                    enumerateAndProcessFolder(url: url)
                 }
+            case .failure:
+                ingestError = "Failed to open folder."
+            }
+        }
+        #else
+        .fileImporter(
+            isPresented: $isImporting,
+            allowedContentTypes: [.data, .zip],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let urls):
+                handleSelectedURLs(urls)
             case .failure:
                 ingestError = "Failed to open file."
             }
         }
-        .fileImporter(
-            isPresented: $isImportingFolder,
-            allowedContentTypes: [.archive, .zip],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    uploadFolder(url: url)
-                }
-            case .failure:
-                ingestError = "Failed to open archive."
-            }
-        }
+        #endif
         .sheet(item: $selectedEntityForEdit) { entity in
             EditAnnotationSheet(entity: entity) { updatedEntity in
                 syncService.queueSync(entityId: updatedEntity.id, type: "LoreEntity", action: "update")
@@ -218,34 +234,26 @@ struct DataIngestionView: View {
                 .scaleEffect(isDraggingOver ? 1.15 : 1.0)
                 .animation(DesignConstants.hoverAnimation, value: isDraggingOver)
 
-            Text("Upload Intel Files")
+            Text("Import Files or Folders")
                 .font(.headline)
                 .foregroundStyle(DesignConstants.primaryText)
 
-            Text("TXT, JSON, CSV, MD, YAML — single files or zip archives")
+            Text("TXT, JSON, CSV, MD — single files, zip archives, or entire folders")
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
 
             HStack(spacing: 12) {
-                Button("Browse Files", systemImage: "folder.fill") {
+                Button("Import Files or Folders", systemImage: "doc.badge.plus") {
                     ingestError = nil
                     analysisResult = nil
                     commitResult = nil
+                    folderResult = nil
                     isImporting = true
                 }
-                .buttonStyle(.bordered)
-                .disabled(isExtracting || isCommitting || isBulkIngesting)
-                .accessibilityLabel("Browse local files to ingest data")
-
-                Button("Upload Folder", systemImage: "folder.badge.gearshape") {
-                    ingestError = nil
-                    analysisResult = nil
-                    commitResult = nil
-                    isImportingFolder = true
-                }
-                .buttonStyle(.bordered)
-                .disabled(isExtracting || isCommitting || isBulkIngesting)
-                .accessibilityLabel("Upload a zip archive of files")
+                .buttonStyle(.borderedProminent)
+                .tint(DesignConstants.systemBlue)
+                .disabled(isExtracting || isCommitting || isBulkIngesting || isProcessingFolder)
+                .accessibilityLabel("Import files or folders to ingest into the wiki")
 
                 if isBulkIngesting {
                     HStack(spacing: 8) {
@@ -305,9 +313,7 @@ struct DataIngestionView: View {
                 item.loadItem(forTypeIdentifier: UTType.data.identifier) { data, error in
                     if let url = data as? URL {
                         DispatchQueue.main.async {
-                            selectedFileURL = url
-                            selectedFileName = url.lastPathComponent
-                            analyzeFile(url: url)
+                            handleSelectedURLs([url])
                         }
                     }
                 }
@@ -553,6 +559,74 @@ struct DataIngestionView: View {
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
+    // MARK: - Folder Result View
+
+    private func folderResultView(_ result: APIFolderIngestResponse) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: result.success ? "folder.fill.badge.checkmark" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(result.success ? DesignConstants.systemGreen : DesignConstants.systemRed)
+                    .font(.title2)
+                Text(result.success ? "Folder Ingest Complete" : "Folder Ingest Failed")
+                    .font(.headline)
+                    .foregroundStyle(DesignConstants.primaryText)
+                Spacer()
+                Button("Dismiss", systemImage: "xmark") {
+                    withAnimation {
+                        folderResult = nil
+                        uploadedFiles.removeAll()
+                    }
+                }
+                .font(.caption)
+                .buttonStyle(.bordered)
+            }
+
+            if result.success {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("\(result.totalFiles) files processed", systemImage: "doc.on.doc")
+                        .font(.caption)
+                    if result.totalPagesCreated > 0 {
+                        Label("\(result.totalPagesCreated) wiki pages created", systemImage: "plus.circle")
+                            .font(.caption)
+                    }
+                    if result.totalPagesUpdated > 0 {
+                        Label("\(result.totalPagesUpdated) wiki pages updated", systemImage: "arrow.triangle.2.circlepath")
+                            .font(.caption)
+                    }
+                    Label("Neo4j: \(result.totalNodesCreated) nodes, \(result.totalRelationshipsCreated) relationships", systemImage: "point.3.connected.trianglepath.dotted")
+                        .font(.caption)
+                    if !result.fileResults.isEmpty {
+                        DisclosureGroup("Per-file breakdown") {
+                            ForEach(Array(result.fileResults.enumerated()), id: \.offset) { idx, fileResult in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("File \(idx + 1)")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                    if !fileResult.pagesCreated.isEmpty {
+                                        Text("Created: \(fileResult.pagesCreated.joined(separator: ", "))")
+                                            .font(.caption2)
+                                    }
+                                    if !fileResult.pagesUpdated.isEmpty {
+                                        Text("Updated: \(fileResult.pagesUpdated.joined(separator: ", "))")
+                                            .font(.caption2)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                        .font(.caption)
+                    }
+                }
+                .foregroundStyle(DesignConstants.secondaryText)
+            }
+        }
+        .padding()
+        .background(DesignConstants.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+        .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
     // MARK: - Ingested Overview List
 
     private var localIngestOverview: some View {
@@ -671,6 +745,31 @@ struct DataIngestionView: View {
         }
     }
 
+    private func handleSelectedURLs(_ urls: [URL]) {
+        if urls.count == 1, let url = urls.first {
+            if url.pathExtension.lowercased() == "zip" {
+                selectedFileName = url.lastPathComponent
+                uploadFolderToBackend(url: url)
+            } else {
+                selectedFileURL = url
+                selectedFileName = url.lastPathComponent
+                analyzeFile(url: url)
+            }
+        } else {
+            for url in urls {
+                if url.pathExtension.lowercased() == "zip" {
+                    uploadFolderToBackend(url: url)
+                    return
+                }
+            }
+            if let first = urls.first {
+                selectedFileURL = first
+                selectedFileName = first.lastPathComponent
+                analyzeFile(url: first)
+            }
+        }
+    }
+
     private func commitFile() {
         guard let url = selectedFileURL else {
             ingestError = "No file selected."
@@ -733,7 +832,7 @@ struct DataIngestionView: View {
         }
     }
 
-    private func uploadFolder(url: URL) {
+    private func uploadFolderToBackend(url: URL) {
         guard url.startAccessingSecurityScopedResource() else {
             ingestError = "Permission denied for archive."
             return
@@ -776,6 +875,61 @@ struct DataIngestionView: View {
             }
         } catch {
             ingestError = "Failed to read archive: \(error.localizedDescription)"
+        }
+    }
+
+    private func enumerateAndProcessFolder(url: URL) {
+        guard url.startAccessingSecurityScopedResource() else {
+            ingestError = "Permission denied for folder."
+            return
+        }
+        isProcessingFolder = true
+        ingestError = nil
+
+        Task {
+            defer {
+                url.stopAccessingSecurityScopedResource()
+                DispatchQueue.main.async { isProcessingFolder = false }
+            }
+            let fm = FileManager.default
+            guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey]) else {
+                await MainActor.run { ingestError = "Failed to enumerate folder." }
+                return
+            }
+
+            var allResults: [APIFileIngestResponse] = []
+            for case let fileURL as URL in enumerator {
+                let ext = fileURL.pathExtension.lowercased()
+                guard ["txt", "md", "json", "csv"].contains(ext) else { continue }
+                guard let data = try? Data(contentsOf: fileURL),
+                      let text = String(data: data, encoding: .utf8) else { continue }
+                let bodyDict: [String: Any] = ["content": text, "filename": fileURL.lastPathComponent]
+                guard let bodyData = try? JSONSerialization.data(withJSONObject: bodyDict) else { continue }
+                if let result: APIFileIngestResponse = try? await APIClient.shared.request(
+                    path: "/ingest/file",
+                    method: "POST",
+                    body: bodyData
+                ) {
+                    allResults.append(result)
+                }
+            }
+
+            await MainActor.run {
+                folderResult = APIFolderIngestResponse(
+                    success: true,
+                    totalFiles: allResults.count,
+                    totalPagesCreated: allResults.reduce(0) { $0 + $1.pagesCreated.count },
+                    totalPagesUpdated: allResults.reduce(0) { $0 + $1.pagesUpdated.count },
+                    totalNodesCreated: allResults.reduce(0) { $0 + $1.nodesCreated },
+                    totalRelationshipsCreated: allResults.reduce(0) { $0 + $1.relationshipsCreated },
+                    fileResults: allResults
+                )
+                uploadedFiles = allResults.flatMap { $0.pagesCreated + $0.pagesUpdated }
+                Task {
+                    await backendService.fetchLoreEntities(context: modelContext)
+                    await backendService.fetchTemporalEvents(context: modelContext)
+                }
+            }
         }
     }
 

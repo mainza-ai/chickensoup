@@ -363,3 +363,44 @@ public struct APIFileIngestResponse: Codable {
         self.relationshipsCreated = relationshipsCreated
     }
 }
+
+public struct APIFolderIngestResponse: Codable {
+    public var success: Bool
+    public var totalFiles: Int
+    public var totalPagesCreated: Int
+    public var totalPagesUpdated: Int
+    public var totalNodesCreated: Int
+    public var totalRelationshipsCreated: Int
+    public var fileResults: [APIFileIngestResponse]
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case totalFiles = "total_files"
+        case totalPagesCreated = "total_pages_created"
+        case totalPagesUpdated = "total_pages_updated"
+        case totalNodesCreated = "total_nodes_created"
+        case totalRelationshipsCreated = "total_relationships_created"
+        case fileResults = "file_results"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.success = try container.decode(Bool.self, forKey: .success)
+        self.totalFiles = try container.decodeIfPresent(Int.self, forKey: .totalFiles) ?? 0
+        self.totalPagesCreated = try container.decodeIfPresent(Int.self, forKey: .totalPagesCreated) ?? 0
+        self.totalPagesUpdated = try container.decodeIfPresent(Int.self, forKey: .totalPagesUpdated) ?? 0
+        self.totalNodesCreated = try container.decodeIfPresent(Int.self, forKey: .totalNodesCreated) ?? 0
+        self.totalRelationshipsCreated = try container.decodeIfPresent(Int.self, forKey: .totalRelationshipsCreated) ?? 0
+        self.fileResults = try container.decodeIfPresent([APIFileIngestResponse].self, forKey: .fileResults) ?? []
+    }
+
+    public init(success: Bool, totalFiles: Int, totalPagesCreated: Int, totalPagesUpdated: Int, totalNodesCreated: Int = 0, totalRelationshipsCreated: Int = 0, fileResults: [APIFileIngestResponse] = []) {
+        self.success = success
+        self.totalFiles = totalFiles
+        self.totalPagesCreated = totalPagesCreated
+        self.totalPagesUpdated = totalPagesUpdated
+        self.totalNodesCreated = totalNodesCreated
+        self.totalRelationshipsCreated = totalRelationshipsCreated
+        self.fileResults = fileResults
+    }
+}
