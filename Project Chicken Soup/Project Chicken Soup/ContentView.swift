@@ -148,7 +148,14 @@ struct ContentView: View {
                         
                         HStack {
                             Spacer()
-                            QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
+                            QueryOverlayView(
+                                text: $queryText,
+                                isStructuredQuery: $isStructuredQuery,
+                                onSubmit: handleQuerySubmit,
+                                messages: messages,
+                                entities: entities,
+                                events: events
+                            )
                             Spacer()
                         }
                         .padding(.bottom, 16)
@@ -253,7 +260,14 @@ struct ContentView: View {
                             
                             HStack {
                                 Spacer()
-                                QueryOverlayView(text: $queryText, isStructuredQuery: $isStructuredQuery, onSubmit: handleQuerySubmit)
+                                QueryOverlayView(
+                                    text: $queryText,
+                                    isStructuredQuery: $isStructuredQuery,
+                                    onSubmit: handleQuerySubmit,
+                                    messages: messages,
+                                    entities: entities,
+                                    events: events
+                                )
                                 Spacer()
                             }
                             .padding(.bottom, 12)

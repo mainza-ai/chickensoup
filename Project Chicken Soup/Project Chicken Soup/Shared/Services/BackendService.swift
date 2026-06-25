@@ -10,6 +10,44 @@ import SwiftData
 import SwiftUI
 import Combine
 
+public struct SuggestionItem: Identifiable, Equatable {
+    public var id = UUID()
+    public var text: String
+    public var category: SuggestionCategory
+
+    public static func == (lhs: SuggestionItem, rhs: SuggestionItem) -> Bool {
+        lhs.text.lowercased() == rhs.text.lowercased()
+    }
+}
+
+public enum SuggestionCategory: String, CaseIterable {
+    case entity = "Entity"
+    case event = "Event"
+    case followUp = "Follow-up"
+    case explore = "Explore"
+    case temporal = "Temporal"
+
+    public var icon: String {
+        switch self {
+        case .entity: return "person.fill"
+        case .event: return "calendar.badge.clock"
+        case .followUp: return "arrow.triangle.branch"
+        case .explore: return "sparkle.magnifyingglass"
+        case .temporal: return "clock.fill"
+        }
+    }
+
+    public var color: Color {
+        switch self {
+        case .entity: return .blue
+        case .event: return .red
+        case .followUp: return .green
+        case .explore: return .purple
+        case .temporal: return .orange
+        }
+    }
+}
+
 @MainActor
 public final class BackendService: ObservableObject {
     public static let shared = BackendService()
@@ -471,6 +509,93 @@ public final class BackendService: ObservableObject {
     @Published public var chatNotifications: [APIChatIngestNotification] = []
     @Published public var isClearingWiki = false
     @Published public var isExportingWiki = false
+    @Published public var suggestions: [SuggestionItem] = []
+
+    public func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
+        var results: [SuggestionItem] = []
+        let focusedName = focusedEntityName.trimmingCharacters(in: .whitespaces)
+
+        if !focusedName.isEmpty {
+            results.append(SuggestionItem(text: "What is \(focusedName)?", category: .entity))
+            results.append(SuggestionItem(text: "Evidence for \(focusedName)", category: .entity))
+            if let neighborhood = neighborhood {
+                for conn in neighborhood.connections.prefix(2) {
+                    results.append(SuggestionItem(
+                        text: "How does \(conn.neighbor.name) relate to \(focusedName)?",
+                        category: .followUp
+                    ))
+                }
+            }
+        }
+
+        if messages.count >= 2 {
+            let lastAssistantMessages = messages.filter { !$0.isUser }.suffix(2)
+            for msg in lastAssistantMessages {
+                let words = msg.text.split(separator: " ").filter { $0.count > 3 }
+                for word in words.prefix(2) {
+                    let topic = String(word).trimmingCharacters(in: .punctuation)
+                    if !topic.isEmpty && topic.count > 2 {
+                        let q = "Tell me more about \(topic)"
+                        if !results.contains(where: { $0.text.lowercased() == q.lowercased() }) {
+                            results.append(SuggestionItem(text: q, category: .followUp))
+                        }
+                    }
+                }
+            }
+            let general = "What else should I know?"
+            if !results.contains(where: { $0.text.lowercased() == general.lowercased() }) {
+                results.append(SuggestionItem(text: general, category: .followUp))
+            }
+        }
+
+        let personEntities = entities.filter { $0.type == "Person" && !focusedName.lowercased().contains($0.name.lowercased()) }.prefix(1)
+        for entity in personEntities {
+            results.append(SuggestionItem(text: "Who is \(entity.name)?", category: .entity))
+        }
+
+        let conceptEntities = entities.filter { $0.type == "Concept" && !focusedName.lowercased().contains($0.name.lowercased()) }.prefix(1)
+        for entity in conceptEntities {
+            results.append(SuggestionItem(text: "Explain \(entity.name)", category: .explore))
+        }
+
+        let projectEntities = entities.filter { $0.type == "Project" }.prefix(1)
+        for entity in projectEntities {
+            results.append(SuggestionItem(text: "What is the \(entity.name) project?", category: .explore))
+        }
+
+        if let event = events.first {
+            let year = Calendar.current.component(.year, from: event.timestamp)
+            if year > 1900 {
+                let q = "What happened in \(year)?"
+                if !results.contains(where: { $0.text.lowercased() == q.lowercased() }) {
+                    results.append(SuggestionItem(text: q, category: .temporal))
+                }
+            }
+        }
+
+        let explorationPrompts = explorationFallbacks(focusedName: focusedName)
+        for prompt in explorationPrompts {
+            if !results.contains(where: { $0.text.lowercased() == prompt.lowercased() }) {
+                results.append(SuggestionItem(text: prompt, category: .explore))
+            }
+        }
+
+        var seen = Set<String>()
+        suggestions = results.filter { seen.insert($0.text.lowercased()).inserted }.prefix(4).map { $0 }
+    }
+
+    private func explorationFallbacks(focusedName: String) -> [String] {
+        var prompts = [
+            "Plot timelines connected to historical events",
+            "Show connections between whistleblowers",
+            "What crash retrievals are documented?",
+            "How does field manipulation work?",
+        ]
+        if !focusedName.isEmpty {
+            prompts.insert("Timeline of \(focusedName)", at: 0)
+        }
+        return prompts
+    }
 
     public func clearUnreadWikiPages() {
         unreadWikiPagesFromChat = 0

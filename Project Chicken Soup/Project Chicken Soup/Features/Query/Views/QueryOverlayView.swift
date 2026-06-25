@@ -11,19 +11,20 @@ struct QueryOverlayView: View {
     @Binding var text: String
     @Binding var isStructuredQuery: Bool
     var onSubmit: () -> Void
+    var messages: [ChatMessage] = []
+    var entities: [LoreEntity] = []
+    var events: [TemporalEvent] = []
     
     @State private var isExpanded = false
     @FocusState private var isFocused: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @ObservedObject private var backendService = BackendService.shared
     
     private var isCompact: Bool { horizontalSizeClass == .compact }
     
-    private let suggestions = [
-        "What happened in northern Italy in 1933?",
-        "Whistleblower David Grusch testimony claims",
-        "Plot timelines connected to Element 115",
-        "Ariel School encounter in Ruwa, Zimbabwe 1994"
-    ]
+    private var suggestions: [SuggestionItem] {
+        backendService.suggestions
+    }
     
     var body: some View {
         VStack(spacing: DesignConstants.compactPadding) {
@@ -107,26 +108,33 @@ struct QueryOverlayView: View {
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 2)
                     
-                    ForEach(suggestions, id: \.self) { suggestion in
+                    ForEach(suggestions) { suggestion in
                         Button {
                             withAnimation(DesignConstants.hoverAnimation) {
-                                text = suggestion
+                                text = suggestion.text
                                 isExpanded = false
                                 isFocused = false
                                 onSubmit()
                             }
                         } label: {
                             HStack {
-                                Image(systemName: "magnifyingglass")
+                                Image(systemName: suggestion.category.icon)
                                     .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                Text(suggestion)
+                                    .foregroundStyle(suggestion.category.color)
+                                    .frame(width: 20)
+                                Text(suggestion.text)
                                     .font(.subheadline)
                                     .foregroundStyle(DesignConstants.primaryText)
+                                    .lineLimit(2)
                                 Spacer()
-                                Image(systemName: "arrow.up.left")
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
+                                Text(suggestion.category.rawValue)
+                                    .font(.caption2)
+                                    .bold()
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(suggestion.category.color.opacity(0.15))
+                                    .foregroundStyle(suggestion.category.color)
+                                    .clipShape(Capsule())
                             }
                             .padding(.vertical, 6)
                             .padding(.horizontal, 8)
@@ -147,6 +155,15 @@ struct QueryOverlayView: View {
             withAnimation(DesignConstants.hoverAnimation) {
                 isExpanded = newValue
             }
+        }
+        .onChange(of: backendService.focusedEntityName) { _, _ in
+            backendService.regenerateSuggestions(messages: messages, entities: entities, events: events)
+        }
+        .onChange(of: messages.count) { _, _ in
+            backendService.regenerateSuggestions(messages: messages, entities: entities, events: events)
+        }
+        .onAppear {
+            backendService.regenerateSuggestions(messages: messages, entities: entities, events: events)
         }
     }
 }
