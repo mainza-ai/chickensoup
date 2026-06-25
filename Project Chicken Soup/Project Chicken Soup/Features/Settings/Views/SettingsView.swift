@@ -361,42 +361,42 @@ struct SettingsView: View {
                                     .font(.caption)
                                     .foregroundStyle(DesignConstants.secondaryText)
                             }
+                        }
 
-                            Divider()
-                                .background(DesignConstants.dividerColor)
+                        Divider()
+                            .background(DesignConstants.dividerColor)
 
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Your Wiki Name")
-                                    .font(.body)
-                                    .bold()
-                                    .foregroundStyle(DesignConstants.primaryText)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Your Wiki Name")
+                                .font(.body)
+                                .bold()
+                                .foregroundStyle(DesignConstants.primaryText)
 
-                                HStack {
-                                    TextField("Primary Researcher", text: Binding(
-                                        get: { backendService.userName },
-                                        set: { backendService.userName = $0 }
-                                    ))
-                                    .font(.system(.body, design: .monospaced))
-                                    .textFieldStyle(.plain)
-                                    .padding(10)
-                                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
-                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                            HStack {
+                                TextField("Primary Researcher", text: Binding(
+                                    get: { backendService.userName },
+                                    set: { backendService.userName = $0 }
+                                ))
+                                .font(.system(.body, design: .monospaced))
+                                .textFieldStyle(.plain)
+                                .padding(10)
+                                .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
 
-                                    Button("Rename") {
-                                        let name = backendService.userName.trimmingCharacters(in: .whitespaces)
-                                        guard !name.isEmpty else { return }
-                                        Task {
-                                            await backendService.setUserName(name)
-                                        }
+                                Button("Rename") {
+                                    let name = backendService.userName.trimmingCharacters(in: .whitespaces)
+                                    guard !name.isEmpty else { return }
+                                    Task {
+                                        await backendService.setUserName(name)
                                     }
-                                    .buttonStyle(.borderedProminent)
-                                    .tint(DesignConstants.systemOrange)
-                                    .font(.caption)
                                 }
-                                Text("This name is used for your personal wiki entity page.")
-                                    .font(.caption)
-                                    .foregroundStyle(DesignConstants.secondaryText)
+                                .buttonStyle(.borderedProminent)
+                                .tint(DesignConstants.systemOrange)
+                                .font(.caption)
                             }
+                            Text("This name is used for your personal wiki entity page.")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.secondaryText)
                         }
                     }
                     .padding(DesignConstants.standardPadding)

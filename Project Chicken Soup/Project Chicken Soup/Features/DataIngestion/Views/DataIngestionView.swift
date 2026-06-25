@@ -750,7 +750,7 @@ struct DataIngestionView: View {
 
                         Button("Run Now") {
                             Task {
-                                await backendService.triggerChatIngest()
+                                _ = await backendService.triggerChatIngest()
                                 await backendService.fetchChatIngestStatus()
                                 await backendService.fetchChatNotifications()
                             }
