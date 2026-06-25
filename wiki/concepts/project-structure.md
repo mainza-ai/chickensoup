@@ -2,9 +2,9 @@
 title: "Project Structure"
 tags: [project, structure, organization]
 created: 2026-06-22
-updated: 2026-06-23
+updated: 2026-06-25
 sources: []
-related: [agent-architecture, technology-stack, api-design, mcp-server, knowledge-graph-schema]
+related: [agent-architecture, technology-stack, api-design, mcp-server, knowledge-graph-schema, wiki-file-system, chat-to-wiki-pipeline, ingestion-pipeline]
 ---
 
 # Project Structure
@@ -26,10 +26,10 @@ chickensoup/
 ├── assets/                 # Logos, favicons, images, slide decks
 ├── development-docs/       # Implementation plan, temp transcripts, videos
 ├── papers/                 # 3 academic PDFs
-├── wiki/                   # Obsidian vault (160+ pages)
-├── src/                    # Python backend
-├── tests/                  # Python test suite (8 files, ~30 tests)
-├── Project Chicken Soup/   # SwiftUI macOS/iOS app (Xcode project)
+├── wiki/                   # Obsidian vault (179 pages)
+├── src/                    # Python backend (22 source files)
+├── tests/                  # Python test suite (9 files, ~30 tests)
+├── Project Chicken Soup/   # SwiftUI macOS/iOS app (Xcode project, 33+ Swift files)
 ├── .agents/                # twostraws agent skills
 ├── .github/workflows/      # CI pipeline
 └── .headroom/              # LLM memory persistence (SQLite)
@@ -39,24 +39,30 @@ chickensoup/
 
 ```
 src/
-├── main.py                 # FastAPI entry point (~706 lines, all routes inline)
-├── config.py               # Pydantic Settings (19 fields)
-├── models.py               # Core request/response Pydantic models (10 models)
-├── discovery.py            # LLM provider auto-discovery
-├── cache.py                # RedisCache + cache_decorator
-├── observability.py        # OpenTelemetry metrics + tracing
-├── multi_llm.py            # Multi-LLM consensus engine
-├── quantum_scheduler.py    # Quantum job scheduler (IBM/D-Wave/IonQ)
-├── tasks.py                # Celery async task definitions
+├── main.py                 # FastAPI entry point (~1175 lines)
+├── config.py               # Pydantic Settings (24+ fields)
+├── models.py               # Core request/response Pydantic models (20+ models)
+├── discovery.py            # LLM provider auto-discovery (158 lines)
+├── cache.py                # RedisCache + cache_decorator (133 lines)
+├── observability.py        # OpenTelemetry metrics + tracing (57 lines)
+├── multi_llm.py            # Multi-LLM consensus engine (122 lines)
+├── quantum_scheduler.py    # Quantum job scheduler (137 lines)
+├── scheduler.py            # Periodic chat-to-wiki background loop (~465 lines)
+├── tasks.py                # Celery async task definitions (83 lines)
 ├── agents/
-│   ├── orchestrator.py     # pydantic-graph orchestration
-│   ├── query_agent.py      # TQL/LLM/heuristic intent parser
-│   ├── research_agent.py   # LangGraph research workflow
-│   └── navigation_agent.py # Quantum pipeline orchestration
+│   ├── orchestrator.py     # pydantic-graph orchestration (262 lines)
+│   ├── query_agent.py      # TQL/LLM/heuristic intent parser (245 lines)
+│   ├── research_agent.py   # LangGraph research workflow (391 lines)
+│   ├── navigation_agent.py # Quantum pipeline orchestration (44 lines)
+│   ├── ingest_agent.py     # File/folder content analysis → wiki pages (182 lines)
+│   └── chat_ingest_agent.py # Conversation-aware LLM extraction (208 lines)
+├── wiki/
+│   ├── writer.py           # Wiki page CRUD, cross-referencing, index/log (223 lines)
+│   └── __init__.py
 ├── knowledge_graph/
 │   ├── connection.py       # Neo4j connection singleton
 │   ├── schema.py           # Constraints + indexes
-│   ├── ingest.py           # Wiki→Neo4j ingestion pipeline
+│   ├── ingest.py           # Wiki→Neo4j ingestion pipeline (267 lines)
 │   └── queries.py          # Cypher query functions
 ├── spacetime_engine/
 │   └── qiskit_simulation.py # 2-qubit circuit simulation + fallback
@@ -64,47 +70,63 @@ src/
 │   └── cuda_simulation.py   # Bubble stability + resonance model
 ├── ai_navigator/
 │   └── pennylane_qml.py     # Variational circuit pathfinding
-├── mcp/
-│   └── tools.py             # FastMCP tools (6 tools)
-└── configuration.py         # (inline in config.py)
+└── mcp/
+    └── tools.py             # FastMCP tools (6 tools)
 ```
 
 ## SwiftUI App (`Project Chicken Soup/`)
 
 ```
 Project Chicken Soup/
-├── Project_Chicken_SoupApp.swift
-├── ContentView.swift               # Main orchestrator (541 lines)
+├── Project_Chicken_SoupApp.swift          # App entry + SwiftData seeding
+├── ContentView.swift                      # Main orchestrator (482 lines)
+├── Models/
+│   ├── LoreEntity.swift                   # SwiftData @Model
+│   ├── TemporalEvent.swift                # SwiftData @Model
+│   └── TimelineBranch.swift               # SwiftData @Model
 ├── Shared/
-│   ├── Models/
-│   │   ├── LoreEntity.swift        # SwiftData @Model
-│   │   ├── TemporalEvent.swift     # SwiftData @Model
-│   │   └── TimelineBranch.swift    # SwiftData @Model
 │   ├── Services/
-│   │   ├── BackendService.swift    # Central service (423 lines)
-│   │   ├── LLMDiscoveryService.swift
-│   │   └── SyncService.swift       # Offline queue + field merge
-│   └── Networking/
-│       ├── APIClient.swift          # Actor-based HTTP client
-│       └── APIModels.swift          # Codable API response models
+│   │   ├── BackendService.swift           # Central service (573 lines)
+│   │   ├── LLMDiscoveryService.swift      # LLM provider discovery
+│   │   └── SyncService.swift              # Offline queue + field merge
+│   ├── Networking/
+│   │   ├── APIClient.swift                # Actor-based HTTP client
+│   │   └── APIModels.swift                # Codable API response models (474 lines)
+│   └── DesignSystem/
+│       ├── DesignConstants.swift          # Colors, spacing, radius, animations
+│       ├── SkeletonModifier.swift         # Loading shimmer effect
+│       └── PremiumSlider.swift            # Custom capsule slider
 └── Features/
     ├── Timeline/
-    │   └── TimelineView.swift       # Custom Layout timeline
+    │   ├── Layouts/TimelineLayout.swift   # Custom Layout for horizontal timeline
+    │   └── Views/
+    │       ├── TimelineView.swift         # Animated canvas timeline
+    │       ├── AdvancedTimelineFilterView.swift # Confidence, type, branch filters
+    │       └── TimelineBranchMergeSheet.swift   # Branch merging UI
     ├── KnowledgeGraph/
-    │   ├── GraphExplorerView.swift  # 2D interactive graph
-    │   ├── NodeView.swift
-    │   ├── SidebarDetailsView.swift
-    │   └── EvidenceHistoryView.swift
+    │   ├── Views/
+    │   │   ├── GraphExplorerView.swift    # 2D interactive graph
+    │   │   ├── NodeView.swift             # Glassmorphic node circles
+    │   │   ├── SidebarDetailsView.swift   # Entity detail sidebar (316 lines)
+    │   │   ├── EntityDetailView.swift     # Entity card sheet (128 lines)
+    │   │   └── EvidenceHistoryView.swift  # Confidence trajectory
+    │   └── Views/GridBackgroundView.swift # Dot grid overlay
     ├── AINavigator/
-    │   ├── AINavigatorView.swift    # Floating control panel
-    │   └── RealitySpacetimeView.swift # 3D visualization
+    │   ├── Views/
+    │   │   ├── AINavigatorView.swift      # Floating control panel (296 lines)
+    │   │   └── RealitySpacetimeView.swift # 3D visualization
     ├── Query/
-    │   ├── QueryOverlayView.swift   # Floating query bar
-    │   └── MultimodalInputView.swift # Voice, photo, camera
+    │   └── Views/
+    │       ├── QueryOverlayView.swift     # Floating query bar (161 lines)
+    │       ├── ChatHistoryView.swift      # Conversation history (139 lines)
+    │       ├── MultimodalInputView.swift  # Voice, photo, camera (356 lines)
+    │       └── LiquidGlassView.swift      # Glassmorphic modifier
     ├── DataIngestion/
-    │   └── DataIngestionView.swift  # Drag-drop + bulk ingest
+    │   └── Views/
+    │       ├── DataIngestionView.swift    # File/folder/chat ingest (1090 lines)
+    │       └── WikiInsightNotificationView.swift # Auto-sliding banner (64 lines)
     └── Settings/
-        └── SettingsView.swift       # Quantum backend config
+        └── Views/SettingsView.swift       # Quantum + LLM + Chat-to-Wiki config (704 lines)
 ```
 
 ## Tests (`tests/`)
@@ -134,3 +156,6 @@ tests/
 - [[api-design]]
 - [[mcp-server]]
 - [[knowledge-graph-schema]]
+- [[wiki-file-system]]
+- [[chat-to-wiki-pipeline]]
+- [[ingestion-pipeline]]

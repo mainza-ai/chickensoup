@@ -2,14 +2,14 @@
 title: "Overview"
 tags: [overview]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-25
 sources: []
-related: []
+related: [chat-to-wiki-pipeline, ingestion-pipeline, wiki-file-system, time-travel-machinery-architecture]
 ---
 
 # Overview
 
-A field guide to UFOs, aliens, and time travel — organized as a growing knowledge base.
+A field guide to UFOs, aliens, and time travel — organized as a growing knowledge base, automatically enriched by user–AI conversations.
 
 This wiki covers:
 
@@ -35,6 +35,12 @@ This wiki covers:
 - [[chicken-soup-spec]] — Project Chicken Soup: full specification
 - [[quantum-systems]] — Comparing quantum platforms (Qiskit, CUDA-Q, D-Wave, IonQ)
 
+## Pipeline Architecture
+
+- [[chat-to-wiki-pipeline]] — Periodic background conversion of conversations into wiki pages (scheduler, ChatIngestAgent, eligibility detection, research threads)
+- [[ingestion-pipeline]] — File/folder upload with AI analysis and wiki commit
+- [[wiki-file-system]] — Markdown CRUD, YAML frontmatter, cross-referencing, index/log management
+
 ## See Also
 
 - [[uap]]
@@ -43,5 +49,5 @@ This wiki covers:
 - [[ai-alien-connection]]
 - [[local-first-llm]]
 - [[earth-as-space-craft]]
-- [[ui-ux-design]] — SwiftUI, light mode default, custom timeline-first layout
-- [[agent-skills]] — Four twostraws agent skills for Swift implementation
+- [[ui-ux-design]]
+- [[agent-skills]]

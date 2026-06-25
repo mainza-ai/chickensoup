@@ -412,6 +412,16 @@ Three new sections: MCP summaries (section 6), sync merge strategy (section 7), 
 ### Key decisions updated
 Added 3 new decisions (tensor summaries, sync merge, wiki edge promotion) with detailed rationale.
 
+## [2026-06-25] ingest | Chat-to-wiki conversion system — Phases 0-5
+- **scheduler.py**: Periodic background loop (300s), conversation eligibility (10+ messages, 30min idle), Redis meta tracking (7d TTL), idempotency, manual trigger
+- **ChatIngestAgent**: Conversation-aware LLM extraction with Q&A prompt, user name detection, temporal reference extraction, entity tracking
+- **User entity**: "Primary Researcher" wiki page auto-created, name detection via LLM, rename via endpoint or Settings, research interests accumulated
+- **Research thread detection**: Topics appearing in 3+ conversations auto-create `projects/research-thread-{topic}.md`
+- **Adaptive confidence**: Redis reinforcement counters boost confidence on repeated topics
+- **Conversation snapshots**: Full archives saved to `wiki/raw/conversation-{id}-{date}.md`
+- **SwiftUI**: Tab badge, notification banner, Chat-to-Wiki section in Settings, chat contributions in Ingest view
+- **New pages**: [[chat-to-wiki-pipeline]], [[ingestion-pipeline]], [[wiki-file-system]]
+
 ## [2026-06-22] update | Deep Dive — Fixed Issues
 
 Comprehensive deep dive of wiki vs PROJECT_SPEC.md. Created 6 new entity pages (swiftui-pro, swiftdata-pro, swift-concurrency-pro, swift-testing-pro, s4, github-actions, logging, core-models), updated key-decisions.md to include all 12 decisions, fixed cross-references in pennylane.md, qiskit.md, cuda-q.md, d-wave.md, ionq.md, fixed self-reference in john.md, added key-decisions to ui-ux-design.md related field, fixed exponential-quantum-speedup and quantum-systems titles, moved agent-skills to Concepts section in index.

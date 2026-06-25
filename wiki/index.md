@@ -130,11 +130,14 @@ related: []
 - [[quantum-machine-learning]] — QML for pattern recognition
 - [[hamiltonian-simulation]] — Simulate spacetime field evolution
 - [[local-first-llm]] — Local-first LLM with auto-discovery
+- [[wiki-file-system]] — Wiki page CRUD, cross-referencing, index/log management
+- [[ingestion-pipeline]] — File/folder upload with AI analysis and wiki commit
+- [[chat-to-wiki-pipeline]] — Periodic background conversion of conversations into wiki pages
 - [[llm-discovery]] — LLM auto-discovery mechanism
 - [[llm-fallback-chain]] — LLM fallback chain (oMLX → Ollama → LM Studio)
 - [[agent-architecture]] — Multi-agent architecture with confidence gating, wiki file fallback, timeout isolation, and routing observability
 - [[knowledge-graph-schema]] — Knowledge graph schema (nodes, relationships, properties)
-- [[api-design]] — 21 endpoints with FastAPI and Pydantic models (includes `/conversation/{id}`, `/debug/routing`)
+- [[api-design]] — 30+ endpoints with FastAPI and Pydantic models (20+ models, ingest, chat-to-wiki, conversation)
 - [[mcp-server]] — MCP server design and tools
 - [[langgraph-features]] — LangGraph features (checkpointing, human-in-the-loop, etc.)
 - [[production-readiness]] — Production readiness checklist
