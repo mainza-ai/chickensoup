@@ -22,11 +22,14 @@
 Project Chicken Soup is a production-quality, local-first system that simulates time travel physics via quantum computation and orchestrates discovery through an AI agent network. The system couples a multi-agent backend with a local knowledge base of extraterrestrial and temporal lore.
 
 ### Key Capabilities
+
 - **Spacetime Simulation**: Computes time dilation, gravity effects, and closed timelike curves (CTCs) using **Qiskit**.
 - **Field Manipulation**: Models field-propulsion metrics using **CUDA-Q**.
 - **QML Navigation**: Plots optimal temporal coordinates via **PennyLane** neural networks, targeting hardware from **D-Wave** and **IonQ**.
 - **Lore Knowledge Graph**: Maps whistleblower claims, historic crashes, and scientific anomalies using a **Neo4j** graph.
 - **Local-First LLMs**: Auto-discovers and falls back across local models (**oMLX** ➔ **Ollama** ➔ **LM Studio**).
+- **Wiki Auto-Ingestion**: Upload files or folders — AI analyzes content and automatically creates wiki pages with cross-references.
+- **Chat-to-Wiki Pipeline**: Periodic background conversion of user–AI conversations into wiki pages, research threads, and temporal events.
 - **Apple SwiftUI Client**: Native macOS & iOS application with a warm, "chicken soup" systemOrange accent theme (`#FF9500`) powered by **SwiftData**.
 
 ---
@@ -45,22 +48,32 @@ graph TD
     
     subgraph AI_Orch ["AI Orchestration Layer (Python)"]
         Orchestrator[Orchestrator Graph: pydantic-graph]
-        Query[Query Agent]
-        Research[Research Agent: LangGraph]
-        Navigator[Navigation Agent]
+        Query[Query Agent: TQL + LLM + Heuristic]
+        Research[Research Agent: LangGraph + Wiki Fallback]
+        Navigator[Navigation Agent: Quantum Pipeline]
+        Ingest[Ingest Agent: File/Folder → Wiki]
+        ChatIngest[Chat Ingest Agent: Conversation → Wiki]
+        Scheduler[Scheduler: Periodic Chat Ingest Loop]
         
         Orchestrator --> Query
         Orchestrator --> Research
         Orchestrator --> Navigator
+        Scheduler --> ChatIngest
     end
     
     API <--> Orchestrator
+    API <--> Ingest
+    API <--> ChatIngest
     Research <--> Graph[(Neo4j Knowledge Graph)]
+    Research <--> Wiki[(Wiki Markdown Vault)]
     Navigator <--> QEngine[Quantum Engines: Qiskit, CUDA-Q, PennyLane]
 ```
 
-- **Orchestrator**: Managed via `pydantic-graph` for top-level routing.
-- **Sub-workflows**: Complex data fusion and research pipelines orchestrated by `LangGraph` (featuring checkpointing, human-in-the-loop validation, and parallel execution).
+- **Orchestrator**: Managed via `pydantic-graph` for top-level routing with confidence gating.
+- **Sub-workflows**: Complex data fusion and research pipelines orchestrated by `LangGraph` (checkpointing, human-in-the-loop, parallel execution).
+- **File Ingest Agent**: Analyzes uploaded `.txt`/`.md`/`.json`/`.csv` files via LLM, extracts entities/concepts/projects, commits to wiki + Neo4j.
+- **Chat Ingest Agent**: Periodically scans eligible conversations (10+ messages, 30min idle), extracts new wiki content, detects user names, identifies temporal references.
+- **Scheduler**: Background asyncio loop (every 5 minutes) managing conversation eligibility, idempotency, research thread detection, and conversation snapshots.
 
 ---
 
@@ -99,12 +112,12 @@ An in-depth presentation outlining the project vision, quantum architectures, an
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS-first & iOS), SwiftData, Swift Testing |
+| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS & iOS, 33+ files), SwiftData, Swift Testing |
 | **API Layer** | FastAPI, FastMCP (Model Context Protocol) |
 | **Agent AI** | Pydantic AI, `pydantic-graph`, LangGraph |
-| **Databases** | Neo4j (Knowledge Graph), Redis (Caching) |
+| **Databases** | Neo4j (Knowledge Graph), Redis (Cache + Conversation History) |
 | **Quantum Tier** | Qiskit (Spacetime), CUDA-Q (Field), PennyLane (Pathfinding QML) |
-| **Infrastructure** | Docker, Ray/Celery, OpenTelemetry, pytest |
+| **Infrastructure** | Docker, Celery, OpenTelemetry, pytest |
 
 ---
 
@@ -114,10 +127,16 @@ An in-depth presentation outlining the project vision, quantum architectures, an
 chickensoup/
 ├── development-docs/       # Project specifications & architecture docs
 │   └── PROJECT_SPEC.md     # Core technical specification
-├── wiki/                   # Markdown wiki (Overview, Index, Logs, Entities)
-├── Project Chicken Soup/   # Native SwiftUI client project (iOS & macOS)
-├── src/                    # Backend source code (FastAPI, Agents, Quantum)
-├── tests/                  # Backend unit and integration tests
+├── wiki/                   # Markdown wiki (179 pages: entities, concepts, projects)
+├── Project Chicken Soup/   # Native SwiftUI client (macOS & iOS, 33+ Swift files)
+├── src/                    # Backend source code (22 Python files)
+│   ├── main.py             # FastAPI entry point (30+ endpoints)
+│   ├── config.py           # Pydantic Settings (24+ fields)
+│   ├── scheduler.py        # Periodic chat-to-wiki background loop
+│   ├── agents/             # 6 agents: orchestrator, query, research, navigation, ingest, chat-ingest
+│   ├── wiki/writer.py      # Wiki page CRUD, cross-referencing, index/log
+│   └── knowledge_graph/    # Neo4j connection, schema, ingest, queries
+├── tests/                  # Backend unit and integration tests (9 files)
 ├── AGENTS.md               # LLM Agent instructions & wiki schema
 ├── CHANGELOG.md            # Project release log
 └── pyproject.toml          # Python build config & dependencies
@@ -159,9 +178,24 @@ chickensoup/
 ---
 
 ## 📚 The Lore Wiki
-The knowledge graph is hydrated directly from the structured markdown files located in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory.
-- Check the [Overview](file:///Users/mck/Desktop/chickensoup/wiki/overview.md) to explore key concepts.
-- See the [Index](file:///Users/mck/Desktop/chickensoup/wiki/index.md) for a map of historical crashes, physics theories, and whistleblowers.
+
+The knowledge graph is hydrated from structured markdown files in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory (179 pages and growing).
+
+Pages are automatically created through two mechanisms:
+- **File/Folder Upload**: Upload `.txt`/`.md`/`.json`/`.csv` files → AI analyzes content → wiki pages created with cross-references → synced to Neo4j.
+- **Chat-to-Wiki Pipeline**: Enable in Settings → conversations with 10+ messages are periodically analyzed → entities, concepts, and projects extracted → wiki pages auto-created.
+
+| Wiki Section | Count | Description |
+|:---|---:|:---|
+| Entities | 87 | People, places, objects, events, programs |
+| Concepts | 85 | Theories, frameworks, ideas, claims |
+| Projects | 6 | Engineering work, architecture, specifications |
+| Raw | 1+ | Immutable source documents, conversation snapshots |
+
+Additional features:
+- **Research Thread Detection**: Topics discussed in 3+ conversations auto-create project pages.
+- **Adaptive Confidence**: Repeated topics get confidence reinforcement across sessions.
+- **Conversation Snapshots**: Full message history saved to `wiki/raw/` as immutable markdown.
 
 ---
 
@@ -172,4 +206,5 @@ The knowledge graph is hydrated directly from the structured markdown files loca
 ---
 
 ## 📝 License
+
 Proprietary / Research Project.
