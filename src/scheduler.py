@@ -1,7 +1,9 @@
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
+import os
+import re
+from datetime import date, datetime, timezone
 from typing import List, Optional
 
 from src.config import settings
@@ -234,6 +236,23 @@ async def process_eligible_conversations():
                 else:
                     pages_updated.append(page["title"])
 
+                _increment_reinforcement(slug)
+                _apply_adaptive_confidence(slug, page["title"], page_type)
+
+            # Research thread detection
+            try:
+                threads = _detect_research_threads()
+                if threads:
+                    logger.info(f"Research threads detected: {threads}")
+            except Exception as thread_err:
+                logger.warning(f"Research thread detection failed: {thread_err}")
+
+            # Conversation snapshot
+            try:
+                _save_conversation_snapshot(messages, cid)
+            except Exception as snap_err:
+                logger.warning(f"Conversation snapshot failed: {snap_err}")
+
             # Handle name detection
             user_name = result.get("user_name_detected")
             if user_name:
@@ -447,6 +466,244 @@ def _update_user_entity_interests(entities_discussed: list):
         related=new_related,
         page_type="entities",
     )
+
+
+# ── Phase 5.1: Research Thread Detection ─────────────────────────
+
+def _get_all_ingested_topics() -> dict:
+    from src.wiki.writer import read_page, slugify
+    user_slug = slugify(settings.CHAT_WIKI_USER_ENTITY_NAME)
+    user_page = read_page(user_slug, page_type="entities")
+    if not user_page:
+        return {}
+
+    body = user_page["body"]
+    conversation_blocks = re.split(r"^- \[", body, flags=re.MULTILINE)
+    topics_per_conv: dict = {}
+    current_conv = None
+
+    for block in conversation_blocks:
+        if not block.strip():
+            continue
+        date_match = re.match(r"^(\d{4}-\d{2}-\d{2})\]\s*(.*)", block)
+        if date_match:
+            current_conv = date_match.group(0).strip()
+            topics_per_conv[current_conv] = set()
+        if current_conv:
+            entity_links = re.findall(r"\[\[([^\]]+)\]\]", block)
+            topics_per_conv[current_conv].update(entity_links)
+            capitalized = re.findall(r"\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)", block)
+            for word in capitalized:
+                if len(word) > 3 and word not in ("This", "The", "What", "When", "Where", "How", "From", "With", "That", "Have", "Been", "Would", "Could", "Should", "About", "Also", "Your", "They", "Were", "There", "Their", "These", "Those", "Which"):
+                    topics_per_conv[current_conv].add(word)
+
+    return topics_per_conv
+
+
+def _detect_research_threads() -> List[str]:
+    topics_per_conv = _get_all_ingested_topics()
+    if len(topics_per_conv) < 3:
+        return []
+
+    all_entities: dict = {}
+    for conv, entities in topics_per_conv.items():
+        for entity in entities:
+            all_entities.setdefault(entity, []).append(conv)
+
+    recurring = {e: convs for e, convs in all_entities.items() if len(convs) >= 3}
+    if not recurring:
+        return []
+
+    from src.wiki.writer import read_page, slugify
+    recurring = dict(sorted(recurring.items(), key=lambda x: -len(x[1])))
+    primary_topic = next(iter(recurring))
+    thread_slug = f"research-thread-{slugify(primary_topic)}"
+    existing = read_page(thread_slug, page_type="projects")
+    if existing:
+        return []
+
+    body_parts = [
+        f"## Research Thread: {primary_topic}\n",
+        f"This thread was automatically detected from multiple conversations "
+        f"where **{primary_topic}** was discussed.\n",
+        f"## Related Conversations\n",
+    ]
+    related_entities = set()
+    for conv in recurring[primary_topic]:
+        related_entities.update(topics_per_conv.get(conv, set()))
+        body_parts.append(f"- {conv}\n")
+    body_parts.append(f"\n## Related Entities\n")
+    for entity in sorted(related_entities):
+        body_parts.append(f"- [[{entity}]]\n")
+    body_parts.append(
+        f"\n## Key Findings\n\n"
+        f"_This is an auto-generated research thread page. "
+        f"Key findings will be populated as conversations continue._\n"
+    )
+
+    from src.wiki.writer import write_page, append_to_index, append_to_log, slugify as wslug
+    slug, is_new = write_page(
+        title=f"Research Thread: {primary_topic}",
+        body="".join(body_parts),
+        tags=["research-thread", "auto-detected", slugify(primary_topic)],
+        sources=["chat-system"],
+        related=list(related_entities),
+        page_type="projects",
+    )
+    if is_new:
+        try:
+            append_to_index([(slug, f"Research Thread: {primary_topic}", "projects")])
+            append_to_log(f"Research thread created: {primary_topic} ({len(recurring[primary_topic])} conversations)")
+        except Exception:
+            pass
+        logger.info(f"Research thread created: {primary_topic}")
+    return [primary_topic]
+
+
+# ── Phase 5.2: Adaptive Confidence ──────────────────────────────
+
+def _reinforcement_key(slug: str) -> str:
+    return f"reinforcement:{slug}"
+
+
+def _increment_reinforcement(slug: str):
+    if not cache_store.redis_client:
+        return
+    try:
+        cache_store.redis_client.incr(_reinforcement_key(slug))
+        cache_store.redis_client.expire(_reinforcement_key(slug), 2592000)
+    except Exception:
+        pass
+
+
+def _get_reinforcement_count(slug: str) -> int:
+    if not cache_store.redis_client:
+        return 0
+    try:
+        val = cache_store.redis_client.get(_reinforcement_key(slug))
+        return int(val) if val else 0
+    except Exception:
+        return 0
+
+
+def _apply_adaptive_confidence(slug: str, page_title: str, page_type: str):
+    count = _get_reinforcement_count(slug)
+    if count < 2:
+        return
+
+    from src.wiki.writer import read_page, write_page
+    existing = read_page(slug, page_type)
+    if not existing:
+        return
+
+    fm = existing["frontmatter"]
+    body = existing["body"]
+    confidence_str = f"*Confidence: reinforced {count}x across conversations*"
+    if confidence_str not in body:
+        body += f"\n\n{confidence_str}\n"
+
+    write_page(
+        title=fm.get("title", page_title),
+        body=body,
+        tags=fm.get("tags", []),
+        sources=fm.get("sources", []),
+        related=fm.get("related", []),
+        page_type=page_type,
+    )
+    logger.info(f"Adaptive confidence: {page_title} reinforced {count}x")
+
+
+# ── Phase 5.3: Conversation Snapshots ───────────────────────────
+
+def _save_conversation_snapshot(messages: list, conversation_id: str):
+    raw_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "wiki", "raw"
+    )
+    os.makedirs(raw_dir, exist_ok=True)
+
+    today = date.today().isoformat()
+    safe_id = conversation_id.replace(":", "-").replace("/", "-")
+    filename = f"conversation-{safe_id}-{today}.md"
+    filepath = os.path.join(raw_dir, filename)
+
+    meta = {
+        "title": f"Conversation {conversation_id[:8]}",
+        "tags": ["conversation", "chat-archive"],
+        "created": today,
+        "updated": today,
+        "sources": [f"conversation:{conversation_id}"],
+        "related": [],
+    }
+    yaml_str = "---\n" + "\n".join(f"{k}: {v}" for k, v in meta.items()) + "\n---\n\n"
+
+    body_parts = [yaml_str]
+    body_parts.append(f"# Conversation Snapshot\n\n")
+    body_parts.append(f"**ID:** `{conversation_id}`  \n")
+    body_parts.append(f"**Date:** {today}  \n")
+    body_parts.append(f"**Messages:** {len(messages)}\n\n")
+
+    user_count = sum(1 for m in messages if m.get("role") == "user")
+    assistant_count = sum(1 for m in messages if m.get("role") == "assistant")
+    body_parts.append(f"**User turns:** {user_count}  \n")
+    body_parts.append(f"**Assistant turns:** {assistant_count}\n\n---\n\n")
+
+    for i, msg in enumerate(messages):
+        role = msg.get("role", "unknown")
+        content = msg.get("content", "")
+        prefix = "**User:**" if role == "user" else "**Assistant:**"
+        body_parts.append(f"### Message {i+1} ({role})\n\n{prefix} {content}\n\n")
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("".join(body_parts))
+    logger.info(f"Conversation snapshot saved: {filepath}")
+
+
+# ── Phase 5.4: Granular Notifications ───────────────────────────
+
+def get_ingest_history(limit: int = 20) -> List[dict]:
+    log_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "wiki", "log.md"
+    )
+    if not os.path.isfile(log_path):
+        return []
+
+    with open(log_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    from src.wiki.writer import parse_frontmatter
+    md = parse_frontmatter(content)
+    body = md["body"]
+
+    entries = []
+    for line in body.split("\n"):
+        line = line.strip()
+        if line.startswith("## [") and "ingest" in line:
+            date_match = re.match(r"## \[(\d{4}-\d{2}-\d{2})\]\s*(\w+)\s*\|\s*(.*)", line)
+            if date_match:
+                entries.append({
+                    "date": date_match.group(1),
+                    "type": date_match.group(2),
+                    "description": date_match.group(3),
+                })
+    return entries[:limit]
+
+
+def get_recent_notifications(limit: int = 10) -> List[dict]:
+    history = get_ingest_history(limit)
+    notifications = []
+    for entry in history:
+        if "chat ingest" in entry["description"].lower():
+            page_match = re.search(r"(\d+) pages? created", entry["description"])
+            pages_created = int(page_match.group(1)) if page_match else 0
+            notifications.append({
+                "date": entry["date"],
+                "type": "chat_ingest",
+                "description": entry["description"],
+                "pages_created": pages_created,
+            })
+    return notifications[:limit]
 
 
 def stop():

@@ -467,8 +467,33 @@ public final class BackendService: ObservableObject {
         }
     }
 
+    @Published public var ingestHistory: [APIIngestHistoryEntry] = []
+    @Published public var chatNotifications: [APIChatIngestNotification] = []
+
     public func clearUnreadWikiPages() {
         unreadWikiPagesFromChat = 0
+    }
+
+    public func fetchIngestHistory() async {
+        do {
+            let response: [String: [APIIngestHistoryEntry]] = try await APIClient.shared.request(path: "/chat/ingest/history")
+            await MainActor.run {
+                self.ingestHistory = response["history"] ?? []
+            }
+        } catch {
+            print("Failed to fetch ingest history: \(error.localizedDescription)")
+        }
+    }
+
+    public func fetchChatNotifications() async {
+        do {
+            let response: [String: [APIChatIngestNotification]] = try await APIClient.shared.request(path: "/chat/ingest/notifications")
+            await MainActor.run {
+                self.chatNotifications = response["notifications"] ?? []
+            }
+        } catch {
+            print("Failed to fetch chat notifications: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Configuration Methods

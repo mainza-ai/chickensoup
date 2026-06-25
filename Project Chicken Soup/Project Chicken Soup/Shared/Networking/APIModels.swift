@@ -432,6 +432,43 @@ public struct APISetUserNameResponse: Codable {
     }
 }
 
+// MARK: - Phase 5: Granular Notifications & History
+
+public struct APIIngestHistoryEntry: Codable, Identifiable {
+    public var id: String { "\(date)-\(description)" }
+    public var date: String
+    public var type: String
+    public var description: String
+
+    public init(date: String, type: String, description: String) {
+        self.date = date
+        self.type = type
+        self.description = description
+    }
+}
+
+public struct APIChatIngestNotification: Codable, Identifiable {
+    public var id: String { "\(date)-\(description)" }
+    public var date: String
+    public var type: String
+    public var description: String
+    public var pagesCreated: Int
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case type
+        case description
+        case pagesCreated = "pages_created"
+    }
+
+    public init(date: String, type: String, description: String, pagesCreated: Int) {
+        self.date = date
+        self.type = type
+        self.description = description
+        self.pagesCreated = pagesCreated
+    }
+}
+
 public struct APIFolderIngestResponse: Codable {
     public var success: Bool
     public var totalFiles: Int

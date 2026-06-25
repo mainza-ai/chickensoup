@@ -380,6 +380,20 @@ async def trigger_chat_ingest():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/chat/ingest/history")
+async def get_chat_ingest_history(limit: int = 20):
+    """Returns detailed ingest history with per-entity breakdown."""
+    from src.scheduler import get_ingest_history
+    return {"history": get_ingest_history(limit=limit)}
+
+
+@app.get("/chat/ingest/notifications")
+async def get_chat_ingest_notifications(limit: int = 10):
+    """Returns recent chat-ingest notifications for the frontend."""
+    from src.scheduler import get_recent_notifications
+    return {"notifications": get_recent_notifications(limit=limit)}
+
+
 @app.post("/chat/name", response_model=SetUserNameResponse)
 async def set_user_name(request: SetUserNameRequest):
     """Set or update the user's wiki entity name."""

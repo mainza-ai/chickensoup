@@ -746,12 +746,48 @@ struct DataIngestionView: View {
                             Task {
                                 await backendService.triggerChatIngest()
                                 await backendService.fetchChatIngestStatus()
+                                await backendService.fetchChatNotifications()
                             }
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(DesignConstants.systemOrange)
                         .font(.caption)
                         .frame(maxWidth: .infinity)
+
+                        if !backendService.chatNotifications.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("RECENT CONTRIBUTIONS")
+                                    .font(.caption)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.secondaryText)
+
+                                ForEach(backendService.chatNotifications.prefix(5)) { notification in
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "leaf.fill")
+                                            .font(.caption)
+                                            .foregroundStyle(DesignConstants.systemGreenText)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(notification.description)
+                                                .font(.caption)
+                                                .foregroundStyle(DesignConstants.primaryText)
+                                            Text(notification.date)
+                                                .font(.caption2)
+                                                .foregroundStyle(DesignConstants.secondaryText)
+                                        }
+                                        Spacer()
+                                        if notification.pagesCreated > 0 {
+                                            Text("+\(notification.pagesCreated)")
+                                                .font(.caption)
+                                                .bold()
+                                                .foregroundStyle(DesignConstants.systemGreenText)
+                                        }
+                                    }
+                                    .padding(8)
+                                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+                            .padding(.top, 4)
+                        }
                     }
                 }
                 .padding()
@@ -764,6 +800,7 @@ struct DataIngestionView: View {
                     Button("Check Chat Status") {
                         Task {
                             await backendService.fetchChatIngestStatus()
+                            await backendService.fetchChatNotifications()
                         }
                     }
                     .font(.subheadline)
