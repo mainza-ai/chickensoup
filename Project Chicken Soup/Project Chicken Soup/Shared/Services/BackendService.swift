@@ -511,7 +511,7 @@ public final class BackendService: ObservableObject {
     @Published public var isExportingWiki = false
     @Published public var suggestions: [SuggestionItem] = []
 
-    public func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
+    func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
         var results: [SuggestionItem] = []
         let focusedName = focusedEntityName.trimmingCharacters(in: .whitespaces)
 
@@ -533,7 +533,7 @@ public final class BackendService: ObservableObject {
             for msg in lastAssistantMessages {
                 let words = msg.text.split(separator: " ").filter { $0.count > 3 }
                 for word in words.prefix(2) {
-                    let topic = String(word).trimmingCharacters(in: .punctuation)
+                    let topic = String(word).trimmingCharacters(in: .punctuationCharacters)
                     if !topic.isEmpty && topic.count > 2 {
                         let q = "Tell me more about \(topic)"
                         if !results.contains(where: { $0.text.lowercased() == q.lowercased() }) {

@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     CHAT_WIKI_IDLE_TIMEOUT_MINUTES: int = 30
     CHAT_WIKI_USER_ENTITY_NAME: str = "Primary Researcher"
 
+    # Orchestrator graph timeout (seconds)
+    ORCHESTRATOR_TIMEOUT_SECONDS: int = 120
+
     @property
     def fallback_chain_list(self) -> List[str]:
         return [provider.strip() for provider in self.LLM_FALLBACK_CHAIN.split(",") if provider.strip()]

@@ -9,6 +9,7 @@ from pydantic_graph import BaseNode, End, GraphBuilder, GraphRunContext, StepCon
 from src.agents.query_agent import QueryAgent, ParsedQuery
 from src.agents.research_agent import ResearchAgent
 from src.agents.navigation_agent import NavigationAgent
+from src.config import settings
 
 logger = logging.getLogger("chickensoup.agents.orchestrator")
 
@@ -217,7 +218,7 @@ class Orchestrator:
         try:
             result_state = await asyncio.wait_for(
                 orchestrator_graph.run(state=state, deps=self.deps),
-                timeout=60.0
+                timeout=settings.ORCHESTRATOR_TIMEOUT_SECONDS
             )
         except asyncio.TimeoutError:
             logger.error(f"Orchestrator execution timed out for query: {query}")
