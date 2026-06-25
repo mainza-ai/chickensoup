@@ -898,7 +898,7 @@ struct DataIngestionView: View {
             }
 
             var allResults: [APIFileIngestResponse] = []
-            for case let fileURL as URL in enumerator {
+            while let fileURL = enumerator.nextObject() as? URL {
                 let ext = fileURL.pathExtension.lowercased()
                 guard ["txt", "md", "json", "csv"].contains(ext) else { continue }
                 guard let data = try? Data(contentsOf: fileURL),
