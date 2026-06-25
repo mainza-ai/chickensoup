@@ -13,7 +13,9 @@ struct ChatHistoryView: View {
     var onClose: () -> Void
     
     @State private var scrollToBottom = false
+    @State private var showWikiInsight = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @ObservedObject var backendService = BackendService.shared
     
     private var isCompact: Bool { horizontalSizeClass == .compact }
     
@@ -26,6 +28,15 @@ struct ChatHistoryView: View {
                     .foregroundStyle(DesignConstants.systemOrangeText)
                 
                 Spacer()
+                
+                if showWikiInsight {
+                    Label("Wiki", systemImage: "leaf.fill")
+                        .font(.caption2)
+                        .foregroundStyle(DesignConstants.systemGreenText)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(DesignConstants.systemGreen.opacity(0.1), in: Capsule())
+                }
                 
                 Button("Clear") {
                     onClear()
@@ -69,6 +80,18 @@ struct ChatHistoryView: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
         .frame(maxWidth: isCompact ? .infinity : 640)
         .padding(.horizontal, DesignConstants.compactPadding)
+        .onChange(of: backendService.unreadWikiPagesFromChat) { _, newValue in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showWikiInsight = newValue > 0
+            }
+            if newValue > 0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showWikiInsight = false
+                    }
+                }
+            }
+        }
     }
 }
 

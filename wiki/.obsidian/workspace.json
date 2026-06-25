@@ -179,6 +179,7 @@
   },
   "active": "04de5102884f8c40",
   "lastOpenFiles": [
+    "entities/primary-researcher.md",
     "concepts/elohim.md",
     "entities/mauro-biglino.md",
     "concepts/swift-frontend-architecture.md",
@@ -204,7 +205,6 @@
     "concepts/antigravity.md",
     "concepts/quantum-simulation-tier.md",
     "concepts/integration-architecture.md",
-    "raw/project-structure-2026-06-22.txt",
-    "concepts/death-ray.md"
+    "raw/project-structure-2026-06-22.txt"
   ]
 }

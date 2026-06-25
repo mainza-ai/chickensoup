@@ -364,6 +364,74 @@ public struct APIFileIngestResponse: Codable {
     }
 }
 
+// MARK: - Chat-to-Wiki Models
+
+public struct APIChatIngestStatus: Codable {
+    public var enabled: Bool
+    public var lastRun: String?
+    public var conversationsChecked: Int
+    public var conversationsIngested: Int
+    public var pagesCreated: Int
+    public var pagesUpdated: Int
+
+    enum CodingKeys: String, CodingKey {
+        case enabled
+        case lastRun = "last_run"
+        case conversationsChecked = "conversations_checked"
+        case conversationsIngested = "conversations_ingested"
+        case pagesCreated = "pages_created"
+        case pagesUpdated = "pages_updated"
+    }
+
+    public init(enabled: Bool, lastRun: String? = nil, conversationsChecked: Int = 0, conversationsIngested: Int = 0, pagesCreated: Int = 0, pagesUpdated: Int = 0) {
+        self.enabled = enabled
+        self.lastRun = lastRun
+        self.conversationsChecked = conversationsChecked
+        self.conversationsIngested = conversationsIngested
+        self.pagesCreated = pagesCreated
+        self.pagesUpdated = pagesUpdated
+    }
+}
+
+public struct APIChatIngestNowResponse: Codable {
+    public var success: Bool
+    public var status: APIChatIngestStatus?
+
+    public init(success: Bool, status: APIChatIngestStatus? = nil) {
+        self.success = success
+        self.status = status
+    }
+}
+
+public struct APISetUserNameRequest: Codable {
+    public var name: String
+
+    public init(name: String) {
+        self.name = name
+    }
+}
+
+public struct APISetUserNameResponse: Codable {
+    public var success: Bool
+    public var previousName: String
+    public var currentName: String
+    public var slug: String
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case previousName = "previous_name"
+        case currentName = "current_name"
+        case slug
+    }
+
+    public init(success: Bool, previousName: String, currentName: String, slug: String) {
+        self.success = success
+        self.previousName = previousName
+        self.currentName = currentName
+        self.slug = slug
+    }
+}
+
 public struct APIFolderIngestResponse: Codable {
     public var success: Bool
     public var totalFiles: Int

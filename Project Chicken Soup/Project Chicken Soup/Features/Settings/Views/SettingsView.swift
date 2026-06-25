@@ -291,7 +291,125 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
                 
-                // Section 3: Hardware Toggles and Credentials
+                // Section 3: Chat-to-Wiki Conversion Settings
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("CHAT TO WIKI CONVERSION")
+                        .font(.caption)
+                        .bold()
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+
+                    VStack(spacing: 16) {
+                        Toggle(isOn: Binding(
+                            get: { backendService.isChatWikiConversionEnabled },
+                            set: { backendService.isChatWikiConversionEnabled = $0 }
+                        )) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Auto-Convert Chat to Wiki")
+                                    .font(.body)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.primaryText)
+                                Text("Periodically extracts entities, concepts, and projects from conversations and creates wiki pages.")
+                                    .font(.caption)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                            }
+                        }
+                        .toggleStyle(SwitchToggleStyle(tint: DesignConstants.systemOrange))
+                        .padding(.vertical, 4)
+
+                        if backendService.isChatWikiConversionEnabled {
+                            Divider()
+                                .background(DesignConstants.dividerColor)
+
+                            Toggle(isOn: Binding(
+                                get: { backendService.chatWikiNotify },
+                                set: { backendService.chatWikiNotify = $0 }
+                            )) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Notify When Pages Created")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                    Text("Shows a banner when new wiki pages are created from your conversations.")
+                                        .font(.caption)
+                                        .foregroundStyle(DesignConstants.secondaryText)
+                                }
+                            }
+                            .toggleStyle(SwitchToggleStyle(tint: DesignConstants.systemOrange))
+
+                            Divider()
+                                .background(DesignConstants.dividerColor)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Minimum Conversation Length")
+                                        .font(.body)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                    Spacer()
+                                    Text("\(backendService.chatWikiMinConversationLength)")
+                                        .font(.system(.subheadline, design: .monospaced))
+                                        .foregroundStyle(DesignConstants.systemOrangeText)
+                                }
+
+                                Stepper("Messages", value: Binding(
+                                    get: { backendService.chatWikiMinConversationLength },
+                                    set: { backendService.chatWikiMinConversationLength = $0 }
+                                ), in: 5...50, step: 5)
+                                .labelsHidden()
+
+                                Text("Conversations must have at least this many messages before extraction.")
+                                    .font(.caption)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                            }
+
+                            Divider()
+                                .background(DesignConstants.dividerColor)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Your Wiki Name")
+                                    .font(.body)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.primaryText)
+
+                                HStack {
+                                    TextField("Primary Researcher", text: Binding(
+                                        get: { backendService.userName },
+                                        set: { backendService.userName = $0 }
+                                    ))
+                                    .font(.system(.body, design: .monospaced))
+                                    .textFieldStyle(.plain)
+                                    .padding(10)
+                                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+
+                                    Button("Rename") {
+                                        let name = backendService.userName.trimmingCharacters(in: .whitespaces)
+                                        guard !name.isEmpty else { return }
+                                        Task {
+                                            await backendService.setUserName(name)
+                                        }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(DesignConstants.systemOrange)
+                                    .font(.caption)
+                                }
+                                Text("This name is used for your personal wiki entity page.")
+                                    .font(.caption)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                            }
+                        }
+                    }
+                    .padding(DesignConstants.standardPadding)
+                    .background(DesignConstants.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
+                            .stroke(DesignConstants.glassBorderColor, lineWidth: 1)
+                    )
+                }
+                .padding(.horizontal)
+
+                // Hardware Toggles and Credentials
                 VStack(alignment: .leading, spacing: 12) {
                     Text("QUANTUM HARDWARE CONNECTIVITY")
                         .font(.caption)

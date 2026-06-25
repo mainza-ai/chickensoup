@@ -77,6 +77,9 @@ struct DataIngestionView: View {
                         .padding(.horizontal)
                 }
 
+                chatContributionsSection
+                    .padding(.horizontal)
+
                 localIngestOverview
                     .padding(.horizontal)
             }
@@ -689,6 +692,83 @@ struct DataIngestionView: View {
                             selectedEntityForEdit = entity
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // MARK: - Chat Contributions
+
+    private var chatContributionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("CHAT CONTRIBUTIONS")
+                .font(.footnote)
+                .fontWeight(.bold)
+                .foregroundStyle(DesignConstants.secondaryText)
+
+            if let status = backendService.chatIngestStatus {
+                VStack(spacing: 12) {
+                    HStack {
+                        Image(systemName: status.enabled ? "leaf.fill" : "leaf")
+                            .foregroundStyle(status.enabled ? DesignConstants.systemGreenText : DesignConstants.secondaryText)
+                        Text(status.enabled ? "Auto-conversion is ON" : "Auto-conversion is OFF")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Spacer()
+                    }
+
+                    if status.enabled {
+                        HStack(spacing: 16) {
+                            statCard(label: "Pages", color: DesignConstants.systemGreen, accessibilityLabel: "Pages created from chat") {
+                                Text("\(status.pagesCreated)")
+                                    .font(.title3)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.systemGreenText)
+                            }
+                            statCard(label: "Conversations", color: DesignConstants.systemOrange, accessibilityLabel: "Conversations ingested") {
+                                Text("\(status.conversationsIngested)")
+                                    .font(.title3)
+                                    .bold()
+                                    .foregroundStyle(DesignConstants.systemOrangeText)
+                            }
+                            if let lastRun = status.lastRun {
+                                statCard(label: "Last Run", color: DesignConstants.secondaryText, accessibilityLabel: "Last ingest run") {
+                                    Text(lastRun.prefix(10))
+                                        .font(.caption)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.secondaryText)
+                                }
+                            }
+                        }
+
+                        Button("Run Now") {
+                            Task {
+                                await backendService.triggerChatIngest()
+                                await backendService.fetchChatIngestStatus()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(DesignConstants.systemOrange)
+                        .font(.caption)
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                .padding()
+                .background(DesignConstants.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+                .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
+            } else {
+                HStack {
+                    Spacer()
+                    Button("Check Chat Status") {
+                        Task {
+                            await backendService.fetchChatIngestStatus()
+                        }
+                    }
+                    .font(.subheadline)
+                    .buttonStyle(.bordered)
+                    Spacer()
                 }
             }
         }

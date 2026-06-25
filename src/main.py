@@ -16,7 +16,9 @@ from src.models import (
     ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse,
     LLMProbeRequest, LLMProbeResponse, LLMProviderStatus,
     AnalyzeRequest, AnalyzeResponse, SuggestedPageModel,
-    FileIngestResponse, FolderIngestResponse
+    FileIngestResponse, FolderIngestResponse,
+    ConversationMetaResponse, ChatIngestStatusResponse,
+    SetUserNameRequest, SetUserNameResponse,
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -43,14 +45,29 @@ orchestrator = Orchestrator()
 async def lifespan(app: FastAPI):
     # Startup actions
     logger.info("Starting up chickensoup API...")
+    scheduler_task = None
     try:
         driver = neo4j_conn.connect()
         initialize_schema(driver)
     except Exception as e:
         logger.error(f"Could not initialize Neo4j connection or schema on startup: {e}")
+
+    try:
+        from src.scheduler import periodic_chat_ingest_loop
+        scheduler_task = asyncio.create_task(periodic_chat_ingest_loop())
+        logger.info("Chat-to-wiki scheduler started")
+    except Exception as e:
+        logger.warning(f"Could not start chat-to-wiki scheduler: {e}")
+
     yield
     # Shutdown actions
     logger.info("Shutting down chickensoup API...")
+    if scheduler_task:
+        scheduler_task.cancel()
+        try:
+            await scheduler_task
+        except asyncio.CancelledError:
+            pass
     neo4j_conn.close()
 
 def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
@@ -320,6 +337,93 @@ async def get_conversation(conversation_id: str):
     return {"conversation_id": conversation_id, "history": []}
 
 
+@app.get("/conversations")
+async def list_conversations():
+    """List all conversations with metadata."""
+    try:
+        from src.scheduler import get_all_conversation_ids, get_conversation_meta
+        ids = get_all_conversation_ids()
+        results = []
+        for cid in ids:
+            meta = get_conversation_meta(cid)
+            results.append(ConversationMetaResponse(
+                id=cid,
+                message_count=meta.get("message_count", 0),
+                last_activity=meta.get("last_activity"),
+                ingested=meta.get("ingested", False),
+                ingested_at=meta.get("ingested_at"),
+                pages_created=meta.get("pages_created", []),
+            ))
+        return {"conversations": results, "total": len(results)}
+    except Exception as e:
+        logger.error(f"Failed to list conversations: {e}")
+        return {"conversations": [], "total": 0}
+
+
+@app.get("/chat/ingest/status", response_model=ChatIngestStatusResponse)
+async def get_chat_ingest_status():
+    """Returns the status of the periodic chat-to-wiki converter."""
+    from src.scheduler import get_status
+    return ChatIngestStatusResponse(**get_status())
+
+
+@app.post("/chat/ingest/now")
+async def trigger_chat_ingest():
+    """Manually triggers an immediate chat-to-wiki scan."""
+    try:
+        from src.scheduler import process_eligible_conversations
+        await process_eligible_conversations()
+        from src.scheduler import get_status
+        return {"success": True, "status": get_status()}
+    except Exception as e:
+        logger.error(f"Manual chat ingest failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/chat/name", response_model=SetUserNameResponse)
+async def set_user_name(request: SetUserNameRequest):
+    """Set or update the user's wiki entity name."""
+    from src.wiki.writer import read_page, write_page, slugify, delete_page
+
+    current_name = settings.CHAT_WIKI_USER_ENTITY_NAME
+    current_slug = slugify(current_name)
+    new_slug = slugify(request.name)
+
+    existing = read_page(current_slug, page_type="entities")
+    if not existing:
+        settings.CHAT_WIKI_USER_ENTITY_NAME = request.name
+        return SetUserNameResponse(
+            success=True,
+            previous_name=current_name,
+            current_name=request.name,
+            slug=new_slug,
+        )
+
+    frontmatter = existing["frontmatter"]
+    write_page(
+        title=request.name,
+        body=existing["body"],
+        tags=frontmatter.get("tags", ["person", "user"]),
+        sources=frontmatter.get("sources", []),
+        related=frontmatter.get("related", []),
+        page_type="entities",
+    )
+
+    if new_slug != current_slug:
+        try:
+            delete_page(current_slug, page_type="entities")
+        except Exception:
+            pass
+
+    settings.CHAT_WIKI_USER_ENTITY_NAME = request.name
+    return SetUserNameResponse(
+        success=True,
+        previous_name=current_name,
+        current_name=request.name,
+        slug=new_slug,
+    )
+
+
 @app.post("/query", response_model=QueryResponse)
 async def post_query(request: QueryRequest):
     """Submits a query to search the knowledge graph and generate an answer summary using Orchestrator."""
@@ -346,7 +450,22 @@ async def post_query(request: QueryRequest):
         history.append({"role": "assistant", "content": response.answer})
         try:
             from src.cache import cache_store
-            cache_store.set(_conversation_redis_key(conversation_id), json.dumps(history[-20:]), ttl=86400)
+            cache_store.set(_conversation_redis_key(conversation_id), json.dumps(history[-20:]), ttl=604800)
+
+            # Update conversation meta for chat-to-wiki scheduler
+            from datetime import datetime, timezone
+            from src.scheduler import update_conversation_meta, add_eligible_conversation
+            meta_key = f"conversation:{conversation_id}:meta"
+            existing_meta = cache_store.get(meta_key) or {}
+            message_count = existing_meta.get("message_count", 0) + 1
+            existing_meta["message_count"] = message_count
+            existing_meta["last_activity"] = datetime.now(timezone.utc).isoformat()
+            if "ingested" not in existing_meta:
+                existing_meta["ingested"] = False
+            cache_store.set(meta_key, existing_meta, ttl=604800)
+
+            if message_count >= settings.CHAT_WIKI_MIN_CONVERSATION_LENGTH:
+                add_eligible_conversation(conversation_id)
         except Exception:
             pass
 

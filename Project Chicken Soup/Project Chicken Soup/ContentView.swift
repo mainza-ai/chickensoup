@@ -70,6 +70,9 @@ struct ContentView: View {
         await backendService.fetchTemporalEvents(context: modelContext)
         await backendService.fetchLoreEntities(context: modelContext)
         await discoveryService.discoverActiveModels()
+        if backendService.isChatWikiConversionEnabled {
+            await backendService.fetchChatIngestStatus()
+        }
     }
     
     // MARK: - Desktop Layout (macOS & iPad)
@@ -111,6 +114,10 @@ struct ContentView: View {
                             .padding(.top, DesignConstants.standardPadding)
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                     }
+                }
+                .overlay(alignment: .top) {
+                    WikiInsightNotificationView()
+                        .padding(.top, 44)
                 }
                 .overlay(alignment: .bottom) {
                     VStack(spacing: 8) {
@@ -321,6 +328,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Ingest", systemImage: "doc.badge.plus")
             }
+            .badge(backendService.unreadWikiPagesFromChat)
             .tag(TabSelection.ingest)
         }
         .tint(DesignConstants.systemOrange)

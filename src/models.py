@@ -134,3 +134,28 @@ class FolderIngestResponse(BaseModel):
     total_nodes_created: int = 0
     total_relationships_created: int = 0
     file_results: List[FileIngestResponse] = Field(default_factory=list)
+
+class ConversationMetaResponse(BaseModel):
+    id: str
+    message_count: int = 0
+    last_activity: Optional[str] = None
+    ingested: bool = False
+    ingested_at: Optional[str] = None
+    pages_created: List[str] = Field(default_factory=list)
+
+class ChatIngestStatusResponse(BaseModel):
+    enabled: bool
+    last_run: Optional[str] = None
+    conversations_checked: int = 0
+    conversations_ingested: int = 0
+    pages_created: int = 0
+    pages_updated: int = 0
+
+class SetUserNameRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100, description="New display name for the user wiki entity")
+
+class SetUserNameResponse(BaseModel):
+    success: bool
+    previous_name: str
+    current_name: str
+    slug: str

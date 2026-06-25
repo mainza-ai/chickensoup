@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     WIKI_MIN_CONFIDENCE: float = 0.5
     WIKI_DATA_DIR: str = "wiki"
 
+    # Chat-to-wiki periodic conversion
+    CHAT_WIKI_CONVERSION_ENABLED: bool = False
+    CHAT_WIKI_MIN_CONVERSATION_LENGTH: int = 10
+    CHAT_WIKI_CHECK_INTERVAL_SECONDS: int = 300
+    CHAT_WIKI_IDLE_TIMEOUT_MINUTES: int = 30
+    CHAT_WIKI_USER_ENTITY_NAME: str = "Primary Researcher"
+
     @property
     def fallback_chain_list(self) -> List[str]:
         return [provider.strip() for provider in self.LLM_FALLBACK_CHAIN.split(",") if provider.strip()]

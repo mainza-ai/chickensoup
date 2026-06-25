@@ -47,6 +47,30 @@ public final class BackendService: ObservableObject {
     @Published public var canGoForward = false
     @Published public var showNavigator = true
     @Published public var showChatHistory = false
+
+    @Published public var chatIngestStatus: APIChatIngestStatus?
+    @Published public var unreadWikiPagesFromChat: Int = 0
+
+    public var isChatWikiConversionEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: "chatWikiConversion") == nil ? false : UserDefaults.standard.bool(forKey: "chatWikiConversion") }
+        set { UserDefaults.standard.set(newValue, forKey: "chatWikiConversion") }
+    }
+
+    public var chatWikiMinConversationLength: Int {
+        get { UserDefaults.standard.object(forKey: "chatWikiMinLength") == nil ? 10 : UserDefaults.standard.integer(forKey: "chatWikiMinLength") }
+        set { UserDefaults.standard.set(newValue, forKey: "chatWikiMinLength") }
+    }
+
+    public var chatWikiNotify: Bool {
+        get { UserDefaults.standard.object(forKey: "chatWikiNotify") == nil ? true : UserDefaults.standard.bool(forKey: "chatWikiNotify") }
+        set { UserDefaults.standard.set(newValue, forKey: "chatWikiNotify") }
+    }
+
+    public var userName: String {
+        get { UserDefaults.standard.string(forKey: "userWikiName") ?? "Primary Researcher" }
+        set { UserDefaults.standard.set(newValue, forKey: "userWikiName") }
+    }
+
     @Published public var isDarkMode: Bool = {
         if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
             return true
@@ -392,6 +416,61 @@ public final class BackendService: ObservableObject {
         }
     }
     
+    // MARK: - Chat-to-Wiki Conversion
+
+    public func fetchChatIngestStatus() async {
+        do {
+            let status: APIChatIngestStatus = try await APIClient.shared.request(path: "/chat/ingest/status")
+            await MainActor.run {
+                self.chatIngestStatus = status
+            }
+        } catch {
+            print("Failed to fetch chat ingest status: \(error.localizedDescription)")
+        }
+    }
+
+    public func triggerChatIngest() async -> Bool {
+        do {
+            let bodyData = try JSONSerialization.data(withJSONObject: [:])
+            let response: APIChatIngestNowResponse = try await APIClient.shared.request(
+                path: "/chat/ingest/now", method: "POST", body: bodyData
+            )
+            if let status = response.status {
+                await MainActor.run {
+                    self.chatIngestStatus = status
+                    self.unreadWikiPagesFromChat += status.pagesCreated
+                }
+            }
+            return response.success
+        } catch {
+            print("Failed to trigger chat ingest: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    public func setUserName(_ name: String) async -> Bool {
+        do {
+            let req = APISetUserNameRequest(name: name)
+            let bodyData = try JSONEncoder().encode(req)
+            let response: APISetUserNameResponse = try await APIClient.shared.request(
+                path: "/chat/name", method: "POST", body: bodyData
+            )
+            await MainActor.run {
+                if response.success {
+                    self.userName = response.currentName
+                }
+            }
+            return response.success
+        } catch {
+            print("Failed to set user name: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    public func clearUnreadWikiPages() {
+        unreadWikiPagesFromChat = 0
+    }
+
     // MARK: - Configuration Methods
     public func fetchConfig() async {
         isFetchingConfig = true
