@@ -207,6 +207,7 @@ struct ContentView: View {
                     .navigationTitle("Spacetime")
                     #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
+                    .withAppToolbar(showSettings: $showSettings)
                     #endif
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         VStack(spacing: 8) {
@@ -274,6 +275,7 @@ struct ContentView: View {
                     .navigationTitle("Lore Graph")
                     #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
+                    .withAppToolbar(showSettings: $showSettings)
                     .refreshable {
                         await backendService.fetchLoreEntities(context: modelContext)
                     }
@@ -293,6 +295,7 @@ struct ContentView: View {
                 .navigationTitle("AI Engine")
                 #if !os(macOS)
                 .navigationBarTitleDisplayMode(.inline)
+                .withAppToolbar(showSettings: $showSettings)
                 .refreshable {
                     await discoveryService.discoverActiveModels()
                 }
@@ -308,6 +311,7 @@ struct ContentView: View {
                 DataIngestionView()
                     #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
+                    .withAppToolbar(showSettings: $showSettings)
                     .refreshable {
                         await backendService.fetchLoreEntities(context: modelContext)
                         await backendService.fetchTemporalEvents(context: modelContext)
@@ -321,15 +325,6 @@ struct ContentView: View {
         }
         .tint(DesignConstants.systemOrange)
         .errorBanner(backendService: backendService)
-        #if !os(macOS)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Settings", systemImage: "gearshape") {
-                    showSettings = true
-                }
-            }
-        }
-        #endif
         .sheet(isPresented: $showSettings) {
             NavigationStack {
                 SettingsView()
@@ -361,6 +356,32 @@ struct ContentView: View {
             }
         }
     }
+}
+
+extension View {
+    #if !os(macOS)
+    func withAppToolbar(showSettings: Binding<Bool>) -> some View {
+        self.toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                HStack(spacing: 4) {
+                    Image("logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 20)
+                    Text("Project Chicken Soup")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(DesignConstants.secondaryText)
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Settings", systemImage: "gearshape") {
+                    showSettings.wrappedValue = true
+                }
+            }
+        }
+    }
+    #endif
 }
 
 struct ContentView_PreviewHelper: View {

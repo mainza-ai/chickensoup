@@ -44,19 +44,32 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: DesignConstants.loosePadding) {
-                // Header Banner
-                VStack(spacing: 8) {
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.system(size: 40))
+                // Brand Header
+                VStack(spacing: 6) {
+                    Image("logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 48)
+                    
+                    Text("Project Chicken Soup")
+                        .font(.title2)
+                        .bold()
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [DesignConstants.systemOrange, .purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
                         )
-                        .padding(.bottom, 8)
                     
+                    Text("Quantum Spacetime Navigator & Lore Engine")
+                        .font(.caption)
+                        .foregroundStyle(DesignConstants.secondaryText)
+                }
+                .padding(.top, DesignConstants.loosePadding)
+                
+                // Header Banner
+                VStack(spacing: 8) {
                     Text("Quantum & Engine Configuration")
                         .font(.title2)
                         .bold()
@@ -68,7 +81,7 @@ struct SettingsView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
-                .padding(.top, DesignConstants.loosePadding)
+                .padding(.top, DesignConstants.compactPadding)
                 
                 // Section 1: Dynamic Backend Picker
                 VStack(alignment: .leading, spacing: 12) {
