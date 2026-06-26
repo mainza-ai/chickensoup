@@ -50,10 +50,8 @@ public final class GraphService {
 
             let filteredResponse = NeighborhoodResponse(entity: responseDecoded.entity, connections: uniqueConns)
 
-            withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                self.neighborhood = filteredResponse
-                self.focusedEntityName = name
-            }
+            self.neighborhood = filteredResponse
+            self.focusedEntityName = name
         } catch {
             logger.error("Failed to fetch neighborhood: \(error)")
             loadFallbackNeighborhood(for: name, context: context)
@@ -117,10 +115,8 @@ public final class GraphService {
 
         let response = NeighborhoodResponse(entity: simpleEntity, connections: sortedConnections)
 
-        withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-            self.neighborhood = response
-            self.focusedEntityName = name
-        }
+        self.neighborhood = response
+        self.focusedEntityName = name
     }
 
     // MARK: - Navigation History
@@ -184,10 +180,20 @@ public final class GraphService {
             let encodedName = entity.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entity.name
             if let response = try? await APIClient.shared.request(path: "/graph/\(encodedName)") as NeighborhoodResponse,
                !response.connections.isEmpty {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    self.neighborhood = response
-                    self.focusedEntityName = entity.name
+                var uniqueConns: [NeighborhoodConnection] = []
+                var seenNames = Set<String>()
+                for conn in response.connections {
+                    let key = conn.neighbor.name.lowercased()
+                    if !seenNames.contains(key) {
+                        seenNames.insert(key)
+                        uniqueConns.append(conn)
+                    }
                 }
+                uniqueConns.sort(by: { $0.neighbor.name.localizedCaseInsensitiveCompare($1.neighbor.name) == .orderedAscending })
+
+                let filteredResponse = NeighborhoodResponse(entity: response.entity, connections: uniqueConns)
+                self.neighborhood = filteredResponse
+                self.focusedEntityName = entity.name
                 return
             }
         }

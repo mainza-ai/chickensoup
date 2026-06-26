@@ -110,35 +110,29 @@ struct GraphExplorerView: View {
                                     }
                                 }
                             
-                            // Connection Lines (Canvas)
-                            Canvas { context, size in
-                                for conn in graph.connections {
-                                    if let neighborPos = currentPositions[conn.neighbor.id] {
-                                        let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
-                                        let start = center
-                                        let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
-                                        
-                                        let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
-                                        let nodeColor: Color = {
-                                            switch guessedType.lowercased() {
-                                            case "person": return DesignConstants.systemOrange
-                                            case "place": return DesignConstants.systemGreen
-                                            case "concept": return DesignConstants.systemPurple
-                                            case "project": return Color.pink
-                                            case "object": return DesignConstants.systemBlue
-                                            case "event": return DesignConstants.systemRed
-                                            default: return DesignConstants.secondaryText
-                                            }
-                                        }()
-                                        
-                                        var path = Path()
-                                        path.move(to: start)
-                                        path.addLine(to: end)
-                                        context.stroke(path, with: .color(nodeColor.opacity(0.35)), lineWidth: 1.5)
-                                    }
+                            // Connection Lines (SwiftUI Shapes for perfect sync)
+                            ForEach(graph.connections) { conn in
+                                if let neighborPos = currentPositions[conn.neighbor.id] {
+                                    let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
+                                    let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
+                                    
+                                    let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
+                                    let nodeColor: Color = {
+                                        switch guessedType.lowercased() {
+                                        case "person": return DesignConstants.systemOrange
+                                        case "place": return DesignConstants.systemGreen
+                                        case "concept": return DesignConstants.systemPurple
+                                        case "project": return Color.pink
+                                        case "object": return DesignConstants.systemBlue
+                                        case "event": return DesignConstants.systemRed
+                                        default: return DesignConstants.secondaryText
+                                        }
+                                    }()
+                                    
+                                    ConnectionLineShape(startX: center.x, startY: center.y, endX: end.x, endY: end.y)
+                                        .stroke(nodeColor.opacity(0.35), lineWidth: 1.5)
                                 }
                             }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             
                             // Relationship Labels
                             ForEach(Array(graph.connections.enumerated()), id: \.element.id) { index, conn in
@@ -281,8 +275,8 @@ struct GraphExplorerView: View {
                                 .padding(.vertical, 5)
                                 .background(DesignConstants.cardBackground.opacity(0.85))
                                 .liquidGlass()
-                                .padding(.trailing, DesignConstants.standardPadding)
-                                .padding(.bottom, isCompact ? (backendService.graph.showChatHistory ? 290 : 90) : (backendService.graph.showChatHistory ? 20 : 16))
+                                .padding(.trailing, (!isCompact && backendService.graph.showNavigator) ? 340 : DesignConstants.standardPadding)
+                                .padding(.bottom, isCompact ? 105 : (backendService.graph.showChatHistory ? 20 : 16))
                             }
                         }
                     } else {
@@ -511,6 +505,32 @@ struct NodeView: View {
                 .frame(width: 85 * max(0.6, min(1.2, scaleFactor)))
                 .offset(y: buttonSize + 4)
         }
+    }
+}
+
+struct ConnectionLineShape: Shape {
+    var startX: CGFloat
+    var startY: CGFloat
+    var endX: CGFloat
+    var endY: CGFloat
+    
+    var animatableData: AnimatablePair<AnimatablePair<CGFloat, CGFloat>, AnimatablePair<CGFloat, CGFloat>> {
+        get {
+            AnimatablePair(AnimatablePair(startX, startY), AnimatablePair(endX, endY))
+        }
+        set {
+            startX = newValue.first.first
+            startY = newValue.first.second
+            endX = newValue.second.first
+            endY = newValue.second.second
+        }
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: startX, y: startY))
+        path.addLine(to: CGPoint(x: endX, y: endY))
+        return path
     }
 }
 
