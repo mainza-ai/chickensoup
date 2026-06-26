@@ -60,7 +60,12 @@ struct WikiBrowserView: View {
             await backendService.fetchWikiPages()
         }
         .refreshable {
-            await backendService.fetchWikiPages()
+            await withCheckedContinuation { continuation in
+                Task {
+                    await backendService.fetchWikiPages()
+                    continuation.resume()
+                }
+            }
         }
         .toolbar {
             ToolbarItem(placement: .principal) {

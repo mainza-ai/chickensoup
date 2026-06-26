@@ -160,6 +160,13 @@ public final class BackendService: ObservableObject {
                 }
             }
             try? context.save()
+
+            let serverEventIDs = Set(apiEvents.map(\.id))
+            let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
+            for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
+                context.delete(local)
+            }
+            try? context.save()
         } catch {
             self.eventsError = error
             print("Failed to fetch events from backend: \(error.localizedDescription)")
@@ -196,6 +203,13 @@ public final class BackendService: ObservableObject {
                     )
                     context.insert(newEntity)
                 }
+            }
+            try? context.save()
+
+            let serverEntityIDs = Set(apiEntities.map(\.id))
+            let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
+            for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
+                context.delete(local)
             }
             try? context.save()
         } catch {

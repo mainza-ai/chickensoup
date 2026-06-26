@@ -161,8 +161,13 @@ struct DataIngestionView: View {
             #endif
         }
         .refreshable {
-            await backendService.fetchLoreEntities(context: modelContext)
-            await backendService.fetchTemporalEvents(context: modelContext)
+            await withCheckedContinuation { continuation in
+                Task {
+                    await backendService.fetchLoreEntities(context: modelContext)
+                    await backendService.fetchTemporalEvents(context: modelContext)
+                    continuation.resume()
+                }
+            }
         }
     }
 
