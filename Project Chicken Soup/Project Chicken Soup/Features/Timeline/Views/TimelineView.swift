@@ -113,7 +113,10 @@ struct TemporalTimelineView: View {
                     )
                     #if !os(macOS)
                     .refreshable {
-                        await backendService.fetchTemporalEvents(context: modelContext)
+                        let task = Task {
+                            await backendService.fetchTemporalEvents(context: modelContext)
+                        }
+                        do { try await task.value } catch { }
                     }
                     #endif
                     

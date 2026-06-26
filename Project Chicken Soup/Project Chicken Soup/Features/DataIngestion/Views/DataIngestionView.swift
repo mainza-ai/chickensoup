@@ -161,8 +161,11 @@ struct DataIngestionView: View {
             #endif
         }
         .refreshable {
-            await backendService.fetchLoreEntities(context: modelContext)
-            await backendService.fetchTemporalEvents(context: modelContext)
+            let task = Task {
+                await backendService.fetchLoreEntities(context: modelContext)
+                await backendService.fetchTemporalEvents(context: modelContext)
+            }
+            do { try await task.value } catch { }
         }
     }
 
