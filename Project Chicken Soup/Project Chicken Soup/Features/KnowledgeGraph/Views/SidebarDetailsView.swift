@@ -43,7 +43,7 @@ struct SidebarDetailsView: View {
                 Spacer()
                 
                 Button(action: toggleTheme) {
-                    Image(systemName: backendService.isDarkMode ? "sun.max.fill" : "moon.fill")
+                    Image(systemName: backendService.config.isDarkMode ? "sun.max.fill" : "moon.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(DesignConstants.systemOrangeText)
                 }
@@ -283,7 +283,7 @@ struct SidebarDetailsView: View {
     
     private func toggleTheme() {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-            backendService.toggleTheme()
+            backendService.config.toggleTheme()
         }
     }
     

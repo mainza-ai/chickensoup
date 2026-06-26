@@ -50,7 +50,7 @@ struct ContentView: View {
             .task {
                 await fetchInitialData()
             }
-            .preferredColorScheme(backendService.isDarkMode ? .dark : .light)
+            .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
         #else
         Group {
             if horizontalSizeClass == .compact {
@@ -62,7 +62,7 @@ struct ContentView: View {
         .task {
             await fetchInitialData()
         }
-        .preferredColorScheme(backendService.isDarkMode ? .dark : .light)
+        .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
         #endif
     }
     
@@ -71,7 +71,7 @@ struct ContentView: View {
         await backendService.fetchLoreEntities(context: modelContext)
         await discoveryService.discoverActiveModels()
         if backendService.isChatWikiConversionEnabled {
-            await backendService.fetchChatIngestStatus()
+            await backendService.chat.fetchChatIngestStatus()
         }
     }
     
@@ -342,7 +342,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Ingest", systemImage: "doc.badge.plus")
             }
-            .badge(backendService.unreadWikiPagesFromChat)
+            .badge(backendService.chat.unreadWikiPagesFromChat)
             .tag(TabSelection.ingest)
         }
         .tint(DesignConstants.systemOrange)

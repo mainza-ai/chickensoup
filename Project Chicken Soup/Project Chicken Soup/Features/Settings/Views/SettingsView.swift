@@ -148,12 +148,12 @@ struct SettingsView: View {
                                     .font(.body)
                                     .bold()
                                     .foregroundStyle(DesignConstants.primaryText)
-                                if !backendService.llmActiveProvider.isEmpty {
+                                if !backendService.config.llmActiveProvider.isEmpty {
                                     HStack(spacing: 6) {
                                         Circle()
-                                            .fill(backendService.llmActiveProvider != "simulated" ? DesignConstants.systemGreen : DesignConstants.systemRed)
+                                            .fill(backendService.config.llmActiveProvider != "simulated" ? DesignConstants.systemGreen : DesignConstants.systemRed)
                                             .frame(width: 8, height: 8)
-                                        Text(backendService.llmActiveProvider)
+                                        Text(backendService.config.llmActiveProvider)
                                             .font(.subheadline)
                                             .foregroundStyle(DesignConstants.systemOrangeText)
                                     }
@@ -180,7 +180,7 @@ struct SettingsView: View {
                                 ForEach(providerOptions, id: \.0) { option in
                                     HStack {
                                         Text(option.1)
-                                        if option.0 == backendService.llmActiveProvider {
+                                        if option.0 == backendService.config.llmActiveProvider {
                                             Image(systemName: "checkmark")
                                                 .foregroundStyle(DesignConstants.systemOrange)
                                         }
@@ -225,7 +225,7 @@ struct SettingsView: View {
                                     ForEach(llmAvailableModels, id: \.self) { model in
                                         HStack {
                                             Text(model)
-                                            if model == backendService.llmActiveModel {
+                                            if model == backendService.config.llmActiveModel {
                                                 Image(systemName: "checkmark")
                                                     .foregroundStyle(DesignConstants.systemOrange)
                                             }
@@ -374,8 +374,8 @@ struct SettingsView: View {
 
                             HStack {
                                 TextField("Primary Researcher", text: Binding(
-                                    get: { backendService.userName },
-                                    set: { backendService.userName = $0 }
+                                    get: { backendService.chat.userName },
+                                    set: { backendService.chat.userName = $0 }
                                 ))
                                 .font(.system(.body, design: .monospaced))
                                 .textFieldStyle(.plain)
@@ -384,10 +384,10 @@ struct SettingsView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
 
                                 Button("Rename") {
-                                    let name = backendService.userName.trimmingCharacters(in: .whitespaces)
+                                    let name = backendService.chat.userName.trimmingCharacters(in: .whitespaces)
                                     guard !name.isEmpty else { return }
                                     Task {
-                                        await backendService.setUserName(name)
+                                        await backendService.chat.setUserName(name)
                                     }
                                 }
                                 .buttonStyle(.borderedProminent)
@@ -496,7 +496,7 @@ struct SettingsView: View {
                             placeholder: "Enter IBMQ Token...",
                             text: $ibmToken,
                             show: $showIbmToken,
-                            isSetOnServer: backendService.ibmApiTokenSet
+                            isSetOnServer: backendService.config.ibmApiTokenSet
                         )
                         
                         Divider()
@@ -508,7 +508,7 @@ struct SettingsView: View {
                             placeholder: "Enter D-Wave API Token...",
                             text: $dwaveToken,
                             show: $showDwaveToken,
-                            isSetOnServer: backendService.dwaveApiTokenSet
+                            isSetOnServer: backendService.config.dwaveApiTokenSet
                         )
                         
                         Divider()
@@ -520,7 +520,7 @@ struct SettingsView: View {
                             placeholder: "Enter IonQ API Token...",
                             text: $ionqToken,
                             show: $showIonqToken,
-                            isSetOnServer: backendService.ionqApiTokenSet
+                            isSetOnServer: backendService.config.ionqApiTokenSet
                         )
                     }
                     .padding(DesignConstants.standardPadding)
@@ -646,22 +646,22 @@ struct SettingsView: View {
     private func loadCurrentConfig() {
         Task {
             await backendService.fetchConfig()
-            self.selectedBackend = backendService.quantumBackend
-            self.hardwareEnabled = backendService.quantumHardwareEnabled
+            self.selectedBackend = backendService.config.quantumBackend
+            self.hardwareEnabled = backendService.config.quantumHardwareEnabled
             self.ibmToken = ""
             self.dwaveToken = ""
             self.ionqToken = ""
             self.selectedProvider = "auto"
-            self.llmAvailableModels = backendService.llmAvailableModels
-            self.llmSelectedModel = backendService.llmActiveModel
+            self.llmAvailableModels = backendService.config.llmAvailableModels
+            self.llmSelectedModel = backendService.config.llmActiveModel
         }
     }
     
     private func refreshLLMModels() {
         Task {
-            await backendService.refreshLLMDiscovery()
-            self.llmAvailableModels = backendService.llmAvailableModels
-            self.llmSelectedModel = backendService.llmActiveModel
+            await backendService.config.refreshLLMDiscovery()
+            self.llmAvailableModels = backendService.config.llmAvailableModels
+            self.llmSelectedModel = backendService.config.llmActiveModel
         }
     }
     
@@ -671,7 +671,7 @@ struct SettingsView: View {
         llmSelectedModel = ""
         
         Task {
-            let result = await backendService.probeLLMProvider(name)
+            let result = await backendService.config.probeLLMProvider(name)
             await MainActor.run {
                 isProbingProvider = false
                 if result.available {
@@ -696,7 +696,7 @@ struct SettingsView: View {
         
         Task {
             let providerToUse = selectedProvider == "auto" ? nil : selectedProvider
-            let success = await backendService.saveLLMConfig(
+            let success = await backendService.config.saveLLMConfig(
                 provider: providerToUse,
                 model: llmSelectedModel
             )
@@ -725,7 +725,7 @@ struct SettingsView: View {
         saveMessage = ""
         
         Task {
-            let success = await backendService.saveConfig(
+            let success = await backendService.config.saveConfig(
                 backend: selectedBackend,
                 ibmToken: ibmToken,
                 dwaveToken: dwaveToken,

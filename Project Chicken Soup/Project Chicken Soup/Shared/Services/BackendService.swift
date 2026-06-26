@@ -55,71 +55,27 @@ public final class BackendService: ObservableObject {
     @Published public var isFetchingEvents = false
     @Published public var isSubmittingQuery = false
     @Published public var isSolvingSpacetime = false
-    
-    @Published public var quantumBackend: String = "numpy"
-    @Published public var quantumHardwareEnabled: Bool = false
-    @Published public var ibmApiTokenSet: Bool = false
-    @Published public var dwaveApiTokenSet: Bool = false
-    @Published public var ionqApiTokenSet: Bool = false
-    @Published public var isFetchingConfig = false
-    @Published public var isSavingConfig = false
-    
-    @Published public var llmActiveProvider: String = ""
-    @Published public var llmActiveModel: String = ""
-    @Published public var llmAvailableModels: [String] = []
-    @Published public var isSavingLLMConfig = false
 
     public var conversationId: String? = nil
-    
+
     @Published public var eventsError: Error?
     @Published public var entitiesError: Error?
     @Published public var queryError: Error?
     @Published public var spacetimeError: Error?
-    
+
     public let graph = GraphService()
     public let wiki = WikiService()
+    public let chat = ChatService()
+    public let config = ConfigService()
 
-    @Published public var chatIngestStatus: APIChatIngestStatus?
-    @Published public var unreadWikiPagesFromChat: Int = 0
-
-    public var isChatWikiConversionEnabled: Bool {
-        get { UserDefaults.standard.object(forKey: "chatWikiConversion") == nil ? false : UserDefaults.standard.bool(forKey: "chatWikiConversion") }
-        set { UserDefaults.standard.set(newValue, forKey: "chatWikiConversion") }
-    }
-
-    public var chatWikiMinConversationLength: Int {
-        get { UserDefaults.standard.object(forKey: "chatWikiMinLength") == nil ? 10 : UserDefaults.standard.integer(forKey: "chatWikiMinLength") }
-        set { UserDefaults.standard.set(newValue, forKey: "chatWikiMinLength") }
-    }
-
-    public var chatWikiNotify: Bool {
-        get { UserDefaults.standard.object(forKey: "chatWikiNotify") == nil ? true : UserDefaults.standard.bool(forKey: "chatWikiNotify") }
-        set { UserDefaults.standard.set(newValue, forKey: "chatWikiNotify") }
-    }
-
-    public var userName: String {
-        get { UserDefaults.standard.string(forKey: "userWikiName") ?? "Primary Researcher" }
-        set { UserDefaults.standard.set(newValue, forKey: "userWikiName") }
-    }
-
-    @Published public var isDarkMode: Bool = {
-        if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
-            return true
-        }
-        return UserDefaults.standard.bool(forKey: "isDarkMode")
-    }()
-    
-    public func toggleTheme() {
-        isDarkMode.toggle()
-        UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
-    }
-    
     private init() {
-        graph.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
+        let forward: (AnyObject) -> Void = { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+        graph.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
+        wiki.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
+        chat.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
+        config.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -379,55 +335,32 @@ public final class BackendService: ObservableObject {
         await graph.fetchNeighborhood(for: name, context: context)
     }
     
-    // MARK: - Chat-to-Wiki Conversion
+    // MARK: - Chat Delegation
 
     public func fetchChatIngestStatus() async {
-        do {
-            let status: APIChatIngestStatus = try await APIClient.shared.request(path: "/chat/ingest/status")
-            self.chatIngestStatus = status
-        } catch {
-            print("Failed to fetch chat ingest status: \(error.localizedDescription)")
-        }
+        await chat.fetchChatIngestStatus()
     }
 
     public func triggerChatIngest() async -> Bool {
-        do {
-            let bodyData = try JSONSerialization.data(withJSONObject: [:])
-            let response: APIChatIngestNowResponse = try await APIClient.shared.request(
-                path: "/chat/ingest/now", method: "POST", body: bodyData
-            )
-            if let status = response.status {
-                self.chatIngestStatus = status
-                self.unreadWikiPagesFromChat += status.pagesCreated
-            }
-            return response.success
-        } catch {
-            print("Failed to trigger chat ingest: \(error.localizedDescription)")
-            return false
-        }
+        await chat.triggerChatIngest()
     }
 
     public func setUserName(_ name: String) async -> Bool {
-        do {
-            let req = APISetUserNameRequest(name: name)
-            let bodyData = try JSONEncoder().encode(req)
-            let response: APISetUserNameResponse = try await APIClient.shared.request(
-                path: "/chat/name", method: "POST", body: bodyData
-            )
-            if response.success {
-                self.userName = response.currentName
-            }
-            return response.success
-        } catch {
-            print("Failed to set user name: \(error.localizedDescription)")
-            return false
-        }
+        await chat.setUserName(name)
     }
 
-    public var ingestHistory: [APIIngestHistoryEntry] = []
-    @Published public var chatNotifications: [APIChatIngestNotification] = []
-    @Published public var isClearingWiki = false
-    @Published public var isExportingWiki = false
+    public func clearUnreadWikiPages() {
+        chat.clearUnreadWikiPages()
+    }
+
+    public func fetchIngestHistory() async {
+        await chat.fetchIngestHistory()
+    }
+
+    public func fetchChatNotifications() async {
+        await chat.fetchChatNotifications()
+    }
+
     @Published public var suggestions: [SuggestionItem] = []
 
     func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
@@ -516,28 +449,6 @@ public final class BackendService: ObservableObject {
         return prompts
     }
 
-    public func clearUnreadWikiPages() {
-        unreadWikiPagesFromChat = 0
-    }
-
-    public func fetchIngestHistory() async {
-        do {
-            let response: [String: [APIIngestHistoryEntry]] = try await APIClient.shared.request(path: "/chat/ingest/history")
-            self.ingestHistory = response["history"] ?? []
-        } catch {
-            print("Failed to fetch ingest history: \(error.localizedDescription)")
-        }
-    }
-
-    public func fetchChatNotifications() async {
-        do {
-            let response: [String: [APIChatIngestNotification]] = try await APIClient.shared.request(path: "/chat/ingest/notifications")
-            self.chatNotifications = response["notifications"] ?? []
-        } catch {
-            print("Failed to fetch chat notifications: \(error.localizedDescription)")
-        }
-    }
-
     public func clearWikiContent() async -> APIWikiClearResponse? {
         await wiki.clearWikiContent()
     }
@@ -570,103 +481,24 @@ public final class BackendService: ObservableObject {
         await wiki.deleteWikiPage(slug: slug, pageType: pageType, hard: hard)
     }
 
-    // MARK: - Configuration Methods
+    // MARK: - Config Delegation
     public func fetchConfig() async {
-        isFetchingConfig = true
-        defer { isFetchingConfig = false }
-        
-        do {
-            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config")
-            self.quantumBackend = response.quantumBackend
-            self.quantumHardwareEnabled = response.quantumHardwareEnabled
-            self.ibmApiTokenSet = response.ibmApiTokenSet
-            self.dwaveApiTokenSet = response.dwaveApiTokenSet
-            self.ionqApiTokenSet = response.ionqApiTokenSet
-            self.llmActiveProvider = response.llmActiveProvider
-            self.llmActiveModel = response.llmActiveModel
-            self.llmAvailableModels = response.llmAvailableModels
-        } catch {
-            print("Failed to fetch configurations: \(error.localizedDescription)")
-        }
+        await config.fetchConfig()
     }
-    
+
     public func saveConfig(backend: String, ibmToken: String?, dwaveToken: String?, ionqToken: String?, hardwareEnabled: Bool) async -> Bool {
-        isSavingConfig = true
-        defer { isSavingConfig = false }
-        
-        do {
-            let req = APIConfigRequest(
-                quantumBackend: backend,
-                ibmApiToken: (ibmToken?.isEmpty ?? true) ? nil : ibmToken,
-                dwaveApiToken: (dwaveToken?.isEmpty ?? true) ? nil : dwaveToken,
-                ionqApiToken: (ionqToken?.isEmpty ?? true) ? nil : ionqToken,
-                quantumHardwareEnabled: hardwareEnabled,
-                llmActiveProvider: nil,
-                llmActiveModel: nil
-            )
-            let bodyData = try JSONEncoder().encode(req)
-            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config", method: "POST", body: bodyData)
-            
-            self.quantumBackend = response.quantumBackend
-            self.quantumHardwareEnabled = response.quantumHardwareEnabled
-            self.ibmApiTokenSet = response.ibmApiTokenSet
-            self.dwaveApiTokenSet = response.dwaveApiTokenSet
-            self.ionqApiTokenSet = response.ionqApiTokenSet
-            self.llmActiveProvider = response.llmActiveProvider
-            self.llmActiveModel = response.llmActiveModel
-            self.llmAvailableModels = response.llmAvailableModels
-            return true
-        } catch {
-            print("Failed to save configurations: \(error.localizedDescription)")
-            return false
-        }
+        await config.saveConfig(backend: backend, ibmToken: ibmToken, dwaveToken: dwaveToken, ionqToken: ionqToken, hardwareEnabled: hardwareEnabled)
     }
-    
-    // MARK: - LLM Configuration
+
     public func saveLLMConfig(provider: String?, model: String?) async -> Bool {
-        isSavingLLMConfig = true
-        defer { isSavingLLMConfig = false }
-        
-        do {
-            let req = APILLMConfigRequest(
-                llmActiveProvider: provider,
-                llmActiveModel: model
-            )
-            let bodyData = try JSONEncoder().encode(req)
-            let response: APILLMConfigResponse = try await APIClient.shared.request(path: "/config/llm", method: "POST", body: bodyData)
-            
-            self.llmActiveProvider = response.llmActiveProvider
-            self.llmActiveModel = response.llmActiveModel
-            self.llmAvailableModels = response.llmAvailableModels
-            return true
-        } catch {
-            print("Failed to save LLM configuration: \(error.localizedDescription)")
-            return false
-        }
+        await config.saveLLMConfig(provider: provider, model: model)
     }
-    
+
     public func refreshLLMDiscovery() async {
-        do {
-            let response: APIConfigResponse = try await APIClient.shared.request(path: "/config")
-            self.llmAvailableModels = response.llmAvailableModels
-            self.llmActiveProvider = response.llmActiveProvider
-            self.llmActiveModel = response.llmActiveModel
-        } catch {
-            print("Failed to refresh LLM discovery: \(error.localizedDescription)")
-        }
+        await config.refreshLLMDiscovery()
     }
-    
+
     public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String]) {
-        do {
-            let req = APILLMProbeRequest(providerName: name)
-            let bodyData = try JSONEncoder().encode(req)
-            let response: APILLMProbeResponse = try await APIClient.shared.request(
-                path: "/config/llm/probe", method: "POST", body: bodyData
-            )
-            return (response.provider, response.available, response.models)
-        } catch {
-            print("Failed to probe LLM provider '\(name)': \(error.localizedDescription)")
-            return (name, false, [])
-        }
+        await config.probeLLMProvider(name)
     }
 }

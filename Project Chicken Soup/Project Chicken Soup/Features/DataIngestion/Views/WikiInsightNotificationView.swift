@@ -17,7 +17,7 @@ struct WikiInsightNotificationView: View {
                             .font(.subheadline)
                             .bold()
                             .foregroundStyle(DesignConstants.primaryText)
-                        Text("\(backendService.unreadWikiPagesFromChat) new \(backendService.unreadWikiPagesFromChat == 1 ? "page" : "pages") from your conversations")
+                        Text("\(backendService.chat.unreadWikiPagesFromChat) new \(backendService.chat.unreadWikiPagesFromChat == 1 ? "page" : "pages") from your conversations")
                             .font(.caption)
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
@@ -27,7 +27,7 @@ struct WikiInsightNotificationView: View {
                     Button {
                         withAnimation(.spring(duration: 0.3)) {
                             showBanner = false
-                            backendService.clearUnreadWikiPages()
+                            backendService.chat.clearUnreadWikiPages()
                         }
                     } label: {
                         Image(systemName: "xmark.circle.fill")
@@ -47,7 +47,7 @@ struct WikiInsightNotificationView: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .onChange(of: backendService.unreadWikiPagesFromChat) { _, newValue in
+        .onChange(of: backendService.chat.unreadWikiPagesFromChat) { _, newValue in
             guard backendService.chatWikiNotify else { return }
             if newValue > 0 {
                 withAnimation(.spring(duration: 0.4)) {

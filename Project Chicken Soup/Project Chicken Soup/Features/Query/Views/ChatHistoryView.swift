@@ -80,7 +80,7 @@ struct ChatHistoryView: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
         .frame(maxWidth: isCompact ? .infinity : 640)
         .padding(.horizontal, DesignConstants.compactPadding)
-        .onChange(of: backendService.unreadWikiPagesFromChat) { _, newValue in
+        .onChange(of: backendService.chat.unreadWikiPagesFromChat) { _, newValue in
             withAnimation(.easeInOut(duration: 0.3)) {
                 showWikiInsight = newValue > 0
             }

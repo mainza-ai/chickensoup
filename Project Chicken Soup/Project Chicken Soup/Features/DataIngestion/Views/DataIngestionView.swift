@@ -675,7 +675,7 @@ struct DataIngestionView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(DesignConstants.secondaryText)
 
-            if let status = backendService.chatIngestStatus {
+            if let status = backendService.chat.chatIngestStatus {
                 VStack(spacing: 12) {
                     HStack {
                         Image(systemName: status.enabled ? "leaf.fill" : "leaf")
@@ -713,9 +713,9 @@ struct DataIngestionView: View {
 
                         Button("Run Now") {
                             Task {
-                                _ = await backendService.triggerChatIngest()
-                                await backendService.fetchChatIngestStatus()
-                                await backendService.fetchChatNotifications()
+                                _ = await backendService.chat.triggerChatIngest()
+                                await backendService.chat.fetchChatIngestStatus()
+                                await backendService.chat.fetchChatNotifications()
                             }
                         }
                         .buttonStyle(.borderedProminent)
@@ -723,14 +723,14 @@ struct DataIngestionView: View {
                         .font(.caption)
                         .frame(maxWidth: .infinity)
 
-                        if !backendService.chatNotifications.isEmpty {
+                        if !backendService.chat.chatNotifications.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("RECENT CONTRIBUTIONS")
                                     .font(.caption)
                                     .bold()
                                     .foregroundStyle(DesignConstants.secondaryText)
 
-                                ForEach(backendService.chatNotifications.prefix(5)) { notification in
+                                ForEach(backendService.chat.chatNotifications.prefix(5)) { notification in
                                     HStack(spacing: 8) {
                                         Image(systemName: "leaf.fill")
                                             .font(.caption)
@@ -768,8 +768,8 @@ struct DataIngestionView: View {
                     Spacer()
                     Button("Check Chat Status") {
                         Task {
-                            await backendService.fetchChatIngestStatus()
-                            await backendService.fetchChatNotifications()
+                            await backendService.chat.fetchChatIngestStatus()
+                            await backendService.chat.fetchChatNotifications()
                         }
                     }
                     .font(.subheadline)

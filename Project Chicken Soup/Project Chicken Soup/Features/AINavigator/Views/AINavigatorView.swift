@@ -15,8 +15,8 @@ struct AINavigatorView: View {
     private var isCompact: Bool { horizontalSizeClass == .compact }
     
     private var currentLLMModel: String {
-        if !backendService.llmActiveModel.isEmpty {
-            return backendService.llmActiveModel
+        if !backendService.config.llmActiveModel.isEmpty {
+            return backendService.config.llmActiveModel
         }
         return "auto-discover"
     }
