@@ -179,7 +179,7 @@ struct GraphExplorerView: View {
                             }
                             
                             // Neighbor Nodes
-                            ForEach(graph.connections) { conn in
+                            ForEach(Array(graph.connections.enumerated()), id: \.element.id) { index, conn in
                                 let entity = conn.neighbor
                                 if let relativePos = currentPositions[entity.id] {
                                     let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
@@ -282,7 +282,7 @@ struct GraphExplorerView: View {
                                 .background(DesignConstants.cardBackground.opacity(0.85))
                                 .liquidGlass()
                                 .padding(.trailing, DesignConstants.standardPadding)
-                                .padding(.bottom, backendService.graph.showChatHistory ? 20 : 16)
+                                .padding(.bottom, isCompact ? (backendService.graph.showChatHistory ? 290 : 90) : (backendService.graph.showChatHistory ? 20 : 16))
                             }
                         }
                     } else {

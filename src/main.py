@@ -525,7 +525,7 @@ async def get_graph_entity(entity: str):
             sources = [str(sources)] if sources else []
             
         simple_entity = {
-            "id": str(uuid.uuid5(uuid.NAMESPACE_DNS, entity_info["name"])),
+            "id": entity_info["name"].lower(),
             "name": entity_info["name"],
             "type": entity_type,
             "summary": props.get("content_preview", props.get("summary", "")),
@@ -551,7 +551,7 @@ async def get_graph_entity(entity: str):
             simple_connections.append({
                 "relationship_type": conn["relationship_type"],
                 "neighbor": {
-                    "id": str(uuid.uuid5(uuid.NAMESPACE_DNS, conn["neighbor_name"])),
+                    "id": conn["neighbor_name"].lower(),
                     "name": conn["neighbor_name"],
                     "type": n_type,
                     "summary": n_props.get("content_preview", n_props.get("summary", "")),
