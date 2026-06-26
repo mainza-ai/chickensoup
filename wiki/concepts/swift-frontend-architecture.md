@@ -66,7 +66,8 @@ Three `@Model` classes stored locally for offline operation:
 - Branch merge sheet (`TimelineBranchMergeSheet`)
 
 ### Knowledge Graph (`Features/KnowledgeGraph/`)
-- Interactive 2D graph with concentric ring layout, drag-to-pan, pinch-to-zoom, connection lines with relationship labels
+- Interactive 2D graph with concentric ring layout, drag-to-pan, pinch-to-zoom, ConnectionLineShape views (animatable SwiftUI Shapes for perfect line/node synchrony during animations and gestures), and relationship labels
+- Zoom controls: dynamically positioned to shift left when AINavigator is open on macOS/iPad (preventing sidebar overlap) and raised on compact iOS viewports to clear the bottom tab bar.
 - Type-colored circles: Person (orange), Place (green), Concept (purple), Project (pink), Object (blue), Event (red)
 - `SidebarDetailsView` (316 lines) with search bar, entity card, relationship list, evidence history
 - `EntityDetailView` (128 lines) entity sheet with edit capabilities

@@ -427,3 +427,19 @@ Added 3 new decisions (tensor summaries, sync merge, wiki edge promotion) with d
 Comprehensive deep dive of wiki vs PROJECT_SPEC.md. Created 6 new entity pages (swiftui-pro, swiftdata-pro, swift-concurrency-pro, swift-testing-pro, s4, github-actions, logging, core-models), updated key-decisions.md to include all 12 decisions, fixed cross-references in pennylane.md, qiskit.md, cuda-q.md, d-wave.md, ionq.md, fixed self-reference in john.md, added key-decisions to ui-ux-design.md related field, fixed exponential-quantum-speedup and quantum-systems titles, moved agent-skills to Concepts section in index.
 ## [2026-06-25] ingest | Deleted wiki page: Vatican UFO Crash Recovery (entities/vatican-ufo-crash-recovery)
 
+## [2026-06-26] fix | Lore Graph Animation Sync & Zoom Controls Overlap
+
+Resolved visual synchrony bugs and overlay obstructions in the SwiftUI client's lore graph exploration interface.
+
+### Changes
+
+- **Connection Rendering**: Replaced the static Canvas component with custom, animatable `ConnectionLineShape` views. This synchronizes line and node positioning within the same SwiftUI transaction, eliminating structural transition drift and visual disconnection when dragging or zooming for the first time on launch.
+- **Controls Positioning**: Shunted the floating zoom controls dynamically left by `340` points when the AI Navigator sidebar is visible on macOS/iPad (`!isCompact && showNavigator`) to prevent menu overlap. 
+- **Tab Bar Clearance**: Raised bottom padding of controls to `105` points in compact iOS views to comfortably clear the system tab bar, removing the redundant dependency on `showChatHistory`.
+- **Alphabetical Sorting**: Enforced deterministic sorting by neighbor name on startup inside `autoSelectInitialEntity`.
+
+### Pages Updated
+
+- [[swift-frontend-architecture]] — Added ConnectionLineShape and zoom controls position details.
+- log.md
+
