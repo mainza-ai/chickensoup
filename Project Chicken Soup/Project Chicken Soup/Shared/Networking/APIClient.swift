@@ -35,6 +35,7 @@ public actor APIClient {
 
     private let session: URLSession
     public private(set) var baseURL: URL
+    public private(set) var apiKey: String = ""
 
     public init(baseURL: URL = URL(string: "http://127.0.0.1:8000")!) {
         let configuration = URLSessionConfiguration.default
@@ -45,6 +46,10 @@ public actor APIClient {
 
     public func updateBaseURL(_ url: URL) {
         self.baseURL = url
+    }
+
+    public func updateAPIKey(_ key: String) {
+        self.apiKey = key
     }
 
     public func request<T: Decodable>(
@@ -75,6 +80,9 @@ public actor APIClient {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        }
         request.httpBody = body
 
         let data: Data
@@ -160,6 +168,9 @@ public actor APIClient {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = method
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        if !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        }
 
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)

@@ -11,33 +11,22 @@ import SwiftData
 @main
 struct Project_Chicken_SoupApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            TemporalEvent.self,
-            TimelineBranch.self,
-            LoreEntity.self
-        ])
+        let schema = Schema(versionedSchema: SchemaV1.self)
         let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: isPreview)
 
         do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            // Seed mock data on main actor on start
+            let container = try ModelContainer(
+                for: schema,
+                migrationPlan: ChickenSoupMigrationPlan.self,
+                configurations: [modelConfiguration]
+            )
             Task { @MainActor in
                 Self.seedMockData(context: container.mainContext)
             }
             return container
         } catch {
-            // Log the failure and retry once (lightweight migration should handle schema evolution)
-            print("ModelContainer initialization failed: \(error.localizedDescription). Retrying...")
-            do {
-                let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-                Task { @MainActor in
-                    Self.seedMockData(context: container.mainContext)
-                }
-                return container
-            } catch {
-                fatalError("Could not create ModelContainer after retry: \(error)")
-            }
+            fatalError("Could not create ModelContainer: \(error)")
         }
     }()
 

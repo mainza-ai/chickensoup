@@ -4,8 +4,10 @@ import os
 import io
 import zipfile
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, status, UploadFile, File
+from fastapi import FastAPI, HTTPException, status, UploadFile, File, Depends
 import redis
+
+from src.api.auth import verify_api_key
 
 from src.config import settings
 from src.discovery import discover_active_provider, get_discovered, get_active_model, get_active_provider, refresh_discovery, probe_provider, get_all_providers
@@ -125,8 +127,8 @@ import time
 from src.observability import tracer, agent_loop_counter, quantum_simulation_duration
 from src.cache import cache_store
 
-# CORS origins
-origins = ["*"]
+# CORS origins — configurable via CORS_ORIGINS env var
+origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 
 app = FastAPI(
     title="Project Chicken Soup API",
@@ -208,7 +210,7 @@ async def get_config():
         llm_providers=llm_providers,
     )
 
-@app.post("/config", response_model=ConfigResponse)
+@app.post("/config", response_model=ConfigResponse, dependencies=[Depends(verify_api_key)])
 async def post_config(request: ConfigRequest):
     """Updates quantum and/or LLM settings and persists to .env."""
     settings.QUANTUM_SIMULATION_BACKEND = request.quantum_backend
@@ -256,7 +258,7 @@ async def post_config(request: ConfigRequest):
         llm_providers=_build_llm_providers(),
     )
 
-@app.post("/config/llm", response_model=LLMConfigResponse)
+@app.post("/config/llm", response_model=LLMConfigResponse, dependencies=[Depends(verify_api_key)])
 async def post_llm_config(request: LLMConfigRequest):
     """Updates LLM provider/model selection, forces fresh probe, persists to .env."""
     if request.llm_active_provider is not None:
@@ -334,8 +336,8 @@ async def get_conversation(conversation_id: str):
         raw = cache_store.get(_conversation_redis_key(conversation_id))
         if raw:
             return {"conversation_id": conversation_id, "history": json.loads(raw)}
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to retrieve conversation {conversation_id}: {e}")
     return {"conversation_id": conversation_id, "history": []}
 
 
@@ -369,7 +371,7 @@ async def get_chat_ingest_status():
     return ChatIngestStatusResponse(**get_status())
 
 
-@app.post("/chat/ingest/now")
+@app.post("/chat/ingest/now", dependencies=[Depends(verify_api_key)])
 async def trigger_chat_ingest():
     """Manually triggers an immediate chat-to-wiki scan."""
     try:
@@ -428,8 +430,8 @@ async def set_user_name(request: SetUserNameRequest):
     if new_slug != current_slug:
         try:
             delete_page(current_slug, page_type="entities")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to delete old user entity page '{current_slug}': {e}")
 
     settings.CHAT_WIKI_USER_ENTITY_NAME = request.name
     return SetUserNameResponse(
@@ -440,7 +442,7 @@ async def set_user_name(request: SetUserNameRequest):
     )
 
 
-@app.post("/query", response_model=QueryResponse)
+@app.post("/query", response_model=QueryResponse, dependencies=[Depends(verify_api_key)])
 async def post_query(request: QueryRequest):
     """Submits a query to search the knowledge graph and generate an answer summary using Orchestrator."""
     try:
@@ -455,8 +457,8 @@ async def post_query(request: QueryRequest):
             raw = cache_store.get(_conversation_redis_key(conversation_id))
             if raw:
                 history = json.loads(raw)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to retrieve conversation history: {e}")
 
         output = await orchestrator.execute(request.query)
         response = _build_query_response(request.query, output, conversation_id=conversation_id, history=history)
@@ -482,18 +484,18 @@ async def post_query(request: QueryRequest):
 
             if message_count >= settings.CHAT_WIKI_MIN_CONVERSATION_LENGTH:
                 add_eligible_conversation(conversation_id)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to store conversation or update meta: {e}")
 
         return response
     except Exception as e:
         logger.error(f"Error handling orchestrated query: {e}")
         return QueryResponse(
             query=request.query,
-            answer=f"Simulation response: The query '{request.query}' relates to anomalous gravitational field theory.",
-            confidence=0.6,
+            answer=f"Error processing query: {str(e)}",
+            confidence=0.0,
             entities=[],
-            sources=["Simulated Fallback Engine"],
+            sources=[],
             inferred_events=[],
             inferred_entities=[],
             conversation_id=request.conversation_id,
@@ -571,7 +573,7 @@ async def get_graph_entity(entity: str):
             detail=f"Database error: {str(e)}"
         )
 
-@app.post("/navigate", response_model=NavigateResponse)
+@app.post("/navigate", response_model=NavigateResponse, dependencies=[Depends(verify_api_key)])
 async def post_navigate(request: NavigateRequest):
     """Computes the optimal path through the warped spacetime manifold using Navigation Agent (offloaded via Celery)."""
     try:
@@ -679,7 +681,7 @@ async def get_quantum_job(job_id: str):
         raise HTTPException(status_code=404, detail="Quantum job not found")
     return job_info
 
-@app.post("/ingest", response_model=IngestResponse)
+@app.post("/ingest", response_model=IngestResponse, dependencies=[Depends(verify_api_key)])
 async def post_ingest(request: IngestRequest):
     """Ingests a new markdown page or document into the Neo4j knowledge graph (offloaded via Celery)."""
     try:
@@ -847,7 +849,7 @@ async def post_ingest_analyze(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 
-@app.post("/ingest/file", response_model=FileIngestResponse)
+@app.post("/ingest/file", response_model=FileIngestResponse, dependencies=[Depends(verify_api_key)])
 async def post_ingest_file(file: UploadFile = File(...)):
     """Uploads a single file, analyzes content via LLM, and creates/updates wiki pages + Neo4j."""
     try:
@@ -864,7 +866,7 @@ async def post_ingest_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"File ingestion failed: {str(e)}")
 
 
-@app.post("/ingest/folder", response_model=FolderIngestResponse)
+@app.post("/ingest/folder", response_model=FolderIngestResponse, dependencies=[Depends(verify_api_key)])
 async def post_ingest_folder(file: UploadFile = File(...)):
     """Uploads a zip archive of files, processes each through the ingest pipeline."""
     try:
@@ -965,8 +967,8 @@ async def websocket_agent_endpoint(websocket: WebSocket):
         logger.error(f"WebSocket error: {e}")
         try:
             await websocket.send_json({"status": "error", "message": str(e)})
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to send WebSocket error message: {e}")
 
 
 @app.get("/entities")
@@ -1013,7 +1015,7 @@ async def get_entities():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/entities/{name}")
+@app.delete("/entities/{name}", dependencies=[Depends(verify_api_key)])
 async def delete_entity(name: str):
     """Deletes a lore entity from Neo4j by name."""
     try:
@@ -1110,12 +1112,14 @@ async def get_events():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/ingest/bulk")
+@app.post("/ingest/bulk", dependencies=[Depends(verify_api_key)])
 async def post_ingest_bulk():
     """Clears the Neo4j database and bulk-ingests all wiki markdown pages."""
     try:
         import os
-        wiki_root = "/Users/mck/Desktop/chickensoup/wiki"
+        wiki_root = settings.WIKI_DATA_DIR
+        if not os.path.isabs(wiki_root):
+            wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
         subdirs = ["concepts", "entities", "projects"]
         
         driver = neo4j_conn.get_driver()
@@ -1164,7 +1168,7 @@ async def post_ingest_bulk():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/wiki/clear-content", response_model=WikiClearResponse)
+@app.post("/wiki/clear-content", response_model=WikiClearResponse, dependencies=[Depends(verify_api_key)])
 async def post_wiki_clear_content():
     """Deletes all CONTENT/SUBJECT wiki pages (UFO/alien/time-travel knowledge),
     preserves CODE/ENGINEERING pages (project architecture, tools, infrastructure).
@@ -1231,7 +1235,7 @@ async def get_wiki_export():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/wiki/import", response_model=WikiImportResponse)
+@app.post("/wiki/import", response_model=WikiImportResponse, dependencies=[Depends(verify_api_key)])
 async def post_wiki_import(file: UploadFile = File(...)):
     """Imports a wiki zip file and restores the wiki directory."""
     try:
@@ -1360,7 +1364,7 @@ async def get_wiki_page(slug: str, page_type: str = "entities"):
     )
 
 
-@app.delete("/wiki/page/{slug:path}", response_model=WikiDeleteResponse)
+@app.delete("/wiki/page/{slug:path}", response_model=WikiDeleteResponse, dependencies=[Depends(verify_api_key)])
 async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = False):
     """Deletes a single wiki page file. Protected pages cannot be deleted."""
     page_data = read_page(slug, page_type)
@@ -1459,8 +1463,8 @@ async def debug_routing(query: str = ""):
     try:
         from src.agents.query_agent import _wiki_entity_lookup
         wiki_matches = _wiki_entity_lookup(query)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Wiki entity lookup failed during debug classify: {e}")
 
     return {
         "query": query,

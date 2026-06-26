@@ -1,9 +1,11 @@
 import Foundation
 import SwiftUI
+import os
 
 @MainActor @Observable
 public final class ConfigService {
     public static let shared = ConfigService()
+    private let logger = Logger(subsystem: "com.projectchickensoup.Project-Chicken-Soup", category: "ConfigService")
 
     public var quantumBackend: String = "numpy"
     public var quantumHardwareEnabled: Bool = false
@@ -47,7 +49,7 @@ public final class ConfigService {
             self.llmActiveModel = response.llmActiveModel
             self.llmAvailableModels = response.llmAvailableModels
         } catch {
-            print("Failed to fetch configurations: \(error.localizedDescription)")
+            logger.error("Failed to fetch configurations: \(error.localizedDescription)")
         }
     }
 
@@ -78,7 +80,7 @@ public final class ConfigService {
             self.llmAvailableModels = response.llmAvailableModels
             return true
         } catch {
-            print("Failed to save configurations: \(error.localizedDescription)")
+            logger.error("Failed to save configurations: \(error.localizedDescription)")
             return false
         }
     }
@@ -102,7 +104,7 @@ public final class ConfigService {
             self.llmAvailableModels = response.llmAvailableModels
             return true
         } catch {
-            print("Failed to save LLM configuration: \(error.localizedDescription)")
+            logger.error("Failed to save LLM configuration: \(error.localizedDescription)")
             return false
         }
     }
@@ -114,7 +116,7 @@ public final class ConfigService {
             self.llmActiveProvider = response.llmActiveProvider
             self.llmActiveModel = response.llmActiveModel
         } catch {
-            print("Failed to refresh LLM discovery: \(error.localizedDescription)")
+            logger.error("Failed to refresh LLM discovery: \(error.localizedDescription)")
         }
     }
 
@@ -127,7 +129,7 @@ public final class ConfigService {
             )
             return (response.provider, response.available, response.models)
         } catch {
-            print("Failed to probe LLM provider '\(name)': \(error.localizedDescription)")
+            logger.error("Failed to probe LLM provider '\(name)': \(error.localizedDescription)")
             return (name, false, [])
         }
     }

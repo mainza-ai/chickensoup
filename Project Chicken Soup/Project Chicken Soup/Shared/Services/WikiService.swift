@@ -1,9 +1,12 @@
 import Foundation
+import os
 import SwiftUI
 
 @MainActor @Observable
 public final class WikiService {
     public static let shared = WikiService()
+
+    private let logger = Logger(subsystem: "com.chickensoup", category: "WikiService")
 
     public var wikiPages: [APIWikiPageListItem] = []
     public var isFetchingWikiPages = false
@@ -29,7 +32,7 @@ public final class WikiService {
             self.wikiPagesError = nil
         } catch {
             self.wikiPagesError = error.localizedDescription
-            print("Failed to fetch wiki pages: \(error.localizedDescription)")
+            logger.error("Failed to fetch wiki pages: \(error.localizedDescription)")
         }
     }
 
@@ -43,7 +46,7 @@ public final class WikiService {
             )
             return response
         } catch {
-            print("Failed to fetch wiki page detail: \(error.localizedDescription)")
+            logger.error("Failed to fetch wiki page detail: \(error.localizedDescription)")
             return nil
         }
     }
@@ -63,7 +66,7 @@ public final class WikiService {
             )
             return response
         } catch {
-            print("Failed to delete wiki page: \(error.localizedDescription)")
+            logger.error("Failed to delete wiki page: \(error.localizedDescription)")
             return nil
         }
     }
@@ -80,7 +83,7 @@ public final class WikiService {
             )
             return response
         } catch {
-            print("Failed to clear wiki content: \(error.localizedDescription)")
+            logger.error("Failed to clear wiki content: \(error.localizedDescription)")
             return nil
         }
     }
@@ -92,7 +95,7 @@ public final class WikiService {
             let response: APIWikiExportResponse = try await APIClient.shared.request(path: "/wiki/export")
             return response
         } catch {
-            print("Failed to export wiki: \(error.localizedDescription)")
+            logger.error("Failed to export wiki: \(error.localizedDescription)")
             return nil
         }
     }
@@ -108,7 +111,7 @@ public final class WikiService {
                 contentType: "application/zip"
             ) as APIWikiImportResponse
         } catch {
-            print("Failed to import wiki: \(error.localizedDescription)")
+            logger.error("Failed to import wiki: \(error.localizedDescription)")
             return nil
         }
     }

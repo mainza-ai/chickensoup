@@ -147,7 +147,7 @@ public struct APIDiscoveryStatus: Codable {
 }
 
 public struct NeighborhoodEntity: Codable, Identifiable, Hashable {
-    public var id: UUID
+    public var id: String
     public var name: String
     public var type: String
     public var summary: String
@@ -167,8 +167,8 @@ public struct NeighborhoodEntity: Codable, Identifiable, Hashable {
         lhs.id == rhs.id
     }
 
-    public init(id: UUID = UUID(), name: String, type: String, summary: String, confidence: Double, source: String, sources: [String]) {
-        self.id = id
+    public init(id: String? = nil, name: String, type: String, summary: String, confidence: Double, source: String, sources: [String]) {
+        self.id = id ?? name.lowercased()
         self.name = name
         self.type = type
         self.summary = summary
@@ -179,7 +179,7 @@ public struct NeighborhoodEntity: Codable, Identifiable, Hashable {
 }
 
 public struct NeighborhoodConnection: Codable, Identifiable {
-    public var id: UUID { neighbor.id }
+    public var id: String { neighbor.id }
     public var relationshipType: String
     public var neighbor: NeighborhoodEntity
     

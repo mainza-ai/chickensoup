@@ -1,10 +1,13 @@
 import Foundation
+import os
 import SwiftData
 import SwiftUI
 
 @MainActor @Observable
 public final class GraphService {
     public static let shared = GraphService()
+
+    private let logger = Logger(subsystem: "com.chickensoup", category: "GraphService")
 
     public var focusedEntityName: String = ""
     public var neighborhood: NeighborhoodResponse? = nil
@@ -29,8 +32,9 @@ public final class GraphService {
         defer { isFetchingNeighborhood = false }
 
         do {
+            let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? name
             let responseDecoded: NeighborhoodResponse = try await APIClient.shared.request(
-                path: "/graph/\(name)"
+                path: "/graph/\(encodedName)"
             )
 
             var uniqueConns: [NeighborhoodConnection] = []
@@ -42,6 +46,7 @@ public final class GraphService {
                     uniqueConns.append(conn)
                 }
             }
+            uniqueConns.sort(by: { $0.neighbor.name.localizedCaseInsensitiveCompare($1.neighbor.name) == .orderedAscending })
 
             let filteredResponse = NeighborhoodResponse(entity: responseDecoded.entity, connections: uniqueConns)
 
@@ -50,7 +55,7 @@ public final class GraphService {
                 self.focusedEntityName = name
             }
         } catch {
-            print("Failed to fetch neighborhood: \(error)")
+            logger.error("Failed to fetch neighborhood: \(error)")
             loadFallbackNeighborhood(for: name, context: context)
         }
     }
@@ -66,7 +71,7 @@ public final class GraphService {
             $0.name.replacingOccurrences(of: " ", with: "-").lowercased() == name.replacingOccurrences(of: " ", with: "-").lowercased()
         }) {
             simpleEntity = NeighborhoodEntity(
-                id: localEntity.id,
+                id: localEntity.name.lowercased(),
                 name: localEntity.name,
                 type: localEntity.type,
                 summary: localEntity.summary,
@@ -76,7 +81,7 @@ public final class GraphService {
             )
         } else {
             simpleEntity = NeighborhoodEntity(
-                id: UUID(),
+                id: name.lowercased(),
                 name: name,
                 type: "Entity",
                 summary: "Lore graph node for \(name). Select or query to discover more.",
@@ -98,7 +103,7 @@ public final class GraphService {
             NeighborhoodConnection(
                 relationshipType: "RELATED_TO",
                 neighbor: NeighborhoodEntity(
-                    id: other.id,
+                    id: other.name.lowercased(),
                     name: other.name,
                     type: other.type,
                     summary: other.summary,
@@ -108,8 +113,9 @@ public final class GraphService {
                 )
             )
         }
+        let sortedConnections = connections.sorted(by: { $0.neighbor.name.localizedCaseInsensitiveCompare($1.neighbor.name) == .orderedAscending })
 
-        let response = NeighborhoodResponse(entity: simpleEntity, connections: Array(connections))
+        let response = NeighborhoodResponse(entity: simpleEntity, connections: sortedConnections)
 
         withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
             self.neighborhood = response

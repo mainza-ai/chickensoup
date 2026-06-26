@@ -1,9 +1,12 @@
 import Foundation
+import os
 import SwiftUI
 
 @MainActor @Observable
 public final class ChatService {
     public static let shared = ChatService()
+
+    private let logger = Logger(subsystem: "com.chickensoup", category: "ChatService")
 
     public var chatIngestStatus: APIChatIngestStatus?
     public var unreadWikiPagesFromChat: Int = 0
@@ -37,7 +40,7 @@ public final class ChatService {
             let status: APIChatIngestStatus = try await APIClient.shared.request(path: "/chat/ingest/status")
             self.chatIngestStatus = status
         } catch {
-            print("Failed to fetch chat ingest status: \(error.localizedDescription)")
+            logger.error("Failed to fetch chat ingest status: \(error.localizedDescription)")
         }
     }
 
@@ -53,7 +56,7 @@ public final class ChatService {
             }
             return response.success
         } catch {
-            print("Failed to trigger chat ingest: \(error.localizedDescription)")
+            logger.error("Failed to trigger chat ingest: \(error.localizedDescription)")
             return false
         }
     }
@@ -70,7 +73,7 @@ public final class ChatService {
             }
             return response.success
         } catch {
-            print("Failed to set user name: \(error.localizedDescription)")
+            logger.error("Failed to set user name: \(error.localizedDescription)")
             return false
         }
     }
@@ -84,7 +87,7 @@ public final class ChatService {
             let response: [String: [APIIngestHistoryEntry]] = try await APIClient.shared.request(path: "/chat/ingest/history")
             self.ingestHistory = response["history"] ?? []
         } catch {
-            print("Failed to fetch ingest history: \(error.localizedDescription)")
+            logger.error("Failed to fetch ingest history: \(error.localizedDescription)")
         }
     }
 
@@ -93,7 +96,7 @@ public final class ChatService {
             let response: [String: [APIChatIngestNotification]] = try await APIClient.shared.request(path: "/chat/ingest/notifications")
             self.chatNotifications = response["notifications"] ?? []
         } catch {
-            print("Failed to fetch chat notifications: \(error.localizedDescription)")
+            logger.error("Failed to fetch chat notifications: \(error.localizedDescription)")
         }
     }
 }

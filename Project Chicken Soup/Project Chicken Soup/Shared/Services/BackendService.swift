@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 import SwiftData
 import SwiftUI
 
@@ -50,6 +51,8 @@ public enum SuggestionCategory: String, CaseIterable {
 @MainActor @Observable
 public final class BackendService {
     public static let shared = BackendService()
+
+    private let logger = Logger(subsystem: "com.chickensoup", category: "BackendService")
     
     public var isFetchingEvents = false
     public var isSubmittingQuery = false
@@ -138,7 +141,7 @@ public final class BackendService {
             try? context.save()
         } catch {
             self.lastError = APIError.requestFailed(error)
-            print("Failed to fetch events from backend: \(error.localizedDescription)")
+            logger.error("Failed to fetch events from backend: \(error.localizedDescription)")
         }
     }
 
@@ -180,7 +183,7 @@ public final class BackendService {
             }
         } catch {
             self.lastError = APIError.requestFailed(error)
-            print("Failed to fetch entities from backend: \(error.localizedDescription)")
+            logger.error("Failed to fetch entities from backend: \(error.localizedDescription)")
         }
     }
 
@@ -192,7 +195,7 @@ public final class BackendService {
             )
             return response.success
         } catch {
-            print("Failed to delete entity '\(name)': \(error)")
+            logger.error("Failed to delete entity '\(name)': \(error)")
             return false
         }
     }
@@ -242,22 +245,8 @@ public final class BackendService {
             return response.responseText
         } catch {
             self.lastError = APIError.requestFailed(error)
-            print("Failed to submit query: \(error.localizedDescription)")
-            try? await Task.sleep(for: .seconds(1.2))
-            let components = text.split(separator: " ")
-            let eventType = components.contains(where: { $0.lowercased() == "crash" }) ? "crash" : "anomaly"
-            let confidence = Double.random(in: 0.85...0.99)
-            let newEvent = TemporalEvent(
-                title: "Inferred: " + text,
-                eventDescription: "AI resolved timeline parameters and verified structural authenticity.",
-                timestamp: Date(),
-                confidence: confidence,
-                source: "AI Navigator (Local Fallback)",
-                type: eventType
-            )
-            context.insert(newEvent)
-            try? context.save()
-            return "Resolved locally: \(text). Extrapolated spacetime alignment parameters."
+            logger.error("Failed to submit query: \(error.localizedDescription)")
+            return nil
         }
     }
 
@@ -271,22 +260,8 @@ public final class BackendService {
             return try await APIClient.shared.request(path: "/simulate", method: "POST", body: bodyData)
         } catch {
             self.lastError = APIError.requestFailed(error)
-            try await Task.sleep(for: .seconds(2.5))
-            
-            let mockLogs = [
-                "Executing PennyLane pathfinding optimization (Local Fallback)...",
-                "Qiskit computed Hamiltonian expectation <H> = \(String(format: "%.3f", Double.random(in: 0.5...0.9)))",
-                "Entangled state resolved: CTC is navigable.",
-                "Geodesic path found! Fallback confidence resolved."
-            ]
-            return APITimeTravelSimulationResponse(
-                success: true,
-                logs: mockLogs,
-                gravityMetric: Double.random(in: 0.2...0.9),
-                velocityMetric: Double.random(in: 0.7...0.99),
-                fieldIntensity: Double.random(in: 0.4...0.8),
-                resolvedPathConfidence: 0.95
-            )
+            logger.error("Failed to solve spacetime geodesic: \(error.localizedDescription)")
+            throw APIError.requestFailed(error)
         }
     }
     

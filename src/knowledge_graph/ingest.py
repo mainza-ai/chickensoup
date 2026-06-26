@@ -11,6 +11,13 @@ from src.discovery import discover_active_provider
 
 logger = logging.getLogger("chickensoup.neo4j.ingest")
 
+# Allowlist of valid Neo4j labels — prevents Cypher injection via user-controlled tags
+VALID_LABELS = frozenset({"Person", "Place", "Concept", "Object", "Project", "Event", "Entity", "Paper", "QuantumPlatform", "Algorithm"})
+
+def _sanitize_label(label: str) -> str:
+    """Validate a label against the allowlist. Returns 'Entity' if invalid."""
+    return label if label in VALID_LABELS else "Entity"
+
 # Enforce a strict type-matching schema layout
 SCHEMA_RELATIONSHIPS = {
     ("Person", "Place"): {"valid": ["VISITED", "BORN_IN", "LOCATED_AT", "TESTIFIED_AT"], "default": "LOCATED_AT"},
@@ -51,11 +58,20 @@ def extract_wiki_links(content: str) -> List[str]:
     link_pattern = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
     return [link.strip() for link in link_pattern.findall(content)]
 
+def _resolve_wiki_root() -> str:
+    """Resolve the wiki root directory from settings."""
+    wiki_dir = settings.WIKI_DATA_DIR
+    if not os.path.isabs(wiki_dir):
+        # Resolve relative to project root (two levels up from this file)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        wiki_dir = os.path.join(project_root, wiki_dir)
+    return wiki_dir
+
 def infer_node_label(name: str) -> str:
     """
     Inspects the local wiki folder structure to pre-infer the primary label of a target node.
     """
-    wiki_root = "/Users/mck/Desktop/chickensoup/wiki"
+    wiki_root = _resolve_wiki_root()
     clean_name = name.lower().replace(" ", "-")
     for subdir, label in [("entities", "Entity"), ("concepts", "Concept"), ("projects", "Project")]:
         file_path = os.path.join(wiki_root, subdir, f"{clean_name}.md")
@@ -209,7 +225,7 @@ def ingest_wiki_page(
     }
     for tag in sorted(tag_strings, key=len, reverse=True):
         if tag in category_map:
-            primary_label = category_map[tag]
+            primary_label = _sanitize_label(category_map[tag])
             break
 
     wiki_links = extract_wiki_links(body)
@@ -231,6 +247,7 @@ def ingest_wiki_page(
         session.run(primary_query, name=title, tags=tags, sources=sources, preview=preview)
         nodes_count += 1
 
+        primary_label = _sanitize_label(primary_label)
         if primary_label != "Entity":
             session.run(f"MATCH (n:Entity {{name: $name}}) SET n:{primary_label}", name=title)
 
@@ -239,7 +256,7 @@ def ingest_wiki_page(
             if not target or target == title:
                 continue
             
-            target_label = infer_node_label(target)
+            target_label = _sanitize_label(infer_node_label(target))
             
             # Create referenced node
             target_query = """

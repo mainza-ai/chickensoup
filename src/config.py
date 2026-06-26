@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     CHAT_WIKI_IDLE_TIMEOUT_MINUTES: int = 30
     CHAT_WIKI_USER_ENTITY_NAME: str = "Primary Researcher"
 
+    # Security
+    API_KEY: str = ""  # Empty = dev mode (no auth required)
+    CORS_ORIGINS: str = "http://127.0.0.1:8000,http://localhost:8000"
+
     # Orchestrator graph timeout (seconds)
     ORCHESTRATOR_TIMEOUT_SECONDS: int = 120
 

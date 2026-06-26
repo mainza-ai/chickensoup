@@ -53,195 +53,55 @@ struct GraphExplorerView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let graph = backendService.graph.neighborhood {
-                    // Compute max radius of concentric rings to calculate scaling factor
-                    let maxRadius: CGFloat = {
-                        let numConnections = graph.connections.count
-                        if numConnections == 0 { return 0 }
-                        
-                        func getRingCapacity(ring: Int) -> Int {
-                            switch ring {
-                            case 0: return 6
-                            case 1: return 12
-                            case 2: return 18
-                            case 3: return 24
-                            default: return 32
-                            }
-                        }
-                        
-                        var tempCount = numConnections
-                        var ring = 0
-                        while tempCount > 0 {
-                            tempCount -= getRingCapacity(ring: ring)
-                            if tempCount > 0 {
-                                ring += 1
-                            }
-                        }
-                        return 150.0 + CGFloat(ring) * 125.0
-                    }()
-                    
-                    let topOffset: CGFloat = 40
-                    let bottomOffset: CGFloat = backendService.graph.showChatHistory ? 220 : 90
-                    let visibleWidth = geometry.size.width - (!isCompact && backendService.graph.showNavigator ? 320 : 0)
-                    let centerY = max(100.0, topOffset + (geometry.size.height - topOffset - bottomOffset) / 2)
-                    let center = CGPoint(x: visibleWidth / 2 + dragOffset.width + accumulatedOffset.width,
-                                         y: centerY + dragOffset.height + accumulatedOffset.height)
-                    
-                    // Determine viewport scaling factor to fit all nodes cleanly inside the canvas
-                    let availableHeight = geometry.size.height - topOffset - bottomOffset
-                    let availableWidth = visibleWidth
-                    let minDimension = min(availableWidth, availableHeight)
-                    let maxAllowedRadius = max(50.0, minDimension / 2.0 - 54.0)
-                    let baseScale = maxRadius > 0 ? min(1.0, max(0.65, maxAllowedRadius / maxRadius)) : 1.0
-                    let scaleFactor = baseScale * zoomScale
-                    
-                    let currentPositions = computeNodePositions(connections: graph.connections)
-                    
-                    ZStack {
-                        // Tap background to reset zoom/pan
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture(count: 2) {
-                                withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
-                                    zoomScale = 1.0
-                                    initialZoomScale = 1.0
-                                    dragOffset = .zero
-                                    accumulatedOffset = .zero
-    }
-}
-                        // Connection Lines
-                        ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
-                            if let neighborPos = currentPositions[conn.neighbor.id] {
-                                let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
-                                let start = center
-                                let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
-                                
-                                let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
-                                let nodeColor: Color = {
-                                    switch guessedType.lowercased() {
-                                    case "person": return DesignConstants.systemOrange
-                                    case "place": return DesignConstants.systemGreen
-                                    case "concept": return DesignConstants.systemPurple
-                                    case "project": return Color.pink
-                                    case "object": return DesignConstants.systemBlue
-                                    case "event": return DesignConstants.systemRed
-                                    default: return DesignConstants.secondaryText
-                                    }
-                                }()
-                                
-                                Path { path in
-                                    path.move(to: start)
-                                    path.addLine(to: end)
-                                }
-                                .stroke(nodeColor.opacity(0.35), lineWidth: 1.5)
-                                
-                                let staggerFactor = 0.42 + 0.16 * Double(index % 2)
-                                let mid = CGPoint(
-                                    x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
-                                    y: start.y + (end.y - start.y) * CGFloat(staggerFactor)
-                                )
-                                
-                                let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ").lowercased()
-                                Text(labelString)
-                                    .font(.system(.caption, design: .monospaced).bold())
-                                    .foregroundStyle(nodeColor.opacity(0.85))
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 2.5)
-                                    .background(DesignConstants.cardBackground.opacity(0.75))
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .position(mid)
-                            }
-                        }
-                        
-                        // Neighbor Nodes
-                        ForEach(graph.connections) { conn in
-                            let entity = conn.neighbor
-                            if let relativePos = currentPositions[entity.id] {
-                                let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
-                                let pos = CGPoint(x: scaledPos.x + center.x, y: scaledPos.y + center.y)
-                                
-                                NodeView(name: entity.name, type: entity.type, isFocused: false, scaleFactor: scaleFactor) {
-                                    selectEntity(name: entity.name)
-                                    #if !os(macOS)
-                                    if horizontalSizeClass == .compact {
-                                        selectedEntityItem = EntitySheetItem(name: entity.name)
-                                    }
-                                    #endif
-                                }
-                                .position(pos)
-                                .transition(.scale.combined(with: .opacity))
-                            }
-                        }
-                        
-                        // Center Focused Node view
-                        NodeView(name: graph.entity.name, type: graph.entity.type, isFocused: true, scaleFactor: scaleFactor) {
-                            #if !os(macOS)
-                            if horizontalSizeClass == .compact {
-                                selectedEntityItem = EntitySheetItem(name: graph.entity.name)
-                            }
-                            #endif
-                        }
-                        .position(center)
-                        .transition(.scale.combined(with: .opacity))
-                    }
-                    .drawingGroup()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .animation(.spring(response: 0.65, dampingFraction: 0.75), value: backendService.graph.neighborhood?.entity.id)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                dragOffset = gesture.translation
-                            }
-                            .onEnded { gesture in
-                                accumulatedOffset.width += gesture.translation.width
-                                accumulatedOffset.height += gesture.translation.height
-                                dragOffset = .zero
-                            }
-                    )
-                    .simultaneousGesture(
-                        MagnifyGesture()
-                            .onChanged { value in
-                                zoomScale = max(0.4, min(2.0, initialZoomScale * value.magnification))
-                            }
-                            .onEnded { _ in
-                                initialZoomScale = zoomScale
-                            }
-                    )
-                    
-                    // Floating Zoom Controls
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
+                    if geometry.size.width > 50 && geometry.size.height > 50 {
+                        // Compute max radius of concentric rings to calculate scaling factor
+                        let maxRadius: CGFloat = {
+                            let numConnections = graph.connections.count
+                            if numConnections == 0 { return 0 }
                             
-                            HStack(spacing: 8) {
-                                Button("Zoom Out", systemImage: "minus.magnifyingglass") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                                        zoomScale = max(0.4, zoomScale - 0.15)
-                                        initialZoomScale = zoomScale
-                                    }
+                            func getRingCapacity(ring: Int) -> Int {
+                                switch ring {
+                                case 0: return 6
+                                case 1: return 12
+                                case 2: return 18
+                                case 3: return 24
+                                default: return 32
                                 }
-                                .buttonStyle(.plain)
-                                .labelStyle(.iconOnly)
-                                .frame(width: 26, height: 26)
-                                .background(DesignConstants.controlBackground, in: Circle())
-                                
-                                Text("\(Int(zoomScale * 100))%")
-                                    .font(.system(.caption, design: .monospaced).bold())
-                                    .foregroundStyle(DesignConstants.primaryText)
-                                    .frame(width: 40)
-                                
-                                Button("Zoom In", systemImage: "plus.magnifyingglass") {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                                        zoomScale = min(2.0, zoomScale + 0.15)
-                                        initialZoomScale = zoomScale
-                                    }
+                            }
+                            
+                            var tempCount = numConnections
+                            var ring = 0
+                            while tempCount > 0 {
+                                tempCount -= getRingCapacity(ring: ring)
+                                if tempCount > 0 {
+                                    ring += 1
                                 }
-                                .buttonStyle(.plain)
-                                .labelStyle(.iconOnly)
-                                .frame(width: 26, height: 26)
-                                .background(DesignConstants.controlBackground, in: Circle())
-                                
-                                Button("Reset Zoom", systemImage: "arrow.counterclockwise") {
+                            }
+                            return 150.0 + CGFloat(ring) * 125.0
+                        }()
+                        
+                        let topOffset: CGFloat = 40
+                        let bottomOffset: CGFloat = backendService.graph.showChatHistory ? 220 : 90
+                        let visibleWidth = geometry.size.width - (!isCompact && backendService.graph.showNavigator ? 320 : 0)
+                        let centerY = max(100.0, topOffset + (geometry.size.height - topOffset - bottomOffset) / 2)
+                        let center = CGPoint(x: visibleWidth / 2 + dragOffset.width + accumulatedOffset.width,
+                                             y: centerY + dragOffset.height + accumulatedOffset.height)
+                        
+                        // Determine viewport scaling factor to fit all nodes cleanly inside the canvas
+                        let availableHeight = geometry.size.height - topOffset - bottomOffset
+                        let availableWidth = visibleWidth
+                        let minDimension = min(availableWidth, availableHeight)
+                        let maxAllowedRadius = max(50.0, minDimension / 2.0 - 54.0)
+                        let baseScale = maxRadius > 0 ? min(1.0, max(0.45, maxAllowedRadius / maxRadius)) : 1.0
+                        let scaleFactor = baseScale * zoomScale
+                        
+                        let currentPositions = computeNodePositions(connections: graph.connections)
+                        
+                        ZStack {
+                            // Tap background to reset zoom/pan
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .onTapGesture(count: 2) {
                                     withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
                                         zoomScale = 1.0
                                         initialZoomScale = 1.0
@@ -249,18 +109,184 @@ struct GraphExplorerView: View {
                                         accumulatedOffset = .zero
                                     }
                                 }
-                                .buttonStyle(.plain)
-                                .labelStyle(.iconOnly)
-                                .frame(width: 26, height: 26)
-                                .background(DesignConstants.controlBackground, in: Circle())
+                            
+                            // Connection Lines (Canvas)
+                            Canvas { context, size in
+                                for conn in graph.connections {
+                                    if let neighborPos = currentPositions[conn.neighbor.id] {
+                                        let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
+                                        let start = center
+                                        let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
+                                        
+                                        let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
+                                        let nodeColor: Color = {
+                                            switch guessedType.lowercased() {
+                                            case "person": return DesignConstants.systemOrange
+                                            case "place": return DesignConstants.systemGreen
+                                            case "concept": return DesignConstants.systemPurple
+                                            case "project": return Color.pink
+                                            case "object": return DesignConstants.systemBlue
+                                            case "event": return DesignConstants.systemRed
+                                            default: return DesignConstants.secondaryText
+                                            }
+                                        }()
+                                        
+                                        var path = Path()
+                                        path.move(to: start)
+                                        path.addLine(to: end)
+                                        context.stroke(path, with: .color(nodeColor.opacity(0.35)), lineWidth: 1.5)
+                                    }
+                                }
                             }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .background(DesignConstants.cardBackground.opacity(0.85))
-                            .liquidGlass()
-                            .padding(.trailing, DesignConstants.standardPadding)
-                            .padding(.bottom, backendService.graph.showChatHistory ? 20 : 16)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            
+                            // Relationship Labels
+                            ForEach(Array(graph.connections.enumerated()), id: \.element.id) { index, conn in
+                                if let neighborPos = currentPositions[conn.neighbor.id] {
+                                    let scaledNeighbor = CGPoint(x: neighborPos.x * scaleFactor, y: neighborPos.y * scaleFactor)
+                                    let start = center
+                                    let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
+                                    
+                                    let staggerFactor = 0.42 + 0.16 * Double(index % 2)
+                                    let mid = CGPoint(
+                                        x: start.x + (end.x - start.x) * CGFloat(staggerFactor),
+                                        y: start.y + (end.y - start.y) * CGFloat(staggerFactor)
+                                    )
+                                    
+                                    let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
+                                    let nodeColor: Color = {
+                                        switch guessedType.lowercased() {
+                                        case "person": return DesignConstants.systemOrange
+                                        case "place": return DesignConstants.systemGreen
+                                        case "concept": return DesignConstants.systemPurple
+                                        case "project": return Color.pink
+                                        case "object": return DesignConstants.systemBlue
+                                        case "event": return DesignConstants.systemRed
+                                        default: return DesignConstants.secondaryText
+                                        }
+                                    }()
+                                    
+                                    let labelString = conn.relationshipType.replacingOccurrences(of: "_", with: " ").lowercased()
+                                    Text(labelString)
+                                        .font(.system(.caption, design: .monospaced).bold())
+                                        .foregroundStyle(nodeColor.opacity(0.85))
+                                        .padding(.horizontal, 5)
+                                        .padding(.vertical, 2.5)
+                                        .background(DesignConstants.cardBackground.opacity(0.75))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                        .position(mid)
+                                }
+                            }
+                            
+                            // Neighbor Nodes
+                            ForEach(graph.connections) { conn in
+                                let entity = conn.neighbor
+                                if let relativePos = currentPositions[entity.id] {
+                                    let scaledPos = CGPoint(x: relativePos.x * scaleFactor, y: relativePos.y * scaleFactor)
+                                    let pos = CGPoint(x: scaledPos.x + center.x, y: scaledPos.y + center.y)
+                                    
+                                    NodeView(name: entity.name, type: entity.type, isFocused: false, scaleFactor: scaleFactor) {
+                                        selectEntity(name: entity.name)
+                                        #if !os(macOS)
+                                        if horizontalSizeClass == .compact {
+                                            selectedEntityItem = EntitySheetItem(name: entity.name)
+                                        }
+                                        #endif
+                                    }
+                                    .position(pos)
+                                }
+                            }
+                            
+                            // Center Focused Node view
+                            NodeView(name: graph.entity.name, type: graph.entity.type, isFocused: true, scaleFactor: scaleFactor) {
+                                #if !os(macOS)
+                                if horizontalSizeClass == .compact {
+                                    selectedEntityItem = EntitySheetItem(name: graph.entity.name)
+                                }
+                                #endif
+                            }
+                            .position(center)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .animation(.spring(response: 0.65, dampingFraction: 0.75), value: backendService.graph.neighborhood?.entity.id)
+                        .gesture(
+                            DragGesture()
+                                .onChanged { gesture in
+                                    dragOffset = gesture.translation
+                                }
+                                .onEnded { gesture in
+                                    accumulatedOffset.width += gesture.translation.width
+                                    accumulatedOffset.height += gesture.translation.height
+                                    dragOffset = .zero
+                                }
+                        )
+                        .simultaneousGesture(
+                            MagnifyGesture()
+                                .onChanged { value in
+                                    zoomScale = max(0.4, min(2.0, initialZoomScale * value.magnification))
+                                }
+                                .onEnded { _ in
+                                    initialZoomScale = zoomScale
+                                }
+                        )
+                        
+                        // Floating Zoom Controls
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                
+                                HStack(spacing: 8) {
+                                    Button("Zoom Out", systemImage: "minus.magnifyingglass") {
+                                        withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                            zoomScale = max(0.4, zoomScale - 0.15)
+                                            initialZoomScale = zoomScale
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .labelStyle(.iconOnly)
+                                    .frame(width: 26, height: 26)
+                                    .background(DesignConstants.controlBackground, in: Circle())
+                                    
+                                    Text("\(Int(zoomScale * 100))%")
+                                        .font(.system(.caption, design: .monospaced).bold())
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                        .frame(width: 40)
+                                    
+                                    Button("Zoom In", systemImage: "plus.magnifyingglass") {
+                                        withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                            zoomScale = min(2.0, zoomScale + 0.15)
+                                            initialZoomScale = zoomScale
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .labelStyle(.iconOnly)
+                                    .frame(width: 26, height: 26)
+                                    .background(DesignConstants.controlBackground, in: Circle())
+                                    
+                                    Button("Reset Zoom", systemImage: "arrow.counterclockwise") {
+                                        withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
+                                            zoomScale = 1.0
+                                            initialZoomScale = 1.0
+                                            dragOffset = .zero
+                                            accumulatedOffset = .zero
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .labelStyle(.iconOnly)
+                                    .frame(width: 26, height: 26)
+                                    .background(DesignConstants.controlBackground, in: Circle())
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .background(DesignConstants.cardBackground.opacity(0.85))
+                                .liquidGlass()
+                                .padding(.trailing, DesignConstants.standardPadding)
+                                .padding(.bottom, backendService.graph.showChatHistory ? 20 : 16)
+                            }
+                        }
+                    } else {
+                        Color.clear
                     }
                 } else {
                     VStack {
@@ -297,8 +323,8 @@ struct GraphExplorerView: View {
         backendService.selectEntity(name, context: modelContext)
     }
     
-    private func computeNodePositions(connections: [NeighborhoodConnection]) -> [UUID: CGPoint] {
-        var newPositions: [UUID: CGPoint] = [:]
+    private func computeNodePositions(connections: [NeighborhoodConnection]) -> [String: CGPoint] {
+        var newPositions: [String: CGPoint] = [:]
         let count = connections.count
         if count == 0 { return [:] }
         
