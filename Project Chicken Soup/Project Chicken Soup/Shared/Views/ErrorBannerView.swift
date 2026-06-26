@@ -37,18 +37,12 @@ struct ErrorBannerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         VStack(spacing: 0) {
-            ErrorBannerView(error: backendService.eventsError ?? backendService.entitiesError ?? backendService.queryError ?? backendService.spacetimeError) {
-                backendService.eventsError = nil
-                backendService.entitiesError = nil
-                backendService.queryError = nil
-                backendService.spacetimeError = nil
+            ErrorBannerView(error: backendService.lastError) {
+                backendService.lastError = nil
             }
             content
         }
-        .animation(.spring(duration: 0.3), value: backendService.eventsError != nil)
-        .animation(.spring(duration: 0.3), value: backendService.entitiesError != nil)
-        .animation(.spring(duration: 0.3), value: backendService.queryError != nil)
-        .animation(.spring(duration: 0.3), value: backendService.spacetimeError != nil)
+        .animation(.spring(duration: 0.3), value: backendService.lastError != nil)
     }
 }
 

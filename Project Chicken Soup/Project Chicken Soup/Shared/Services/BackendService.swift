@@ -58,10 +58,7 @@ public final class BackendService: ObservableObject {
 
     public var conversationId: String? = nil
 
-    @Published public var eventsError: Error?
-    @Published public var entitiesError: Error?
-    @Published public var queryError: Error?
-    @Published public var spacetimeError: Error?
+    @Published public var lastError: APIError?
 
     public let graph = GraphService()
     public let wiki = WikiService()
@@ -151,6 +148,7 @@ public final class BackendService: ObservableObject {
             }
             try? context.save()
         } catch {
+            self.lastError = APIError.requestFailed(error)
             print("Failed to fetch events from backend: \(error.localizedDescription)")
         }
     }
@@ -183,7 +181,7 @@ public final class BackendService: ObservableObject {
 
             let serverEntityIDs = Set(apiEntities.map(\.id))
             let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
-            for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
+            for local in allLocalEntities ?? [] where !serverEventIDs.contains(local.id) {
                 context.delete(local)
             }
             try? context.save()
@@ -192,11 +190,11 @@ public final class BackendService: ObservableObject {
                 await graph.autoSelectInitialEntity(context: context)
             }
         } catch {
+            self.lastError = APIError.requestFailed(error)
             print("Failed to fetch entities from backend: \(error.localizedDescription)")
         }
     }
 
-    @discardableResult
     public func deleteLoreEntity(name: String) async -> Bool {
         do {
             let response: APIEntityDeleteResponse = try await APIClient.shared.request(
@@ -208,13 +206,11 @@ public final class BackendService: ObservableObject {
             return false
         }
     }
-    
-    // MARK: - Execute TQL or Natural Query
+
     public func submitQuery(_ text: String, isStructured: Bool, context: ModelContext) async -> String? {
         isSubmittingQuery = true
-        queryError = nil
         defer { isSubmittingQuery = false }
-        
+
         do {
             var bodyDict: [String: Any] = ["query": text, "structured": isStructured]
             if let cid = conversationId {
@@ -222,13 +218,11 @@ public final class BackendService: ObservableObject {
             }
             let bodyData = try JSONSerialization.data(withJSONObject: bodyDict)
             let response: APIQueryResponse = try await APIClient.shared.request(path: "/query", method: "POST", body: bodyData)
-            
-            // Persist conversation ID for follow-up queries
+
             if let cid = response.conversationId {
                 conversationId = cid
             }
-            
-            // Handle any newly inferred events returned in query response
+
             for apiEvent in response.inferredEvents {
                 let newEvent = TemporalEvent(
                     id: apiEvent.id,
@@ -241,8 +235,7 @@ public final class BackendService: ObservableObject {
                 )
                 context.insert(newEvent)
             }
-            
-            // Handle inferred entities
+
             for apiEntity in response.inferredEntities {
                 let newEntity = LoreEntity(
                     id: apiEntity.id,
@@ -254,21 +247,16 @@ public final class BackendService: ObservableObject {
                 )
                 context.insert(newEntity)
             }
-            
+
             try? context.save()
             return response.responseText
         } catch {
-            self.queryError = error
+            self.lastError = APIError.requestFailed(error)
             print("Failed to submit query: \(error.localizedDescription)")
-            
-            // Fallback Simulation when server is offline
             try? await Task.sleep(for: .seconds(1.2))
-            
-            // Simulate the addition of a new dynamic temporal event from AI query response
             let components = text.split(separator: " ")
             let eventType = components.contains(where: { $0.lowercased() == "crash" }) ? "crash" : "anomaly"
             let confidence = Double.random(in: 0.85...0.99)
-            
             let newEvent = TemporalEvent(
                 title: "Inferred: " + text,
                 eventDescription: "AI resolved timeline parameters and verified structural authenticity.",
@@ -282,20 +270,17 @@ public final class BackendService: ObservableObject {
             return "Resolved locally: \(text). Extrapolated spacetime alignment parameters."
         }
     }
-    
-    // MARK: - Simulate Spacetime Geodesic (Time Travel)
+
     public func solveSpacetimeGeodesic(gravity: Double, velocity: Double, intensity: Double) async throws -> APITimeTravelSimulationResponse {
         isSolvingSpacetime = true
-        spacetimeError = nil
         defer { isSolvingSpacetime = false }
-        
+
         do {
             let bodyDict: [String: Any] = ["gravity": gravity, "velocity": velocity, "intensity": intensity]
             let bodyData = try JSONSerialization.data(withJSONObject: bodyDict)
             return try await APIClient.shared.request(path: "/simulate", method: "POST", body: bodyData)
         } catch {
-            self.spacetimeError = error
-            // Fallback simulation internally
+            self.lastError = APIError.requestFailed(error)
             try await Task.sleep(for: .seconds(2.5))
             
             let mockLogs = [
