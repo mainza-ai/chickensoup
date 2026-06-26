@@ -95,3 +95,41 @@ def test_api_query_endpoint(client, mock_neo4j):
         assert "Roswell Craft" in data["answer"]
         assert data["confidence"] == 0.95
         assert data["entities"] == ["Roswell Craft"]
+
+def test_api_ingest_bulk(client, mock_neo4j):
+    from unittest.mock import mock_open
+    mock_driver = MagicMock()
+    mock_neo4j.get_driver.return_value = mock_driver
+
+    with patch("src.main.ingest_wiki_page", return_value=(2, 3)):
+        with patch("os.path.exists", return_value=True):
+            with patch("os.listdir", return_value=["alien-encounter.md"]):
+                with patch("builtins.open", mock_open(read_data="---\ntags: [ufo]\n---\nTest body")):
+                    response = client.post("/ingest/bulk")
+                    assert response.status_code == 200
+                    data = response.json()
+                    assert data["success"] is True
+                    assert data["pages_ingested"] > 0
+                    assert data["nodes_created"] > 0
+
+def test_api_clear_content(client, mock_neo4j):
+    mock_driver = MagicMock()
+    mock_neo4j.get_driver.return_value = mock_driver
+
+    mock_clear_res = {
+        "success": True,
+        "dry_run": False,
+        "preserved_count": 5,
+        "deleted_count": 10,
+        "protected_added_count": 2,
+        "preserved_slugs": ["entities/aldo-rebelo"],
+        "deleted_slugs": ["entities/roswell-crash"]
+    }
+
+    with patch("src.wiki.cleanup.clear_content_pages", return_value=mock_clear_res):
+        response = client.post("/wiki/clear-content")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["preserved_count"] == 5
+        assert data["deleted_count"] == 10

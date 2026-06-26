@@ -9,6 +9,7 @@ from neo4j import Driver
 from src.knowledge_graph.connection import neo4j_conn
 from src.discovery import discover_active_provider
 from src.cache import cache_decorator
+from src.config import settings
 
 logger = logging.getLogger("chickensoup.neo4j.ingest")
 
@@ -243,7 +244,7 @@ def ingest_wiki_page(
         MERGE (n:Entity {name: $name})
         ON CREATE SET n.tags = $tags, n.sources = $sources, n.content_preview = $preview, n.confidence = 1.0
         ON MATCH SET n.tags = $tags, n.sources = $sources, n.content_preview = $preview
-        RETURN id(n)
+        RETURN elementId(n)
         """
         preview = body[:300] + "..." if len(body) > 300 else body
         session.run(primary_query, name=title, tags=tags, sources=sources, preview=preview)
@@ -264,7 +265,7 @@ def ingest_wiki_page(
             target_query = """
             MERGE (t:Entity {name: $target_name})
             ON CREATE SET t.confidence = 0.5
-            RETURN id(t)
+            RETURN elementId(t)
             """
             session.run(target_query, target_name=target)
             nodes_count += 1
@@ -275,22 +276,22 @@ def ingest_wiki_page(
             # Classify edge type
             rel_type, reverse = _query_llm_for_edge_type(title, primary_label, target, target_label, body)
             
-            # Draw relationship in the correct semantic direction
+            # Draw relationship in the correct semantic direction using :Entity matching
             if reverse:
                 rel_query = f"""
-                MATCH (n:{primary_label} {{name: $name}})
-                MATCH (t:{target_label} {{name: $target_name}})
+                MATCH (n:Entity {{name: $name}})
+                MATCH (t:Entity {{name: $target_name}})
                 MERGE (t)-[r:{rel_type}]->(n)
                 ON CREATE SET r.confidence = 0.8
-                RETURN id(r)
+                RETURN elementId(r)
                 """
             else:
                 rel_query = f"""
-                MATCH (n:{primary_label} {{name: $name}})
-                MATCH (t:{target_label} {{name: $target_name}})
+                MATCH (n:Entity {{name: $name}})
+                MATCH (t:Entity {{name: $target_name}})
                 MERGE (n)-[r:{rel_type}]->(t)
                 ON CREATE SET r.confidence = 0.8
-                RETURN id(r)
+                RETURN elementId(r)
                 """
             session.run(rel_query, name=title, target_name=target)
             rels_count += 1
