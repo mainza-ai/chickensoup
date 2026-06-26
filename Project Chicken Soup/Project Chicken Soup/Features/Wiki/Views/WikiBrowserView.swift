@@ -24,58 +24,59 @@ struct WikiBrowserView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let error = backendService.wikiPagesError {
-                HStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(DesignConstants.systemRed)
-                    Text("Error loading wiki: \(error)")
-                        .font(.caption)
-                        .foregroundStyle(DesignConstants.systemRed)
-                    Spacer()
-                    Button("Retry") {
-                        Task { await backendService.fetchWikiPages() }
-                    }
-                    .font(.caption)
-                    .buttonStyle(.bordered)
-                    .tint(DesignConstants.systemRed)
-                }
-                .padding(.horizontal, DesignConstants.standardPadding)
-                .padding(.vertical, 8)
-                .background(DesignConstants.systemRed.opacity(0.1))
-            }
-            filterBar
-            Divider()
+        List {
             if backendService.isFetchingWikiPages && backendService.wikiPages.isEmpty {
-                Spacer()
-                ProgressView("Loading wiki pages...")
-                Spacer()
-            } else if filteredPages.isEmpty {
-                Spacer()
-                VStack(spacing: 8) {
-                    Image(systemName: "book.closed")
-                        .font(.largeTitle)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    Text("No wiki pages found")
-                        .font(.subheadline)
-                        .foregroundStyle(DesignConstants.secondaryText)
+                Section {
+                    HStack {
+                        Spacer()
+                        ProgressView("Loading wiki pages...")
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
                 }
-                Spacer()
+            } else if backendService.wikiPagesError != nil {
+                Section {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(DesignConstants.systemRed)
+                        Text(backendService.wikiPagesError!)
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.systemRed)
+                        Spacer()
+                        Button("Retry") {
+                            Task { await backendService.fetchWikiPages() }
+                        }
+                        .font(.caption)
+                        .buttonStyle(.bordered)
+                        .tint(DesignConstants.systemRed)
+                    }
+                    .listRowBackground(Color.clear)
+                }
+            } else if filteredPages.isEmpty {
+                Section {
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 8) {
+                            Image(systemName: "book.closed")
+                                .font(.largeTitle)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                            Text("No wiki pages found")
+                                .font(.subheadline)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                                .padding(.top, 4)
+                        }
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
+                }
             } else {
-                List {
+                Section {
                     ForEach(filteredPages) { page in
-                        Button {
-                            Task {
-                                let detail = await backendService.fetchWikiPageDetail(slug: page.slug, pageType: page.pageType)
-                                if let detail = detail {
-                                    selectedPage = detail
-                                    showPageDetail = true
-                                }
-                            }
+                        NavigationLink {
+                            WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
                         } label: {
                             WikiPageRow(page: page)
                         }
-                        .buttonStyle(.plain)
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             if !page.protected {
                                 Button("Delete", role: .destructive) {
@@ -86,15 +87,28 @@ struct WikiBrowserView: View {
                         }
                     }
                 }
-                .listStyle(.plain)
-                .refreshable {
-                    await backendService.fetchWikiPages()
-                }
             }
         }
-        .navigationTitle("Wiki Pages")
+        .listStyle(.plain)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search by title or tag...")
+        .navigationTitle("Wiki Pages (\(filteredPages.count))")
         .task {
             await backendService.fetchWikiPages()
+        }
+        .refreshable {
+            await backendService.fetchWikiPages()
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Picker("Type", selection: $selectedType) {
+                    Text("All").tag(nil as String?)
+                    Text("Entities").tag("entities" as String?)
+                    Text("Concepts").tag("concepts" as String?)
+                    Text("Projects").tag("projects" as String?)
+                }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 320)
+            }
         }
         .sheet(isPresented: $showPageDetail) {
             if let detail = selectedPage {
@@ -117,40 +131,6 @@ struct WikiBrowserView: View {
         } message: { page in
             Text("Delete '\(page.title)'? This removes the page from disk and Neo4j graph. Cross-references will be cleaned up.")
         }
-    }
-
-    private var filterBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(DesignConstants.secondaryText)
-            TextField("Search by title or tag...", text: $searchText)
-                .textFieldStyle(.plain)
-                .font(.subheadline)
-            Spacer()
-            typeFilterButton("All", type: nil)
-            typeFilterButton("Entities", type: "entities")
-            typeFilterButton("Concepts", type: "concepts")
-            typeFilterButton("Projects", type: "projects")
-        }
-        .padding(.horizontal, DesignConstants.standardPadding)
-        .padding(.vertical, 8)
-    }
-
-    private func typeFilterButton(_ label: String, type: String?) -> some View {
-        Button(label) {
-            selectedType = selectedType == type ? nil : type
-        }
-        .font(.caption2)
-        .fontWeight(.bold)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(selectedType == type ? DesignConstants.systemBlue.opacity(0.2) : Color.clear)
-        .foregroundStyle(selectedType == type ? DesignConstants.systemBlue : DesignConstants.secondaryText)
-        .clipShape(Capsule())
-        .overlay(
-            Capsule()
-                .stroke(selectedType == type ? DesignConstants.systemBlue.opacity(0.4) : DesignConstants.dividerColor, lineWidth: 1)
-        )
     }
 }
 
@@ -204,6 +184,34 @@ struct WikiPageRow: View {
         case "concepts": return DesignConstants.systemPurple
         case "projects": return DesignConstants.systemGreenText
         default: return DesignConstants.secondaryText
+        }
+    }
+}
+
+// MARK: - Wiki Page Loader (async detail fetch)
+
+class WikiPageLoader: ObservableObject {
+    @Published var detail: APIWikiPageDetail? = nil
+    @Published var isLoading = false
+    @Published var error: String? = nil
+
+    let slug: String
+    let pageType: String
+
+    init(slug: String, pageType: String) {
+        self.slug = slug
+        self.pageType = pageType
+    }
+
+    @MainActor
+    func load() async {
+        isLoading = true
+        let result = await BackendService.shared.fetchWikiPageDetail(slug: slug, pageType: pageType)
+        isLoading = false
+        if let detail = result {
+            self.detail = detail
+        } else {
+            self.error = "Failed to load page detail"
         }
     }
 }
