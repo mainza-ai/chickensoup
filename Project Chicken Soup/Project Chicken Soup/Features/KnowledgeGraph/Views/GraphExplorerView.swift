@@ -12,8 +12,7 @@ struct GraphExplorerView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LoreEntity.name) private var allEntities: [LoreEntity]
     
-    @ObservedObject var backendService = BackendService.shared
-    @State private var nodePositions: [UUID: CGPoint] = [:]
+    var backendService = BackendService.shared
     
     @State private var dragOffset = CGSize.zero
     @State private var accumulatedOffset = CGSize.zero
@@ -31,11 +30,13 @@ struct GraphExplorerView: View {
     
     var body: some View {
         GeometryReader { geometry in
+            let _ = geometry.size // force re-read on layout changes
             ZStack(alignment: .top) {
                 // 1. Grid Background
                 GridBackgroundView()
                     .background(DesignConstants.cardBackground)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .drawingGroup()
                 
                 // 2. Main Content Canvas
                 if allEntities.isEmpty {
@@ -93,8 +94,7 @@ struct GraphExplorerView: View {
                     let baseScale = maxRadius > 0 ? min(1.0, max(0.65, maxAllowedRadius / maxRadius)) : 1.0
                     let scaleFactor = baseScale * zoomScale
                     
-                    let computedPositions = computeNodePositions(connections: graph.connections)
-                    let currentPositions = graph.connections.allSatisfy { nodePositions[$0.neighbor.id] != nil } ? nodePositions : computedPositions
+                    let currentPositions = computeNodePositions(connections: graph.connections)
                     
                     ZStack {
                         // Tap background to reset zoom/pan
@@ -108,35 +108,6 @@ struct GraphExplorerView: View {
                                     accumulatedOffset = .zero
     }
 }
-
-// MARK: - Shared type guessing utility (file scope, accessible from both GraphExplorerView and NodeView)
-
-func guessEntityType(name: String, currentType: String) -> String {
-    let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-    if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
-        return currentType
-    }
-
-    let lower = name.lowercased()
-    if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
-        return "Person"
-    }
-    if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
-        return "Place"
-    }
-    if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
-        return "Event"
-    }
-    if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
-        return "Project"
-    }
-    if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
-        return "Object"
-    }
-    return "Concept"
-}
-
-
                         // Connection Lines
                         ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
                             if let neighborPos = currentPositions[conn.neighbor.id] {
@@ -212,7 +183,9 @@ func guessEntityType(name: String, currentType: String) -> String {
                         .position(center)
                         .transition(.scale.combined(with: .opacity))
                     }
+                    .drawingGroup()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .animation(.spring(response: 0.65, dampingFraction: 0.75), value: backendService.graph.neighborhood?.entity.id)
                     .gesture(
                         DragGesture()
                             .onChanged { gesture in
@@ -297,25 +270,14 @@ func guessEntityType(name: String, currentType: String) -> String {
                 }
             }
         }
+        .ignoresSafeArea()
         .onAppear {
             dragOffset = .zero
             accumulatedOffset = .zero
-            if !backendService.graph.focusedEntityName.isEmpty {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    if let graph = backendService.graph.neighborhood {
-                        nodePositions = computeNodePositions(connections: graph.connections)
-                    }
-                }
-            }
         }
         .onChange(of: backendService.graph.neighborhood?.entity.id) { _, _ in
-            if let graph = backendService.graph.neighborhood {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    nodePositions = computeNodePositions(connections: graph.connections)
-                    dragOffset = .zero
-                    accumulatedOffset = .zero
-                }
-            }
+            dragOffset = .zero
+            accumulatedOffset = .zero
         }
         #if !os(macOS)
         .sheet(item: $selectedEntityItem) { item in
@@ -400,6 +362,33 @@ struct GridBackgroundView: View {
     }
 }
 
+// MARK: - Shared type guessing utility (file scope, accessible from both GraphExplorerView and NodeView)
+
+func guessEntityType(name: String, currentType: String) -> String {
+    let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
+        return currentType
+    }
+
+    let lower = name.lowercased()
+    if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
+        return "Person"
+    }
+    if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
+        return "Place"
+    }
+    if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
+        return "Event"
+    }
+    if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
+        return "Project"
+    }
+    if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
+        return "Object"
+    }
+    return "Concept"
+}
+
 struct NodeView: View {
     let name: String
     let type: String
@@ -412,6 +401,7 @@ struct NodeView: View {
     var body: some View {
         let guessedType = guessEntityType(name: name, currentType: type)
         let size = (isFocused ? 48.0 : 36.0) * max(0.5, min(1.2, scaleFactor))
+        let buttonSize = max(44.0, size + 16)
         
         let nodeColor: Color = {
             switch guessedType.lowercased() {
@@ -437,56 +427,54 @@ struct NodeView: View {
             }
         }()
         
-        VStack(spacing: 4) {
-            Button(action: action) {
-                ZStack {
-                    // Outer glow
-                    Circle()
-                        .fill(nodeColor.opacity(isFocused ? 0.3 : 0.15))
-                        .frame(width: size + 16, height: size + 16)
-                        .blur(radius: 6)
-                        .scaleEffect(isHovered ? 1.15 : 1.0)
-                    
-                    // Glassmorphic border
-                    Circle()
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [.white.opacity(0.4), nodeColor.opacity(0.8), .clear],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: isFocused ? 2.5 : 1.5
+        Button(action: action) {
+            ZStack {
+                // Outer glow
+                Circle()
+                    .fill(nodeColor.opacity(isFocused ? 0.3 : 0.15))
+                    .frame(width: size + 16, height: size + 16)
+                    .blur(radius: 6)
+                    .scaleEffect(isHovered ? 1.15 : 1.0)
+                
+                // Glassmorphic border
+                Circle()
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [.white.opacity(0.4), nodeColor.opacity(0.8), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: isFocused ? 2.5 : 1.5
+                    )
+                    .frame(width: size + 4, height: size + 4)
+                
+                // Central type-gradient fill
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [nodeColor, nodeColor.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
-                        .frame(width: size + 4, height: size + 4)
-                    
-                    // Central type-gradient fill
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [nodeColor, nodeColor.opacity(0.6)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: size, height: size)
-                        .shadow(color: nodeColor.opacity(0.35), radius: 6, x: 0, y: 3)
-                    
-                    // SF Symbol Icon
-                    Image(systemName: symbol)
-                        .font(.system(size: (isFocused ? 18 : 13) * max(0.5, min(1.2, scaleFactor)), weight: .bold))
-                        .foregroundStyle(.white)
-                }
+                    )
+                    .frame(width: size, height: size)
+                    .shadow(color: nodeColor.opacity(0.35), radius: 6, x: 0, y: 3)
+                
+                // SF Symbol Icon
+                Image(systemName: symbol)
+                    .font(.system(size: (isFocused ? 18 : 13) * max(0.5, min(1.2, scaleFactor)), weight: .bold))
+                    .foregroundStyle(.white)
             }
-            .buttonStyle(.plain)
-            .frame(minWidth: 44, minHeight: 44)
-            .contentShape(Rectangle())
-            .scaleEffect(isHovered ? 1.08 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
-            .onHover { hovering in
-                isHovered = hovering
-            }
-            
-            // Multi-line word-wrapped label text
+        }
+        .buttonStyle(.plain)
+        .frame(width: buttonSize, height: buttonSize)
+        .contentShape(Rectangle())
+        .scaleEffect(isHovered ? 1.08 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .overlay(alignment: .top) {
             let formattedName = name.replacingOccurrences(of: "-", with: " ").capitalized
             Text(formattedName)
                 .font(.system(.caption, design: .rounded).weight(isFocused ? .bold : .semibold))
@@ -495,6 +483,7 @@ struct NodeView: View {
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(width: 85 * max(0.6, min(1.2, scaleFactor)))
+                .offset(y: buttonSize + 4)
         }
     }
 }

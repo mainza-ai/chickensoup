@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct WikiBrowserView: View {
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
     @Environment(\.modelContext) private var modelContext
 
     @State private var searchText = ""
@@ -37,7 +37,7 @@ struct WikiBrowserView: View {
                         WikiPageCell(page: page, onDelete: {
                             pageToDelete = page
                             showDeleteConfirmation = true
-                        }, navigateToPage: $navigateToPage)
+                        })
                     }
                 }
             }

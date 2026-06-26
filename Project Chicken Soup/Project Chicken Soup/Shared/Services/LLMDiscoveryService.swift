@@ -6,23 +6,22 @@
 //
 
 import Foundation
-import Combine
 
-@MainActor
-public final class LLMDiscoveryService: ObservableObject {
+@MainActor @Observable
+public final class LLMDiscoveryService {
     public static let shared = LLMDiscoveryService()
     
-    @Published public private(set) var discoveryChain: [APIDiscoveryStatus] = [
+    public private(set) var discoveryChain: [APIDiscoveryStatus] = [
         APIDiscoveryStatus(modelName: "oMLX", isAvailable: false, isCurrent: false, latencyMs: 0.0),
         APIDiscoveryStatus(modelName: "Ollama", isAvailable: false, isCurrent: false, latencyMs: 0.0),
         APIDiscoveryStatus(modelName: "LM Studio", isAvailable: false, isCurrent: false, latencyMs: 0.0)
     ]
-    @Published public private(set) var isRefreshing = false
+    public private(set) var isRefreshing = false
     
-    @Published public var availableModels: [String] = []
-    @Published public var selectedModel: String = ""
-    @Published public var activeProvider: String = ""
-    @Published public var providerStates: [String: Bool] = [:]
+    public var availableModels: [String] = []
+    public var selectedModel: String = ""
+    public var activeProvider: String = ""
+    public var providerStates: [String: Bool] = [:]
     
     private init() {}
     

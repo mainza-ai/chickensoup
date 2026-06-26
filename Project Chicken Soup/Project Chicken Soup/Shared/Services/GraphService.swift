@@ -2,18 +2,18 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-@MainActor
-public final class GraphService: ObservableObject {
+@MainActor @Observable
+public final class GraphService {
     public static let shared = GraphService()
 
-    @Published public var focusedEntityName: String = ""
-    @Published public var neighborhood: NeighborhoodResponse? = nil
-    @Published public var isFetchingNeighborhood = false
+    public var focusedEntityName: String = ""
+    public var neighborhood: NeighborhoodResponse? = nil
+    public var isFetchingNeighborhood = false
 
-    @Published public var canGoBack = false
-    @Published public var canGoForward = false
-    @Published public var showNavigator = true
-    @Published public var showChatHistory = false
+    public var canGoBack = false
+    public var canGoForward = false
+    public var showNavigator = true
+    public var showChatHistory = false
 
     private var backStack: [String] = []
     private var forwardStack: [String] = []

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AINavigatorView: View {
-    @ObservedObject var discoveryService = LLMDiscoveryService.shared
-    @ObservedObject var backendService = BackendService.shared
+    var discoveryService = LLMDiscoveryService.shared
+    var backendService = BackendService.shared
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var isCompact: Bool { horizontalSizeClass == .compact }

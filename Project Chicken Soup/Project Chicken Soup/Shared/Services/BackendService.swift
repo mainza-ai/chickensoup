@@ -8,7 +8,6 @@
 import Foundation
 import SwiftData
 import SwiftUI
-import Combine
 
 public struct SuggestionItem: Identifiable, Equatable {
     public var id = UUID()
@@ -48,34 +47,24 @@ public enum SuggestionCategory: String, CaseIterable {
     }
 }
 
-@MainActor
-public final class BackendService: ObservableObject {
+@MainActor @Observable
+public final class BackendService {
     public static let shared = BackendService()
     
-    @Published public var isFetchingEvents = false
-    @Published public var isSubmittingQuery = false
-    @Published public var isSolvingSpacetime = false
+    public var isFetchingEvents = false
+    public var isSubmittingQuery = false
+    public var isSolvingSpacetime = false
 
     public var conversationId: String? = nil
 
-    @Published public var lastError: APIError?
+    public var lastError: APIError?
 
-    public let graph = GraphService()
-    public let wiki = WikiService()
-    public let chat = ChatService()
-    public let config = ConfigService()
+    public let graph = GraphService.shared
+    public let wiki = WikiService.shared
+    public let chat = ChatService.shared
+    public let config = ConfigService.shared
 
-    private init() {
-        let forward: (AnyObject) -> Void = { [weak self] _ in
-            self?.objectWillChange.send()
-        }
-        graph.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
-        wiki.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
-        chat.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
-        config.objectWillChange.sink(receiveValue: forward).store(in: &cancellables)
-    }
-
-    private var cancellables = Set<AnyCancellable>()
+    private init() {}
     
     // MARK: - Merge Helpers (previously in SyncService)
 
@@ -181,7 +170,7 @@ public final class BackendService: ObservableObject {
 
             let serverEntityIDs = Set(apiEntities.map(\.id))
             let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
-            for local in allLocalEntities ?? [] where !serverEventIDs.contains(local.id) {
+            for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
                 context.delete(local)
             }
             try? context.save()
@@ -195,6 +184,7 @@ public final class BackendService: ObservableObject {
         }
     }
 
+    @discardableResult
     public func deleteLoreEntity(name: String) async -> Bool {
         do {
             let response: APIEntityDeleteResponse = try await APIClient.shared.request(
@@ -346,7 +336,7 @@ public final class BackendService: ObservableObject {
         await chat.fetchChatNotifications()
     }
 
-    @Published public var suggestions: [SuggestionItem] = []
+    public var suggestions: [SuggestionItem] = []
 
     func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
         var results: [SuggestionItem] = []
@@ -355,7 +345,7 @@ public final class BackendService: ObservableObject {
         if !focusedName.isEmpty {
             results.append(SuggestionItem(text: "What is \(focusedName)?", category: .entity))
             results.append(SuggestionItem(text: "Evidence for \(focusedName)", category: .entity))
-            if let neighborhood = neighborhood {
+            if let neighborhood = graph.neighborhood {
                 for conn in neighborhood.connections.prefix(2) {
                     results.append(SuggestionItem(
                         text: "How does \(conn.neighbor.name) relate to \(focusedName)?",

@@ -15,7 +15,7 @@ struct ChatHistoryView: View {
     @State private var scrollToBottom = false
     @State private var showWikiInsight = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
     
     private var isCompact: Bool { horizontalSizeClass == .compact }
     

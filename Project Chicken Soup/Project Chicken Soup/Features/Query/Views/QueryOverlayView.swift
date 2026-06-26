@@ -18,7 +18,7 @@ struct QueryOverlayView: View {
     @State private var isExpanded = false
     @FocusState private var isFocused: Bool
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @ObservedObject private var backendService = BackendService.shared
+    var backendService = BackendService.shared
     
     private var isCompact: Bool { horizontalSizeClass == .compact }
     

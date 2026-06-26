@@ -3,7 +3,7 @@ import SwiftData
 
 struct LoreRepositoryView: View {
     @Query(sort: \LoreEntity.name) private var localEntities: [LoreEntity]
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
 
     @State private var searchText = ""
     @State private var typeFilter: String? = nil

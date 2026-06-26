@@ -1,24 +1,24 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-public final class ConfigService: ObservableObject {
+@MainActor @Observable
+public final class ConfigService {
     public static let shared = ConfigService()
 
-    @Published public var quantumBackend: String = "numpy"
-    @Published public var quantumHardwareEnabled: Bool = false
-    @Published public var ibmApiTokenSet: Bool = false
-    @Published public var dwaveApiTokenSet: Bool = false
-    @Published public var ionqApiTokenSet: Bool = false
-    @Published public var isFetchingConfig = false
-    @Published public var isSavingConfig = false
+    public var quantumBackend: String = "numpy"
+    public var quantumHardwareEnabled: Bool = false
+    public var ibmApiTokenSet: Bool = false
+    public var dwaveApiTokenSet: Bool = false
+    public var ionqApiTokenSet: Bool = false
+    public var isFetchingConfig = false
+    public var isSavingConfig = false
 
-    @Published public var llmActiveProvider: String = ""
-    @Published public var llmActiveModel: String = ""
-    @Published public var llmAvailableModels: [String] = []
-    @Published public var isSavingLLMConfig = false
+    public var llmActiveProvider: String = ""
+    public var llmActiveModel: String = ""
+    public var llmAvailableModels: [String] = []
+    public var isSavingLLMConfig = false
 
-    @Published public var isDarkMode: Bool = {
+    public var isDarkMode: Bool = {
         if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
             return true
         }

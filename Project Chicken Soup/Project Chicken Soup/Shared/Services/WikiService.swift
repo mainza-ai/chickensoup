@@ -1,17 +1,17 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-public final class WikiService: ObservableObject {
+@MainActor @Observable
+public final class WikiService {
     public static let shared = WikiService()
 
-    @Published public var wikiPages: [APIWikiPageListItem] = []
-    @Published public var isFetchingWikiPages = false
-    @Published public var isDeletingWikiPage = false
-    @Published public var wikiPagesError: String? = nil
+    public var wikiPages: [APIWikiPageListItem] = []
+    public var isFetchingWikiPages = false
+    public var isDeletingWikiPage = false
+    public var wikiPagesError: String? = nil
 
-    @Published public var isClearingWiki = false
-    @Published public var isExportingWiki = false
+    public var isClearingWiki = false
+    public var isExportingWiki = false
 
     private init() {}
 

@@ -33,7 +33,7 @@ struct ErrorBannerView: View {
 }
 
 struct ErrorBannerModifier: ViewModifier {
-    @ObservedObject var backendService: BackendService
+    var backendService: BackendService
 
     func body(content: Content) -> some View {
         VStack(spacing: 0) {

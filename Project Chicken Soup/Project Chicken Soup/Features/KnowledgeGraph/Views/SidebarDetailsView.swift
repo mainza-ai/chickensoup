@@ -12,7 +12,7 @@ struct SidebarDetailsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LoreEntity.name) private var allEntities: [LoreEntity]
     
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
     @State private var searchText = ""
     @State private var showSuggestions = false
     

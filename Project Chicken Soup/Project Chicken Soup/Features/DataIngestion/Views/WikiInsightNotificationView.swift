@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct WikiInsightNotificationView: View {
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
     @State private var showBanner = false
 
     var body: some View {
@@ -48,7 +48,7 @@ struct WikiInsightNotificationView: View {
             }
         }
         .onChange(of: backendService.chat.unreadWikiPagesFromChat) { _, newValue in
-            guard backendService.chatWikiNotify else { return }
+            guard backendService.chat.chatWikiNotify else { return }
             if newValue > 0 {
                 withAnimation(.spring(duration: 0.4)) {
                     showBanner = true

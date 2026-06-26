@@ -15,7 +15,7 @@ struct TemporalTimelineView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
     
     private var isCompact: Bool { horizontalSizeClass == .compact }
     

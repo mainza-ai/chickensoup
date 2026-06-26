@@ -29,8 +29,8 @@ struct ContentView: View {
     @State private var activeDetailTab: DetailTab = .graph
     
     // Inject services
-    @ObservedObject var backendService = BackendService.shared
-    @ObservedObject var discoveryService = LLMDiscoveryService.shared
+    var backendService = BackendService.shared
+    var discoveryService = LLMDiscoveryService.shared
     
     // Support adaptive size classes
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -70,7 +70,7 @@ struct ContentView: View {
         await backendService.fetchTemporalEvents(context: modelContext)
         await backendService.fetchLoreEntities(context: modelContext)
         await discoveryService.discoverActiveModels()
-        if backendService.isChatWikiConversionEnabled {
+        if backendService.chat.isChatWikiConversionEnabled {
             await backendService.chat.fetchChatIngestStatus()
         }
     }

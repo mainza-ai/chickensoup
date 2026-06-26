@@ -6,7 +6,7 @@ struct DataIngestionView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LoreEntity.name) private var localEntities: [LoreEntity]
 
-    @ObservedObject var backendService = BackendService.shared
+    var backendService = BackendService.shared
 
     @State private var isDraggingOver = false
     @State private var uploadedFiles: [String] = []
@@ -1060,15 +1060,13 @@ struct DataIngestionView: View {
                     DispatchQueue.main.async { isBulkIngesting = false }
                 }
                 do {
-                    let result: APIFileIngestResponse? = try? await APIClient.shared.uploadMultipart(
+                    let _: APIFileIngestResponse = try await APIClient.shared.uploadMultipart(
                         path: "/ingest/folder",
                         fileData: data,
                         filename: url.lastPathComponent,
                         contentType: "application/zip"
                     )
-                    if result != nil {
-                        refreshAfterIngest()
-                    }
+                    refreshAfterIngest()
                 } catch {
                     await MainActor.run {
                         ingestError = "Folder upload failed: \(error.localizedDescription)"
@@ -1148,7 +1146,7 @@ struct DataIngestionView: View {
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     await backendService.refreshAfterIngest(context: modelContext)
                     if !backendService.graph.focusedEntityName.isEmpty {
-                        await await backendService.graph.fetchNeighborhood(for: backendService.graph.focusedEntityName, context: modelContext)
+                        await backendService.graph.fetchNeighborhood(for: backendService.graph.focusedEntityName, context: modelContext)
                     }
                 }
             } catch {

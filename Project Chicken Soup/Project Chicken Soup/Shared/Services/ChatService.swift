@@ -1,13 +1,13 @@
 import Foundation
 import SwiftUI
 
-@MainActor
-public final class ChatService: ObservableObject {
+@MainActor @Observable
+public final class ChatService {
     public static let shared = ChatService()
 
-    @Published public var chatIngestStatus: APIChatIngestStatus?
-    @Published public var unreadWikiPagesFromChat: Int = 0
-    @Published public var chatNotifications: [APIChatIngestNotification] = []
+    public var chatIngestStatus: APIChatIngestStatus?
+    public var unreadWikiPagesFromChat: Int = 0
+    public var chatNotifications: [APIChatIngestNotification] = []
     public var ingestHistory: [APIIngestHistoryEntry] = []
 
     public var isChatWikiConversionEnabled: Bool {
