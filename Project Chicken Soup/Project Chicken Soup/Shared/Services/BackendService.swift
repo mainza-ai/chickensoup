@@ -203,6 +203,22 @@ public final class BackendService: ObservableObject {
             print("Failed to fetch entities from backend: \(error.localizedDescription)")
         }
     }
+
+    @discardableResult
+    public func deleteLoreEntity(name: String) async -> Bool {
+        guard let url = URL(string: "http://127.0.0.1:8000/entities/\(name)") else { return false }
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return false }
+            let result = try JSONDecoder().decode(APIEntityDeleteResponse.self, from: data)
+            return result.success
+        } catch {
+            print("Failed to delete entity '\(name)': \(error)")
+            return false
+        }
+    }
     
     // MARK: - Execute TQL or Natural Query
     public func submitQuery(_ text: String, isStructured: Bool, context: ModelContext) async -> String? {
@@ -675,6 +691,58 @@ public final class BackendService: ObservableObject {
             return try JSONDecoder().decode(APIWikiImportResponse.self, from: data)
         } catch {
             print("Failed to import wiki: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    // MARK: - Wiki Page CRUD
+    @Published public var wikiPages: [APIWikiPageListItem] = []
+    @Published public var isFetchingWikiPages = false
+    @Published public var isDeletingWikiPage = false
+    @Published public var wikiPagesError: String? = nil
+
+    public func fetchWikiPages(pageType: String? = nil) async {
+        isFetchingWikiPages = true
+        defer { isFetchingWikiPages = false }
+        do {
+            let queryItems: [URLQueryItem]? = pageType.map { [URLQueryItem(name: "page_type", value: $0)] }
+            let response: APIWikiPageListResponse = try await APIClient.shared.request(
+                path: "/wiki/pages", queryItems: queryItems
+            )
+            self.wikiPages = response.pages
+            self.wikiPagesError = nil
+        } catch {
+            self.wikiPagesError = error.localizedDescription
+            print("Failed to fetch wiki pages: \(error.localizedDescription)")
+        }
+    }
+
+    public func fetchWikiPageDetail(slug: String, pageType: String) async -> APIWikiPageDetail? {
+        do {
+            let response: APIWikiPageDetail = try await APIClient.shared.request(
+                path: "/wiki/page/\(slug)",
+                queryItems: [URLQueryItem(name: "page_type", value: pageType)]
+            )
+            return response
+        } catch {
+            print("Failed to fetch wiki page detail: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func deleteWikiPage(slug: String, pageType: String, hard: Bool = false) async -> APIWikiDeleteResponse? {
+        isDeletingWikiPage = true
+        defer { isDeletingWikiPage = false }
+        do {
+            var queryItems = [URLQueryItem(name: "page_type", value: pageType)]
+            if hard { queryItems.append(URLQueryItem(name: "hard", value: "true")) }
+            let bodyData = try JSONSerialization.data(withJSONObject: [:])
+            let response: APIWikiDeleteResponse = try await APIClient.shared.request(
+                path: "/wiki/page/\(slug)", method: "DELETE", body: bodyData, queryItems: queryItems
+            )
+            return response
+        } catch {
+            print("Failed to delete wiki page: \(error.localizedDescription)")
             return nil
         }
     }

@@ -20,8 +20,6 @@ struct DataIngestionView: View {
     @State private var selectedFileURL: URL?
     @State private var selectedFileName: String = ""
 
-    @State private var selectedEntityForEdit: LoreEntity? = nil
-
     @State private var analysisResult: APIAnalyzeResponse? = nil
     @State private var commitResult: APIFileIngestResponse? = nil
     @State private var folderResult: APIFolderIngestResponse? = nil
@@ -29,6 +27,8 @@ struct DataIngestionView: View {
     @State private var showClearConfirmation = false
     @State private var clearResult: APIWikiClearResponse? = nil
     @State private var showClearResult = false
+    @State private var showWikiBrowser = false
+    @State private var isLoreExpanded = true
 
     @Namespace private var animationNamespace
 
@@ -86,8 +86,30 @@ struct DataIngestionView: View {
                 clearContentSection
                     .padding(.horizontal)
 
-                localIngestOverview
+                wikiBrowserSection
                     .padding(.horizontal)
+
+                DisclosureGroup(
+                    isExpanded: $isLoreExpanded,
+                    content: {
+                        LoreRepositoryView()
+                    },
+                    label: {
+                        HStack {
+                            Text("LORE REPOSITORY")
+                                .font(.footnote)
+                                .fontWeight(.bold)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                            Spacer()
+                            if !isLoreExpanded {
+                                Text("\(localEntities.count) entities")
+                                    .font(.caption2)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                            }
+                        }
+                    }
+                )
+                .padding(.horizontal)
             }
             .padding(.vertical, DesignConstants.standardPadding)
         }
@@ -125,11 +147,13 @@ struct DataIngestionView: View {
             }
         }
         #endif
-        .sheet(item: $selectedEntityForEdit) { entity in
-            EditAnnotationSheet(entity: entity) { updatedEntity in
-                syncService.queueSync(entityId: updatedEntity.id, type: "LoreEntity", action: "update")
-                selectedEntityForEdit = nil
+        .sheet(isPresented: $showWikiBrowser) {
+            NavigationStack {
+                WikiBrowserView()
             }
+        }
+        .refreshable {
+            await backendService.fetchLoreEntities(context: modelContext)
         }
     }
 
@@ -214,7 +238,7 @@ struct DataIngestionView: View {
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
             HStack {
-                Image(systemName: syncService.isSyncing ? "arrow.triangle.2.circlepath" : "cloud.checkmark.fill")
+                Image(systemName: syncService.isSyncing ? "arrow.triangle.2.circlepath" : "checkmark.icloud.fill")
                     .foregroundStyle(syncService.isSyncing ? DesignConstants.systemOrange : DesignConstants.systemGreen)
                     .symbolEffect(.pulse, isActive: syncService.isSyncing)
                 Text("\(syncService.pendingSyncCount) pending")
@@ -636,72 +660,7 @@ struct DataIngestionView: View {
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
-    // MARK: - Ingested Overview List
-
-    private var localIngestOverview: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("LORE REPOSITORY")
-                .font(.footnote)
-                .fontWeight(.bold)
-                .foregroundStyle(DesignConstants.secondaryText)
-
-            if localEntities.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "archivebox")
-                        .font(.largeTitle)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    Text("No local lore entities cataloged yet.")
-                        .font(.subheadline)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-            } else {
-                LazyVStack(spacing: DesignConstants.compactPadding) {
-                    ForEach(localEntities) { entity in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(entity.name)
-                                    .font(.body)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(DesignConstants.primaryText)
-
-                                Text(entity.summary)
-                                    .font(.caption)
-                                    .foregroundStyle(DesignConstants.secondaryText)
-                                    .lineLimit(2)
-                            }
-
-                            Spacer()
-
-                            VStack(alignment: .trailing, spacing: 4) {
-                                Text(entity.type)
-                                    .font(.caption2)
-                                    .fontWeight(.bold)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(DesignConstants.systemBlue.opacity(0.15))
-                                    .foregroundStyle(DesignConstants.systemBlue)
-                                    .clipShape(Capsule())
-
-                                Text("Notes: \(entity.userNotes.isEmpty ? "None" : entity.userNotes)")
-                                    .font(.caption2)
-                                    .foregroundStyle(DesignConstants.secondaryText)
-                                    .lineLimit(1)
-                            }
-                        }
-                        .padding()
-                        .background(DesignConstants.cardBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
-                        .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
-                        .onTapGesture {
-                            selectedEntityForEdit = entity
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // MARK: - Ingested Overview List (moved to LoreRepositoryView.swift)
 
     // MARK: - Chat Contributions
 
@@ -935,6 +894,27 @@ struct DataIngestionView: View {
                     Text("This will permanently delete all UFO/alien/time-travel knowledge pages from the wiki. Engineering documentation, code architecture pages, your user profile, and the projects folder will be preserved. The knowledge graph will also be cleared and rebuilt from the remaining pages. This cannot be undone.")
                 }
             }
+        }
+    }
+
+    // MARK: - Wiki Browser
+
+    private var wikiBrowserSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("WIKI PAGES")
+                .font(.footnote)
+                .fontWeight(.bold)
+                .foregroundStyle(DesignConstants.secondaryText)
+
+            Text("Browse, search, and manage all \(backendService.wikiPages.count) wiki pages")
+                .font(.caption)
+                .foregroundStyle(DesignConstants.secondaryText)
+
+            Button("Browse Wiki (\(backendService.wikiPages.count))", systemImage: "book") {
+                showWikiBrowser = true
+            }
+            .buttonStyle(.bordered)
+            .tint(DesignConstants.systemBlue)
         }
     }
 

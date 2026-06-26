@@ -154,6 +154,41 @@ class WikiImportResponse(BaseModel):
     success: bool
     restored_count: int = 0
 
+class WikiPageListItem(BaseModel):
+    slug: str
+    title: str
+    page_type: str
+    tags: List[str] = Field(default_factory=list)
+    created: str = ""
+    updated: str = ""
+    protected: bool = False
+
+class WikiPageListResponse(BaseModel):
+    success: bool
+    pages: List[WikiPageListItem] = Field(default_factory=list)
+    total: int = 0
+
+class WikiPageDetailResponse(BaseModel):
+    success: bool
+    slug: str = ""
+    title: str = ""
+    page_type: str = ""
+    tags: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+    related: List[str] = Field(default_factory=list)
+    body: str = ""
+    created: str = ""
+    updated: str = ""
+    protected: bool = False
+
+class WikiDeleteResponse(BaseModel):
+    success: bool
+    slug: str = ""
+    page_type: str = ""
+    title: str = ""
+    neo4j_cleaned: bool = False
+    cross_refs_cleaned: int = 0
+
 class ConversationMetaResponse(BaseModel):
     id: str
     message_count: int = 0

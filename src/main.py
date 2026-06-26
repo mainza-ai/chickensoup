@@ -20,6 +20,7 @@ from src.models import (
     ConversationMetaResponse, ChatIngestStatusResponse,
     SetUserNameRequest, SetUserNameResponse,
     WikiClearResponse, WikiExportResponse, WikiImportResponse,
+    WikiPageListItem, WikiPageListResponse, WikiPageDetailResponse, WikiDeleteResponse,
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -30,7 +31,7 @@ from src.field_manipulator.cuda_simulation import manipulate_spacetime_field
 from src.ai_navigator.pennylane_qml import find_optimal_path
 from src.agents.orchestrator import Orchestrator
 from src.agents.ingest_agent import IngestAgent
-from src.wiki.writer import write_page, append_to_index, append_to_log, slugify, cross_reference_new_page, invalidate_index_cache
+from src.wiki.writer import write_page, append_to_index, append_to_log, slugify, cross_reference_new_page, invalidate_index_cache, delete_page, read_page
 from src.mcp.tools import mcp
 
 ingest_agent = IngestAgent()
@@ -1012,6 +1013,23 @@ async def get_entities():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.delete("/entities/{name}")
+async def delete_entity(name: str):
+    """Deletes a lore entity from Neo4j by name."""
+    try:
+        driver = neo4j_conn.get_driver()
+        if not driver:
+            return {"success": False, "deleted": False}
+        with driver.session() as session:
+            result = session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n RETURN count(n)", name=name)
+            count = result.single()[0]
+            logger.info(f"Deleted entity '{name}' from Neo4j (nodes removed: {count})")
+            return {"success": True, "deleted": count > 0}
+    except Exception as e:
+        logger.error(f"Failed to delete entity '{name}': {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/events")
 async def get_events():
     """Retrieves all Temporal Events (Event nodes) from the Neo4j database."""
@@ -1281,6 +1299,142 @@ async def create_wiki_backup_now():
     from src.wiki.backup import create_snapshot
     path = create_snapshot(name=f"manual-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
     return {"success": path is not None, "filepath": path}
+
+
+@app.get("/wiki/pages", response_model=WikiPageListResponse)
+async def get_wiki_pages(page_type: Optional[str] = None):
+    """Lists all wiki pages with frontmatter metadata. Optionally filter by page_type."""
+    wiki_root = settings.WIKI_DATA_DIR
+    if not os.path.isabs(wiki_root):
+        wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
+    subdirs = ["entities", "concepts", "projects"]
+    if page_type:
+        subdirs = [s for s in subdirs if s == page_type]
+    pages = []
+    for subdir in subdirs:
+        dir_path = os.path.join(wiki_root, subdir)
+        if not os.path.isdir(dir_path):
+            continue
+        for fname in sorted(os.listdir(dir_path)):
+            if not fname.endswith(".md"):
+                continue
+            slug = fname[:-3]
+            page_data = read_page(slug, subdir)
+            if not page_data:
+                continue
+            fm = page_data["frontmatter"]
+            try:
+                pages.append(WikiPageListItem(
+                    slug=slug,
+                    title=fm.get("title", slug),
+                    page_type=subdir,
+                    tags=fm.get("tags", []),
+                    created=str(fm.get("created", "")),
+                    updated=str(fm.get("updated", "")),
+                    protected=fm.get("protected", False),
+                ))
+            except Exception as e:
+                logger.warning(f"Skipping page {slug}/{subdir} due to validation error: {e}")
+    return WikiPageListResponse(success=True, pages=pages, total=len(pages))
+
+
+@app.get("/wiki/page/{slug:path}", response_model=WikiPageDetailResponse)
+async def get_wiki_page(slug: str, page_type: str = "entities"):
+    """Returns full detail for a single wiki page."""
+    page_data = read_page(slug, page_type)
+    if not page_data:
+        raise HTTPException(status_code=404, detail=f"Wiki page '{slug}' not found in {page_type}")
+    fm = page_data["frontmatter"]
+    return WikiPageDetailResponse(
+        success=True,
+        slug=slug,
+        title=fm.get("title", slug),
+        page_type=page_type,
+        tags=fm.get("tags", []),
+        sources=fm.get("sources", []),
+        related=fm.get("related", []),
+        body=page_data["body"],
+        created=fm.get("created", ""),
+        updated=fm.get("updated", ""),
+        protected=fm.get("protected", False),
+    )
+
+
+@app.delete("/wiki/page/{slug:path}", response_model=WikiDeleteResponse)
+async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = False):
+    """Deletes a single wiki page file. Protected pages cannot be deleted."""
+    page_data = read_page(slug, page_type)
+    if not page_data:
+        raise HTTPException(status_code=404, detail=f"Wiki page '{slug}' not found in {page_type}")
+    fm = page_data["frontmatter"]
+    title = fm.get("title", slug)
+
+    if fm.get("protected", False):
+        raise HTTPException(status_code=403, detail=f"Wiki page '{title}' is protected and cannot be deleted")
+
+    deleted = delete_page(slug, page_type)
+    if not deleted:
+        raise HTTPException(status_code=500, detail=f"Failed to delete wiki page '{slug}'")
+
+    neo4j_cleaned = False
+    try:
+        driver = neo4j_conn.get_driver()
+        if driver:
+            with driver.session() as session:
+                session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n", name=title)
+                neo4j_cleaned = True
+    except Exception as e:
+        logger.warning(f"Neo4j cleanup skipped for deleted page '{title}': {e}")
+
+    cross_refs_cleaned = 0
+    if hard:
+        wiki_root = settings.WIKI_DATA_DIR
+        if not os.path.isabs(wiki_root):
+            wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
+        try:
+            for subdir in ["entities", "concepts", "projects"]:
+                dir_path = os.path.join(wiki_root, subdir)
+                if not os.path.isdir(dir_path):
+                    continue
+                for fname in os.listdir(dir_path):
+                    if not fname.endswith(".md"):
+                        continue
+                    fslug = fname[:-3]
+                    if fslug == slug:
+                        continue
+                    pdata = read_page(fslug, subdir)
+                    if not pdata:
+                        continue
+                    rel = set(pdata["frontmatter"].get("related", []))
+                    removed = False
+                    for ref in list(rel):
+                        if slugify(ref) == slug or ref == title:
+                            rel.discard(ref)
+                            removed = True
+                    if removed:
+                        write_page(
+                            title=pdata["frontmatter"].get("title", fslug),
+                            body=pdata["body"],
+                            tags=pdata["frontmatter"].get("tags", []),
+                            sources=pdata["frontmatter"].get("sources", []),
+                            related=list(rel),
+                            page_type=subdir,
+                        )
+                        cross_refs_cleaned += 1
+        except Exception as e:
+            logger.warning(f"Cross-reference cleanup failed: {e}")
+
+    invalidate_index_cache()
+    append_to_log(f"Deleted wiki page: {title} ({page_type}/{slug})")
+
+    return WikiDeleteResponse(
+        success=True,
+        slug=slug,
+        page_type=page_type,
+        title=title,
+        neo4j_cleaned=neo4j_cleaned,
+        cross_refs_cleaned=cross_refs_cleaned,
+    )
 
 
 @app.get("/debug/routing")

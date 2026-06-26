@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from datetime import date
+from datetime import date, datetime
 from typing import Optional, Dict, Any, List, Tuple
 import yaml
 
@@ -35,6 +35,16 @@ def read_page(slug: str, page_type: str = "entities") -> Optional[Dict[str, Any]
         except Exception:
             pass
         body = content[yaml_match.end():]
+
+    if isinstance(meta, dict):
+        for key in ("created", "updated"):
+            if isinstance(meta.get(key), (date, datetime)):
+                meta[key] = meta[key].isoformat()
+        if "tags" in meta:
+            if isinstance(meta["tags"], str):
+                meta["tags"] = [meta["tags"]]
+            else:
+                meta["tags"] = [str(t) for t in meta["tags"]]
     return {"frontmatter": meta, "body": body, "path": path}
 
 def write_page(

@@ -576,3 +576,129 @@ public struct APIFolderIngestResponse: Codable {
         self.fileResults = fileResults
     }
 }
+
+// MARK: - Entity Delete
+
+public struct APIEntityDeleteResponse: Codable {
+    public var success: Bool
+    public var deleted: Bool
+
+    public init(success: Bool, deleted: Bool) {
+        self.success = success
+        self.deleted = deleted
+    }
+}
+
+// MARK: - Wiki Page CRUD
+
+public struct APIWikiPageListItem: Codable, Identifiable {
+    public var id: String { slug }
+    public var slug: String
+    public var title: String
+    public var pageType: String
+    public var tags: [String]
+    public var created: String
+    public var updated: String
+    public var protected: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case slug
+        case title
+        case pageType = "page_type"
+        case tags
+        case created
+        case updated
+        case protected
+    }
+
+    public init(slug: String, title: String, pageType: String, tags: [String], created: String, updated: String, protected: Bool) {
+        self.slug = slug
+        self.title = title
+        self.pageType = pageType
+        self.tags = tags
+        self.created = created
+        self.updated = updated
+        self.protected = protected
+    }
+}
+
+public struct APIWikiPageListResponse: Codable {
+    public var success: Bool
+    public var pages: [APIWikiPageListItem]
+    public var total: Int
+
+    public init(success: Bool, pages: [APIWikiPageListItem], total: Int) {
+        self.success = success
+        self.pages = pages
+        self.total = total
+    }
+}
+
+public struct APIWikiPageDetail: Codable {
+    public var success: Bool
+    public var slug: String
+    public var title: String
+    public var pageType: String
+    public var tags: [String]
+    public var sources: [String]
+    public var related: [String]
+    public var body: String
+    public var created: String
+    public var updated: String
+    public var protected: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case slug
+        case title
+        case pageType = "page_type"
+        case tags
+        case sources
+        case related
+        case body
+        case created
+        case updated
+        case protected
+    }
+
+    public init(success: Bool, slug: String, title: String, pageType: String, tags: [String], sources: [String], related: [String], body: String, created: String, updated: String, protected: Bool) {
+        self.success = success
+        self.slug = slug
+        self.title = title
+        self.pageType = pageType
+        self.tags = tags
+        self.sources = sources
+        self.related = related
+        self.body = body
+        self.created = created
+        self.updated = updated
+        self.protected = protected
+    }
+}
+
+public struct APIWikiDeleteResponse: Codable {
+    public var success: Bool
+    public var slug: String
+    public var pageType: String
+    public var title: String
+    public var neo4jCleaned: Bool
+    public var crossRefsCleaned: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case slug
+        case pageType = "page_type"
+        case title
+        case neo4jCleaned = "neo4j_cleaned"
+        case crossRefsCleaned = "cross_refs_cleaned"
+    }
+
+    public init(success: Bool, slug: String, pageType: String, title: String, neo4jCleaned: Bool, crossRefsCleaned: Int) {
+        self.success = success
+        self.slug = slug
+        self.pageType = pageType
+        self.title = title
+        self.neo4jCleaned = neo4jCleaned
+        self.crossRefsCleaned = crossRefsCleaned
+    }
+}

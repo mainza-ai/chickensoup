@@ -189,16 +189,28 @@ def ingest_wiki_page(
     
     # Determine primary label
     primary_label = "Entity"
-    if "concept" in tags:
-        primary_label = "Concept"
-    elif "project" in tags:
-        primary_label = "Project"
-    elif "person" in tags:
-        primary_label = "Person"
-    elif "place" in tags:
-        primary_label = "Place"
-    elif "event" in tags:
-        primary_label = "Event"
+    tag_strings = set(str(t).lower() for t in tags)
+    category_map = {
+        "person": "Person", "people": "Person", "whistleblower": "Person",
+        "scientist": "Person", "researcher": "Person", "witness": "Person",
+        "witnesses": "Person", "military": "Person", "agent": "Person",
+        "place": "Place", "location": "Place", "locations": "Place",
+        "area": "Place", "country": "Place", "city": "Place",
+        "event": "Event", "events": "Event", "crash": "Event",
+        "incident": "Event", "encounter": "Event", "sighting": "Event",
+        "accident": "Event", "recovery": "Event", "landing": "Event",
+        "concept": "Concept", "theory": "Concept", "idea": "Concept",
+        "principle": "Concept", "model": "Concept", "framework": "Concept",
+        "project": "Project", "program": "Project", "experiment": "Project",
+        "mission": "Project", "operation": "Project",
+        "object": "Object", "craft": "Object", "artifact": "Object",
+        "device": "Object", "technology": "Object", "weapon": "Object",
+        "material": "Object", "element": "Object",
+    }
+    for tag in sorted(tag_strings, key=len, reverse=True):
+        if tag in category_map:
+            primary_label = category_map[tag]
+            break
 
     wiki_links = extract_wiki_links(body)
     all_targets = list(set(related + wiki_links))
