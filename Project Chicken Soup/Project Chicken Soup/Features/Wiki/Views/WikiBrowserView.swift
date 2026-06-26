@@ -83,14 +83,14 @@ struct WikiBrowserView: View {
             }
             #endif
         }
+        #if os(macOS)
         .onDeleteCommand {
-            #if os(macOS)
             if let page = selectedPage, !page.protected {
                 pageToDelete = page
                 showDeleteConfirmation = true
             }
-            #endif
         }
+        #endif
         .alert("Delete Wiki Entry", isPresented: $showDeleteConfirmation, presenting: pageToDelete) { page in
             Button("Cancel", role: .cancel) {
                 pageToDelete = nil

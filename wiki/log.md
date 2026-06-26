@@ -425,3 +425,5 @@ Added 3 new decisions (tensor summaries, sync merge, wiki edge promotion) with d
 ## [2026-06-22] update | Deep Dive — Fixed Issues
 
 Comprehensive deep dive of wiki vs PROJECT_SPEC.md. Created 6 new entity pages (swiftui-pro, swiftdata-pro, swift-concurrency-pro, swift-testing-pro, s4, github-actions, logging, core-models), updated key-decisions.md to include all 12 decisions, fixed cross-references in pennylane.md, qiskit.md, cuda-q.md, d-wave.md, ionq.md, fixed self-reference in john.md, added key-decisions to ui-ux-design.md related field, fixed exponential-quantum-speedup and quantum-systems titles, moved agent-skills to Concepts section in index.
+## [2026-06-25] ingest | Deleted wiki page: Vatican UFO Crash Recovery (entities/vatican-ufo-crash-recovery)
+
