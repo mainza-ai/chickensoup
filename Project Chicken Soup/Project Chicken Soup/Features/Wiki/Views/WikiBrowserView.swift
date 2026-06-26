@@ -25,81 +25,18 @@ struct WikiBrowserView: View {
     var body: some View {
         List(selection: $selectedPage) {
             if backendService.isFetchingWikiPages && backendService.wikiPages.isEmpty {
-                Section {
-                    HStack {
-                        Spacer()
-                        ProgressView("Loading wiki pages...")
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                }
+                loadingSection
             } else if let error = backendService.wikiPagesError {
-                Section {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(DesignConstants.systemRed)
-                        Text(error)
-                            .font(.caption)
-                            .foregroundStyle(DesignConstants.systemRed)
-                        Spacer()
-                        Button("Retry") {
-                            Task { await backendService.fetchWikiPages() }
-                        }
-                        .font(.caption)
-                        .buttonStyle(.bordered)
-                        .tint(DesignConstants.systemRed)
-                    }
-                    .listRowBackground(Color.clear)
-                }
+                errorSection(error)
             } else if filteredPages.isEmpty {
-                Section {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Image(systemName: "book.closed")
-                                .font(.largeTitle)
-                                .foregroundStyle(DesignConstants.secondaryText)
-                            Text("No wiki pages found")
-                                .font(.subheadline)
-                                .foregroundStyle(DesignConstants.secondaryText)
-                                .padding(.top, 4)
-                        }
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                }
+                emptySection
             } else {
                 Section {
                     ForEach(filteredPages) { page in
-                        #if os(macOS)
-                        WikiPageRow(page: page)
-                            .tag(page)
-                            .onTapGesture(count: 2) {
-                                navigateToPage = page
-                            }
-                        #else
-                        NavigationLink(value: page) {
-                            WikiPageRow(page: page)
-                        }
-                        #endif
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            if !page.protected {
-                                Button("Delete", role: .destructive) {
-                                    pageToDelete = page
-                                    showDeleteConfirmation = true
-                                }
-                            }
-                        }
-                        .contextMenu {
-                            if !page.protected {
-                                Button(role: .destructive) {
-                                    pageToDelete = page
-                                    showDeleteConfirmation = true
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                        }
+                        WikiPageCell(page: page, onDelete: {
+                            pageToDelete = page
+                            showDeleteConfirmation = true
+                        }, navigateToPage: $navigateToPage)
                     }
                 }
             }
@@ -166,6 +103,94 @@ struct WikiBrowserView: View {
             }
         } message: { page in
             Text("Delete '\(page.title)'? This removes the page from disk and Neo4j graph. Cross-references will be cleaned up.")
+        }
+    }
+}
+
+// MARK: - List Sections (extracted for type-checking performance)
+
+extension WikiBrowserView {
+    var loadingSection: some View {
+        Section {
+            HStack {
+                Spacer()
+                ProgressView("Loading wiki pages...")
+                Spacer()
+            }
+            .listRowBackground(Color.clear)
+        }
+    }
+
+    func errorSection(_ error: String) -> some View {
+        Section {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(DesignConstants.systemRed)
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(DesignConstants.systemRed)
+                Spacer()
+                Button("Retry") {
+                    Task { await backendService.fetchWikiPages() }
+                }
+                .font(.caption)
+                .buttonStyle(.bordered)
+                .tint(DesignConstants.systemRed)
+            }
+            .listRowBackground(Color.clear)
+        }
+    }
+
+    var emptySection: some View {
+        Section {
+            HStack {
+                Spacer()
+                VStack(spacing: 8) {
+                    Image(systemName: "book.closed")
+                        .font(.largeTitle)
+                        .foregroundStyle(DesignConstants.secondaryText)
+                    Text("No wiki pages found")
+                        .font(.subheadline)
+                        .foregroundStyle(DesignConstants.secondaryText)
+                        .padding(.top, 4)
+                }
+                Spacer()
+            }
+            .listRowBackground(Color.clear)
+        }
+    }
+}
+
+// MARK: - Wiki Page Row (platform-specific cell)
+
+struct WikiPageCell: View {
+    let page: APIWikiPageListItem
+    let onDelete: () -> Void
+    @Binding var navigateToPage: APIWikiPageListItem?
+
+    var body: some View {
+        #if os(macOS)
+        WikiPageRow(page: page)
+            .tag(page)
+            .onTapGesture(count: 2) {
+                navigateToPage = page
+            }
+        #else
+        NavigationLink(value: page) {
+            WikiPageRow(page: page)
+        }
+        #endif
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            if !page.protected {
+                Button("Delete", role: .destructive, action: onDelete)
+            }
+        }
+        .contextMenu {
+            if !page.protected {
+                Button(role: .destructive, action: onDelete) {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
     }
 }
