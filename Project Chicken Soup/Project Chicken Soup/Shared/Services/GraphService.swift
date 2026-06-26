@@ -175,7 +175,12 @@ public final class GraphService {
         let allLocal = (try? context.fetch(FetchDescriptor<LoreEntity>())) ?? []
         guard !allLocal.isEmpty else { return }
 
-        for entity in allLocal.sorted(by: { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }) {
+        // Sort all entities alphabetically
+        let sortedLocal = allLocal.sorted(by: { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending })
+
+        // Check at most 3 candidates to find a connected node, avoiding sequential network request storms
+        let candidates = Array(sortedLocal.prefix(3))
+        for entity in candidates {
             if Task.isCancelled { return }
             let encodedName = entity.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entity.name
             if let response = try? await APIClient.shared.request(path: "/graph/\(encodedName)") as NeighborhoodResponse,
@@ -197,7 +202,9 @@ public final class GraphService {
                 return
             }
         }
-        if let first = allLocal.first {
+        
+        // Fallback directly to the first entity without making extra connectivity checks
+        if let first = sortedLocal.first {
             await fetchNeighborhood(for: first.name, context: context)
         }
     }

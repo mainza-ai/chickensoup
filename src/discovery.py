@@ -154,5 +154,6 @@ def probe_provider(name: str) -> Tuple[str, str, List[str]]:
     return "simulated", result["base_url"], []
 
 
-# Alias for backward compatibility
-discover_active_provider = refresh_discovery
+def discover_active_provider() -> Tuple[str, str, List[str]]:
+    """Return cached active-provider info, re-probing only if not yet cached."""
+    return get_discovered("cached")

@@ -1159,7 +1159,7 @@ async def get_events():
 
 
 @app.post("/ingest/bulk", dependencies=[Depends(verify_api_key)])
-async def post_ingest_bulk():
+def post_ingest_bulk():
     """Clears the Neo4j database and bulk-ingests all wiki markdown pages."""
     try:
         import os
@@ -1215,7 +1215,7 @@ async def post_ingest_bulk():
 
 
 @app.post("/wiki/clear-content", response_model=WikiClearResponse, dependencies=[Depends(verify_api_key)])
-async def post_wiki_clear_content():
+def post_wiki_clear_content():
     """Deletes all CONTENT/SUBJECT wiki pages (UFO/alien/time-travel knowledge),
     preserves CODE/ENGINEERING pages (project architecture, tools, infrastructure).
     Pages with `protected: true` in frontmatter are never deleted."""

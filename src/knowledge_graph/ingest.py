@@ -8,6 +8,7 @@ from typing import Dict, List, Any, Tuple
 from neo4j import Driver
 from src.knowledge_graph.connection import neo4j_conn
 from src.discovery import discover_active_provider
+from src.cache import cache_decorator
 
 logger = logging.getLogger("chickensoup.neo4j.ingest")
 
@@ -95,6 +96,7 @@ def infer_node_label(name: str) -> str:
             return label
     return "Entity"
 
+@cache_decorator(prefix="llm", ttl=3600)
 def _query_llm_for_edge_type(source: str, source_label: str, target: str, target_label: str, body: str) -> Tuple[str, bool]:
     """
     Probes the active LLM (or heuristics) to determine the best relationship type.
