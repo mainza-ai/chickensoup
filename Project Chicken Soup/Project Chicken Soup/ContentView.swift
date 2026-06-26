@@ -108,7 +108,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(alignment: .topTrailing) {
-                    if backendService.showNavigator {
+                    if backendService.graph.showNavigator {
                         AINavigatorView()
                             .padding(.trailing, DesignConstants.standardPadding)
                             .padding(.top, DesignConstants.standardPadding)
@@ -121,7 +121,7 @@ struct ContentView: View {
                 }
                 .overlay(alignment: .bottom) {
                     VStack(spacing: 8) {
-                        if backendService.showChatHistory && !messages.isEmpty {
+                        if backendService.graph.showChatHistory && !messages.isEmpty {
                             HStack {
                                 Spacer()
                                 ChatHistoryView(
@@ -129,12 +129,12 @@ struct ContentView: View {
                                     onClear: {
                                         withAnimation(.spring(duration: 0.3)) {
                                             messages.removeAll()
-                                            backendService.showChatHistory = false
+                                            backendService.graph.showChatHistory = false
                                         }
                                     },
                                     onClose: {
                                         withAnimation(.spring(duration: 0.3)) {
-                                            backendService.showChatHistory = false
+                                            backendService.graph.showChatHistory = false
                                         }
                                     }
                                 )
@@ -160,7 +160,7 @@ struct ContentView: View {
                         }
                         .padding(.bottom, 16)
                     }
-                    .padding(.trailing, backendService.showNavigator ? 320 : 0)
+                    .padding(.trailing, backendService.graph.showNavigator ? 320 : 0)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -175,7 +175,7 @@ struct ContentView: View {
                 ToolbarItem {
                     Button(action: {
                         withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
-                            backendService.showNavigator.toggle()
+                            backendService.graph.showNavigator.toggle()
                         }
                     }) {
                         Label("AI Navigator", systemImage: "brain")
@@ -225,7 +225,7 @@ struct ContentView: View {
                     #endif
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         VStack(spacing: 8) {
-                            if backendService.showChatHistory {
+                            if backendService.graph.showChatHistory {
                                 if messages.isEmpty {
                                     HStack {
                                         Spacer()
@@ -245,12 +245,12 @@ struct ContentView: View {
                                         onClear: {
                                             withAnimation(.spring(duration: 0.3)) {
                                                 messages.removeAll()
-                                                backendService.showChatHistory = false
+                                                backendService.graph.showChatHistory = false
                                             }
                                         },
                                         onClose: {
                                             withAnimation(.spring(duration: 0.3)) {
-                                                backendService.showChatHistory = false
+                                                backendService.graph.showChatHistory = false
                                             }
                                         }
                                     )
@@ -365,7 +365,7 @@ struct ContentView: View {
         
         withAnimation(.spring(duration: 0.3)) {
             messages.append(ChatMessage(isUser: true, text: currentQuery))
-            backendService.showChatHistory = true
+            backendService.graph.showChatHistory = true
             queryText = ""
         }
         

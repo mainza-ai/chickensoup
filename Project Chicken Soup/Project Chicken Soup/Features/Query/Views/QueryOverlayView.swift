@@ -156,7 +156,7 @@ struct QueryOverlayView: View {
                 isExpanded = newValue
             }
         }
-        .onChange(of: backendService.focusedEntityName) { _, _ in
+        .onChange(of: backendService.graph.focusedEntityName) { _, _ in
             backendService.regenerateSuggestions(messages: messages, entities: entities, events: events)
         }
         .onChange(of: messages.count) { _, _ in

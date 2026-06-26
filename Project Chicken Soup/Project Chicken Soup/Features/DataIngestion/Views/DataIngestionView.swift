@@ -1147,8 +1147,8 @@ struct DataIngestionView: View {
                 let (_, response) = try await URLSession.shared.data(for: request)
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     await backendService.refreshAfterIngest(context: modelContext)
-                    if !backendService.focusedEntityName.isEmpty {
-                        await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
+                    if !backendService.graph.focusedEntityName.isEmpty {
+                        await await backendService.graph.fetchNeighborhood(for: backendService.graph.focusedEntityName, context: modelContext)
                     }
                 }
             } catch {

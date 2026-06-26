@@ -61,19 +61,19 @@ struct SidebarDetailsView: View {
                     Button(action: navigateBack) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(backendService.canGoBack ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
+                            .foregroundStyle(backendService.graph.canGoBack ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
                     }
                     .buttonStyle(.plain)
-                    .disabled(!backendService.canGoBack)
+                    .disabled(!backendService.graph.canGoBack)
                     
                     // Forward button
                     Button(action: navigateForward) {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(backendService.canGoForward ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
+                            .foregroundStyle(backendService.graph.canGoForward ? DesignConstants.systemOrangeText : Color.secondary.opacity(0.3))
                     }
                     .buttonStyle(.plain)
-                    .disabled(!backendService.canGoForward)
+                    .disabled(!backendService.graph.canGoForward)
                     .padding(.trailing, 4)
                     
                     Image(systemName: "magnifyingglass")
@@ -101,7 +101,7 @@ struct SidebarDetailsView: View {
                     
                     Spacer()
                     
-                    if backendService.isFetchingNeighborhood {
+                    if backendService.graph.isFetchingNeighborhood {
                         ProgressView()
                             .scaleEffect(0.8)
                     } else {
@@ -124,7 +124,7 @@ struct SidebarDetailsView: View {
             
             // Details Scroll Area
             ScrollView {
-                if let graph = backendService.neighborhood {
+                if let graph = backendService.graph.neighborhood {
                     VStack(alignment: .leading, spacing: DesignConstants.standardPadding) {
                         // Main entity header info
                         VStack(alignment: .leading, spacing: DesignConstants.compactPadding) {
@@ -296,9 +296,9 @@ struct SidebarDetailsView: View {
     }
     
     private func refreshNeighborhood() {
-        if !backendService.focusedEntityName.isEmpty {
+        if !backendService.graph.focusedEntityName.isEmpty {
             Task {
-                await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
+                await backendService.fetchNeighborhood(for: backendService.graph.focusedEntityName, context: modelContext)
             }
         } else if let first = allEntities.first {
             selectEntity(name: first.name)

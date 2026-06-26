@@ -51,7 +51,7 @@ struct GraphExplorerView: View {
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let graph = backendService.neighborhood {
+                } else if let graph = backendService.graph.neighborhood {
                     // Compute max radius of concentric rings to calculate scaling factor
                     let maxRadius: CGFloat = {
                         let numConnections = graph.connections.count
@@ -79,8 +79,8 @@ struct GraphExplorerView: View {
                     }()
                     
                     let topOffset: CGFloat = 40
-                    let bottomOffset: CGFloat = backendService.showChatHistory ? 220 : 90
-                    let visibleWidth = geometry.size.width - (!isCompact && backendService.showNavigator ? 320 : 0)
+                    let bottomOffset: CGFloat = backendService.graph.showChatHistory ? 220 : 90
+                    let visibleWidth = geometry.size.width - (!isCompact && backendService.graph.showNavigator ? 320 : 0)
                     let centerY = max(100.0, topOffset + (geometry.size.height - topOffset - bottomOffset) / 2)
                     let center = CGPoint(x: visibleWidth / 2 + dragOffset.width + accumulatedOffset.width,
                                          y: centerY + dragOffset.height + accumulatedOffset.height)
@@ -286,7 +286,7 @@ func guessEntityType(name: String, currentType: String) -> String {
                             .background(DesignConstants.cardBackground.opacity(0.85))
                             .liquidGlass()
                             .padding(.trailing, DesignConstants.standardPadding)
-                            .padding(.bottom, backendService.showChatHistory ? 20 : 16)
+                            .padding(.bottom, backendService.graph.showChatHistory ? 20 : 16)
                         }
                     }
                 } else {
@@ -300,16 +300,16 @@ func guessEntityType(name: String, currentType: String) -> String {
         .onAppear {
             dragOffset = .zero
             accumulatedOffset = .zero
-            if !backendService.focusedEntityName.isEmpty {
+            if !backendService.graph.focusedEntityName.isEmpty {
                 withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    if let graph = backendService.neighborhood {
+                    if let graph = backendService.graph.neighborhood {
                         nodePositions = computeNodePositions(connections: graph.connections)
                     }
                 }
             }
         }
-        .onChange(of: backendService.neighborhood?.entity.id) { _, _ in
-            if let graph = backendService.neighborhood {
+        .onChange(of: backendService.graph.neighborhood?.entity.id) { _, _ in
+            if let graph = backendService.graph.neighborhood {
                 withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
                     nodePositions = computeNodePositions(connections: graph.connections)
                     dragOffset = .zero
@@ -320,7 +320,7 @@ func guessEntityType(name: String, currentType: String) -> String {
         #if !os(macOS)
         .sheet(item: $selectedEntityItem) { item in
             NavigationStack {
-                EntityDetailView(entityName: item.name, entity: backendService.focusedEntityName == item.name ? backendService.neighborhood?.entity : nil)
+                EntityDetailView(entityName: item.name, entity: backendService.graph.focusedEntityName == item.name ? backendService.graph.neighborhood?.entity : nil)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { selectedEntityItem = nil }

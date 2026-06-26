@@ -76,14 +76,7 @@ public final class BackendService: ObservableObject {
     @Published public var queryError: Error?
     @Published public var spacetimeError: Error?
     
-    @Published public var focusedEntityName: String = ""
-    @Published public var neighborhood: NeighborhoodResponse? = nil
-    @Published public var isFetchingNeighborhood = false
-    
-    @Published public var canGoBack = false
-    @Published public var canGoForward = false
-    @Published public var showNavigator = true
-    @Published public var showChatHistory = false
+    public let graph = GraphService()
 
     @Published public var chatIngestStatus: APIChatIngestStatus?
     @Published public var unreadWikiPagesFromChat: Int = 0
@@ -120,12 +113,15 @@ public final class BackendService: ObservableObject {
         UserDefaults.standard.set(isDarkMode, forKey: "isDarkMode")
     }
     
-    private var backStack: [String] = []
-    private var forwardStack: [String] = []
-    private var fetchNeighborhoodTask: Task<Void, Never>?
-    private let backStackMaxSize = 50
+    private init() {
+        graph.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
 
-    private init() {}
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Merge Helpers (previously in SyncService)
 
@@ -235,35 +231,11 @@ public final class BackendService: ObservableObject {
             }
             try? context.save()
 
-            if focusedEntityName.isEmpty {
-                await autoSelectInitialEntity(context: context)
+            if graph.focusedEntityName.isEmpty {
+                await graph.autoSelectInitialEntity(context: context)
             }
         } catch {
             print("Failed to fetch entities from backend: \(error.localizedDescription)")
-        }
-    }
-
-    /// Selects the first entity with graph connections from the local store.
-    /// Called automatically when entities are first loaded and no entity is focused.
-    private func autoSelectInitialEntity(context: ModelContext) async {
-        let allLocal = (try? context.fetch(FetchDescriptor<LoreEntity>())) ?? []
-        guard !allLocal.isEmpty else { return }
-
-        for entity in allLocal.sorted(by: { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }) {
-            if Task.isCancelled { return }
-            let encodedName = entity.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entity.name
-            if let response = try? await APIClient.shared.request(path: "/graph/\(encodedName)") as NeighborhoodResponse,
-               !response.connections.isEmpty {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    self.neighborhood = response
-                    self.focusedEntityName = entity.name
-                }
-                return
-            }
-        }
-        // Fallback: select the first entity even if it has no connections
-        if let first = allLocal.first {
-            await fetchNeighborhood(for: first.name, context: context)
         }
     }
 
@@ -386,149 +358,24 @@ public final class BackendService: ObservableObject {
         }
     }
     
-    // MARK: - Fetch Neighborhood (Knowledge Graph)
-    public func fetchNeighborhood(for name: String, context: ModelContext) async {
-        isFetchingNeighborhood = true
-        defer { isFetchingNeighborhood = false }
-
-        do {
-            let responseDecoded: NeighborhoodResponse = try await APIClient.shared.request(
-                path: "/graph/\(name)"
-            )
-
-            var uniqueConns: [NeighborhoodConnection] = []
-            var seenNames = Set<String>()
-            for conn in responseDecoded.connections {
-                let key = conn.neighbor.name.lowercased()
-                if !seenNames.contains(key) {
-                    seenNames.insert(key)
-                    uniqueConns.append(conn)
-                }
-            }
-
-            let filteredResponse = NeighborhoodResponse(entity: responseDecoded.entity, connections: uniqueConns)
-
-            withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                self.neighborhood = filteredResponse
-                self.focusedEntityName = name
-            }
-        } catch {
-            print("Failed to fetch neighborhood: \(error)")
-            loadFallbackNeighborhood(for: name, context: context)
-        }
-    }
-    
-    @MainActor
-    private func loadFallbackNeighborhood(for name: String, context: ModelContext) {
-        let fetchDescriptor = FetchDescriptor<LoreEntity>()
-        let allEntities = (try? context.fetch(fetchDescriptor)) ?? []
-        
-        let simpleEntity: NeighborhoodEntity
-        if let localEntity = allEntities.first(where: { 
-            $0.name == name || 
-            $0.name.lowercased() == name.lowercased() || 
-            $0.name.replacingOccurrences(of: " ", with: "-").lowercased() == name.replacingOccurrences(of: " ", with: "-").lowercased() 
-        }) {
-            simpleEntity = NeighborhoodEntity(
-                id: localEntity.id,
-                name: localEntity.name,
-                type: localEntity.type,
-                summary: localEntity.summary,
-                confidence: localEntity.confidence,
-                source: localEntity.source,
-                sources: [localEntity.source]
-            )
-        } else {
-            simpleEntity = NeighborhoodEntity(
-                id: UUID(),
-                name: name,
-                type: "Entity",
-                summary: "Lore graph node for \(name). Select or query to discover more.",
-                confidence: 0.5,
-                source: "Unknown",
-                sources: ["Offline Cache"]
-            )
-        }
-        
-        let otherEntities = allEntities.filter { $0.name.lowercased() != name.lowercased() }
-        var uniqueOthers: [LoreEntity] = []
-        for other in otherEntities {
-            if !uniqueOthers.contains(where: { $0.name.lowercased() == other.name.lowercased() }) {
-                uniqueOthers.append(other)
-            }
-        }
-        
-        let connections = uniqueOthers.prefix(5).map { other in
-            NeighborhoodConnection(
-                relationshipType: "RELATED_TO",
-                neighbor: NeighborhoodEntity(
-                    id: other.id,
-                    name: other.name,
-                    type: other.type,
-                    summary: other.summary,
-                    confidence: other.confidence,
-                    source: other.source,
-                    sources: [other.source]
-                )
-            )
-        }
-        
-        let response = NeighborhoodResponse(entity: simpleEntity, connections: Array(connections))
-        
-        withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-            self.neighborhood = response
-            self.focusedEntityName = name
-        }
-    }
-    
-    // MARK: - Navigation History
-    /// Selects an entity and fetches its neighborhood.
+    /// Selects an entity. Delegated to GraphService.
     public func selectEntity(_ name: String, context: ModelContext) {
-        fetchNeighborhoodTask?.cancel()
-
-        let currentFocused = focusedEntityName
-        if !currentFocused.isEmpty && currentFocused.lowercased() != name.lowercased() {
-            backStack.append(currentFocused)
-            if backStack.count > backStackMaxSize { backStack.removeFirst() }
-            forwardStack.removeAll()
-            canGoBack = true
-            canGoForward = false
-        }
-        fetchNeighborhoodTask = Task { [weak self] in
-            await self?.fetchNeighborhood(for: name, context: context)
-        }
+        graph.selectEntity(name, context: context)
     }
 
+    /// Delegated to GraphService.
     public func navigateBack(context: ModelContext) {
-        fetchNeighborhoodTask?.cancel()
-        guard !backStack.isEmpty else { return }
-        let prev = backStack.removeLast()
-        let currentFocused = focusedEntityName
-        if !currentFocused.isEmpty {
-            forwardStack.append(currentFocused)
-            if forwardStack.count > backStackMaxSize { forwardStack.removeFirst() }
-            canGoForward = true
-        }
-        canGoBack = !backStack.isEmpty
-        fetchNeighborhoodTask = Task { [weak self] in
-            await self?.fetchNeighborhood(for: prev, context: context)
-        }
+        graph.navigateBack(context: context)
     }
 
+    /// Delegated to GraphService.
     public func navigateForward(context: ModelContext) {
-        fetchNeighborhoodTask?.cancel()
-        guard !forwardStack.isEmpty else { return }
-        let next = forwardStack.removeLast()
-        let currentFocused = focusedEntityName
-        if !currentFocused.isEmpty {
-            backStack.append(currentFocused)
-            if backStack.count > backStackMaxSize { backStack.removeFirst() }
-            canGoBack = true
-        }
-        canGoForward = !forwardStack.isEmpty
-        fetchNeighborhoodTask = Task { [weak self] in
-            await self?.fetchNeighborhood(for: next, context: context)
-        }
+        graph.navigateForward(context: context)
+    }
+
+    /// Delegated to GraphService.
+    public func fetchNeighborhood(for name: String, context: ModelContext) async {
+        await graph.fetchNeighborhood(for: name, context: context)
     }
     
     // MARK: - Chat-to-Wiki Conversion
@@ -584,7 +431,7 @@ public final class BackendService: ObservableObject {
 
     func regenerateSuggestions(messages: [ChatMessage], entities: [LoreEntity], events: [TemporalEvent]) {
         var results: [SuggestionItem] = []
-        let focusedName = focusedEntityName.trimmingCharacters(in: .whitespaces)
+        let focusedName = graph.focusedEntityName.trimmingCharacters(in: .whitespaces)
 
         if !focusedName.isEmpty {
             results.append(SuggestionItem(text: "What is \(focusedName)?", category: .entity))
