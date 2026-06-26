@@ -721,30 +721,22 @@ public final class BackendService: ObservableObject {
         defer { try? FileManager.default.removeItem(at: fileURL) }
         do {
             let fileData = try Data(contentsOf: fileURL)
-            let boundary = UUID().uuidString
-            let baseURL = await APIClient.shared.baseURL
-            var request = URLRequest(url: baseURL.appendingPathComponent("/wiki/import"))
-            request.httpMethod = "POST"
-            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-            var body = Data()
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"wiki-import.zip\"\r\n".data(using: .utf8)!)
-            body.append("Content-Type: application/zip\r\n\r\n".data(using: .utf8)!)
-            body.append(fileData)
-            body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-            request.httpBody = body
-
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                print("Failed to import wiki: HTTP error")
-                return nil
-            }
-            return try JSONDecoder().decode(APIWikiImportResponse.self, from: data)
+            return try await APIClient.shared.uploadMultipart(
+                path: "/wiki/import",
+                fileData: fileData,
+                filename: "wiki-import.zip",
+                contentType: "application/zip"
+            ) as APIWikiImportResponse
         } catch {
             print("Failed to import wiki: \(error.localizedDescription)")
             return nil
         }
+    }
+
+    /// Refresh the local cache of both lore entities and temporal events after an ingest operation.
+    public func refreshAfterIngest(context: ModelContext) async {
+        await fetchLoreEntities(context: context)
+        await fetchTemporalEvents(context: context)
     }
 
     // MARK: - Wiki Page CRUD

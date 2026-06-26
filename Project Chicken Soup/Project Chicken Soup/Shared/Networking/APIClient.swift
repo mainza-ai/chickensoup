@@ -146,4 +146,40 @@ public actor APIClient {
     private func isRetryableStatusCode(_ code: Int) -> Bool {
         [429, 502, 503, 504].contains(code)
     }
+
+    // MARK: - Multipart Upload
+
+    public func uploadMultipart<T: Decodable>(
+        path: String,
+        fileData: Data,
+        filename: String,
+        contentType: String = "application/octet-stream",
+        method: String = "POST"
+    ) async throws -> T {
+        let boundary = UUID().uuidString
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = method
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(contentType)\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            throw APIError.httpError(statusCode: statusCode)
+        }
+
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            throw APIError.decodingFailed(error)
+        }
+    }
 }

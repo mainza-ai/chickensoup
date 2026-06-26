@@ -889,8 +889,7 @@ struct DataIngestionView: View {
                                 clearResult = result
                                 showClearResult = true
                             }
-                            await backendService.fetchLoreEntities(context: modelContext)
-                            await backendService.fetchTemporalEvents(context: modelContext)
+                            await backendService.refreshAfterIngest(context: modelContext)
                         }
                     }
                     Button("Cancel", role: .cancel) {}
@@ -1019,34 +1018,18 @@ struct DataIngestionView: View {
                     DispatchQueue.main.async { isCommitting = false }
                 }
                 do {
-                    let boundary = UUID().uuidString
-                    var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/ingest/file")!)
-                    request.httpMethod = "POST"
-                    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-                    var bodyData = Data()
-                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                    bodyData.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(url.lastPathComponent)\"\r\n".data(using: .utf8)!)
-                    bodyData.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
-                    bodyData.append(data)
-                    bodyData.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-                    request.httpBody = bodyData
-
-                    let (responseData, response) = try await URLSession.shared.data(for: request)
-                    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                        throw URLError(.badServerResponse)
-                    }
-                    let result = try JSONDecoder().decode(APIFileIngestResponse.self, from: responseData)
+                    let result: APIFileIngestResponse = try await APIClient.shared.uploadMultipart(
+                        path: "/ingest/file",
+                        fileData: data,
+                        filename: url.lastPathComponent
+                    )
                     await MainActor.run {
                         withAnimation {
                             commitResult = result
                             analysisResult = nil
                         }
                         if result.success {
-                            Task {
-                                await backendService.fetchLoreEntities(context: modelContext)
-                                await backendService.fetchTemporalEvents(context: modelContext)
-                            }
+                            refreshAfterIngest()
                         }
                     }
                 } catch {
@@ -1077,23 +1060,14 @@ struct DataIngestionView: View {
                     DispatchQueue.main.async { isBulkIngesting = false }
                 }
                 do {
-                    let boundary = UUID().uuidString
-                    var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/ingest/folder")!)
-                    request.httpMethod = "POST"
-                    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-                    var bodyData = Data()
-                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                    bodyData.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(url.lastPathComponent)\"\r\n".data(using: .utf8)!)
-                    bodyData.append("Content-Type: application/zip\r\n\r\n".data(using: .utf8)!)
-                    bodyData.append(data)
-                    bodyData.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-                    request.httpBody = bodyData
-
-                    let (_, response) = try await URLSession.shared.data(for: request)
-                    if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                        await backendService.fetchLoreEntities(context: modelContext)
-                        await backendService.fetchTemporalEvents(context: modelContext)
+                    let result: APIFileIngestResponse? = try? await APIClient.shared.uploadMultipart(
+                        path: "/ingest/folder",
+                        fileData: data,
+                        filename: url.lastPathComponent,
+                        contentType: "application/zip"
+                    )
+                    if result != nil {
+                        refreshAfterIngest()
                     }
                 } catch {
                     await MainActor.run {
@@ -1153,10 +1127,7 @@ struct DataIngestionView: View {
                     fileResults: allResults
                 )
                 uploadedFiles = allResults.flatMap { $0.pagesCreated + $0.pagesUpdated }
-                Task {
-                    await backendService.fetchLoreEntities(context: modelContext)
-                    await backendService.fetchTemporalEvents(context: modelContext)
-                }
+                refreshAfterIngest()
             }
         }
     }
@@ -1175,8 +1146,7 @@ struct DataIngestionView: View {
             do {
                 let (_, response) = try await URLSession.shared.data(for: request)
                 if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                    await backendService.fetchLoreEntities(context: modelContext)
-                    await backendService.fetchTemporalEvents(context: modelContext)
+                    await backendService.refreshAfterIngest(context: modelContext)
                     if !backendService.focusedEntityName.isEmpty {
                         await backendService.fetchNeighborhood(for: backendService.focusedEntityName, context: modelContext)
                     }
@@ -1188,6 +1158,12 @@ struct DataIngestionView: View {
             await MainActor.run {
                 isBulkIngesting = false
             }
+        }
+    }
+
+    private func refreshAfterIngest() {
+        Task {
+            await backendService.refreshAfterIngest(context: modelContext)
         }
     }
 }
