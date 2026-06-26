@@ -10,7 +10,6 @@ struct WikiBrowserView: View {
     @State private var showDeleteConfirmation = false
     @State private var pageToDelete: APIWikiPageListItem? = nil
     @State private var selectedPage: APIWikiPageListItem? = nil
-    @State private var navigateToPage: APIWikiPageListItem? = nil
 
     private var filteredPages: [APIWikiPageListItem] {
         var pages = backendService.wikiPages
@@ -53,17 +52,11 @@ struct WikiBrowserView: View {
         .navigationDestination(for: APIWikiPageListItem.self) { page in
             WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
         }
-        .navigationDestination(item: $navigateToPage) { page in
-            WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
-        }
         .task {
             await backendService.fetchWikiPages()
         }
         .refreshable {
-            let task = Task {
-                await backendService.fetchWikiPages()
-            }
-            await task.value
+            await backendService.fetchWikiPages()
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -183,37 +176,26 @@ extension WikiBrowserView {
 struct WikiPageCell: View {
     let page: APIWikiPageListItem
     let onDelete: () -> Void
-    @Binding var navigateToPage: APIWikiPageListItem?
 
     var body: some View {
-        cellContent
-            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                if !page.protected {
-                    Button("Delete", role: .destructive, action: onDelete)
-                }
-            }
-            .contextMenu {
-                if !page.protected {
-                    Button(role: .destructive, action: onDelete) {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-            }
-    }
-
-    @ViewBuilder
-    private var cellContent: some View {
-        #if os(macOS)
-        WikiPageRow(page: page)
-            .tag(page)
-            .onTapGesture(count: 2) {
-                navigateToPage = page
-            }
-        #else
         NavigationLink(value: page) {
             WikiPageRow(page: page)
         }
+        #if os(macOS)
+        .buttonStyle(.plain)
         #endif
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            if !page.protected {
+                Button("Delete", role: .destructive, action: onDelete)
+            }
+        }
+        .contextMenu {
+            if !page.protected {
+                Button(role: .destructive, action: onDelete) {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
     }
 }
 

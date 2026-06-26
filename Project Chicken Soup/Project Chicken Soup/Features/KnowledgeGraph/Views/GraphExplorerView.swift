@@ -106,8 +106,36 @@ struct GraphExplorerView: View {
                                     initialZoomScale = 1.0
                                     dragOffset = .zero
                                     accumulatedOffset = .zero
-                                }
-                            }
+    }
+}
+
+// MARK: - Shared type guessing utility
+
+private func guessEntityType(name: String, currentType: String) -> String {
+    let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
+        return currentType
+    }
+
+    let lower = name.lowercased()
+    if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
+        return "Person"
+    }
+    if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
+        return "Place"
+    }
+    if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
+        return "Event"
+    }
+    if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
+        return "Project"
+    }
+    if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
+        return "Object"
+    }
+    return "Concept"
+}
+
                         
                         // Connection Lines
                         ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
@@ -116,7 +144,7 @@ struct GraphExplorerView: View {
                                 let start = center
                                 let end = CGPoint(x: scaledNeighbor.x + center.x, y: scaledNeighbor.y + center.y)
                                 
-                                let guessedType = guessTypeForName(conn.neighbor.name, originalType: conn.neighbor.type)
+                                let guessedType = guessEntityType(name: conn.neighbor.name, currentType: conn.neighbor.type)
                                 let nodeColor: Color = {
                                     switch guessedType.lowercased() {
                                     case "person": return DesignConstants.systemOrange
@@ -307,51 +335,6 @@ struct GraphExplorerView: View {
         backendService.selectEntity(name, context: modelContext)
     }
     
-    private func wrappedText(_ name: String) -> String {
-        let words = name.replacingOccurrences(of: "-", with: " ").split(separator: " ")
-        var lines: [String] = []
-        var currentLine = ""
-        for word in words {
-            if currentLine.isEmpty {
-                currentLine = String(word)
-            } else if currentLine.count + word.count + 1 > 12 {
-                lines.append(currentLine)
-                currentLine = String(word)
-            } else {
-                currentLine += " " + word
-            }
-        }
-        if !currentLine.isEmpty {
-            lines.append(currentLine)
-        }
-        return lines.joined(separator: "\n")
-    }
-    
-    private func guessTypeForName(_ name: String, originalType: String) -> String {
-        let cleanType = originalType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
-            return originalType
-        }
-        
-        let lower = name.lowercased()
-        if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
-            return "Person"
-        }
-        if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
-            return "Place"
-        }
-        if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
-            return "Event"
-        }
-        if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
-            return "Project"
-        }
-        if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
-            return "Object"
-        }
-        return "Concept"
-    }
-    
     private func computeNodePositions(connections: [NeighborhoodConnection]) -> [UUID: CGPoint] {
         var newPositions: [UUID: CGPoint] = [:]
         let count = connections.count
@@ -417,12 +400,6 @@ struct GridBackgroundView: View {
     }
 }
 
-extension View {
-    func zPriority(_ index: Double) -> some View {
-        self.zIndex(index)
-    }
-}
-
 struct NodeView: View {
     let name: String
     let type: String
@@ -432,33 +409,8 @@ struct NodeView: View {
     
     @State private var isHovered = false
     
-    private func guessType(name: String, currentType: String) -> String {
-        let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
-            return currentType
-        }
-        
-        let lower = name.lowercased()
-        if lower.contains("bob") || lower.contains("tesla") || lower.contains("grusch") || lower.contains("rebelo") || lower.contains("buchanan") || lower.contains("mussolini") || lower.contains("freedman") || lower.contains("brown") || lower.contains("fravor") {
-            return "Person"
-        }
-        if lower.contains("roswell") || lower.contains("varginha") || lower.contains("area") || lower.contains("school") || lower.contains("mount") || lower.contains("brazil") || lower.contains("italy") || lower.contains("zimbabwe") || lower.contains("vatican") || lower.contains("capistrano") {
-            return "Place"
-        }
-        if lower.contains("crash") || lower.contains("incident") || lower.contains("hearings") || lower.contains("disclosure") || lower.contains("encounter") || lower.contains("recovery") || lower.contains("assassination") {
-            return "Event"
-        }
-        if lower.contains("project") || lower.contains("program") || lower.contains("serpo") {
-            return "Project"
-        }
-        if lower.contains("element") || lower.contains("device") || lower.contains("energy") || lower.contains("ray") || lower.contains("craft") || lower.contains("thing") || lower.contains("wireless") {
-            return "Object"
-        }
-        return "Concept"
-    }
-    
     var body: some View {
-        let guessedType = guessType(name: name, currentType: type)
+        let guessedType = guessEntityType(name: name, currentType: type)
         let size = (isFocused ? 48.0 : 36.0) * max(0.5, min(1.2, scaleFactor))
         
         let nodeColor: Color = {

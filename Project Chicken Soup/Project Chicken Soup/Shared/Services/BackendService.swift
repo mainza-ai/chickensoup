@@ -53,7 +53,6 @@ public final class BackendService: ObservableObject {
     public static let shared = BackendService()
     
     @Published public var isFetchingEvents = false
-    @Published public var isFetchingEntities = false
     @Published public var isSubmittingQuery = false
     @Published public var isSolvingSpacetime = false
     
@@ -70,7 +69,7 @@ public final class BackendService: ObservableObject {
     @Published public var llmAvailableModels: [String] = []
     @Published public var isSavingLLMConfig = false
 
-    @Published public var conversationId: String? = nil
+    public var conversationId: String? = nil
     
     @Published public var eventsError: Error?
     @Published public var entitiesError: Error?
@@ -205,9 +204,6 @@ public final class BackendService: ObservableObject {
 
     // MARK: - Fetch Lore Entities
     public func fetchLoreEntities(context: ModelContext) async {
-        isFetchingEntities = true
-        defer { isFetchingEntities = false }
-
         do {
             let apiEntities: [APILoreEntity] = try await APIClient.shared.request(path: "/entities")
 
@@ -499,7 +495,7 @@ public final class BackendService: ObservableObject {
             canGoForward = false
         }
         fetchNeighborhoodTask = Task { [weak self] in
-            await self?.fetchNeighborhood(for: name, context: context, isAutoSelection: isAutoSelection)
+            await self?.fetchNeighborhood(for: name, context: context)
         }
     }
 
@@ -580,7 +576,7 @@ public final class BackendService: ObservableObject {
         }
     }
 
-    @Published public var ingestHistory: [APIIngestHistoryEntry] = []
+    public var ingestHistory: [APIIngestHistoryEntry] = []
     @Published public var chatNotifications: [APIChatIngestNotification] = []
     @Published public var isClearingWiki = false
     @Published public var isExportingWiki = false

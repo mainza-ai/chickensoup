@@ -1,13 +1,5 @@
 import SwiftUI
 
-struct ConflictingField<T: Equatable>: Identifiable {
-    let id = UUID()
-    let name: String
-    let localValue: T
-    let remoteValue: T
-    var selectedValue: Binding<T>
-}
-
 struct TimelineBranchMergeSheet: View {
     @Environment(\.dismiss) private var dismiss
     
