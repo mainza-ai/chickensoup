@@ -278,6 +278,11 @@ struct SidebarDetailsView: View {
                 selectEntity(name: first.name)
             }
         }
+        .onChange(of: allEntities.count) { _, _ in
+            if backendService.focusedEntityName.isEmpty, let first = allEntities.first {
+                selectEntity(name: first.name)
+            }
+        }
     }
     
     private func selectEntity(name: String) {

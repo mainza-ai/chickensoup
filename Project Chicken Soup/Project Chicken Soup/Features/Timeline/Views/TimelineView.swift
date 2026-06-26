@@ -168,6 +168,18 @@ struct TemporalTimelineView: View {
             .padding(isCompact ? .trailing : .leading, 20)
             .zIndex(10)
         }
+        #if os(macOS)
+        .toolbar {
+            ToolbarItem {
+                Button("Refresh", systemImage: "arrow.clockwise") {
+                    Task {
+                        await backendService.fetchTemporalEvents(context: modelContext)
+                    }
+                }
+                .keyboardShortcut("r")
+            }
+        }
+        #endif
         .background(
             DesignConstants.warmBackground
                 .ignoresSafeArea()

@@ -161,12 +161,14 @@ public final class BackendService: ObservableObject {
             }
             try? context.save()
 
-            let serverEventIDs = Set(apiEvents.map(\.id))
-            let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
-            for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
-                context.delete(local)
+            if !apiEvents.isEmpty {
+                let serverEventIDs = Set(apiEvents.map(\.id))
+                let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
+                for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
+                    context.delete(local)
+                }
+                try? context.save()
             }
-            try? context.save()
         } catch {
             self.eventsError = error
             print("Failed to fetch events from backend: \(error.localizedDescription)")
@@ -206,12 +208,14 @@ public final class BackendService: ObservableObject {
             }
             try? context.save()
 
-            let serverEntityIDs = Set(apiEntities.map(\.id))
-            let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
-            for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
-                context.delete(local)
+            if !apiEntities.isEmpty {
+                let serverEntityIDs = Set(apiEntities.map(\.id))
+                let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
+                for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
+                    context.delete(local)
+                }
+                try? context.save()
             }
-            try? context.save()
         } catch {
             self.entitiesError = error
             print("Failed to fetch entities from backend: \(error.localizedDescription)")
@@ -380,6 +384,7 @@ public final class BackendService: ObservableObject {
         }
     }
     
+    @MainActor
     private func loadFallbackNeighborhood(for name: String, context: ModelContext) {
         let fetchDescriptor = FetchDescriptor<LoreEntity>()
         let allEntities = (try? context.fetch(fetchDescriptor)) ?? []
