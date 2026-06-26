@@ -971,11 +971,55 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             logger.warning(f"Failed to send WebSocket error message: {e}")
 
 
+def reconcile_neo4j_with_wiki(driver):
+    """Prunes Neo4j nodes that were deleted from the wiki filesystem."""
+    try:
+        wiki_root = settings.WIKI_DATA_DIR
+        if not os.path.isabs(wiki_root):
+            wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
+            
+        valid_slugs = set()
+        for subdir in ["entities", "concepts", "projects"]:
+            dir_path = os.path.join(wiki_root, subdir)
+            if os.path.isdir(dir_path):
+                for fname in os.listdir(dir_path):
+                    if fname.endswith(".md"):
+                        valid_slugs.add(fname[:-3].lower())
+                        
+        with driver.session() as session:
+            result = session.run("MATCH (n:Entity) RETURN n.name as name, n.tags as tags, n.confidence as confidence")
+            orphans = []
+            for record in result:
+                name = record["name"]
+                if not name:
+                    continue
+                slug = slugify(name)
+                tags = record["tags"]
+                confidence = record["confidence"]
+                
+                # If it's not a placeholder, check if it has a corresponding wiki page
+                has_page = slug in valid_slugs
+                is_placeholder = (not tags) and (confidence is not None and confidence < 1.0)
+                
+                if not has_page and not is_placeholder:
+                    orphans.append(name)
+                    
+            if orphans:
+                logger.info(f"Reconciliation: Found {len(orphans)} orphaned Neo4j nodes. Pruning: {orphans}")
+                session.run("MATCH (n:Entity) WHERE n.name IN $names DETACH DELETE n", names=orphans)
+                from src.cache import cache_store
+                cache_store.clear()
+    except Exception as e:
+        logger.warning(f"Failed to reconcile Neo4j with wiki: {e}")
+
+
 @app.get("/entities")
 async def get_entities():
     """Retrieves all Lore Entities from the Neo4j database."""
     import uuid
     driver = neo4j_conn.get_driver()
+    if driver:
+        reconcile_neo4j_with_wiki(driver)
     query = """
     MATCH (n:Entity)
     RETURN n
@@ -1038,6 +1082,8 @@ async def get_events():
     import uuid
     from datetime import datetime
     driver = neo4j_conn.get_driver()
+    if driver:
+        reconcile_neo4j_with_wiki(driver)
     query = """
     MATCH (e:Entity)
     RETURN e
