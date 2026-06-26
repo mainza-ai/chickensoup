@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct WikiBrowserView: View {
     @ObservedObject var backendService = BackendService.shared
+    @Environment(\.modelContext) private var modelContext
 
     @State private var searchText = ""
     @State private var selectedType: String? = nil
@@ -99,6 +101,8 @@ struct WikiBrowserView: View {
                 Task {
                     await backendService.deleteWikiPage(slug: page.slug, pageType: page.pageType, hard: true)
                     await backendService.fetchWikiPages()
+                    await backendService.fetchLoreEntities(context: modelContext)
+                    await backendService.fetchTemporalEvents(context: modelContext)
                 }
             }
         } message: { page in
