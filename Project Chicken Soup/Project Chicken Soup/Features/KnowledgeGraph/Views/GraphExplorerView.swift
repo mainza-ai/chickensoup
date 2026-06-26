@@ -10,7 +10,7 @@ import SwiftData
 
 struct GraphExplorerView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var allEntities: [LoreEntity]
+    @Query(sort: \LoreEntity.name) private var allEntities: [LoreEntity]
     
     @ObservedObject var backendService = BackendService.shared
     @State private var nodePositions: [UUID: CGPoint] = [:]

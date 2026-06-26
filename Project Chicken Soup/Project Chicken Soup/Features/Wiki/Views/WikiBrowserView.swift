@@ -63,7 +63,7 @@ struct WikiBrowserView: View {
             let task = Task {
                 await backendService.fetchWikiPages()
             }
-            do { try await task.value } catch { }
+            await task.value
         }
         .toolbar {
             ToolbarItem(placement: .principal) {

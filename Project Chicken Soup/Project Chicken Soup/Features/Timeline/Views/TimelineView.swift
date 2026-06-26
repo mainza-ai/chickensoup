@@ -116,7 +116,7 @@ struct TemporalTimelineView: View {
                         let task = Task {
                             await backendService.fetchTemporalEvents(context: modelContext)
                         }
-                        do { try await task.value } catch { }
+                        await task.value
                     }
                     #endif
                     

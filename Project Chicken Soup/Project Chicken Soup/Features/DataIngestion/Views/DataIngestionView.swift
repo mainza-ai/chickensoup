@@ -165,7 +165,7 @@ struct DataIngestionView: View {
                 await backendService.fetchLoreEntities(context: modelContext)
                 await backendService.fetchTemporalEvents(context: modelContext)
             }
-            do { try await task.value } catch { }
+            await task.value
         }
     }
 
