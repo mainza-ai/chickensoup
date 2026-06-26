@@ -272,24 +272,12 @@ struct GraphExplorerView: View {
         .onAppear {
             dragOffset = .zero
             accumulatedOffset = .zero
-            if backendService.focusedEntityName.isEmpty {
-                if let first = allEntities.first {
-                    selectEntity(name: first.name)
-                }
-            } else {
+            if !backendService.focusedEntityName.isEmpty {
                 withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
                     if let graph = backendService.neighborhood {
                         nodePositions = computeNodePositions(connections: graph.connections)
                     }
                 }
-                if backendService.neighborhood?.entity.name.lowercased() != backendService.focusedEntityName.lowercased() {
-                    selectEntity(name: backendService.focusedEntityName)
-                }
-            }
-        }
-        .onChange(of: allEntities.count) { _, _ in
-            if backendService.focusedEntityName.isEmpty, let first = allEntities.first {
-                selectEntity(name: first.name)
             }
         }
         .onChange(of: backendService.neighborhood?.entity.id) { _, _ in

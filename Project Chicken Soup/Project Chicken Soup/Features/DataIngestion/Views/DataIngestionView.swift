@@ -5,9 +5,7 @@ import UniformTypeIdentifiers
 struct DataIngestionView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LoreEntity.name) private var localEntities: [LoreEntity]
-    @Query(sort: \TemporalEvent.timestamp) private var localEvents: [TemporalEvent]
 
-    @ObservedObject var syncService = SyncService.shared
     @ObservedObject var backendService = BackendService.shared
 
     @State private var isDraggingOver = false
@@ -29,8 +27,6 @@ struct DataIngestionView: View {
     @State private var showClearResult = false
     @State private var showWikiBrowser = false
     @State private var isLoreExpanded = true
-
-    @Namespace private var animationNamespace
 
     private var averageConfidence: Double {
         localEntities.isEmpty ? 0.0 : localEntities.map { $0.confidence }.reduce(0.0, +) / Double(localEntities.count)
@@ -246,14 +242,13 @@ struct DataIngestionView: View {
 
     private var syncStatusCard: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Sync Queue")
+            Text("Local Store")
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
             HStack {
-                Image(systemName: syncService.isSyncing ? "arrow.triangle.2.circlepath" : "checkmark.icloud.fill")
-                    .foregroundStyle(syncService.isSyncing ? DesignConstants.systemOrange : DesignConstants.systemGreen)
-                    .symbolEffect(.pulse, isActive: syncService.isSyncing)
-                Text("\(syncService.pendingSyncCount) pending")
+                Image(systemName: "checkmark.icloud.fill")
+                    .foregroundStyle(DesignConstants.systemGreen)
+                Text("\(localEntities.count) entities cached")
                     .font(.body)
                     .fontWeight(.medium)
                     .foregroundStyle(DesignConstants.primaryText)
@@ -265,7 +260,7 @@ struct DataIngestionView: View {
         .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
         .shadow(color: DesignConstants.glassShadowColor, radius: 4, y: 2)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(syncService.pendingSyncCount) entities pending database synchronization")
+        .accessibilityLabel("\(localEntities.count) entities cached locally")
     }
 
     // MARK: - Drop Target View

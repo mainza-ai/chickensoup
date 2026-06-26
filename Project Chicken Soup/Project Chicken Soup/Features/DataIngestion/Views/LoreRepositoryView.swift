@@ -42,7 +42,6 @@ struct LoreRepositoryView: View {
         .onChange(of: sortOrder) { _, _ in displayLimit = 50 }
         .sheet(item: $selectedEntityForEdit) { entity in
             EditAnnotationSheet(entity: entity) { updatedEntity in
-                SyncService.shared.queueSync(entityId: updatedEntity.id, type: "LoreEntity", action: "update")
                 selectedEntityForEdit = nil
             }
         }

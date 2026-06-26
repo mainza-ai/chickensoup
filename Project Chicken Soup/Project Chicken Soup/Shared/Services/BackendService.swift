@@ -123,29 +123,58 @@ public final class BackendService: ObservableObject {
     
     private var backStack: [String] = []
     private var forwardStack: [String] = []
-    
+    private var fetchNeighborhoodTask: Task<Void, Never>?
+    private let backStackMaxSize = 50
+
     private init() {}
     
+    // MARK: - Merge Helpers (previously in SyncService)
+
+    /// Merges server values into a local LoreEntity using Phase 3 rules:
+    /// - confidence: server-authoritative
+    /// - userNotes: client-wins (kept unless local is empty)
+    /// - sources: union of local and server
+    private func mergeLoreEntity(_ local: LoreEntity, with server: APILoreEntity) {
+        local.name = server.name
+        local.type = server.type
+        local.summary = server.summary
+        local.confidence = server.confidence
+        let localSources = Set(local.sources)
+        let serverSources = Set(server.sources ?? [server.source])
+        local.sources = Array(localSources.union(serverSources)).sorted()
+        if local.userNotes.isEmpty {
+            local.userNotes = server.userNotes ?? ""
+        }
+    }
+
+    /// Merges server values into a local TemporalEvent using Phase 3 rules.
+    private func mergeTemporalEvent(_ local: TemporalEvent, with server: APITemporalEvent) {
+        local.title = server.title
+        local.eventDescription = server.eventDescription
+        local.timestamp = server.timestamp
+        local.confidence = server.confidence
+        local.type = server.type
+        let localSources = Set(local.sources)
+        let serverSources = Set(server.sources ?? [server.source])
+        local.sources = Array(localSources.union(serverSources)).sorted()
+        if local.userNotes.isEmpty {
+            local.userNotes = server.userNotes ?? ""
+        }
+    }
+
     // MARK: - Fetch Temporal Events
     public func fetchTemporalEvents(context: ModelContext) async {
         isFetchingEvents = true
-        eventsError = nil
         defer { isFetchingEvents = false }
-        
+
         do {
             let apiEvents: [APITemporalEvent] = try await APIClient.shared.request(path: "/events")
-            
-            // Sync with local SwiftData store
+
             for apiEvent in apiEvents {
                 let id = apiEvent.id
                 let fetchDescriptor = FetchDescriptor<TemporalEvent>(predicate: #Predicate { $0.id == id })
                 if let existing = try? context.fetch(fetchDescriptor).first {
-                    existing.title = apiEvent.title
-                    existing.eventDescription = apiEvent.eventDescription
-                    existing.timestamp = apiEvent.timestamp
-                    existing.confidence = apiEvent.confidence
-                    existing.source = apiEvent.source
-                    existing.type = apiEvent.type
+                    mergeTemporalEvent(existing, with: apiEvent)
                 } else {
                     let newEvent = TemporalEvent(
                         id: apiEvent.id,
@@ -154,46 +183,39 @@ public final class BackendService: ObservableObject {
                         timestamp: apiEvent.timestamp,
                         confidence: apiEvent.confidence,
                         source: apiEvent.source,
-                        type: apiEvent.type
+                        type: apiEvent.type,
+                        userNotes: apiEvent.userNotes ?? "",
+                        sources: apiEvent.sources ?? [apiEvent.source]
                     )
                     context.insert(newEvent)
                 }
             }
             try? context.save()
 
-            if !apiEvents.isEmpty {
-                let serverEventIDs = Set(apiEvents.map(\.id))
-                let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
-                for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
-                    context.delete(local)
-                }
-                try? context.save()
+            let serverEventIDs = Set(apiEvents.map(\.id))
+            let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
+            for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
+                context.delete(local)
             }
+            try? context.save()
         } catch {
-            self.eventsError = error
             print("Failed to fetch events from backend: \(error.localizedDescription)")
-            // Graceful fallback to cached or seeded SwiftData in view layer
         }
     }
-    
+
     // MARK: - Fetch Lore Entities
     public func fetchLoreEntities(context: ModelContext) async {
         isFetchingEntities = true
-        entitiesError = nil
         defer { isFetchingEntities = false }
-        
+
         do {
             let apiEntities: [APILoreEntity] = try await APIClient.shared.request(path: "/entities")
-            
+
             for apiEntity in apiEntities {
                 let id = apiEntity.id
                 let fetchDescriptor = FetchDescriptor<LoreEntity>(predicate: #Predicate { $0.id == id })
                 if let existing = try? context.fetch(fetchDescriptor).first {
-                    existing.name = apiEntity.name
-                    existing.type = apiEntity.type
-                    existing.summary = apiEntity.summary
-                    existing.confidence = apiEntity.confidence
-                    existing.source = apiEntity.source
+                    mergeLoreEntity(existing, with: apiEntity)
                 } else {
                     let newEntity = LoreEntity(
                         id: apiEntity.id,
@@ -201,37 +223,61 @@ public final class BackendService: ObservableObject {
                         type: apiEntity.type,
                         summary: apiEntity.summary,
                         confidence: apiEntity.confidence,
-                        source: apiEntity.source
+                        source: apiEntity.source,
+                        userNotes: apiEntity.userNotes ?? "",
+                        sources: apiEntity.sources ?? [apiEntity.source]
                     )
                     context.insert(newEntity)
                 }
             }
             try? context.save()
 
-            if !apiEntities.isEmpty {
-                let serverEntityIDs = Set(apiEntities.map(\.id))
-                let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
-                for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
-                    context.delete(local)
-                }
-                try? context.save()
+            let serverEntityIDs = Set(apiEntities.map(\.id))
+            let allLocalEntities = try? context.fetch(FetchDescriptor<LoreEntity>())
+            for local in allLocalEntities ?? [] where !serverEntityIDs.contains(local.id) {
+                context.delete(local)
+            }
+            try? context.save()
+
+            if focusedEntityName.isEmpty {
+                await autoSelectInitialEntity(context: context)
             }
         } catch {
-            self.entitiesError = error
             print("Failed to fetch entities from backend: \(error.localizedDescription)")
+        }
+    }
+
+    /// Selects the first entity with graph connections from the local store.
+    /// Called automatically when entities are first loaded and no entity is focused.
+    private func autoSelectInitialEntity(context: ModelContext) async {
+        let allLocal = (try? context.fetch(FetchDescriptor<LoreEntity>())) ?? []
+        guard !allLocal.isEmpty else { return }
+
+        for entity in allLocal.sorted(by: { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }) {
+            if Task.isCancelled { return }
+            let encodedName = entity.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entity.name
+            if let response = try? await APIClient.shared.request(path: "/graph/\(encodedName)") as NeighborhoodResponse,
+               !response.connections.isEmpty {
+                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
+                    self.neighborhood = response
+                    self.focusedEntityName = entity.name
+                }
+                return
+            }
+        }
+        // Fallback: select the first entity even if it has no connections
+        if let first = allLocal.first {
+            await fetchNeighborhood(for: first.name, context: context)
         }
     }
 
     @discardableResult
     public func deleteLoreEntity(name: String) async -> Bool {
-        guard let url = URL(string: "http://127.0.0.1:8000/entities/\(name)") else { return false }
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return false }
-            let result = try JSONDecoder().decode(APIEntityDeleteResponse.self, from: data)
-            return result.success
+            let response: APIEntityDeleteResponse = try await APIClient.shared.request(
+                path: "/entities/\(name)", method: "DELETE"
+            )
+            return response.success
         } catch {
             print("Failed to delete entity '\(name)': \(error)")
             return false
@@ -348,35 +394,27 @@ public final class BackendService: ObservableObject {
     public func fetchNeighborhood(for name: String, context: ModelContext) async {
         isFetchingNeighborhood = true
         defer { isFetchingNeighborhood = false }
-        
-        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? name
-        guard let url = URL(string: "http://127.0.0.1:8000/graph/\(encodedName)") else { return }
-        
+
         do {
-            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
-            
-            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                loadFallbackNeighborhood(for: name, context: context)
-                return
-            }
-            
-            let decoder = JSONDecoder()
-            let responseDecoded = try decoder.decode(NeighborhoodResponse.self, from: data)
-            
+            let responseDecoded: NeighborhoodResponse = try await APIClient.shared.request(
+                path: "/graph/\(name)"
+            )
+
             var uniqueConns: [NeighborhoodConnection] = []
+            var seenNames = Set<String>()
             for conn in responseDecoded.connections {
-                if !uniqueConns.contains(where: { $0.neighbor.name.lowercased() == conn.neighbor.name.lowercased() }) {
+                let key = conn.neighbor.name.lowercased()
+                if !seenNames.contains(key) {
+                    seenNames.insert(key)
                     uniqueConns.append(conn)
                 }
             }
-            
+
             let filteredResponse = NeighborhoodResponse(entity: responseDecoded.entity, connections: uniqueConns)
-            
-            await MainActor.run {
-                withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
-                    self.neighborhood = filteredResponse
-                    self.focusedEntityName = name
-                }
+
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.75)) {
+                self.neighborhood = filteredResponse
+                self.focusedEntityName = name
             }
         } catch {
             print("Failed to fetch neighborhood: \(error)")
@@ -416,7 +454,7 @@ public final class BackendService: ObservableObject {
             )
         }
         
-        let otherEntities = allEntities.filter { $0.name != name }
+        let otherEntities = allEntities.filter { $0.name.lowercased() != name.lowercased() }
         var uniqueOthers: [LoreEntity] = []
         for other in otherEntities {
             if !uniqueOthers.contains(where: { $0.name.lowercased() == other.name.lowercased() }) {
@@ -448,44 +486,52 @@ public final class BackendService: ObservableObject {
     }
     
     // MARK: - Navigation History
+    /// Selects an entity and fetches its neighborhood.
     public func selectEntity(_ name: String, context: ModelContext) {
+        fetchNeighborhoodTask?.cancel()
+
         let currentFocused = focusedEntityName
         if !currentFocused.isEmpty && currentFocused.lowercased() != name.lowercased() {
             backStack.append(currentFocused)
+            if backStack.count > backStackMaxSize { backStack.removeFirst() }
             forwardStack.removeAll()
             canGoBack = true
             canGoForward = false
         }
-        Task {
-            await fetchNeighborhood(for: name, context: context)
+        fetchNeighborhoodTask = Task { [weak self] in
+            await self?.fetchNeighborhood(for: name, context: context, isAutoSelection: isAutoSelection)
         }
     }
-    
+
     public func navigateBack(context: ModelContext) {
+        fetchNeighborhoodTask?.cancel()
         guard !backStack.isEmpty else { return }
         let prev = backStack.removeLast()
         let currentFocused = focusedEntityName
         if !currentFocused.isEmpty {
             forwardStack.append(currentFocused)
+            if forwardStack.count > backStackMaxSize { forwardStack.removeFirst() }
             canGoForward = true
         }
         canGoBack = !backStack.isEmpty
-        Task {
-            await fetchNeighborhood(for: prev, context: context)
+        fetchNeighborhoodTask = Task { [weak self] in
+            await self?.fetchNeighborhood(for: prev, context: context)
         }
     }
-    
+
     public func navigateForward(context: ModelContext) {
+        fetchNeighborhoodTask?.cancel()
         guard !forwardStack.isEmpty else { return }
         let next = forwardStack.removeLast()
         let currentFocused = focusedEntityName
         if !currentFocused.isEmpty {
             backStack.append(currentFocused)
+            if backStack.count > backStackMaxSize { backStack.removeFirst() }
             canGoBack = true
         }
         canGoForward = !forwardStack.isEmpty
-        Task {
-            await fetchNeighborhood(for: next, context: context)
+        fetchNeighborhoodTask = Task { [weak self] in
+            await self?.fetchNeighborhood(for: next, context: context)
         }
     }
     
@@ -494,9 +540,7 @@ public final class BackendService: ObservableObject {
     public func fetchChatIngestStatus() async {
         do {
             let status: APIChatIngestStatus = try await APIClient.shared.request(path: "/chat/ingest/status")
-            await MainActor.run {
-                self.chatIngestStatus = status
-            }
+            self.chatIngestStatus = status
         } catch {
             print("Failed to fetch chat ingest status: \(error.localizedDescription)")
         }
@@ -509,10 +553,8 @@ public final class BackendService: ObservableObject {
                 path: "/chat/ingest/now", method: "POST", body: bodyData
             )
             if let status = response.status {
-                await MainActor.run {
-                    self.chatIngestStatus = status
-                    self.unreadWikiPagesFromChat += status.pagesCreated
-                }
+                self.chatIngestStatus = status
+                self.unreadWikiPagesFromChat += status.pagesCreated
             }
             return response.success
         } catch {
@@ -528,10 +570,8 @@ public final class BackendService: ObservableObject {
             let response: APISetUserNameResponse = try await APIClient.shared.request(
                 path: "/chat/name", method: "POST", body: bodyData
             )
-            await MainActor.run {
-                if response.success {
-                    self.userName = response.currentName
-                }
+            if response.success {
+                self.userName = response.currentName
             }
             return response.success
         } catch {
@@ -639,9 +679,7 @@ public final class BackendService: ObservableObject {
     public func fetchIngestHistory() async {
         do {
             let response: [String: [APIIngestHistoryEntry]] = try await APIClient.shared.request(path: "/chat/ingest/history")
-            await MainActor.run {
-                self.ingestHistory = response["history"] ?? []
-            }
+            self.ingestHistory = response["history"] ?? []
         } catch {
             print("Failed to fetch ingest history: \(error.localizedDescription)")
         }
@@ -650,9 +688,7 @@ public final class BackendService: ObservableObject {
     public func fetchChatNotifications() async {
         do {
             let response: [String: [APIChatIngestNotification]] = try await APIClient.shared.request(path: "/chat/ingest/notifications")
-            await MainActor.run {
-                self.chatNotifications = response["notifications"] ?? []
-            }
+            self.chatNotifications = response["notifications"] ?? []
         } catch {
             print("Failed to fetch chat notifications: \(error.localizedDescription)")
         }
@@ -690,7 +726,8 @@ public final class BackendService: ObservableObject {
         do {
             let fileData = try Data(contentsOf: fileURL)
             let boundary = UUID().uuidString
-            var request = URLRequest(url: URL(string: "http://127.0.0.1:8000/wiki/import")!)
+            let baseURL = await APIClient.shared.baseURL
+            var request = URLRequest(url: baseURL.appendingPathComponent("/wiki/import"))
             request.httpMethod = "POST"
             request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 

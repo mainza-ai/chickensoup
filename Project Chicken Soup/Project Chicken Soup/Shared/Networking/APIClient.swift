@@ -32,85 +32,118 @@ public enum APIError: Error, LocalizedError {
 
 public actor APIClient {
     public static let shared = APIClient()
-    
+
     private let session: URLSession
-    private let baseURL: URL
-    
-    private init() {
+    public private(set) var baseURL: URL
+
+    public init(baseURL: URL = URL(string: "http://127.0.0.1:8000")!) {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 90.0
+        configuration.timeoutIntervalForRequest = 30.0
         self.session = URLSession(configuration: configuration)
-        // Point to the active FastAPI server port 8000
-        self.baseURL = URL(string: "http://127.0.0.1:8000")!
+        self.baseURL = baseURL
     }
-    
+
+    public func updateBaseURL(_ url: URL) {
+        self.baseURL = url
+    }
+
     public func request<T: Decodable>(
         path: String,
         method: String = "GET",
         body: Data? = nil,
         queryItems: [URLQueryItem]? = nil
     ) async throws -> T {
+        try await requestWithRetry(path: path, method: method, body: body, queryItems: queryItems, retries: 2)
+    }
+
+    private func requestWithRetry<T: Decodable>(
+        path: String,
+        method: String = "GET",
+        body: Data? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        retries: Int
+    ) async throws -> T {
         var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: true)
         if let queryItems = queryItems {
             urlComponents?.queryItems = queryItems
         }
-        
+
         guard let url = urlComponents?.url else {
             throw APIError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = body
-        
+
         let data: Data
         let response: URLResponse
-        
+
         do {
             (data, response) = try await session.data(for: request)
         } catch {
+            if retries > 0, isTransientError(error) {
+                try await Task.sleep(for: .seconds(1.0))
+                return try await requestWithRetry(path: path, method: method, body: body, queryItems: queryItems, retries: retries - 1)
+            }
             throw APIError.requestFailed(error)
         }
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
-        
+
         guard (200...299).contains(httpResponse.statusCode) else {
+            if retries > 0, isRetryableStatusCode(httpResponse.statusCode) {
+                try await Task.sleep(for: .seconds(1.0))
+                return try await requestWithRetry(path: path, method: method, body: body, queryItems: queryItems, retries: retries - 1)
+            }
             throw APIError.httpError(statusCode: httpResponse.statusCode)
         }
-        
+
         let decoder = JSONDecoder()
-        // Support custom Date decoding if required, standard ISO8601 formatting is common
         decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
             let dateStr = try container.decode(String.self)
-            
-            // Try standard ISO8601
+
             let dateFormatter = ISO8601DateFormatter()
             if let date = dateFormatter.date(from: dateStr) {
                 return date
             }
-            
-            // Try ISO8601 with fractional seconds
+
             let fractionalFormatter = ISO8601DateFormatter()
             fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             if let date = fractionalFormatter.date(from: dateStr) {
                 return date
             }
-            
-            // Fallback to time interval or epoch if parsing fails
+
             if let doubleVal = Double(dateStr) {
                 return Date(timeIntervalSince1970: doubleVal)
             }
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateStr)")
         }
-        
+
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
             throw APIError.decodingFailed(error)
         }
+    }
+
+    private func isTransientError(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        let transientCodes: Set<URLError.Code> = [
+            .timedOut, .networkConnectionLost, .notConnectedToInternet,
+            .dnsLookupFailed, .secureConnectionFailed, .cannotConnectToHost
+        ]
+        if let urlError = error as? URLError, transientCodes.contains(urlError.code) {
+            return true
+        }
+        return nsError.domain == NSURLErrorDomain
+    }
+
+    private func isRetryableStatusCode(_ code: Int) -> Bool {
+        [429, 502, 503, 504].contains(code)
     }
 }

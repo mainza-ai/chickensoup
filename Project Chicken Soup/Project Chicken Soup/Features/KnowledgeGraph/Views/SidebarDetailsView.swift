@@ -273,16 +273,8 @@ struct SidebarDetailsView: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .onAppear {
-            if backendService.focusedEntityName.isEmpty, let first = allEntities.first {
-                selectEntity(name: first.name)
-            }
-        }
-        .onChange(of: allEntities.count) { _, _ in
-            if backendService.focusedEntityName.isEmpty, let first = allEntities.first {
-                selectEntity(name: first.name)
-            }
-        }
+        // Auto-selection is handled by BackendService.autoSelectInitialEntity
+        // after fetchLoreEntities completes. No onAppear/onChange needed here.
     }
     
     private func selectEntity(name: String) {
