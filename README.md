@@ -108,6 +108,32 @@ An in-depth presentation outlining the project vision, quantum architectures, an
 
 ---
 
+## 📸 Screen Demonstrations & Video
+
+### 🎥 Demo Video
+
+Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
+
+[![Project Chicken Soup Demo Video](https://img.youtube.com/vi/orRyWnZc4Ek/0.jpg)](https://www.youtube.com/watch?v=orRyWnZc4Ek)
+
+🔗 **Link**: [Watch on YouTube](https://www.youtube.com/watch?v=orRyWnZc4Ek)
+
+### 🖥️ Application Screenshots
+
+<p align="center">
+  <img src="assets/screenshots/1.png" alt="Lore Knowledge Graph Interface on First Launch" width="750" />
+  <br/>
+  <em>iOS Client Graph Exploration Interface</em>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/2.png" alt="Interactive Panning and Node Highlighting" width="750" />
+  <br/>
+  <em>macOS Client Interactive Lore Graph Exploration</em>
+</p>
+
+---
+
 ## 🛠️ Technology Stack
 
 | Layer | Technologies |
