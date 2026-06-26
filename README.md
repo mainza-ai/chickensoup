@@ -121,15 +121,15 @@ Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
 ### 🖥️ Application Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/1.png" alt="Lore Knowledge Graph Interface on First Launch" width="750" />
+  <img src="assets/screenshots/1.png" alt="Interactive Panning and Node Highlighting" width="750" />
   <br/>
-  <em>iOS Client Graph Exploration Interface</em>
+  <em>macOS Client Interactive Lore Graph Exploration</em>
 </p>
 
 <p align="center">
-  <img src="assets/screenshots/2.png" alt="Interactive Panning and Node Highlighting" width="750" />
+  <img src="assets/screenshots/2.png" alt="Lore Knowledge Graph Interface on First Launch" width="750" />
   <br/>
-  <em>macOS Client Interactive Lore Graph Exploration</em>
+  <em>iOS Client Graph Exploration Interface</em>
 </p>
 
 ---
