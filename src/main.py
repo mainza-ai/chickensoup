@@ -1008,7 +1008,7 @@ def reconcile_neo4j_with_wiki(driver):
                 logger.info(f"Reconciliation: Found {len(orphans)} orphaned Neo4j nodes. Pruning: {orphans}")
                 session.run("MATCH (n:Entity) WHERE n.name IN $names DETACH DELETE n", names=orphans)
                 from src.cache import cache_store
-                cache_store.clear()
+                cache_store.invalidate_all()
     except Exception as e:
         logger.warning(f"Failed to reconcile Neo4j with wiki: {e}")
 

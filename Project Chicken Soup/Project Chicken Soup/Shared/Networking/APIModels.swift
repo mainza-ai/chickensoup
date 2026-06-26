@@ -799,3 +799,24 @@ public struct APIWikiDeleteResponse: Codable {
         self.crossRefsCleaned = crossRefsCleaned
     }
 }
+
+public struct APIBulkIngestResponse: Codable {
+    public var success: Bool
+    public var pagesIngested: Int
+    public var nodesCreated: Int
+    public var relationshipsCreated: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case pagesIngested = "pages_ingested"
+        case nodesCreated = "nodes_created"
+        case relationshipsCreated = "relationships_created"
+    }
+
+    public init(success: Bool, pagesIngested: Int, nodesCreated: Int, relationshipsCreated: Int) {
+        self.success = success
+        self.pagesIngested = pagesIngested
+        self.nodesCreated = nodesCreated
+        self.relationshipsCreated = relationshipsCreated
+    }
+}

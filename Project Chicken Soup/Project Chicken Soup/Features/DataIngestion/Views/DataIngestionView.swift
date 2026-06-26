@@ -1133,17 +1133,12 @@ struct DataIngestionView: View {
     private func runBulkIngestion() {
         isBulkIngesting = true
         Task {
-            guard let url = URL(string: "http://127.0.0.1:8000/ingest/bulk") else {
-                await MainActor.run { isBulkIngesting = false }
-                return
-            }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-
             do {
-                let (_, response) = try await URLSession.shared.data(for: request)
-                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                let response: APIBulkIngestResponse = try await APIClient.shared.request(
+                    path: "/ingest/bulk",
+                    method: "POST"
+                )
+                if response.success {
                     await backendService.refreshAfterIngest(context: modelContext)
                     if !backendService.graph.focusedEntityName.isEmpty {
                         await backendService.graph.fetchNeighborhood(for: backendService.graph.focusedEntityName, context: modelContext)
