@@ -1381,8 +1381,14 @@ async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = 
         driver = neo4j_conn.get_driver()
         if driver:
             with driver.session() as session:
-                session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n", name=title)
-                neo4j_cleaned = True
+                result = session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n RETURN count(n)", name=title)
+                count = result.single()[0]
+                if count == 0 and slug != title:
+                    result = session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n RETURN count(n)", name=slug)
+                    count = result.single()[0]
+                if count > 0:
+                    neo4j_cleaned = True
+                    logger.info(f"Deleted Neo4j node for '{title}' ({count} nodes removed)")
     except Exception as e:
         logger.warning(f"Neo4j cleanup skipped for deleted page '{title}': {e}")
 
