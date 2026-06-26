@@ -162,6 +162,7 @@ struct DataIngestionView: View {
         }
         .refreshable {
             await backendService.fetchLoreEntities(context: modelContext)
+            await backendService.fetchTemporalEvents(context: modelContext)
         }
     }
 

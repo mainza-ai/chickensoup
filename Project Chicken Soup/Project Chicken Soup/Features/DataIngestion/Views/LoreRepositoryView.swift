@@ -85,6 +85,15 @@ struct LoreRepositoryView: View {
                     .font(.caption)
                     .foregroundStyle(DesignConstants.systemBlue)
             }
+            Button {
+                Task {
+                    await backendService.fetchLoreEntities(context: modelContext)
+                }
+            } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+                    .font(.caption)
+                    .foregroundStyle(DesignConstants.systemBlue)
+            }
         }
     }
 

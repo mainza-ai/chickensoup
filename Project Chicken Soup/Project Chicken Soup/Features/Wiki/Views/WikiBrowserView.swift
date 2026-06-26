@@ -75,6 +75,16 @@ struct WikiBrowserView: View {
             }
             #if os(macOS)
             ToolbarItem {
+                Button("Refresh", systemImage: "arrow.clockwise") {
+                    Task {
+                        await backendService.fetchWikiPages()
+                        await backendService.fetchLoreEntities(context: modelContext)
+                        await backendService.fetchTemporalEvents(context: modelContext)
+                    }
+                }
+                .keyboardShortcut("r")
+            }
+            ToolbarItem {
                 Button("Delete", systemImage: "trash") {
                     if let page = selectedPage, !page.protected {
                         pageToDelete = page
