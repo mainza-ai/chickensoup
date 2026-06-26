@@ -46,12 +46,17 @@ public struct APITemporalEvent: Codable, Identifiable {
 public struct APILoreEntity: Codable, Identifiable {
     public var id: UUID
     public var name: String
-    public var type: String // "Person", "Place", "Concept", "Object", "Project"
+    public var type: String
     public var summary: String
     public var confidence: Double
     public var source: String
     public var userNotes: String?
     public var sources: [String]?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, type, summary, confidence, source, sources
+        case userNotes = "user_notes"
+    }
     
     public init(id: UUID = UUID(), name: String, type: String, summary: String, confidence: Double, source: String, userNotes: String? = nil, sources: [String]? = nil) {
         self.id = id
@@ -72,7 +77,15 @@ public struct APITimeTravelSimulationResponse: Codable {
     public var velocityMetric: Double
     public var fieldIntensity: Double
     public var resolvedPathConfidence: Double
-    
+
+    enum CodingKeys: String, CodingKey {
+        case success, logs
+        case gravityMetric = "gravity_metric"
+        case velocityMetric = "velocity_metric"
+        case fieldIntensity = "field_intensity"
+        case resolvedPathConfidence = "resolved_path_confidence"
+    }
+
     public init(success: Bool, logs: [String], gravityMetric: Double, velocityMetric: Double, fieldIntensity: Double, resolvedPathConfidence: Double) {
         self.success = success
         self.logs = logs
@@ -117,7 +130,14 @@ public struct APIDiscoveryStatus: Codable {
     public var isAvailable: Bool
     public var isCurrent: Bool
     public var latencyMs: Double
-    
+
+    enum CodingKeys: String, CodingKey {
+        case modelName = "model_name"
+        case isAvailable = "is_available"
+        case isCurrent = "is_current"
+        case latencyMs = "latency_ms"
+    }
+
     public init(modelName: String, isAvailable: Bool, isCurrent: Bool, latencyMs: Double) {
         self.modelName = modelName
         self.isAvailable = isAvailable
@@ -129,20 +149,24 @@ public struct APIDiscoveryStatus: Codable {
 public struct NeighborhoodEntity: Codable, Identifiable, Hashable {
     public var id: UUID
     public var name: String
-    public var type: String // "Person", "Place", "Concept", "Object", "Project", "Event"
+    public var type: String
     public var summary: String
     public var confidence: Double
     public var source: String
     public var sources: [String]
-    
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, type, summary, confidence, source, sources
+    }
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
+
     public static func == (lhs: NeighborhoodEntity, rhs: NeighborhoodEntity) -> Bool {
         lhs.id == rhs.id
     }
-    
+
     public init(id: UUID = UUID(), name: String, type: String, summary: String, confidence: Double, source: String, sources: [String]) {
         self.id = id
         self.name = name
@@ -173,7 +197,11 @@ public struct NeighborhoodConnection: Codable, Identifiable {
 public struct NeighborhoodResponse: Codable {
     public var entity: NeighborhoodEntity
     public var connections: [NeighborhoodConnection]
-    
+
+    enum CodingKeys: String, CodingKey {
+        case entity, connections
+    }
+
     public init(entity: NeighborhoodEntity, connections: [NeighborhoodConnection]) {
         self.entity = entity
         self.connections = connections
@@ -181,78 +209,123 @@ public struct NeighborhoodResponse: Codable {
 }
 
 public struct APIConfigRequest: Codable {
-    public var quantum_backend: String
-    public var ibm_api_token: String?
-    public var dwave_api_token: String?
-    public var ionq_api_token: String?
-    public var quantum_hardware_enabled: Bool
-    public var llm_active_provider: String?
-    public var llm_active_model: String?
-    
-    public init(quantum_backend: String, ibm_api_token: String? = nil, dwave_api_token: String? = nil, ionq_api_token: String? = nil, quantum_hardware_enabled: Bool, llm_active_provider: String? = nil, llm_active_model: String? = nil) {
-        self.quantum_backend = quantum_backend
-        self.ibm_api_token = ibm_api_token
-        self.dwave_api_token = dwave_api_token
-        self.ionq_api_token = ionq_api_token
-        self.quantum_hardware_enabled = quantum_hardware_enabled
-        self.llm_active_provider = llm_active_provider
-        self.llm_active_model = llm_active_model
+    public var quantumBackend: String
+    public var ibmApiToken: String?
+    public var dwaveApiToken: String?
+    public var ionqApiToken: String?
+    public var quantumHardwareEnabled: Bool
+    public var llmActiveProvider: String?
+    public var llmActiveModel: String?
+
+    enum CodingKeys: String, CodingKey {
+        case quantumBackend = "quantum_backend"
+        case ibmApiToken = "ibm_api_token"
+        case dwaveApiToken = "dwave_api_token"
+        case ionqApiToken = "ionq_api_token"
+        case quantumHardwareEnabled = "quantum_hardware_enabled"
+        case llmActiveProvider = "llm_active_provider"
+        case llmActiveModel = "llm_active_model"
+    }
+
+    public init(quantumBackend: String, ibmApiToken: String? = nil, dwaveApiToken: String? = nil, ionqApiToken: String? = nil, quantumHardwareEnabled: Bool, llmActiveProvider: String? = nil, llmActiveModel: String? = nil) {
+        self.quantumBackend = quantumBackend
+        self.ibmApiToken = ibmApiToken
+        self.dwaveApiToken = dwaveApiToken
+        self.ionqApiToken = ionqApiToken
+        self.quantumHardwareEnabled = quantumHardwareEnabled
+        self.llmActiveProvider = llmActiveProvider
+        self.llmActiveModel = llmActiveModel
     }
 }
 
 public struct APILLMProviderStatus: Codable {
     public var available: Bool
     public var models: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case available, models
+    }
 }
 
 public struct APIConfigResponse: Codable {
     public var success: Bool
-    public var quantum_backend: String
-    public var quantum_hardware_enabled: Bool
-    public var ibm_api_token_set: Bool
-    public var dwave_api_token_set: Bool
-    public var ionq_api_token_set: Bool
-    public var llm_active_provider: String
-    public var llm_active_model: String
-    public var llm_available_models: [String]
-    public var llm_providers: [String: APILLMProviderStatus]
-    
-    public init(success: Bool, quantum_backend: String, quantum_hardware_enabled: Bool, ibm_api_token_set: Bool, dwave_api_token_set: Bool, ionq_api_token_set: Bool, llm_active_provider: String, llm_active_model: String, llm_available_models: [String], llm_providers: [String: APILLMProviderStatus]) {
+    public var quantumBackend: String
+    public var quantumHardwareEnabled: Bool
+    public var ibmApiTokenSet: Bool
+    public var dwaveApiTokenSet: Bool
+    public var ionqApiTokenSet: Bool
+    public var llmActiveProvider: String
+    public var llmActiveModel: String
+    public var llmAvailableModels: [String]
+    public var llmProviders: [String: APILLMProviderStatus]
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case quantumBackend = "quantum_backend"
+        case quantumHardwareEnabled = "quantum_hardware_enabled"
+        case ibmApiTokenSet = "ibm_api_token_set"
+        case dwaveApiTokenSet = "dwave_api_token_set"
+        case ionqApiTokenSet = "ionq_api_token_set"
+        case llmActiveProvider = "llm_active_provider"
+        case llmActiveModel = "llm_active_model"
+        case llmAvailableModels = "llm_available_models"
+        case llmProviders = "llm_providers"
+    }
+
+    public init(success: Bool, quantumBackend: String, quantumHardwareEnabled: Bool, ibmApiTokenSet: Bool, dwaveApiTokenSet: Bool, ionqApiTokenSet: Bool, llmActiveProvider: String, llmActiveModel: String, llmAvailableModels: [String], llmProviders: [String: APILLMProviderStatus]) {
         self.success = success
-        self.quantum_backend = quantum_backend
-        self.quantum_hardware_enabled = quantum_hardware_enabled
-        self.ibm_api_token_set = ibm_api_token_set
-        self.dwave_api_token_set = dwave_api_token_set
-        self.ionq_api_token_set = ionq_api_token_set
-        self.llm_active_provider = llm_active_provider
-        self.llm_active_model = llm_active_model
-        self.llm_available_models = llm_available_models
-        self.llm_providers = llm_providers
+        self.quantumBackend = quantumBackend
+        self.quantumHardwareEnabled = quantumHardwareEnabled
+        self.ibmApiTokenSet = ibmApiTokenSet
+        self.dwaveApiTokenSet = dwaveApiTokenSet
+        self.ionqApiTokenSet = ionqApiTokenSet
+        self.llmActiveProvider = llmActiveProvider
+        self.llmActiveModel = llmActiveModel
+        self.llmAvailableModels = llmAvailableModels
+        self.llmProviders = llmProviders
     }
 }
 
 public struct APILLMConfigRequest: Codable {
-    public var llm_active_provider: String?
-    public var llm_active_model: String?
-    
-    public init(llm_active_provider: String? = nil, llm_active_model: String? = nil) {
-        self.llm_active_provider = llm_active_provider
-        self.llm_active_model = llm_active_model
+    public var llmActiveProvider: String?
+    public var llmActiveModel: String?
+
+    enum CodingKeys: String, CodingKey {
+        case llmActiveProvider = "llm_active_provider"
+        case llmActiveModel = "llm_active_model"
+    }
+
+    public init(llmActiveProvider: String? = nil, llmActiveModel: String? = nil) {
+        self.llmActiveProvider = llmActiveProvider
+        self.llmActiveModel = llmActiveModel
     }
 }
 
 public struct APILLMConfigResponse: Codable {
     public var success: Bool
-    public var llm_active_provider: String
-    public var llm_active_model: String
-    public var llm_available_models: [String]
-    public var llm_providers: [String: APILLMProviderStatus]
+    public var llmActiveProvider: String
+    public var llmActiveModel: String
+    public var llmAvailableModels: [String]
+    public var llmProviders: [String: APILLMProviderStatus]
+
+    enum CodingKeys: String, CodingKey {
+        case success
+        case llmActiveProvider = "llm_active_provider"
+        case llmActiveModel = "llm_active_model"
+        case llmAvailableModels = "llm_available_models"
+        case llmProviders = "llm_providers"
+    }
 }
 
 public struct APILLMProbeRequest: Codable {
-    public var provider_name: String
+    public var providerName: String
+
+    enum CodingKeys: String, CodingKey {
+        case providerName = "provider_name"
+    }
+
     public init(providerName: String) {
-        self.provider_name = providerName
+        self.providerName = providerName
     }
 }
 
@@ -260,6 +333,10 @@ public struct APILLMProbeResponse: Codable {
     public var provider: String
     public var available: Bool
     public var models: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case provider, available, models
+    }
 }
 
 // MARK: - Ingest Analysis Models
@@ -397,6 +474,10 @@ public struct APIChatIngestNowResponse: Codable {
     public var success: Bool
     public var status: APIChatIngestStatus?
 
+    enum CodingKeys: String, CodingKey {
+        case success, status
+    }
+
     public init(success: Bool, status: APIChatIngestStatus? = nil) {
         self.success = success
         self.status = status
@@ -405,6 +486,10 @@ public struct APIChatIngestNowResponse: Codable {
 
 public struct APISetUserNameRequest: Codable {
     public var name: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+    }
 
     public init(name: String) {
         self.name = name
@@ -439,6 +524,10 @@ public struct APIIngestHistoryEntry: Codable, Identifiable {
     public var date: String
     public var type: String
     public var description: String
+
+    enum CodingKeys: String, CodingKey {
+        case date, type, description
+    }
 
     public init(date: String, type: String, description: String) {
         self.date = date
@@ -583,6 +672,10 @@ public struct APIEntityDeleteResponse: Codable {
     public var success: Bool
     public var deleted: Bool
 
+    enum CodingKeys: String, CodingKey {
+        case success, deleted
+    }
+
     public init(success: Bool, deleted: Bool) {
         self.success = success
         self.deleted = deleted
@@ -626,6 +719,10 @@ public struct APIWikiPageListResponse: Codable {
     public var success: Bool
     public var pages: [APIWikiPageListItem]
     public var total: Int
+
+    enum CodingKeys: String, CodingKey {
+        case success, pages, total
+    }
 
     public init(success: Bool, pages: [APIWikiPageListItem], total: Int) {
         self.success = success

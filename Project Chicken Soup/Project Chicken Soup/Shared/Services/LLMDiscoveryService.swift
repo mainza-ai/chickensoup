@@ -32,23 +32,23 @@ public final class LLMDiscoveryService: ObservableObject {
         
         do {
             let config: APIConfigResponse = try await APIClient.shared.request(path: "/config")
-            self.availableModels = config.llm_available_models
-            self.selectedModel = config.llm_active_model
-            self.activeProvider = config.llm_active_provider
-            self.providerStates = config.llm_providers.mapValues { $0.available }
+            self.availableModels = config.llmAvailableModels
+            self.selectedModel = config.llmActiveModel
+            self.activeProvider = config.llmActiveProvider
+            self.providerStates = config.llmProviders.mapValues { $0.available }
 
             // Sync to BackendService so AINavigatorView displays the active model immediately
-            BackendService.shared.llmActiveModel = config.llm_active_model
-            BackendService.shared.llmActiveProvider = config.llm_active_provider
+            BackendService.shared.llmActiveModel = config.llmActiveModel
+            BackendService.shared.llmActiveProvider = config.llmActiveProvider
             
             // Build discovery chain from llm_providers response
             let providerOrder = ["omlx", "ollama", "lmstudio"]
             self.discoveryChain = providerOrder.map { name in
-                let info = config.llm_providers[name]
+                let info = config.llmProviders[name]
                 return APIDiscoveryStatus(
                     modelName: name.prefix(1).uppercased() + name.dropFirst(),
                     isAvailable: info?.available ?? false,
-                    isCurrent: name == config.llm_active_provider,
+                    isCurrent: name == config.llmActiveProvider,
                     latencyMs: 0.0
                 )
             }
