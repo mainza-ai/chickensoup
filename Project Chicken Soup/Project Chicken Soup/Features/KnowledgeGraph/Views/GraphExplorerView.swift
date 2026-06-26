@@ -109,9 +109,9 @@ struct GraphExplorerView: View {
     }
 }
 
-// MARK: - Shared type guessing utility
+// MARK: - Shared type guessing utility (file scope, accessible from both GraphExplorerView and NodeView)
 
-private func guessEntityType(name: String, currentType: String) -> String {
+func guessEntityType(name: String, currentType: String) -> String {
     let cleanType = currentType.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     if ["person", "place", "concept", "project", "object", "event"].contains(cleanType) {
         return currentType
@@ -136,7 +136,7 @@ private func guessEntityType(name: String, currentType: String) -> String {
     return "Concept"
 }
 
-                        
+
                         // Connection Lines
                         ForEach(Array(graph.connections.enumerated()), id: \.offset) { index, conn in
                             if let neighborPos = currentPositions[conn.neighbor.id] {
