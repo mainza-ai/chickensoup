@@ -417,7 +417,7 @@ struct SettingsView: View {
                         .foregroundStyle(DesignConstants.systemOrangeText)
 
                     VStack(spacing: 16) {
-                        if backendService.isExportingWiki {
+                        if backendService.wiki.isExportingWiki {
                             HStack {
                                 ProgressView()
                                     .scaleEffect(0.8)
@@ -429,7 +429,7 @@ struct SettingsView: View {
                         } else {
                             Button(action: {
                                 Task {
-                                    let result = await backendService.exportWiki()
+                                    let result = await backendService.wiki.exportWiki()
                                     await MainActor.run {
                                         if let r = result, r.success {
                                             print("Wiki exported: \(r.filepath) (\(r.pageCount) pages, \(r.sizeKb) KB)")

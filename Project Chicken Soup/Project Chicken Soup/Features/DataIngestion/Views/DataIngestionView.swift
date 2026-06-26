@@ -842,7 +842,7 @@ struct DataIngestionView: View {
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
 
-                    if backendService.isClearingWiki {
+                    if backendService.wiki.isClearingWiki {
                         HStack {
                             ProgressView()
                                 .scaleEffect(0.8)
@@ -884,7 +884,7 @@ struct DataIngestionView: View {
                 ) {
                     Button("Clear All Content", role: .destructive) {
                         Task {
-                            let result = await backendService.clearWikiContent()
+                            let result = await backendService.wiki.clearWikiContent()
                             await MainActor.run {
                                 clearResult = result
                                 showClearResult = true
@@ -909,11 +909,11 @@ struct DataIngestionView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(DesignConstants.secondaryText)
 
-            Text("Browse, search, and manage all \(backendService.wikiPages.count) wiki pages")
+            Text("Browse, search, and manage all \(backendService.wiki.wikiPages.count) wiki pages")
                 .font(.caption)
                 .foregroundStyle(DesignConstants.secondaryText)
 
-            Button("Browse Wiki (\(backendService.wikiPages.count))", systemImage: "book") {
+            Button("Browse Wiki (\(backendService.wiki.wikiPages.count))", systemImage: "book") {
                 showWikiBrowser = true
             }
             .buttonStyle(.bordered)

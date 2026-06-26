@@ -12,7 +12,7 @@ struct WikiBrowserView: View {
     @State private var selectedPage: APIWikiPageListItem? = nil
 
     private var filteredPages: [APIWikiPageListItem] {
-        var pages = backendService.wikiPages
+        var pages = backendService.wiki.wikiPages
         if let type = selectedType {
             pages = pages.filter { $0.pageType == type }
         }
@@ -25,9 +25,9 @@ struct WikiBrowserView: View {
 
     var body: some View {
         List(selection: $selectedPage) {
-            if backendService.isFetchingWikiPages && backendService.wikiPages.isEmpty {
+            if backendService.wiki.isFetchingWikiPages && backendService.wiki.wikiPages.isEmpty {
                 loadingSection
-            } else if let error = backendService.wikiPagesError {
+            } else if let error = backendService.wiki.wikiPagesError {
                 errorSection(error)
             } else if filteredPages.isEmpty {
                 emptySection
@@ -53,10 +53,10 @@ struct WikiBrowserView: View {
             WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
         }
         .task {
-            await backendService.fetchWikiPages()
+            await backendService.wiki.fetchWikiPages()
         }
         .refreshable {
-            await backendService.fetchWikiPages()
+            await backendService.wiki.fetchWikiPages()
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -73,7 +73,7 @@ struct WikiBrowserView: View {
             ToolbarItem {
                 Button("Refresh", systemImage: "arrow.clockwise") {
                     Task {
-                        await backendService.fetchWikiPages()
+                        await backendService.wiki.fetchWikiPages()
                         await backendService.fetchLoreEntities(context: modelContext)
                         await backendService.fetchTemporalEvents(context: modelContext)
                     }
@@ -106,7 +106,7 @@ struct WikiBrowserView: View {
             Button("Delete", role: .destructive) {
                 Task {
                     await backendService.deleteWikiPage(slug: page.slug, pageType: page.pageType, hard: true)
-                    await backendService.fetchWikiPages()
+                    await backendService.wiki.fetchWikiPages()
                     await backendService.fetchLoreEntities(context: modelContext)
                     await backendService.fetchTemporalEvents(context: modelContext)
                 }
@@ -141,7 +141,7 @@ extension WikiBrowserView {
                     .foregroundStyle(DesignConstants.systemRed)
                 Spacer()
                 Button("Retry") {
-                    Task { await backendService.fetchWikiPages() }
+                    Task { await backendService.wiki.fetchWikiPages() }
                 }
                 .font(.caption)
                 .buttonStyle(.bordered)
