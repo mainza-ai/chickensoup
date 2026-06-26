@@ -169,6 +169,23 @@ struct WikiPageCell: View {
     @Binding var navigateToPage: APIWikiPageListItem?
 
     var body: some View {
+        cellContent
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                if !page.protected {
+                    Button("Delete", role: .destructive, action: onDelete)
+                }
+            }
+            .contextMenu {
+                if !page.protected {
+                    Button(role: .destructive, action: onDelete) {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var cellContent: some View {
         #if os(macOS)
         WikiPageRow(page: page)
             .tag(page)
@@ -180,18 +197,6 @@ struct WikiPageCell: View {
             WikiPageRow(page: page)
         }
         #endif
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if !page.protected {
-                Button("Delete", role: .destructive, action: onDelete)
-            }
-        }
-        .contextMenu {
-            if !page.protected {
-                Button(role: .destructive, action: onDelete) {
-                    Label("Delete", systemImage: "trash")
-                }
-            }
-        }
     }
 }
 

@@ -730,6 +730,7 @@ public final class BackendService: ObservableObject {
         }
     }
 
+    @discardableResult
     public func deleteWikiPage(slug: String, pageType: String, hard: Bool = false) async -> APIWikiDeleteResponse? {
         isDeletingWikiPage = true
         defer { isDeletingWikiPage = false }
