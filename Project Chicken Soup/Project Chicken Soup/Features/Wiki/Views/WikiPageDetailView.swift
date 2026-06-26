@@ -3,43 +3,44 @@ import SwiftUI
 struct WikiPageDetailView: View {
     let detail: APIWikiPageDetail?
 
-    @StateObject var loader: WikiPageLoader
+    @State var loader: WikiPageLoader?
     @State private var loadedDetail: APIWikiPageDetail? = nil
 
     init(detail: APIWikiPageDetail) {
         self.detail = detail
-        self._loader = StateObject(wrappedValue: WikiPageLoader(slug: detail.slug, pageType: detail.pageType))
         self.loadedDetail = detail
     }
 
     init(loader: WikiPageLoader) {
         self.detail = nil
-        self._loader = StateObject(wrappedValue: loader)
+        self._loader = State(initialValue: loader)
     }
 
     var body: some View {
         Group {
             if let d = loadedDetail {
                 detailContent(d)
-            } else if loader.isLoading {
-                ProgressView("Loading page...")
-            } else if let d = loader.detail {
-                let _ = Task { loadedDetail = d }
-                detailContent(d)
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.largeTitle)
-                        .foregroundStyle(DesignConstants.secondaryText)
-                    Text(loader.error ?? "Failed to load page")
-                        .font(.subheadline)
-                        .foregroundStyle(DesignConstants.secondaryText)
+            } else if let loader = loader {
+                if loader.isLoading {
+                    ProgressView("Loading page...")
+                } else if let d = loader.detail {
+                    let _ = Task { loadedDetail = d }
+                    detailContent(d)
+                } else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.largeTitle)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                        Text(loader.error ?? "Failed to load page")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
                 }
             }
         }
         .background(DesignConstants.warmBackground)
         .task {
-            if detail == nil {
+            if detail == nil, let loader = loader {
                 await loader.load()
                 if let d = loader.detail {
                     loadedDetail = d

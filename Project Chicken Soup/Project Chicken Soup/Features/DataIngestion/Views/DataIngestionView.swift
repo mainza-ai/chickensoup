@@ -95,13 +95,13 @@ struct DataIngestionView: View {
                         LoreRepositoryView()
                     },
                     label: {
-                        HStack {
-                            Text("LORE REPOSITORY")
-                                .font(.footnote)
-                                .fontWeight(.bold)
-                                .foregroundStyle(DesignConstants.secondaryText)
-                            Spacer()
-                            if !isLoreExpanded {
+                        if !isLoreExpanded {
+                            HStack {
+                                Text("LORE REPOSITORY")
+                                    .font(.footnote)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(DesignConstants.secondaryText)
+                                Spacer()
                                 Text("\(localEntities.count) entities")
                                     .font(.caption2)
                                     .foregroundStyle(DesignConstants.secondaryText)
@@ -150,7 +150,15 @@ struct DataIngestionView: View {
         .sheet(isPresented: $showWikiBrowser) {
             NavigationStack {
                 WikiBrowserView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { showWikiBrowser = false }
+                        }
+                    }
             }
+            #if os(macOS)
+            .frame(minWidth: 500, minHeight: 400)
+            #endif
         }
         .refreshable {
             await backendService.fetchLoreEntities(context: modelContext)

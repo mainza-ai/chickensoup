@@ -90,7 +90,11 @@ struct WikiBrowserView: View {
             }
         }
         .listStyle(.plain)
+        #if os(macOS)
+        .searchable(text: $searchText, prompt: "Search by title or tag...")
+        #else
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search by title or tag...")
+        #endif
         .navigationTitle("Wiki Pages (\(filteredPages.count))")
         .task {
             await backendService.fetchWikiPages()
@@ -190,10 +194,12 @@ struct WikiPageRow: View {
 
 // MARK: - Wiki Page Loader (async detail fetch)
 
-class WikiPageLoader: ObservableObject {
-    @Published var detail: APIWikiPageDetail? = nil
-    @Published var isLoading = false
-    @Published var error: String? = nil
+@Observable
+@MainActor
+class WikiPageLoader {
+    var detail: APIWikiPageDetail? = nil
+    var isLoading = false
+    var error: String? = nil
 
     let slug: String
     let pageType: String
@@ -203,7 +209,6 @@ class WikiPageLoader: ObservableObject {
         self.pageType = pageType
     }
 
-    @MainActor
     func load() async {
         isLoading = true
         let result = await BackendService.shared.fetchWikiPageDetail(slug: slug, pageType: pageType)
