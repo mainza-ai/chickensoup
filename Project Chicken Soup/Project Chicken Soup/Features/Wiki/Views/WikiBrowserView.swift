@@ -7,9 +7,8 @@ struct WikiBrowserView: View {
     @State private var selectedType: String? = nil
     @State private var showDeleteConfirmation = false
     @State private var pageToDelete: APIWikiPageListItem? = nil
-    @State private var deleteResult: APIWikiDeleteResponse? = nil
-    @State private var selectedPage: APIWikiPageDetail? = nil
-    @State private var showPageDetail = false
+    @State private var selectedPage: APIWikiPageListItem? = nil
+    @State private var navigateToPage: APIWikiPageListItem? = nil
 
     private var filteredPages: [APIWikiPageListItem] {
         var pages = backendService.wikiPages
@@ -24,7 +23,7 @@ struct WikiBrowserView: View {
     }
 
     var body: some View {
-        List {
+        List(selection: $selectedPage) {
             if backendService.isFetchingWikiPages && backendService.wikiPages.isEmpty {
                 Section {
                     HStack {
@@ -34,12 +33,12 @@ struct WikiBrowserView: View {
                     }
                     .listRowBackground(Color.clear)
                 }
-            } else if backendService.wikiPagesError != nil {
+            } else if let error = backendService.wikiPagesError {
                 Section {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(DesignConstants.systemRed)
-                        Text(backendService.wikiPagesError!)
+                        Text(error)
                             .font(.caption)
                             .foregroundStyle(DesignConstants.systemRed)
                         Spacer()
@@ -72,16 +71,32 @@ struct WikiBrowserView: View {
             } else {
                 Section {
                     ForEach(filteredPages) { page in
-                        NavigationLink {
-                            WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
-                        } label: {
+                        #if os(macOS)
+                        WikiPageRow(page: page)
+                            .tag(page)
+                            .onTapGesture(count: 2) {
+                                navigateToPage = page
+                            }
+                        #else
+                        NavigationLink(value: page) {
                             WikiPageRow(page: page)
                         }
+                        #endif
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             if !page.protected {
                                 Button("Delete", role: .destructive) {
                                     pageToDelete = page
                                     showDeleteConfirmation = true
+                                }
+                            }
+                        }
+                        .contextMenu {
+                            if !page.protected {
+                                Button(role: .destructive) {
+                                    pageToDelete = page
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
                                 }
                             }
                         }
@@ -96,6 +111,12 @@ struct WikiBrowserView: View {
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search by title or tag...")
         #endif
         .navigationTitle("Wiki Pages (\(filteredPages.count))")
+        .navigationDestination(for: APIWikiPageListItem.self) { page in
+            WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
+        }
+        .navigationDestination(item: $navigateToPage) { page in
+            WikiPageDetailView(loader: WikiPageLoader(slug: page.slug, pageType: page.pageType))
+        }
         .task {
             await backendService.fetchWikiPages()
         }
@@ -113,13 +134,25 @@ struct WikiBrowserView: View {
                 .pickerStyle(.segmented)
                 .frame(maxWidth: 320)
             }
-        }
-        .sheet(isPresented: $showPageDetail) {
-            if let detail = selectedPage {
-                NavigationStack {
-                    WikiPageDetailView(detail: detail)
+            #if os(macOS)
+            ToolbarItem {
+                Button("Delete", systemImage: "trash") {
+                    if let page = selectedPage, !page.protected {
+                        pageToDelete = page
+                        showDeleteConfirmation = true
+                    }
                 }
+                .disabled(selectedPage == nil || selectedPage!.protected)
             }
+            #endif
+        }
+        .onDeleteCommand {
+            #if os(macOS)
+            if let page = selectedPage, !page.protected {
+                pageToDelete = page
+                showDeleteConfirmation = true
+            }
+            #endif
         }
         .alert("Delete Wiki Entry", isPresented: $showDeleteConfirmation, presenting: pageToDelete) { page in
             Button("Cancel", role: .cancel) {
@@ -127,8 +160,7 @@ struct WikiBrowserView: View {
             }
             Button("Delete", role: .destructive) {
                 Task {
-                    let result = await backendService.deleteWikiPage(slug: page.slug, pageType: page.pageType, hard: true)
-                    deleteResult = result
+                    await backendService.deleteWikiPage(slug: page.slug, pageType: page.pageType, hard: true)
                     await backendService.fetchWikiPages()
                 }
             }

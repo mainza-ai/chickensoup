@@ -591,7 +591,7 @@ public struct APIEntityDeleteResponse: Codable {
 
 // MARK: - Wiki Page CRUD
 
-public struct APIWikiPageListItem: Codable, Identifiable {
+public struct APIWikiPageListItem: Codable, Identifiable, Hashable {
     public var id: String { slug }
     public var slug: String
     public var title: String
