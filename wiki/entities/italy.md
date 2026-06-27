@@ -4,7 +4,7 @@ related:
 - magenta-ufo-crash
 - mussolini
 - vatican
-- vatican-ufo-crash-recovery
+- vatican
 sources:
 - Grusch-2023
 tags:
@@ -35,7 +35,7 @@ Italy's role in the early UFO recovery program — with both the Magenta crash a
 ## See Also
 
 - [[magenta-ufo-crash]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
 - [[vatican]]
 - [[mussolini]]
 - [[ufo-retrieval-program]]
@@ -57,7 +57,7 @@ Italy's role in the early UFO recovery program — with both the Magenta crash a
 ## See Also
 
 - [[magenta-ufo-crash]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
 - [[vatican]]
 - [[mussolini]]
 - [[ufo-retrieval-program]]

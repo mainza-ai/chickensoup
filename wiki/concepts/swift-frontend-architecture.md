@@ -36,14 +36,17 @@ Three `@Model` classes stored locally for offline operation:
 
 ### Services (`Shared/Services/`)
 
-- **BackendService** (`@MainActor`, 573 lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries with `conversation_id`, simulates geodesics, fetches graph neighborhoods, manages navigation history stack, LLM config, and now **chat-to-wiki conversion** (status polling, manual trigger, user name management, notification tracking). Stores `ChatIngestStatus`, `unreadWikiPagesFromChat` badge count, chat preferences in UserDefaults.
+- **BackendService** (`@MainActor`, 454 lines) — Central service layer. Fetches events/entities from backend or SwiftData fallback, submits queries with `conversation_id`, simulates geodesics, fetches graph neighborhoods, manages navigation history stack, LLM config, and now **chat-to-wiki conversion** (status polling, manual trigger, user name management, notification tracking). Stores `ChatIngestStatus`, `unreadWikiPagesFromChat` badge count, chat preferences in UserDefaults.
+- **GraphService** (`@MainActor`, 211 lines) — Knowledge graph navigation. Fetches entity neighborhoods from backend with deduplication. Maintains back/forward navigation history (up to 50 entries). Falls back to local SwiftData when backend unavailable.
+- **WikiService** — Wiki page listing, detail retrieval, deletion, export/import.
+- **ChatService** (`@MainActor`, 136 lines) — Chat-to-wiki settings management (UserDefaults). Fetches chat ingest status, triggers manual ingest, manages user name, fetches ingest history and notifications.
+- **ConfigService** — LLM/quantum configuration management. Fetches config, saves backend/provider/model settings, probes LLM providers.
 - **LLMDiscoveryService** (`@MainActor ObservableObject`) — Probes providers (oMLX, Ollama, LM Studio), displays availability as a chevron chain with status indicators. Syncs `llmActiveModel`/`llmActiveProvider` to BackendService.
-- **SyncService** (`@MainActor ObservableObject`) — Offline queue (`[SyncOperation]` persisted in UserDefaults), field-level merge resolution.
 
 ### Networking (`Shared/Networking/`)
 
 - **APIClient** (actor, singleton) — Generic `request<T: Decodable>` with custom ISO8601 date decoding, 90s timeout, 5 error types. Base URL: `http://127.0.0.1:8000`.
-- **APIModels** (474 lines) — 20+ Codable structs: `APITemporalEvent`, `APILoreEntity`, `APITimeTravelSimulationResponse`, `APIQueryResponse`, `APIDiscoveryStatus`, `NeighborhoodEntity/Connection/Response`, `APIConfigRequest/Response`, `APIAnalyzedPage`, `APIAnalyzeResponse`, `APIFileIngestResponse`, `APIFolderIngestResponse`, `APIChatIngestStatus`, `APIChatIngestNowResponse`, `APISetUserNameRequest/Response`, `APIIngestHistoryEntry`, `APIChatIngestNotification`.
+- **APIModels** (822 lines) — 20+ Codable structs: `APITemporalEvent`, `APILoreEntity`, `APITimeTravelSimulationResponse`, `APIQueryResponse`, `APIDiscoveryStatus`, `NeighborhoodEntity/Connection/Response`, `APIConfigRequest/Response`, `APIAnalyzedPage`, `APIAnalyzeResponse`, `APIFileIngestResponse`, `APIFolderIngestResponse`, `APIChatIngestStatus`, `APIChatIngestNowResponse`, `APISetUserNameRequest/Response`, `APIIngestHistoryEntry`, `APIChatIngestNotification`.
 
 ### Design System (`Shared/DesignSystem/`)
 
@@ -53,7 +56,7 @@ Three `@Model` classes stored locally for offline operation:
 
 ## Frontend Features
 
-### ContentView (`ContentView.swift`, 482 lines)
+### ContentView (`ContentView.swift`, 496 lines)
 - **Desktop** (macOS/iPad): `NavigationSplitView` with `SidebarDetailsView` + segmented picker (Lore Graph / Spacetime Timeline)
 - **Phone**: `TabView` with 4 tabs + chat overlay + settings sheets
 - **Overlays**: `AINavigatorView` (top-right), `ChatHistoryView` (bottom), `WikiInsightNotificationView` (top notification banner)
@@ -98,7 +101,6 @@ Three `@Model` classes stored locally for offline operation:
 
 - SwiftData is the read-through cache for Neo4j data
 - `BackendService` falls back to local SwiftData when server is unreachable
-- `SyncService` queues write operations offline and replays them when connected
 - Merge: server confidence is authoritative, local notes win, sources are unioned
 
 ## See Also

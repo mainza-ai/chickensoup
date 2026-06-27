@@ -9,7 +9,7 @@ related: [fastapi, local-first-llm, multi-llm-consensus, quantum-job-scheduler, 
 
 # API Design
 
-FastAPI server at `src/main.py` (~1175 lines). All endpoints live in one file, organized by function.
+FastAPI server at `src/main.py` (1611 lines). All endpoints live in one file, organized by function.
 
 ## Endpoints
 

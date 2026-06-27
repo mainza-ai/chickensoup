@@ -5,7 +5,7 @@ related:
 - mussolini
 - ufo-retrieval-program
 - vatican
-- vatican-ufo-crash-recovery
+- vatican
 sources:
 - Grusch-2023
 tags:
@@ -49,7 +49,7 @@ This crash predates Roswell by 14 years and supports the theory that the UFO ret
 ## See Also
 
 - [[ufo-retrieval-program]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
 - [[vatican]]
 - [[mussolini]]
 - [[italy]]
@@ -84,7 +84,7 @@ This crash predates Roswell by 14 years and supports the theory that the UFO ret
 ## See Also
 
 - [[ufo-retrieval-program]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
 - [[vatican]]
 - [[mussolini]]
 - [[italy]]

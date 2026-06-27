@@ -4,7 +4,7 @@ tags: [chat, ingest, scheduler, wiki, automation]
 created: 2026-06-25
 updated: 2026-06-25
 sources: [chat-system]
-related: [ingestion-pipeline, wiki-file-system, agent-architecture, api-design, conversation-entity-management]
+related: [ingestion-pipeline, wiki-file-system, agent-architecture, api-design]
 ---
 
 # Chat-to-Wiki Pipeline
@@ -30,7 +30,7 @@ A periodic background system that converts user–AI conversations into wiki pag
 
 ## Components
 
-### Scheduler (`src/scheduler.py`, ~465 lines)
+### Scheduler (`src/scheduler.py`, 711 lines)
 
 - **Periodic loop**: Runs every `CHAT_WIKI_CHECK_INTERVAL_SECONDS` (default 300), gated by `CHAT_WIKI_CONVERSION_ENABLED` (default False — opt-in)
 - **Eligibility detection**: Conversations must have `message_count >= CHAT_WIKI_MIN_CONVERSATION_LENGTH` (default 10) AND be idle for `CHAT_WIKI_IDLE_TIMEOUT_MINUTES` (default 30)
@@ -104,4 +104,3 @@ All settings in `src/config.py`:
 - [[ingestion-pipeline]]
 - [[wiki-file-system]]
 - [[agent-architecture]]
-- [[conversation-entity-management]]

@@ -4,7 +4,7 @@ tags: [cache, redis, infrastructure]
 created: 2026-06-22
 updated: 2026-06-23
 sources: [redis-2026]
-related: [cache-architecture, local-first-llm, api-design]
+related: [local-first-llm, api-design]
 ---
 
 # Redis

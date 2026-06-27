@@ -4,12 +4,12 @@ tags: [wiki, files, markdown, frontmatter, crud]
 created: 2026-06-25
 updated: 2026-06-25
 sources: [project-structure-2026-06-22]
-related: [ingestion-pipeline, chat-to-wiki-pipeline, knowlege-graph-ingestion, project-structure]
+related: [ingestion-pipeline, chat-to-wiki-pipeline, knowledge-graph-ingestion, project-structure]
 ---
 
 # Wiki File System
 
-The wiki is a file‑based Obsidian‑compatible markdown vault at `wiki/`. All pages use YAML frontmatter with cross‑references via `[[wikiname]]` syntax. The `src/wiki/writer.py` module (223 lines) provides CRUD operations, index management, and bidirectional cross‑referencing.
+The wiki is a file‑based Obsidian‑compatible markdown vault at `wiki/`. All pages use YAML frontmatter with cross‑references via `[[wikiname]]` syntax. The `src/wiki/writer.py` module (241 lines) provides CRUD operations, index management, and bidirectional cross‑referencing.
 
 ## Directory Structure
 
@@ -18,8 +18,8 @@ wiki/
 ├── index.md          # Content catalog (updated on every ingest)
 ├── log.md            # Append-only chronological log
 ├── overview.md       # Top-level summary
-├── entities/         # 87 pages — people, places, objects, events
-├── concepts/         # 82 pages — ideas, theories, frameworks
+├── entities/         # 78 pages — people, places, objects, events
+├── concepts/         # 91 pages — ideas, theories, frameworks
 ├── projects/         # 6 pages — engineering, architecture
 └── raw/              # Immutable source documents, conversation snapshots
 ```

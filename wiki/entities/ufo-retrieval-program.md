@@ -52,7 +52,7 @@ The U.S. government's program for recovering and studying UFOs and UAPs.
 - [[bob-lazar]]
 - [[area-51]]
 - [[the-thing]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]
 - [[vatican]]
 - [[magenta-ufo-crash]]
 - [[mussolini]]

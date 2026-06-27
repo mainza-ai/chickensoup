@@ -25,4 +25,4 @@ Mussolini's regime had significant resources and scientific institutions capable
 
 - [[magenta-ufo-crash]]
 - [[ufo-retrieval-program]]
-- [[vatican-ufo-crash-recovery]]
+- [[vatican]]

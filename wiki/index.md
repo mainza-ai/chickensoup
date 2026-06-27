@@ -54,7 +54,7 @@ related: []
 - [[swift-testing-pro]] — Agent skill: Swift Testing best practices (twostraws)
 - [[github-actions]] — CI/CD for automated testing, building, deployment
 - [[core-models]] — Core Pydantic models for the system
-- [[logging]] — Logging and observability setup
+- [[logging]] — Logging and observability setup with OpenTelemetry tracing and metrics
 - [[ezekiel]] — Prophet with chariot vision (593 BC)
 - [[daniel]] — Prophet with throne vision (605-536 BC)
 - [[john]] — Author of Revelation
@@ -67,7 +67,7 @@ related: []
 - [[maxwells-demon]] — Information as thermodynamic agent
 - [[s4]] — Area 51 sub-base where Bob Lazar worked on alien craft
 - [[vatican]] — The headquarters of the Catholic Church, recovered a UFO in 1937
-- [[vatican-ufo-crash-recovery]] — 1937 Vatican UFO crash, later transferred to USA
+- [[vatican]] — 1937 Vatican UFO crash, later transferred to USA
 - [[magenta-ufo-crash]] — 1933 crash in Magenta, Italy, recovered by Mussolini's regime
 - [[mussolini]] — Fascist dictator who recovered the Magenta UFO
 - [[italy]] — Central location for early UFO recoveries
@@ -94,6 +94,9 @@ related: []
 - [[neil-turok]] — Physicist working on quadratic gravity and CPT-symmetric universe
 - [[juan-maldacena]] — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior
 - [[mauro-biglino]] — Former Vatican translator, literal Hebrew Bible, Elohim as plural advanced civilization
+- [[knowledge-graph-ingestion]] — Wiki markdown to Neo4j ingestion with schema-constrained LLM edge classification
+- [[wiki-backup-restore]] — Wiki snapshot creation, export/import, and backup management
+- [[wiki-cleanup]] — Bulk content deletion with tag-based preservation rules
 
 ## Concepts (in wiki/concepts/)
 
@@ -174,6 +177,8 @@ related: []
 - [[cellular-intelligence]] — Every cell as reinforcement learning agent
 - [[weak-measurement]] — Conditional measurements, retrocausality, time symmetry
 - [[multi-llm-consensus]] — Cross-provider LLM consensus with Jaccard agreement scoring
+- [[api-authentication]] — API key header verification with dev mode support
+- [[celery-tasks]] — Async background tasks for wiki ingestion and spacetime navigation
 - [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
 - [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features, conversation support, discovery sync
 - [[elohim]] — The Elohim as plural, physical, advanced civilization in the Hebrew Bible
