@@ -95,6 +95,9 @@ def _should_preserve(frontmatter: dict, page_type: str, filename: str) -> bool:
     if tags & CONTENT_TAGS:
         return False
 
+    if page_type in ("entities", "concepts"):
+        return False
+
     return True
 
 

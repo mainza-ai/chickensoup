@@ -7,7 +7,12 @@ import yaml
 
 logger = logging.getLogger("chickensoup.wiki.writer")
 
-WIKI_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "wiki")
+from src.config import settings
+
+WIKI_DIR = settings.WIKI_DATA_DIR
+if not os.path.isabs(WIKI_DIR):
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    WIKI_DIR = os.path.join(project_root, WIKI_DIR)
 SUBDIRS = {
     "entities": "entities",
     "concepts": "concepts",

@@ -43,7 +43,10 @@ def create_snapshot(name: str = "auto") -> Optional[str]:
 
     try:
         with zipfile.ZipFile(filepath, "w", zipfile.ZIP_DEFLATED) as zf:
-            for root, _dirs, files in os.walk(WIKI_DIR):
+            for root, dirs, files in os.walk(WIKI_DIR):
+                if os.path.abspath(root) == os.path.abspath(BACKUP_DIR) or os.path.abspath(root).startswith(os.path.abspath(BACKUP_DIR) + os.sep):
+                    dirs[:] = []
+                    continue
                 for fname in files:
                     full_path = os.path.join(root, fname)
                     arcname = os.path.relpath(full_path, os.path.dirname(WIKI_DIR))
@@ -65,7 +68,10 @@ def export_wiki() -> Optional[str]:
 
     try:
         with zipfile.ZipFile(filepath, "w", zipfile.ZIP_DEFLATED) as zf:
-            for root, _dirs, files in os.walk(WIKI_DIR):
+            for root, dirs, files in os.walk(WIKI_DIR):
+                if os.path.abspath(root) == os.path.abspath(BACKUP_DIR) or os.path.abspath(root).startswith(os.path.abspath(BACKUP_DIR) + os.sep):
+                    dirs[:] = []
+                    continue
                 for fname in files:
                     full_path = os.path.join(root, fname)
                     arcname = os.path.relpath(full_path, os.path.dirname(WIKI_DIR))

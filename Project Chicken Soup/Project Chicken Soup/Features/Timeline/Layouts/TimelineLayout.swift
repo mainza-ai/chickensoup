@@ -32,7 +32,8 @@ struct TimelineLayout: Layout {
     
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let totalDuration = endDate.timeIntervalSince(startDate)
-        let width = max(CGFloat(totalDuration) * 0.00001, minWidth)
+        // Add 300 points of horizontal padding (150 on each side) to accommodate card width and prevent clipping
+        let width = max(CGFloat(totalDuration) * 0.00001, minWidth) + 300
         return CGSize(width: width, height: proposal.height ?? 300)
     }
     
@@ -59,13 +60,19 @@ struct TimelineLayout: Layout {
         let trackCount = max(branches.count, 1)
         let trackHeight = bounds.height / CGFloat(trackCount)
         
+        // Horizontal padding of 150 points on each side
+        let padding: CGFloat = 150
+        let availableWidth = bounds.width - (padding * 2)
+        
         for subview in subviews {
             let date = subview[EventDateKey.self]
             let branch = subview[EventBranchKey.self]
             
             let offset = date.timeIntervalSince(startDate)
             let ratio = CGFloat(offset / totalDuration)
-            let x = bounds.minX + (ratio * bounds.width)
+            
+            // Map the ratio to [minX + padding, maxX - padding]
+            let x = bounds.minX + padding + (ratio * availableWidth)
             
             let size = subview.sizeThatFits(.unspecified)
             

@@ -1,4 +1,5 @@
 import json
+import re
 import logging
 import os
 import io
@@ -801,7 +802,9 @@ def _process_ingested_content(
         logger.warning(f"Index update failed: {idx_err}")
 
     try:
-        log_text = f"Uploaded {filename or 'document'}: {len(pages_created)} pages created, {len(pages_updated)} updated"
+        safe_filename = filename or 'document'
+        safe_filename = re.sub(r'[\r\n#*`\[\]\(\)]', '', safe_filename)
+        log_text = f"Uploaded {safe_filename}: {len(pages_created)} pages created, {len(pages_updated)} updated"
         append_to_log(log_text)
     except Exception as log_err:
         logger.warning(f"Log update failed: {log_err}")
@@ -854,6 +857,8 @@ async def post_ingest_file(file: UploadFile = File(...)):
     """Uploads a single file, analyzes content via LLM, and creates/updates wiki pages + Neo4j."""
     try:
         content_bytes = await file.read()
+        if len(content_bytes) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="Uploaded file size exceeds the 50MB limit")
         try:
             text = content_bytes.decode("utf-8")
         except UnicodeDecodeError:
@@ -861,6 +866,8 @@ async def post_ingest_file(file: UploadFile = File(...)):
 
         response = _process_ingested_content(text, filename=file.filename)
         return response
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"File ingestion failed: {e}")
         raise HTTPException(status_code=500, detail=f"File ingestion failed: {str(e)}")
@@ -871,7 +878,10 @@ async def post_ingest_folder(file: UploadFile = File(...)):
     """Uploads a zip archive of files, processes each through the ingest pipeline."""
     try:
         content_bytes = await file.read()
+        if len(content_bytes) > 50 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="Uploaded file size exceeds the 50MB limit")
         file_results = []
+        failed_files = []
         total_created = 0
         total_updated = 0
         total_nodes = 0
@@ -899,6 +909,7 @@ async def post_ingest_folder(file: UploadFile = File(...)):
                     file_count += 1
                 except Exception as per_file_err:
                     logger.warning(f"Failed to process {entry.filename}: {per_file_err}")
+                    failed_files.append({"filename": entry.filename, "error": str(per_file_err)})
 
         return FolderIngestResponse(
             success=True,
@@ -908,7 +919,10 @@ async def post_ingest_folder(file: UploadFile = File(...)):
             total_nodes_created=total_nodes,
             total_relationships_created=total_rels,
             file_results=file_results,
+            failed_files=failed_files,
         )
+    except HTTPException:
+        raise
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="Uploaded file is not a valid zip archive")
     except Exception as e:
@@ -1060,17 +1074,36 @@ async def get_entities():
 
 
 @app.delete("/entities/{name}", dependencies=[Depends(verify_api_key)])
-async def delete_entity(name: str):
-    """Deletes a lore entity from Neo4j by name."""
+async def delete_entity(name: str, hard: bool = True, force: bool = False):
+    """Deletes a lore entity. Coordinates with filesystem to delete the matching wiki page if it exists."""
+    slug = slugify(name)
+    found_subdir = None
+    for subdir in ["entities", "concepts", "projects"]:
+        try:
+            if read_page(slug, subdir) is not None:
+                found_subdir = subdir
+                break
+        except Exception:
+            pass
+            
+    if found_subdir:
+        logger.info(f"Coordinating deletion of entity '{name}' with wiki page '{slug}' in {found_subdir}")
+        # Delegate to delete_wiki_page to handle backups, link cleaning, and Neo4j deletion
+        await delete_wiki_page(slug=slug, page_type=found_subdir, hard=hard, force=force)
+        return {"success": True, "deleted": True, "wiki_deleted": True}
+        
     try:
         driver = neo4j_conn.get_driver()
         if not driver:
-            return {"success": False, "deleted": False}
+            return {"success": False, "deleted": False, "wiki_deleted": False}
         with driver.session() as session:
             result = session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n RETURN count(n)", name=name)
             count = result.single()[0]
-            logger.info(f"Deleted entity '{name}' from Neo4j (nodes removed: {count})")
-            return {"success": True, "deleted": count > 0}
+            if count == 0 and slug != name:
+                result = session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n RETURN count(n)", name=slug)
+                count = result.single()[0]
+            logger.info(f"Deleted entity '{name}' directly from Neo4j (nodes removed: {count})")
+            return {"success": True, "deleted": count > 0, "wiki_deleted": False}
     except Exception as e:
         logger.error(f"Failed to delete entity '{name}': {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -1106,6 +1139,14 @@ async def get_events():
                 
                 if not is_event:
                     continue
+                
+                from src.wiki.cleanup import ENGINEERING_TAGS
+                has_engineering_tags = any(t in ENGINEERING_TAGS for t in tags)
+                is_engineering_project = "project" in labels
+                
+                if is_engineering_project or has_engineering_tags:
+                    if not any(hp in title_lower for hp in ["serpo", "rainbow", "looking glass", "pegasus", "paperclip"]):
+                        continue
                 
                 node_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, title))
                 
@@ -1215,17 +1256,21 @@ def post_ingest_bulk():
 
 
 @app.post("/wiki/clear-content", response_model=WikiClearResponse, dependencies=[Depends(verify_api_key)])
-def post_wiki_clear_content():
+def post_wiki_clear_content(confirm: bool = False):
     """Deletes all CONTENT/SUBJECT wiki pages (UFO/alien/time-travel knowledge),
     preserves CODE/ENGINEERING pages (project architecture, tools, infrastructure).
     Pages with `protected: true` in frontmatter are never deleted."""
+    if not confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This is a highly destructive operation. Please provide the 'confirm=true' query parameter to proceed."
+        )
     try:
         from src.wiki.cleanup import clear_content_pages
         result = clear_content_pages(dry_run=False)
 
         if result.get("success"):
             try:
-                from src.knowledge_graph.connection import neo4j_conn
                 driver = neo4j_conn.get_driver()
                 if driver:
                     import os
@@ -1300,7 +1345,6 @@ async def post_wiki_import(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="No pages could be restored from the uploaded file. Ensure it is a valid wiki export zip.")
 
         try:
-            from src.knowledge_graph.connection import neo4j_conn
             driver = neo4j_conn.get_driver()
             if driver:
                 with driver.session() as session:
@@ -1411,8 +1455,8 @@ async def get_wiki_page(slug: str, page_type: str = "entities"):
 
 
 @app.delete("/wiki/page/{slug:path}", response_model=WikiDeleteResponse, dependencies=[Depends(verify_api_key)])
-async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = False):
-    """Deletes a single wiki page file. Protected pages cannot be deleted."""
+async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = False, force: bool = False):
+    """Deletes a single wiki page file. Protected pages cannot be deleted unless forced (only lore pages can be forced)."""
     page_data = read_page(slug, page_type)
     if not page_data:
         raise HTTPException(status_code=404, detail=f"Wiki page '{slug}' not found in {page_type}")
@@ -1420,7 +1464,20 @@ async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = 
     title = fm.get("title", slug)
 
     if fm.get("protected", False):
-        raise HTTPException(status_code=403, detail=f"Wiki page '{title}' is protected and cannot be deleted")
+        from src.wiki.cleanup import ENGINEERING_TAGS
+        tags = set(fm.get("tags", []))
+        is_engineering = (page_type == "projects") or bool(tags & ENGINEERING_TAGS)
+        if is_engineering:
+            raise HTTPException(status_code=403, detail=f"Wiki page '{title}' is a core engineering/project file and cannot be deleted.")
+        if not force:
+            raise HTTPException(status_code=403, detail=f"Wiki page '{title}' is protected. Use the 'force=true' parameter to delete this content page.")
+
+    # Create pre-deletion backup snapshot
+    from src.wiki.backup import create_snapshot
+    try:
+        create_snapshot(name="auto")
+    except Exception as snap_err:
+        logger.warning(f"Pre-deletion snapshot failed: {snap_err}")
 
     deleted = delete_page(slug, page_type)
     if not deleted:
@@ -1447,6 +1504,31 @@ async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = 
         wiki_root = settings.WIKI_DATA_DIR
         if not os.path.isabs(wiki_root):
             wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
+            
+        def clean_obsidian_links(body_text: str, target_slug: str, target_title: str) -> tuple[str, bool]:
+            link_pattern = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
+            modified = False
+            
+            def repl(match):
+                nonlocal modified
+                link_target = match.group(1).strip()
+                alias = match.group(2)
+                
+                # Match against slug, title, case insensitively and slugified
+                if (slugify(link_target) == slugify(target_slug) or 
+                    slugify(link_target) == slugify(target_title) or 
+                    link_target.lower() == target_title.lower() or 
+                    link_target.lower() == target_slug.lower()):
+                    modified = True
+                    if alias:
+                        return alias.strip()
+                    else:
+                        return link_target
+                return match.group(0)
+                
+            new_body = link_pattern.sub(repl, body_text)
+            return new_body, modified
+
         try:
             for subdir in ["entities", "concepts", "projects"]:
                 dir_path = os.path.join(wiki_root, subdir)
@@ -1461,16 +1543,22 @@ async def delete_wiki_page(slug: str, page_type: str = "entities", hard: bool = 
                     pdata = read_page(fslug, subdir)
                     if not pdata:
                         continue
+                    
+                    # 1. Clean related frontmatter field
                     rel = set(pdata["frontmatter"].get("related", []))
-                    removed = False
+                    removed_rel = False
                     for ref in list(rel):
-                        if slugify(ref) == slug or ref == title:
+                        if slugify(ref) == slug or ref == title or ref.lower() == title.lower() or slugify(ref) == slugify(title):
                             rel.discard(ref)
-                            removed = True
-                    if removed:
+                            removed_rel = True
+                            
+                    # 2. Clean Obsidian links from body text
+                    new_body, removed_body = clean_obsidian_links(pdata["body"], slug, title)
+                    
+                    if removed_rel or removed_body:
                         write_page(
                             title=pdata["frontmatter"].get("title", fslug),
-                            body=pdata["body"],
+                            body=new_body,
                             tags=pdata["frontmatter"].get("tags", []),
                             sources=pdata["frontmatter"].get("sources", []),
                             related=list(rel),

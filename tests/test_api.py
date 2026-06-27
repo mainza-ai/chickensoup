@@ -126,10 +126,52 @@ def test_api_clear_content(client, mock_neo4j):
         "deleted_slugs": ["entities/roswell-crash"]
     }
 
-    with patch("src.wiki.cleanup.clear_content_pages", return_value=mock_clear_res):
-        response = client.post("/wiki/clear-content")
+    with patch("src.wiki.cleanup.clear_content_pages", return_value=mock_clear_res), \
+         patch("src.knowledge_graph.ingest.ingest_wiki_page", return_value=(0, 0)):
+        response = client.post("/wiki/clear-content?confirm=true")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
         assert data["preserved_count"] == 5
         assert data["deleted_count"] == 10
+
+def test_api_get_events_filtering(client, mock_neo4j):
+    mock_driver = MagicMock()
+    mock_neo4j.get_driver.return_value = mock_driver
+    mock_session = MagicMock()
+    mock_driver.session.return_value.__enter__.return_value = mock_session
+
+    class FakeNode:
+        def __init__(self, name, labels, tags):
+            self.labels = set(labels)
+            self._properties = {
+                "name": name,
+                "tags": tags,
+                "sources": ["Grusch-2023"],
+                "content_preview": "Test description"
+            }
+        def get(self, key, default=None):
+            return self._properties.get(key, default)
+
+    node1 = FakeNode("Roswell Crash", ["Entity"], ["ufo", "crash"])
+    node2 = FakeNode("Technology Stack", ["Concept"], ["project", "technology", "stack"])
+    node3 = FakeNode("Project Serpo", ["Entity"], ["project-serpo", "uap"])
+    node4 = FakeNode("Project Structure", ["Project"], ["build"])
+
+    mock_record1 = {"e": node1}
+    mock_record2 = {"e": node2}
+    mock_record3 = {"e": node3}
+    mock_record4 = {"e": node4}
+
+    mock_session.run.return_value = [mock_record1, mock_record2, mock_record3, mock_record4]
+
+    with patch("src.main.reconcile_neo4j_with_wiki"):
+        response = client.get("/events")
+        assert response.status_code == 200
+        data = response.json()
+        
+        titles = [event["title"] for event in data]
+        assert "Roswell Crash" in titles
+        assert "Project Serpo" in titles
+        assert "Technology Stack" not in titles
+        assert "Project Structure" not in titles

@@ -94,13 +94,6 @@ struct TemporalTimelineView: View {
                             .eventBranch(event.branch?.name ?? "Universe Prime")
                         }
                     }
-                    .padding(.leading, isCompact ? 120 : 240)
-                    .padding(.trailing, isCompact ? 20 : 120)
-                    
-                    let timelineScroll = ScrollView(.horizontal) {
-                        timelineContent
-                    }
-                    .scrollIndicators(.hidden)
                     .background(
                         Group {
                             if isCompact {
@@ -111,6 +104,13 @@ struct TemporalTimelineView: View {
                             }
                         }
                     )
+                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
+                    
+                    let timelineScroll = ScrollView(.horizontal) {
+                        timelineContent
+                    }
+                    .scrollIndicators(.hidden)
                     #if !os(macOS)
                     .refreshable {
                         await backendService.fetchTemporalEvents(context: modelContext)
@@ -220,6 +220,10 @@ struct CanvasView: View {
                 let trackCount = max(branches.count, 1)
                 let trackHeight = size.height / CGFloat(trackCount)
                 
+                // Horizontal padding of 150 points on each side to match TimelineLayout
+                let padding: CGFloat = 150
+                let availableWidth = size.width - (padding * 2)
+                
                 // Draw Spacetime Grid lines
                 var gridPath = Path()
                 let gridSpacing: CGFloat = 80
@@ -238,21 +242,21 @@ struct CanvasView: View {
                 for (index, branch) in branches.enumerated() {
                     let trackCenterY = CGFloat(index) * trackHeight + (trackHeight / 2)
                     var trackPath = Path()
-                    trackPath.move(to: CGPoint(x: 0, y: trackCenterY))
+                    trackPath.move(to: CGPoint(x: padding, y: trackCenterY))
                     
-                    // Wave representing spacetime warp/energy on this branch
-                    for x in stride(from: 0, to: size.width, by: 10) {
-                        let wave = sin(x * 0.005 + CGFloat(time) + CGFloat(index * 2)) * 6
+                    // Wave representing spacetime warp/energy on this branch (bounded by padding)
+                    for x in stride(from: padding, to: size.width - padding, by: 10) {
+                        let wave = sin((x - padding) * 0.005 + CGFloat(time) + CGFloat(index * 2)) * 6
                         trackPath.addLine(to: CGPoint(x: x, y: trackCenterY + wave))
                     }
                     
                     let tintColor = index == 0 ? DesignConstants.systemOrange : DesignConstants.systemBlue
                     gc.stroke(trackPath, with: .color(tintColor.opacity(0.18)), lineWidth: 2)
                     
-                    // Draw branch labels at the top of each track
+                    // Draw branch labels at the top of each track (aligned with start of track line)
                     let font = Font.system(.caption, design: .monospaced).bold()
                     let text = gc.resolve(Text(branch.uppercased()).font(font).foregroundStyle(tintColor.opacity(0.35)))
-                    gc.draw(text, at: CGPoint(x: 10, y: CGFloat(index) * trackHeight + 14), anchor: .leading)
+                    gc.draw(text, at: CGPoint(x: padding + 10, y: CGFloat(index) * trackHeight + 14), anchor: .leading)
                 }
                 
                 // Draw branching curves
@@ -264,7 +268,7 @@ struct CanvasView: View {
                     guard let firstEvent = branchEvents.first else { continue }
                     
                     let firstEventOffset = firstEvent.timestamp.timeIntervalSince(startDate)
-                    let targetX = (CGFloat(firstEventOffset / totalDuration) * size.width)
+                    let targetX = padding + (CGFloat(firstEventOffset / totalDuration) * availableWidth)
                     let targetY = CGFloat(index) * trackHeight + (trackHeight / 2)
                     
                     // Find a preceding event in "Universe Prime" to branch from
@@ -275,7 +279,7 @@ struct CanvasView: View {
                     
                     if let sourceEvent = precedingEvent {
                         let sourceOffset = sourceEvent.timestamp.timeIntervalSince(startDate)
-                        let sourceX = (CGFloat(sourceOffset / totalDuration) * size.width)
+                        let sourceX = padding + (CGFloat(sourceOffset / totalDuration) * availableWidth)
                         let sourceY = trackHeight / 2 // "Universe Prime" center Y
                         
                         var splitPath = Path()
@@ -299,14 +303,15 @@ struct CanvasView: View {
                     }
                 }
                 
-                // Particle flow streams along the active tracks
+                // Particle flow streams along the active tracks (bounded by padding)
                 if !events.isEmpty {
                     for i in 0..<8 {
                         let trackIndex = i % trackCount
                         let trackCenterY = CGFloat(trackIndex) * trackHeight + (trackHeight / 2)
                         let speed = Double((i % 3) + 1) * 0.2
-                        let pX = CGFloat((time * 80 * speed).truncatingRemainder(dividingBy: Double(size.width)))
-                        let wave = sin(pX * 0.005 + CGFloat(time)) * 6
+                        let pOffset = CGFloat((time * 80 * speed).truncatingRemainder(dividingBy: Double(availableWidth)))
+                        let pX = padding + pOffset
+                        let wave = sin(pOffset * 0.005 + CGFloat(time)) * 6
                         
                         gc.fill(
                             Path(ellipseIn: CGRect(x: pX - 2, y: trackCenterY + wave - 2, width: 4, height: 4)),

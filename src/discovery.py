@@ -109,28 +109,23 @@ def get_discovered(depth: str = "cached") -> Tuple[str, str, List[str]]:
 
 
 def get_active_model() -> str:
-    """Return the user-configured model, or the first model from the active provider."""
-    if settings.LLM_ACTIVE_MODEL:
-        return settings.LLM_ACTIVE_MODEL
-    _, _, models = get_discovered()
+    """Return the configured model if compatible with the active provider, otherwise the first discovered model."""
+    provider, _, models = get_discovered()
+    if settings.LLM_ACTIVE_PROVIDER and settings.LLM_ACTIVE_PROVIDER.lower() == provider:
+        if settings.LLM_ACTIVE_MODEL:
+            if not models or settings.LLM_ACTIVE_MODEL in models:
+                return settings.LLM_ACTIVE_MODEL
     return models[0] if models else "default-model"
 
 
 def get_active_provider() -> str:
-    """Return the user-configured provider, or the first available from the chain."""
-    if settings.LLM_ACTIVE_PROVIDER:
-        return settings.LLM_ACTIVE_PROVIDER
+    """Return the actual active provider being used (resolved from discovery)."""
     provider, _, _ = get_discovered()
     return provider
 
 
 def get_active_base_url() -> str:
-    """Return the base URL for the current active provider (live lookup)."""
-    if settings.LLM_ACTIVE_PROVIDER:
-        name = settings.LLM_ACTIVE_PROVIDER.lower()
-        url = _URL_MAPPING.get(name)
-        if url:
-            return url.rstrip("/")
+    """Return the base URL for the actual active provider being used."""
     _, url, _ = get_discovered()
     return url
 

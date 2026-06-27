@@ -134,6 +134,7 @@ class FolderIngestResponse(BaseModel):
     total_nodes_created: int = 0
     total_relationships_created: int = 0
     file_results: List[FileIngestResponse] = Field(default_factory=list)
+    failed_files: List[Dict[str, str]] = Field(default_factory=list)
 
 class WikiClearResponse(BaseModel):
     success: bool

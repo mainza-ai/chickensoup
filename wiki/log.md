@@ -442,4 +442,10 @@ Resolved visual synchrony bugs and overlay obstructions in the SwiftUI client's 
 
 - [[swift-frontend-architecture]] — Added ConnectionLineShape and zoom controls position details.
 - log.md
+## [2026-06-26] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-06-26] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-06-26] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-06-26] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-06-26] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-06-26] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 
