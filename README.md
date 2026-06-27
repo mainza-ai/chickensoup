@@ -139,12 +139,12 @@ Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS & iOS, 33+ files), SwiftData, Swift Testing |
-| **API Layer** | FastAPI, FastMCP (Model Context Protocol) |
-| **Agent AI** | Pydantic AI, `pydantic-graph`, LangGraph |
-| **Databases** | Neo4j (Knowledge Graph), Redis (Cache + Conversation History) |
-| **Quantum Tier** | Qiskit (Spacetime), CUDA-Q (Field), PennyLane (Pathfinding QML) |
-| **Infrastructure** | Docker, Celery, OpenTelemetry, pytest |
+| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS & iOS, 33+ files), SwiftData, Swift Testing, os.Logger |
+| **API Layer** | FastAPI, FastMCP (Model Context Protocol), WebSockets, custom API Key Security Middleware |
+| **Agent AI** | Pydantic AI, `pydantic-graph`, LangGraph, Langchain |
+| **Databases** | Neo4j (Knowledge Graph), Redis (Cache + Invalidation + Celery broker) |
+| **Quantum Tier** | Qiskit (Spacetime), CUDA-Q (Field), PennyLane (Pathfinding QML), Quantum Hardware Job Scheduler |
+| **Infrastructure** | Docker, Celery (Asynchronous Ingestion Workers), OpenTelemetry (observability, metrics, tracing), pytest |
 
 ---
 
@@ -154,15 +154,34 @@ Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
 chickensoup/
 ├── development-docs/       # Project specifications & architecture docs
 │   └── PROJECT_SPEC.md     # Core technical specification
-├── wiki/                   # Markdown wiki (179 pages: entities, concepts, projects)
+├── wiki/                   # Markdown wiki (181 pages: entities, concepts, projects)
+│   ├── entities/           # 81 pages (people, craft, places, events, programs)
+│   ├── concepts/           # 93 pages (ideas, theories, frameworks)
+│   ├── projects/           # 6 pages (time travel machinery specs)
+│   └── raw/                # Immutable conversation snapshots
 ├── Project Chicken Soup/   # Native SwiftUI client (macOS & iOS, 33+ Swift files)
 ├── src/                    # Backend source code (22 Python files)
-│   ├── main.py             # FastAPI entry point (30+ endpoints)
-│   ├── config.py           # Pydantic Settings (24+ fields)
-│   ├── scheduler.py        # Periodic chat-to-wiki background loop
-│   ├── agents/             # 6 agents: orchestrator, query, research, navigation, ingest, chat-ingest
-│   ├── wiki/writer.py      # Wiki page CRUD, cross-referencing, index/log
-│   └── knowledge_graph/    # Neo4j connection, schema, ingest, queries
+│   ├── main.py             # FastAPI entry point (30+ endpoints & WebSocket routing)
+│   ├── config.py           # Config settings & environment variables
+│   ├── discovery.py        # Local LLM auto-discovery fallback resolver
+│   ├── cache.py            # Redis query & LLM cache layer with invalidation
+│   ├── tasks.py            # Celery asynchronous worker tasks
+│   ├── observability.py    # OpenTelemetry instrumented tracing & metrics
+│   ├── multi_llm.py        # Consensus-based multi-LLM querying & scoring
+│   ├── quantum_scheduler.py# Job routing to D-Wave, IonQ, and IBM Quantum
+│   ├── scheduler.py        # Background scheduler for chat-to-wiki ingestion
+│   ├── api/                # API router & auth dependencies
+│   │   └── auth.py         # API key header authentication checker
+│   ├── agents/             # pydantic-graph & LangGraph agents (orchestrator, query, navigation, research, ingest)
+│   ├── wiki/               # Wiki vault interaction utilities
+│   │   ├── writer.py       # YAML frontmatter page writer & indexer
+│   │   ├── backup.py       # Safe pre-mutation automated backups
+│   │   └── cleanup.py      # Secure lore clearing & metadata preservation
+│   └── knowledge_graph/    # Neo4j query & ingestion layer
+│       ├── ingest.py       # LLM relationship extraction & Cypher injection sanitizer
+│       ├── connection.py   # Thread-safe driver connection lifecycle
+│       ├── queries.py      # Neo4j query builder templates
+│       └── schema.py       # Indexes and constraint builders
 ├── tests/                  # Backend unit and integration tests (9 files)
 ├── AGENTS.md               # LLM Agent instructions & wiki schema
 ├── CHANGELOG.md            # Project release log
@@ -206,7 +225,7 @@ chickensoup/
 
 ## 📚 The Lore Wiki
 
-The knowledge graph is hydrated from structured markdown files in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory (179 pages and growing).
+The knowledge graph is hydrated from structured markdown files in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory (180 content pages and growing).
 
 Pages are automatically created through two mechanisms:
 - **File/Folder Upload**: Upload `.txt`/`.md`/`.json`/`.csv` files → AI analyzes content → wiki pages created with cross-references → synced to Neo4j.
@@ -214,15 +233,20 @@ Pages are automatically created through two mechanisms:
 
 | Wiki Section | Count | Description |
 |:---|---:|:---|
-| Entities | 87 | People, places, objects, events, programs |
-| Concepts | 85 | Theories, frameworks, ideas, claims |
-| Projects | 6 | Engineering work, architecture, specifications |
-| Raw | 1+ | Immutable source documents, conversation snapshots |
+| [Entities](file:///Users/mck/Desktop/chickensoup/wiki/entities) | 81 | People, places, objects, events, programs |
+| [Concepts](file:///Users/mck/Desktop/chickensoup/wiki/concepts) | 93 | Theories, frameworks, ideas, claims |
+| [Projects](file:///Users/mck/Desktop/chickensoup/wiki/projects) | 6 | Engineering work, architecture, specifications |
+| [Raw](file:///Users/mck/Desktop/chickensoup/wiki/raw) | 1+ | Immutable source documents, conversation snapshots |
 
-Additional features:
-- **Research Thread Detection**: Topics discussed in 3+ conversations auto-create project pages.
-- **Adaptive Confidence**: Repeated topics get confidence reinforcement across sessions.
-- **Conversation Snapshots**: Full message history saved to `wiki/raw/` as immutable markdown.
+### Advanced Capabilities & Services
+
+* **Consensus-based Multi-LLM Querying**: Exposes `/consensus/query` to route requests across multiple local LLM providers, calculating consensus scores for high-reliability outputs.
+* **Auto-Discovery Fallback**: Resolves active local LLM runtime (oMLX, Ollama, LM Studio) dynamically, mapping model properties and base URLs.
+* **Wiki Backup & Restore**: Features pre-mutation backup snapshots in `src/wiki/backup.py` to prevent data loss during clearance or import.
+* **Wiki Cleanup & Sanitation**: Deletes lore-related content in `src/wiki/cleanup.py` while preserving core system documentation, engineering guides, and user profile metadata.
+* **API Authentication Security**: Employs headers (`X-API-Key`) validation on mutating endpoints (POST, DELETE) to secure internal graph modification.
+* **MCP Integration**: Integration of FastMCP exposing 6 custom tools for external client consuming applications.
+* **Observability (OpenTelemetry)**: Instruments standard OpenTelemetry traces, spans, and latency metrics for Neo4j, Redis, and quantum spacetime solver executions.
 
 ---
 
