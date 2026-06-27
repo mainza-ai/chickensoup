@@ -27,7 +27,8 @@ Project Chicken Soup is a production-quality, local-first system that simulates 
 - **Field Manipulation**: Models field-propulsion metrics using **CUDA-Q**.
 - **QML Navigation**: Plots optimal temporal coordinates via **PennyLane** neural networks, targeting hardware from **D-Wave** and **IonQ**.
 - **Lore Knowledge Graph**: Maps whistleblower claims, historic crashes, and scientific anomalies using a **Neo4j** graph.
-- **Local-First LLMs**: Auto-discovers and falls back across local models (**oMLX** ➔ **Ollama** ➔ **LM Studio**).
+- **Clean Spacetime Timeline**: Filters out software blueprints, codebase configs, and engineering documentation from the events timeline to show only actual historical incidents, projects, and whistleblowers.
+- **Local-First LLMs & Active Model Resolution**: Auto-discovers and falls back across local models (**oMLX** ➔ **Ollama** ➔ **LM Studio**), dynamically resolving active model names and base URLs to prevent UI desyncs when providers fall back.
 - **Wiki Auto-Ingestion**: Upload files or folders — AI analyzes content and automatically creates wiki pages with cross-references.
 - **Chat-to-Wiki Pipeline**: Periodic background conversion of user–AI conversations into wiki pages, research threads, and temporal events.
 - **Apple SwiftUI Client**: Native macOS & iOS application with a warm, "chicken soup" systemOrange accent theme (`#FF9500`) powered by **SwiftData**.
