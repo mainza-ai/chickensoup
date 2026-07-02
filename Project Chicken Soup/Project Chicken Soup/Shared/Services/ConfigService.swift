@@ -120,17 +120,17 @@ public final class ConfigService {
         }
     }
 
-    public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String]) {
+    public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String], error: String?) {
         do {
             let req = APILLMProbeRequest(providerName: name)
             let bodyData = try JSONEncoder().encode(req)
             let response: APILLMProbeResponse = try await APIClient.shared.request(
                 path: "/config/llm/probe", method: "POST", body: bodyData
             )
-            return (response.provider, response.available, response.models)
+            return (response.provider, response.available, response.models, response.error)
         } catch {
             logger.error("Failed to probe LLM provider '\(name)': \(error.localizedDescription)")
-            return (name, false, [])
+            return (name, false, [], error.localizedDescription)
         }
     }
 }

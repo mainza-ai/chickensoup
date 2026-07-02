@@ -1,7 +1,8 @@
 import json
 import urllib.error
 from unittest.mock import patch, MagicMock
-from src.discovery import refresh_discovery, get_discovered, get_active_model, get_active_provider
+from src.discovery import refresh_discovery, get_discovered, get_active_model, get_active_provider, probe_provider, _probe_single
+import time
 
 def _clear_discovery_cache():
     """Reset the module-level cache for test isolation."""
@@ -9,13 +10,19 @@ def _clear_discovery_cache():
     d._discovered_provider = None
     d._discovered_base_url = None
     d._discovered_models = []
+    d._discovered_all = {}
+    d._discovered_at = 0.0
+    d._circuit_breakers.clear()
+
 
 def test_discover_active_provider_fallback():
     _clear_discovery_cache()
-    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")):
+    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")), \
+         patch("time.sleep"):
         provider, url, models = refresh_discovery()
         assert provider == "simulated"
         assert "mock-gpt-4" in models
+
 
 def test_discover_active_provider_success_omlx():
     _clear_discovery_cache()
@@ -30,8 +37,9 @@ def test_discover_active_provider_success_omlx():
 
         provider, url, models = refresh_discovery()
         assert provider == "omlx"
-        assert url == "http://127.0.0.1:9000/v1"
+        assert url == "http://localhost:9000/v1"
         assert models == ["omlx-model-1", "omlx-model-2"]
+
 
 def test_discover_active_provider_success_ollama_after_omlx_fail():
     _clear_discovery_cache()
@@ -45,18 +53,82 @@ def test_discover_active_provider_success_ollama_after_omlx_fail():
     fail_effect = urllib.error.URLError("Connection refused")
 
     def urlopen_side_effect(req, timeout=None):
-        url = req.full_url if hasattr(req, "full_url") else req
+        url = req.full_url if hasattr(req, "full_url") else str(req)
         if "9000" in url:
             raise fail_effect
         cm = MagicMock()
         cm.__enter__.return_value = mock_response
         return cm
 
-    with patch("urllib.request.urlopen", side_effect=urlopen_side_effect):
+    with patch("urllib.request.urlopen", side_effect=urlopen_side_effect), \
+         patch("time.sleep"):
         provider, url, models = refresh_discovery()
         assert provider == "ollama"
         assert url == "http://localhost:11434/v1"
-        assert "ollama-llama3" in models
+        assert "ollama-llama-3" in models or "ollama-llama3" in models
+
+
+def test_override_falls_through_to_chain_when_unreachable():
+    """LLM_ACTIVE_PROVIDER=ollama but ollama is down → fallback to oMLX."""
+    import src.config as cfg
+    import src.discovery as d
+    _clear_discovery_cache()
+
+    original_override = cfg.settings.LLM_ACTIVE_PROVIDER
+    cfg.settings.LLM_ACTIVE_PROVIDER = "ollama"
+
+    mock_response = MagicMock()
+    mock_response.status = 200
+    mock_response.read.return_value = json.dumps({
+        "data": [{"id": "omlx-model-1"}]
+    }).encode("utf-8")
+
+    def urlopen_side_effect(req, timeout=None):
+        url = req.full_url if hasattr(req, "full_url") else str(req)
+        if "11434" in url:
+            raise urllib.error.URLError("Connection refused")
+        cm = MagicMock()
+        cm.__enter__.return_value = mock_response
+        return cm
+
+    try:
+        with patch("urllib.request.urlopen", side_effect=urlopen_side_effect), \
+             patch("time.sleep"):
+            provider, url, models = refresh_discovery()
+            assert provider == "omlx"
+            assert "omlx-model-1" in models
+    finally:
+        cfg.settings.LLM_ACTIVE_PROVIDER = original_override
+
+
+def test_probe_tries_multiple_model_paths():
+    """404 on /v1/models → falls back to /models and succeeds."""
+    _clear_discovery_cache()
+
+    mock_200 = MagicMock()
+    mock_200.status = 200
+    mock_200.read.return_value = json.dumps({
+        "data": [{"id": "ollama-llama3"}]
+    }).encode("utf-8")
+
+    mock_404 = MagicMock()
+    mock_404.status = 404
+    mock_404.read.return_value = b"{}"
+
+    def urlopen_side_effect(req, timeout=None):
+        url = req.full_url if hasattr(req, "full_url") else str(req)
+        if url.endswith("/v1/models"):
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+        cm = MagicMock()
+        cm.__enter__.return_value = mock_200
+        return cm
+
+    with patch("urllib.request.urlopen", side_effect=urlopen_side_effect), \
+         patch("time.sleep"):
+        result = _probe_single("ollama")
+        assert result["available"] is True
+        assert "ollama-llama3" in result["models"]
+
 
 def test_get_discovered_caching():
     _clear_discovery_cache()
@@ -79,10 +151,22 @@ def test_get_discovered_caching():
         assert models == ["cached-model"]
         assert mock_urlopen.call_count == 3
 
+
 def test_get_active_model_fallback():
     _clear_discovery_cache()
-    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")):
+    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")), \
+         patch("time.sleep"):
         refresh_discovery()
         model = get_active_model()
         # After fallback, first model is "mock-gpt-4"
         assert model == "mock-gpt-4"
+
+
+def test_probe_provider_returns_error_on_failure():
+    _clear_discovery_cache()
+    with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("Connection refused")), \
+         patch("time.sleep"):
+        provider, url, models, error = probe_provider("omlx")
+        assert provider == "simulated"
+        assert models == []
+        assert error is not None

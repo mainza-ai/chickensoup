@@ -448,4 +448,6 @@ Resolved visual synchrony bugs and overlay obstructions in the SwiftUI client's 
 ## [2026-06-26] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 ## [2026-06-26] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
 ## [2026-06-26] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-02] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-02] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 

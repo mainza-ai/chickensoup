@@ -83,6 +83,7 @@ def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
         name: LLMProviderStatus(
             available=info.get("available", False),
             models=info.get("models", []),
+            error=info.get("error"),
         )
         for name, info in raw.items()
     }
@@ -289,11 +290,12 @@ async def post_llm_config(request: LLMConfigRequest):
 @app.post("/config/llm/probe", response_model=LLMProbeResponse)
 async def post_llm_probe(request: LLMProbeRequest):
     """Probe a specific provider and return its models (does not change active config)."""
-    provider, _, models = probe_provider(request.provider_name)
+    provider, _, models, error = probe_provider(request.provider_name)
     return LLMProbeResponse(
         provider=provider,
         available=provider != "simulated",
         models=models,
+        error=error,
     )
 
 @app.get("/models", response_model=ModelsResponse)

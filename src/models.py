@@ -56,7 +56,8 @@ class ModelsResponse(BaseModel):
 
 class LLMProviderStatus(BaseModel):
     available: bool = False
-    models: List[str] = []
+    models: List[str] = Field(default_factory=list)
+    error: Optional[str] = None
 
 class ConfigRequest(BaseModel):
     quantum_backend: str
@@ -97,6 +98,7 @@ class LLMProbeResponse(BaseModel):
     provider: str
     available: bool = False
     models: List[str] = Field(default_factory=list)
+    error: Optional[str] = None
 
 class AnalyzeRequest(BaseModel):
     content: str = Field(..., description="Raw text content to analyze for wiki page extraction")

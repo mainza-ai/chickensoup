@@ -448,7 +448,7 @@ public final class BackendService {
         await config.refreshLLMDiscovery()
     }
 
-    public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String]) {
+    public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String], error: String?) {
         await config.probeLLMProvider(name)
     }
 }

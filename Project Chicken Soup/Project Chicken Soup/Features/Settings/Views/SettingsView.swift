@@ -680,7 +680,7 @@ struct SettingsView: View {
         isProbingProvider = true
         llmAvailableModels = []
         llmSelectedModel = ""
-        
+
         Task {
             let result = await backendService.config.probeLLMProvider(name)
             await MainActor.run {
@@ -688,12 +688,20 @@ struct SettingsView: View {
                 if result.available {
                     self.llmAvailableModels = result.models
                     self.llmSelectedModel = result.models.first ?? ""
+                    self.llmSaveMessage = "Provider '\(name)' is available with \(result.models.count) model(s)."
+                    self.llmSaveSuccess = true
                 } else {
                     self.llmAvailableModels = []
-                    self.llmSaveMessage = "Provider '\(name)' is not available."
+                    let reason = result.error?.isEmpty == false ? result.error : "no response"
+                    self.llmSaveMessage = "Provider '\(name)' is not available: \(reason)"
                     self.llmSaveSuccess = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        withAnimation { self.llmSaveMessage = "" }
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    withAnimation {
+                        if self.llmSaveMessage.contains("available") || self.llmSaveMessage.contains("success") {
+                            self.llmSaveMessage = ""
+                        }
                     }
                 }
             }

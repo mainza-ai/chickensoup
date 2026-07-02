@@ -130,19 +130,22 @@ public struct APIDiscoveryStatus: Codable {
     public var isAvailable: Bool
     public var isCurrent: Bool
     public var latencyMs: Double
+    public var error: String?
 
     enum CodingKeys: String, CodingKey {
         case modelName = "model_name"
         case isAvailable = "is_available"
         case isCurrent = "is_current"
         case latencyMs = "latency_ms"
+        case error
     }
 
-    public init(modelName: String, isAvailable: Bool, isCurrent: Bool, latencyMs: Double) {
+    public init(modelName: String, isAvailable: Bool = false, isCurrent: Bool = false, latencyMs: Double = 0.0, error: String? = nil) {
         self.modelName = modelName
         self.isAvailable = isAvailable
         self.isCurrent = isCurrent
         self.latencyMs = latencyMs
+        self.error = error
     }
 }
 
@@ -241,9 +244,16 @@ public struct APIConfigRequest: Codable {
 public struct APILLMProviderStatus: Codable {
     public var available: Bool
     public var models: [String]
+    public var error: String?
 
     enum CodingKeys: String, CodingKey {
-        case available, models
+        case available, models, error
+    }
+
+    public init(available: Bool = false, models: [String] = [], error: String? = nil) {
+        self.available = available
+        self.models = models
+        self.error = error
     }
 }
 
@@ -333,9 +343,17 @@ public struct APILLMProbeResponse: Codable {
     public var provider: String
     public var available: Bool
     public var models: [String]
+    public var error: String?
 
     enum CodingKeys: String, CodingKey {
-        case provider, available, models
+        case provider, available, models, error
+    }
+
+    public init(provider: String, available: Bool = false, models: [String] = [], error: String? = nil) {
+        self.provider = provider
+        self.available = available
+        self.models = models
+        self.error = error
     }
 }
 
