@@ -57,6 +57,7 @@ related: []
 - [[logging]] — Logging and observability setup with OpenTelemetry tracing and metrics
 - [[ezekiel]] — Prophet with chariot vision (593 BC)
 - [[daniel]] — Prophet with throne vision (605-536 BC)
+- [[eric-burles]] — Rep. Eric Burles (R-MO), congressional UAP disclosure advocate
 - [[john]] — Author of Revelation
 - [[enoch]] — Ancient figure who ascended to heaven
 - [[nephilim]] — Giants, offspring of sons of God and daughters of men
@@ -97,6 +98,7 @@ related: []
 - [[knowledge-graph-ingestion]] — Wiki markdown to Neo4j ingestion with schema-constrained LLM edge classification
 - [[wiki-backup-restore]] — Wiki snapshot creation, export/import, and backup management
 - [[wiki-cleanup]] — Bulk content deletion with tag-based preservation rules
+- [[physics-of-time-travel]] — Time travel physics transcript covering paradoxes and entropic closed timelike curves
 
 ## Concepts (in wiki/concepts/)
 
