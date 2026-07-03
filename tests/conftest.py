@@ -1,5 +1,6 @@
 import os
 import pytest
+from typing import Any
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 
@@ -79,3 +80,10 @@ def client():
     from src.main import app
     with TestClient(app, headers={"x-api-key": "test_api_key"}) as c:
         yield c
+
+
+# Override anyio's default backends to asyncio-only.
+# The project uses FastAPI + asyncio; trio is not a runtime dependency.
+@pytest.fixture(scope="module", params=["asyncio"])
+def anyio_backend(request: Any) -> Any:
+    return request.param

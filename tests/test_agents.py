@@ -45,7 +45,7 @@ def test_navigation_agent_calculation():
     assert res["warp_factor"] > 1.0
     assert res["divergence_risk"] >= 0.0
 
-@pytest.mark.anyio
+@pytest.mark.anyio(backends=["asyncio"])
 async def test_orchestrator_execution():
     orchestrator = Orchestrator()
     # Mock endpoints and LLM behaviors

@@ -1,34 +1,45 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from src.main import app
 
+mock_orchestrator_output = {
+    "status": "completed",
+    "answer": "Roswell incident summary.",
+    "confidence": 0.9,
+    "entities": ["Roswell"],
+    "sources": ["Test mock"],
+}
+
+
 def test_websocket_agent_endpoint():
     client = TestClient(app)
-    with client.websocket_connect("/ws/agent?x-api-key=test_api_key") as websocket:
-        # Send a query
-        websocket.send_text("Roswell")
-        
-        # We expect a status processing message
-        data = websocket.receive_json()
-        assert data["status"] == "processing"
-        
-        # Receive the streamed response
-        chunks = []
-        while True:
-            resp = websocket.receive_json()
-            if resp["status"] == "streaming":
-                chunks.append(resp["chunk"])
-            elif resp["status"] == "completed":
-                assert "answer" in resp
-                break
-            elif resp["status"] == "paused_for_human_approval":
-                break
-            elif resp["status"] == "error":
-                # Handle error status gracefully since dependencies like Neo4j aren't running in tests
-                assert "message" in resp
-                break
-            else:
-                pytest.fail(f"Unexpected status: {resp['status']}")
+    with patch("src.main.orchestrator.execute", return_value=mock_orchestrator_output):
+        with client.websocket_connect("/ws/agent?x-api-key=test_api_key") as websocket:
+            # Send a query
+            websocket.send_text("Roswell")
+            
+            # We expect a status processing message
+            data = websocket.receive_json()
+            assert data["status"] == "processing"
+            
+            # Receive the streamed response
+            chunks = []
+            while True:
+                resp = websocket.receive_json()
+                if resp["status"] == "streaming":
+                    chunks.append(resp["chunk"])
+                elif resp["status"] == "completed":
+                    assert "answer" in resp
+                    break
+                elif resp["status"] == "paused_for_human_approval":
+                    break
+                elif resp["status"] == "error":
+                    # Handle error status gracefully since dependencies like Neo4j aren't running in tests
+                    assert "message" in resp
+                    break
+                else:
+                    pytest.fail(f"Unexpected status: {resp['status']}")
 
 def test_cache_functionality():
     from src.cache import cache_decorator, cache_store
