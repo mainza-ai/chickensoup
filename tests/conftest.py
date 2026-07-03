@@ -3,15 +3,23 @@ import pytest
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 
+# Ensure critical credentials are present before any test imports src.config
+os.environ.setdefault("NEO4J_PASSWORD", "test_password")
+os.environ.setdefault("API_KEY", "test_api_key")
+
 @pytest.fixture(autouse=True)
 def clear_llm_env_overrides(monkeypatch):
     """Isolate tests from any LLM_ACTIVE_PROVIDER/MODEL env vars set in CI or dev env."""
     # Patch both os.environ and the singleton so everything stays consistent
     monkeypatch.setenv("LLM_ACTIVE_PROVIDER", "")
     monkeypatch.setenv("LLM_ACTIVE_MODEL", "")
+    monkeypatch.setenv("NEO4J_PASSWORD", "test_password")
+    monkeypatch.setenv("API_KEY", "test_api_key")
     import src.config
     monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_PROVIDER", "")
     monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_MODEL", "")
+    monkeypatch.setattr(src.config.settings, "NEO4J_PASSWORD", "test_password")
+    monkeypatch.setattr(src.config.settings, "API_KEY", "test_api_key")
     # Reset the discovery module-level cache so tests start clean
     import src.discovery as d
     d._discovered_provider = None
@@ -69,5 +77,5 @@ def mock_redis():
 @pytest.fixture
 def client():
     from src.main import app
-    with TestClient(app) as c:
+    with TestClient(app, headers={"x-api-key": "test_api_key"}) as c:
         yield c

@@ -50,6 +50,11 @@ orchestrator = Orchestrator()
 async def lifespan(app: FastAPI):
     # Startup actions
     logger.info("Starting up chickensoup API...")
+    if settings.ENVIRONMENT == "production":
+        if not settings.NEO4J_PASSWORD:
+            raise RuntimeError("NEO4J_PASSWORD is not set. Set it in .env or environment.")
+        if not settings.API_KEY:
+            raise RuntimeError("API_KEY is not set. Set it in .env or environment.")
     scheduler_task = None
     try:
         driver = neo4j_conn.connect()
@@ -88,6 +93,26 @@ def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
         for name, info in raw.items()
     }
 
+# Keys that are safe to persist via the /config endpoint. Anything else is rejected
+# to prevent environment-file injection via newline smuggling.
+_UPDATABLE_ENV_KEYS = {
+    "QUANTUM_SIMULATION_BACKEND",
+    "QUANTUM_HARDWARE_ENABLED",
+    "LLM_ACTIVE_PROVIDER",
+    "LLM_ACTIVE_MODEL",
+    "OMLX_API_URL",
+    "CORS_ORIGINS",
+    "IBM_API_TOKEN",
+    "DWAVE_API_TOKEN",
+    "IONQ_API_TOKEN",
+}
+
+
+def _sanitize_env_value(value: str) -> str:
+    """Strip control characters and newlines to prevent .env injection."""
+    return "".join(ch for ch in value if ch >= " " and ch != chr(0x7F))
+
+
 def _update_env_file(updates: dict):
     """Persist key-value pairs to .env, preserving existing lines."""
     try:
@@ -96,6 +121,14 @@ def _update_env_file(updates: dict):
         if os.path.exists(env_path):
             with open(env_path, "r") as f:
                 lines = f.readlines()
+
+        sanitized = {}
+        for key, val in updates.items():
+            if key not in _UPDATABLE_ENV_KEYS:
+                logger.warning(f"Ignoring disallowed .env key in _update_env_file: {key}")
+                continue
+            sval = _sanitize_env_value(str(val))
+            sanitized[key] = sval
 
         updated_keys = set()
         new_lines = []
@@ -106,13 +139,13 @@ def _update_env_file(updates: dict):
                 continue
             parts = line_str.split("=", 1)
             key = parts[0].strip()
-            if key in updates:
-                new_lines.append(f"{key}={updates[key]}\n")
+            if key in sanitized:
+                new_lines.append(f"{key}={sanitized[key]}\n")
                 updated_keys.add(key)
             else:
                 new_lines.append(line)
 
-        for key, val in updates.items():
+        for key, val in sanitized.items():
             if key not in updated_keys:
                 new_lines.append(f"{key}={val}\n")
 
@@ -492,16 +525,10 @@ async def post_query(request: QueryRequest):
 
         return response
     except Exception as e:
-        logger.error(f"Error handling orchestrated query: {e}")
-        return QueryResponse(
-            query=request.query,
-            answer=f"Error processing query: {str(e)}",
-            confidence=0.0,
-            entities=[],
-            sources=[],
-            inferred_events=[],
-            inferred_entities=[],
-            conversation_id=request.conversation_id,
+        logger.error(f"Error handling orchestrated query: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Query processing failed: {str(e)}"
         )
 
 @app.get("/graph/{entity}")
@@ -642,7 +669,7 @@ class QuantumJobRequest(BaseModel):
     target_year: int
     energy_level: float = 1.0
 
-@app.post("/consensus/query")
+@app.post("/consensus/query", dependencies=[Depends(verify_api_key)])
 async def post_consensus_query(request: ConsensusQueryRequest):
     """
     Evaluates queries against multiple active provider models, returning consensus scores.
@@ -657,7 +684,7 @@ async def post_consensus_query(request: ConsensusQueryRequest):
             detail=f"Consensus generation error: {str(e)}"
         )
 
-@app.post("/quantum/schedule")
+@app.post("/quantum/schedule", dependencies=[Depends(verify_api_key)])
 async def post_quantum_schedule(request: QuantumJobRequest):
     """
     Schedules simulated or real quantum hardware execution tasks.
@@ -939,8 +966,16 @@ import asyncio
 async def websocket_agent_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for streaming agent responses and status updates.
+    Requires x-api-key query parameter when API_KEY is configured.
     """
     await websocket.accept()
+
+    api_key = websocket.query_params.get("x-api-key")
+    if settings.API_KEY and api_key != settings.API_KEY:
+        await websocket.send_json({"status": "error", "message": "Unauthorized"})
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
     try:
         while True:
             # Wait for incoming messages from the client
@@ -987,8 +1022,16 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             logger.warning(f"Failed to send WebSocket error message: {e}")
 
 
+_RECONCILIATION_CACHE: Dict[str, Any] = {"ts": 0.0, "orphans": []}
+_RECONCILIATION_TTL = 60.0  # seconds
+
+
 def reconcile_neo4j_with_wiki(driver):
     """Prunes Neo4j nodes that were deleted from the wiki filesystem."""
+    now = time.monotonic()
+    if now - _RECONCILIATION_CACHE["ts"] < _RECONCILIATION_TTL:
+        return
+    _RECONCILIATION_CACHE["ts"] = now
     try:
         wiki_root = settings.WIKI_DATA_DIR
         if not os.path.isabs(wiki_root):

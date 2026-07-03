@@ -15,12 +15,12 @@ class Settings(BaseSettings):
 
     NEO4J_URI: str = "bolt://localhost:7687"
     NEO4J_USER: str = "neo4j"
-    NEO4J_PASSWORD: str = "chickensoup_password"
+    NEO4J_PASSWORD: str = ""
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
     LLM_FALLBACK_CHAIN: str = "omlx,ollama,lmstudio"
-    OMLX_API_URL: str = "http://127.0.0.1:9000/v1"
+    OMLX_API_URL: str = "http://localhost:9000/v1"
     OLLAMA_API_URL: str = "http://localhost:11434/v1"
     LMSTUDIO_API_URL: str = "http://localhost:1234/v1"
 
@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     CHAT_WIKI_CHECK_INTERVAL_SECONDS: int = 300
     CHAT_WIKI_IDLE_TIMEOUT_MINUTES: int = 30
     CHAT_WIKI_USER_ENTITY_NAME: str = "Primary Researcher"
+
+    # Environment (development | production)
+    ENVIRONMENT: str = "development"
 
     # Security
     API_KEY: str = ""  # Empty = dev mode (no auth required)

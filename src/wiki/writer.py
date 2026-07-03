@@ -1,6 +1,8 @@
 import os
 import re
+import fcntl
 import logging
+import contextlib
 from datetime import date, datetime
 from typing import Optional, Dict, Any, List, Tuple
 import yaml
@@ -8,6 +10,18 @@ import yaml
 logger = logging.getLogger("chickensoup.wiki.writer")
 
 from src.config import settings
+
+
+@contextlib.contextmanager
+def _file_lock(path: str):
+    fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+
 
 WIKI_DIR = settings.WIKI_DATA_DIR
 if not os.path.isabs(WIKI_DIR):
@@ -61,43 +75,48 @@ def write_page(
     page_type: str = "entities",
 ) -> Tuple[str, bool]:
     slug = slugify(title)
-    existing = read_page(slug, page_type)
-    today = date.today().isoformat()
-    created = today
-
-    if existing:
-        fm = existing["frontmatter"]
-        created = fm.get("created", today)
-        existing_tags = set(fm.get("tags", []))
-        existing_sources = set(fm.get("sources", []))
-        existing_related = set(fm.get("related", []))
-        tags = list(existing_tags | set(tags))
-        sources = list(existing_sources | set(sources))
-        related = list(existing_related | set(related))
-        body = existing["body"].rstrip() + "\n\n" + body
-        is_new = False
-    else:
-        is_new = True
-
-    frontmatter = {
-        "title": title,
-        "tags": sorted(set(tags)),
-        "created": created,
-        "updated": today,
-        "sources": sorted(set(sources)),
-        "related": sorted(set(related)),
-    }
-
-    if existing and existing["frontmatter"].get("protected", False):
-        frontmatter["protected"] = True
-
-    yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
-    full_content = f"---\n{yaml_str}\n---\n\n{body}\n"
-
     path = _page_path(slug, page_type)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(full_content)
+    # Ensure the file exists so we can lock it
+    with open(path, "a", encoding="utf-8") as f:
+        pass
+    with _file_lock(path):
+        # Re-read inside the lock to avoid stale data
+        existing = read_page(slug, page_type)
+        today = date.today().isoformat()
+        created = today
+
+        if existing:
+            fm = existing["frontmatter"]
+            created = fm.get("created", today)
+            existing_tags = set(fm.get("tags", []))
+            existing_sources = set(fm.get("sources", []))
+            existing_related = set(fm.get("related", []))
+            tags = list(existing_tags | set(tags))
+            sources = list(existing_sources | set(sources))
+            related = list(existing_related | set(related))
+            body = existing["body"].rstrip() + "\n\n" + body
+            is_new = False
+        else:
+            is_new = True
+
+        frontmatter = {
+            "title": title,
+            "tags": sorted(set(tags)),
+            "created": created,
+            "updated": today,
+            "sources": sorted(set(sources)),
+            "related": sorted(set(related)),
+        }
+
+        if existing and existing["frontmatter"].get("protected", False):
+            frontmatter["protected"] = True
+
+        yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
+        full_content = f"---\n{yaml_str}\n---\n\n{body}\n"
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(full_content)
     logger.info(f"{'Created' if is_new else 'Updated'} wiki page: {path}")
     return slug, is_new
 
@@ -156,52 +175,54 @@ def append_to_index(slugs: List[Tuple[str, str, str]]):
     index_path = os.path.join(WIKI_DIR, "index.md")
     if not os.path.isfile(index_path):
         return
-    with open(index_path, "r", encoding="utf-8") as f:
-        content = f.read()
+    with _file_lock(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
 
-    md = parse_frontmatter(content)
-    body = md["body"]
+        md = parse_frontmatter(content)
+        body = md["body"]
 
-    for slug, display_name, page_type in slugs:
-        link = f"[[{display_name}]]"
-        if link in body:
-            continue
-        section_header = "## Entities"
-        if page_type == "concepts":
-            section_header = "## Concepts (in wiki/concepts/)"
-        elif page_type == "projects":
-            section_header = "## Projects (in wiki/projects/)"
+        for slug, display_name, page_type in slugs:
+            link = f"[[{display_name}]]"
+            if link in body:
+                continue
+            section_header = "## Entities"
+            if page_type == "concepts":
+                section_header = "## Concepts (in wiki/concepts/)"
+            elif page_type == "projects":
+                section_header = "## Projects (in wiki/projects/)"
 
-        entry = f"\n- {link}"
-        section_pos = body.find(section_header)
-        if section_pos != -1:
-            next_section = body.find("\n## ", section_pos + len(section_header))
-            if next_section != -1:
-                body = body[:next_section] + entry + body[next_section:]
+            entry = f"\n- {link}"
+            section_pos = body.find(section_header)
+            if section_pos != -1:
+                next_section = body.find("\n## ", section_pos + len(section_header))
+                if next_section != -1:
+                    body = body[:next_section] + entry + body[next_section:]
+                else:
+                    body = body.rstrip() + entry + "\n"
             else:
-                body = body.rstrip() + entry + "\n"
-        else:
-            body = body.rstrip() + f"\n\n{section_header}\n\n{entry}\n"
+                body = body.rstrip() + f"\n\n{section_header}\n\n{entry}\n"
 
-    with open(index_path, "w", encoding="utf-8") as f:
-        f.write(md["frontmatter_yaml"] + body)
+        with open(index_path, "w", encoding="utf-8") as f:
+            f.write(md["frontmatter_yaml"] + body)
 
 def append_to_log(entry_text: str):
     log_path = os.path.join(WIKI_DIR, "log.md")
     if not os.path.isfile(log_path):
         return
-    with open(log_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    md = parse_frontmatter(content)
-    header = md["frontmatter_yaml"]
-    body = md["body"]
+    with _file_lock(log_path):
+        with open(log_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        md = parse_frontmatter(content)
+        header = md["frontmatter_yaml"]
+        body = md["body"]
 
-    today = date.today().isoformat()
-    log_entry = f"\n## [{today}] ingest | {entry_text}\n"
-    body = body.rstrip() + log_entry + "\n"
+        today = date.today().isoformat()
+        log_entry = f"\n## [{today}] ingest | {entry_text}\n"
+        body = body.rstrip() + log_entry + "\n"
 
-    with open(log_path, "w", encoding="utf-8") as f:
-        f.write(header + body)
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(header + body)
 
 def parse_frontmatter(content: str) -> Dict[str, Any]:
     yaml_match = re.match(r"^(---\s*\n.*?\n---)\s*\n", content, re.DOTALL)
@@ -213,6 +234,7 @@ def parse_frontmatter(content: str) -> Dict[str, Any]:
     return {"frontmatter_yaml": "", "body": content}
 
 def cross_reference_new_page(slug: str, display_name: str, page_type: str):
+    files_to_update = []
     for subdir in SUBDIRS:
         dir_path = os.path.join(WIKI_DIR, subdir)
         if not os.path.isdir(dir_path):
@@ -231,11 +253,22 @@ def cross_reference_new_page(slug: str, display_name: str, page_type: str):
                 if page:
                     existing_related = set(page["frontmatter"].get("related", []))
                     if display_name not in existing_related:
-                        existing_related.add(display_name)
-                        frontmatter = dict(page["frontmatter"])
-                        frontmatter["related"] = sorted(existing_related)
-                        frontmatter["updated"] = date.today().isoformat()
-                        yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
-                        with open(fpath, "w", encoding="utf-8") as fw:
-                            fw.write(f"---\n{yaml_str}\n---\n\n{page['body']}")
-                        logger.info(f"Cross-referenced {display_name} in {fpath}")
+                        files_to_update.append((fpath, page, display_name))
+
+    # Lock in sorted order to avoid deadlocks when multiple writers run concurrently
+    for fpath, page, display_name in sorted(files_to_update, key=lambda x: x[0]):
+        with _file_lock(fpath):
+            # Re-read inside lock to handle concurrent modifications
+            page = read_page(page["frontmatter"].get("title", slug), page_type)
+            if not page:
+                continue
+            existing_related = set(page["frontmatter"].get("related", []))
+            if display_name not in existing_related:
+                existing_related.add(display_name)
+                frontmatter = dict(page["frontmatter"])
+                frontmatter["related"] = sorted(existing_related)
+                frontmatter["updated"] = date.today().isoformat()
+                yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
+                with open(fpath, "w", encoding="utf-8") as fw:
+                    fw.write(f"---\n{yaml_str}\n---\n\n{page['body']}")
+                logger.info(f"Cross-referenced {display_name} in {fpath}")

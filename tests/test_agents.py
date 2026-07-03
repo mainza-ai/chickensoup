@@ -27,11 +27,11 @@ def test_research_agent_flow(mock_conn):
     # Mock Neo4j driver results
     mock_driver = MagicMock()
     mock_conn.get_driver.return_value = mock_driver
-    
+
     agent = ResearchAgent()
     with patch("src.agents.research_agent.search_entities", return_value=[{"name": "Bob Lazar", "confidence": 0.85, "labels": ["Person"]}]), \
-         patch("src.agents.research_agent.get_entity_neighborhood", return_value={"entity": {"name": "Bob Lazar", "labels": ["Person"], "properties": {"confidence": 0.85}}, "connections": []}):
-        
+         patch("src.agents.research_agent.get_entity_neighborhoods_batch", return_value={"bob lazar": {"entity": {"name": "Bob Lazar", "labels": ["Person"], "properties": {"confidence": 0.85}}, "connections": []}}):
+
         res = agent.run_research(query="Bob Lazar", entities=["Bob Lazar"], thread_id="test_thread")
         assert "Bob Lazar" in res["assembled_context"]
         assert res["credibility_scores"]["Bob Lazar"] >= 0.85

@@ -4,7 +4,7 @@ from src.main import app
 
 def test_websocket_agent_endpoint():
     client = TestClient(app)
-    with client.websocket_connect("/ws/agent") as websocket:
+    with client.websocket_connect("/ws/agent?x-api-key=test_api_key") as websocket:
         # Send a query
         websocket.send_text("Roswell")
         

@@ -89,3 +89,54 @@ def get_evidence_by_entity(driver: Driver, entity_name: str) -> List[str]:
         if record and record["sources"]:
             return list(record["sources"])
     return []
+
+
+def get_entity_neighborhoods_batch(driver: Driver, entity_names: List[str]) -> Dict[str, Dict[str, Any]]:
+    """
+    Retrieves neighborhoods for multiple entities in a single round-trip using UNWIND.
+    Returns a dict keyed by lowercase entity name: {name: neighborhood_dict}
+    """
+    if not entity_names:
+        return {}
+    unique_names = list(dict.fromkeys(entity_names))
+    query = """
+    UNWIND $names AS name
+    MATCH (n:Entity)
+    WHERE toLower(n.name) = toLower(name)
+       OR replace(toLower(n.name), ' ', '-') = replace(toLower(name), ' ', '-')
+       OR replace(toLower(n.name), '-', ' ') = replace(toLower(name), '-', ' ')
+       OR replace(toLower(n.name), ' ', '-') CONTAINS replace(toLower(name), ' ', '-')
+       OR replace(toLower(name), ' ', '-') CONTAINS replace(toLower(n.name), ' ', '-')
+    OPTIONAL MATCH (n)-[r]-(m:Entity)
+    WITH n, collect(r) as rels, collect(m) as neigh
+    RETURN n.name as name, rels, neigh
+    """
+    results: Dict[str, Dict[str, Any]] = {}
+    try:
+        with driver.session() as session:
+            records = session.run(query, names=unique_names)
+            for record in records:
+                entity_node = record["n"]
+                rels = record["rels"]
+                neighbors = record["neigh"]
+                name = entity_node.get("name", "")
+                connections = []
+                for r, m in zip(rels, neighbors):
+                    connections.append({
+                        "relationship_type": r.type,
+                        "relationship_properties": dict(r),
+                        "neighbor_name": m.get("name"),
+                        "neighbor_labels": list(m.labels),
+                        "neighbor_properties": dict(m)
+                    })
+                results[name.lower()] = {
+                    "entity": {
+                        "name": name,
+                        "labels": list(entity_node.labels),
+                        "properties": dict(entity_node)
+                    },
+                    "connections": connections
+                }
+    except Exception as e:
+        logger.warning(f"Batch neighborhood query failed: {e}")
+    return results

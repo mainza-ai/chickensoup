@@ -98,4 +98,4 @@ Burles claims he was the first elected official briefed on a recent UAP event at
 - [[consciousness]]
 - [[varginha-ufo-crash]]
 - [[biefeld-brown-effect]]
-- [[alde-rebelo]]
+ - [[aldo-rebelo]]
