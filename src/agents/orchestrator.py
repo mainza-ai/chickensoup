@@ -214,7 +214,7 @@ class Orchestrator:
         state = OrchestratorState(query=query, thread_id=thread_id, human_approved=human_approved)
         try:
             result_state = await asyncio.wait_for(
-                orchestrator_graph.run(state=state, deps=self.deps),
+                orchestrator_graph.run(ClassifyNode(), state=state, deps=self.deps),
                 timeout=settings.ORCHESTRATOR_TIMEOUT_SECONDS
             )
         except asyncio.TimeoutError:
@@ -226,7 +226,7 @@ class Orchestrator:
                 "entities": [],
                 "sources": ["Timeout Fallback"],
             }
-        output = result_state.final_output or {}
+        output = result_state.state.final_output or {}
 
         # Synthesize answer if missing or empty — every endpoint needs an "answer" key
         if not output.get("answer"):

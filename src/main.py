@@ -1115,7 +1115,7 @@ async def delete_entity(name: str, hard: bool = True, force: bool = False):
 async def get_events():
     """Retrieves all Temporal Events (Event nodes) from the Neo4j database."""
     import uuid
-    from datetime import datetime
+    from datetime import datetime, timezone
     driver = neo4j_conn.get_driver()
     if driver:
         reconcile_neo4j_with_wiki(driver)
@@ -1157,7 +1157,7 @@ async def get_events():
                     node_sources = [str(node_sources)] if node_sources else []
                 node_sources = [str(s) for s in node_sources]
                 
-                timestamp = datetime.utcnow().isoformat() + "Z"
+                timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
                 year = None
                 for t in tags:
                     if t.isdigit() and len(t) == 4:
