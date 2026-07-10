@@ -3,7 +3,7 @@ title: "Post-Quantum Cryptography Transition"
 tags: [quantum-computation, post-quantum-cryptography, quantum-threat, research-paper, papers]
 created: 2026-07-10
 updated: 2026-07-10
-sources: [69a867ee3495099f5be3bdb1_2022-05-11_Nature_Transitioning.pdf, Nature-2022]
+sources: [69a867ee3495099f5be3bdb1_2022-05-11_Nature_Transitioning organizations to post-quantum cryptography (1).pdf, Nature-2022]
 related: [quantum-computation, post-quantum-cryptography, backdoor-science]
 ---
 

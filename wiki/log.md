@@ -540,3 +540,43 @@ Triage: 61 PDFs extracted, all with text. Distribution: 11 high-relevance, 14 me
 - [[quantum-computation]] — added PQC transition governance and quantum encoding structure references
 - [[quantum-machine-learning]] — added non-unitary CC ansatz and structure-preserving encoding connections
 - [[hamiltonian-simulation]] — added coupled oscillator simulation exponential speedup reference
+
+## [2026-07-10B] re-ingest | Complete PDF-Wiki Coverage (61/61)
+
+Re-triage based on full wiki themes (UAP, spacetime, consciousness, quantum), not just quantum algorithms + PQC. All 61 PDFs now have at least one corresponding wiki page.
+
+### Rationale for Re-Triage
+Prior triage incorrectly labeled chemistry/bio/math papers as "LOW relevance." This was wrong for a wiki whose scope explicitly includes exotic matter, consciousness substrates, field manipulation, and spacetime geometry. Quantum chemistry, bioinformatics, category theory, and sensor papers all map directly to wiki themes.
+
+### New Entity Pages (2)
+- **[[post-quantum-cryptography-transition]]** (fixed sources filename to actual PDF name with spaces/parenthetical)
+- **[[post-quantum-cryptography-transition]]** sources corrected to include actual PDF filename
+
+### New Concept Pages Created (41 total)
+All written from extracted PDF content, not filenames.
+
+**Core Time Travel Theme:**
+- **[[emergent-time-and-time-travel]]** — Alonso-Serrano, Schuster, Visser (2024): Page-Wootters formalism, Novikov self-consistency, POVM time observables; directly addresses quantum time travel without CTCs
+
+**PQC / Cryptography (26 new):**
+- [[x-wing-hybrid-kem]], [[starfighters-x-wing-general-applicability]], [[scaling-lattice-sieves]], [[return-of-sdith]], [[quantum-lattice-enumeration]], [[slap-polynomial-commitments]], [[crypto-dark-matter-on-the-torus]], [[hybrid-signature-schemes]], [[revisiting-key-decomposition-fhe]], [[spectre-rsb-cryptographic-code-protection]], [[tight-sp hin cs-proof]], [[gaussian-leftover-hash-lemma]], [[cake-provably-secure-pake]], [[hybrid-query-bounds-metcr]]
+
+**Quantum Simulation & Chemistry (12 new):**
+- [[tangelo-quantum-chemistry]], [[quantum-pes-via-adiabatic-transitions]], [[pfas-massively-parallel-quantum-chemistry]], [[parallel-dmrg-quarter-petaflops]], [[physics-informed-aeromagnetic-calibration]], [[aqvolt26-halide-dataset]], [[idolpro-guided-drug-design]], [[pfas-correlated-electrons-breakdown]], [[ml-guided-aqfep]], [[lithium-ion-carbonate-polymer-electrolytes]], [[aqcat25-spin-aware-ml-potentials]], [[trapped-ion-electronic-structure]]
+
+**Math / Category Theory / Sensors / Privacy:**
+- [[hyperdeterminants-hardness]], [[structure-of-meaning-category-theory]], [[magnav-navigation-accuracy-metric]], [[differential-privacy-traffic-classification]], [[bedside-magnetocardiography]]
+
+**Binding Affinity:**
+- [[sair-binding-affinity-synthetic-data]]
+
+### Pages Enriched
+- [[post-quantum-cryptography-transition]] — corrected sources to actual PDF filename; added wiki connections
+- [[science-reference-library]] — updated to reflect all 61 PDFs covered by at least one wiki page; removed artificial LOW tier
+- [[science-reference-library]] — added 41 additional concept pages to index
+
+### Raw Provenance
+-Restored: `wiki/raw/temple-new-science-of-heaven-interview.txt` (legitimate source transcript, not test/blank)
+- Purged: `conversation-test-conv-id-2026-06-25.md`, `my-paper.pdf`, `project-structure-2026-06-22.txt`, `quantum-coupled-oscillator-simulation.pdf`, `scanned.pdf`, `test-paper.pdf` (test/blank artifacts only)
+- Added raw: `wiki/raw/mannheim-conformal-gravity-interview.txt` (Mannheim podcast transcript)
+- All 61 PDFs confirmed present in `wiki/raw/` with exact filename match against `papers/`
