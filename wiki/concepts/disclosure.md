@@ -21,4 +21,5 @@ UFO disclosure refers to the process by which governments acknowledge the existe
 
 - [[jfk-assassination-and-ufo-disclosure]] — The theory that Kennedy's planned disclosure was a factor in his assassination
 - [[ufo-retrieval-program]] — The alleged covert program to recover and study non-human craft
+- [[kordylewski-clouds]] — 18× Earth-sized plasma clouds at Earth-Moon L4/L5, suppressed for ~58 years after Kordylewski's 1961 discovery, confirmed only in 2019. Temple argues they are intelligent beings hidden in plain sight.
 - [[david-grusch]] — Whistleblower whose 2023 testimony reignited disclosure demands

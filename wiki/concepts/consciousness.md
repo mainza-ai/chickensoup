@@ -30,6 +30,7 @@ Brain waves are categorized by frequency:
 
 ## Connection to the Wiki
 
+- **Plasma consciousness** — Temple's thesis that [[kordylewski-clouds]] can self-organize into intelligent beings via emergence, proposing bioplasma bodies as the substrate of what tradition calls subtle bodies
 - **Exotic matter and consciousness** — Exotic matter is the substrate of consciousness
 - **7.46 Hz** — The frequency of consciousness and UAPs
 - **Schumann resonance** — The Earth's natural resonance is in the theta range

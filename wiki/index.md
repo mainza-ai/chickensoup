@@ -98,7 +98,9 @@ related: []
 - [[knowledge-graph-ingestion]] — Wiki markdown to Neo4j ingestion with schema-constrained LLM edge classification
 - [[wiki-backup-restore]] — Wiki snapshot creation, export/import, and backup management
 - [[wiki-cleanup]] — Bulk content deletion with tag-based preservation rules
-- [[physics-of-time-travel]] — Time travel physics transcript covering paradoxes and entropic closed timelike curves
+ - [[physics-of-time-travel]] — Time travel physics transcript covering paradoxes and entropic closed timelike curves
+ - [[kordylewski-clouds]] — Earth-Moon L4/L5 dusty plasma clouds, auroral circuit hypothesis
+ - [[robert-temple]] — Author of "A New Science of Heaven," plasma-consciousness thesis
 
 ## Concepts (in wiki/concepts/)
 
@@ -183,7 +185,14 @@ related: []
 - [[celery-tasks]] — Async background tasks for wiki ingestion and spacetime navigation
 - [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
 - [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features, conversation support, discovery sync
-- [[elohim]] — The Elohim as plural, physical, advanced civilization in the Hebrew Bible
+ - [[post-quantum-cryptographic-governance]] — Assemblage theory analysis of how states govern the quantum cybersecurity threat (Csenkey & Bindel, 2022)
+ - [[quantum-coupled-oscillator-simulation]] — WISER/Classiq 2026 implementation of Babbush et al. exponential quantum speedup for coupled oscillator simulation
+ - [[non-unitary-coupled-cluster-quantum]] — Mid-circuit measurement extension of coupled cluster for quantum chemistry; 28% CNOT / 57% T-gate reduction (Fleury et al., 2024)
+ - [[structure-preserving-quantum-encodings]] — Category-theoretic framework for designing quantum encodings that preserve dataset structure (Parzygnat et al., 2024)
+ - [[elohim]] — The Elohim as plural, physical, advanced civilization in the Hebrew Bible
+ - [[new-science-of-heaven]] — Plasma as 4th state of matter, bioplasma body, emergence/intelligence
+  - [[post-quantum-cryptography-transition]] — Nature 2022 Perspective on migrating organizations to PQC before quantum computers break current crypto
+  - [[the-new-science-of-uap-paper]] — Knuth et al. 195-page academic review of UAP; foundational multi-author science paper (arXiv:2502.06794)
 
 ## Projects (in wiki/projects/)
 

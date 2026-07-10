@@ -7,7 +7,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
 from src.knowledge_graph.connection import neo4j_conn
-from src.knowledge_graph.queries import search_entities, get_entity_neighborhood, get_entity_neighborhoods_batch
+from src.knowledge_graph.queries import search_entities, get_entity_neighborhood
 from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
 from src.cache import cache_decorator
 import urllib.request
@@ -132,25 +132,21 @@ def neo4j_lookup_node(state: ResearchState) -> Dict[str, Any]:
         logger.warning(f"Neo4j driver unavailable: {e}")
 
     if driver:
-        lookup_names = []
         for entity in entities:
             matches = search_entities(driver, entity)
             for match in matches:
                 found_nodes.append(match)
-                lookup_names.append(match["name"])
-
+                neighborhood = get_entity_neighborhood(driver, match["name"])
+                if neighborhood and neighborhood.get("entity"):
+                    graph_context.append(neighborhood)
+                    
         if not found_nodes and state.get("query"):
             matches = search_entities(driver, state["query"])
             for match in matches:
                 found_nodes.append(match)
-                lookup_names.append(match["name"])
-
-        # Batch-fetch all neighborhoods in a single round-trip
-        neighborhoods = get_entity_neighborhoods_batch(driver, lookup_names)
-        for node in found_nodes:
-            neighborhood = neighborhoods.get(node["name"].lower())
-            if neighborhood and neighborhood.get("entity"):
-                graph_context.append(neighborhood)
+                neighborhood = get_entity_neighborhood(driver, match["name"])
+                if neighborhood and neighborhood.get("entity"):
+                    graph_context.append(neighborhood)
 
     # Fallback to wiki files when Neo4j returned nothing
     if not graph_context:

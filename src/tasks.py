@@ -29,13 +29,13 @@ def async_ingest_page(title: str, content: str, tags: List[str], sources: List[s
         driver = neo4j_conn.connect()
         
     try:
-        nodes_count, rels_count = ingest_wiki_page(driver, title, content, tags, sources)
+        result = ingest_wiki_page(driver, title, content, tags, sources)
         return {
             "success": True,
             "title": title,
-            "nodes_created": nodes_count,
-            "relationships_created": rels_count,
-            "confidence_score": 1.0
+            "nodes_created": result.get("nodes_created", 0),
+            "relationships_created": result.get("relationships_created", 0),
+            "confidence_score": result.get("confidence_score", 1.0)
         }
     except Exception as e:
         logger.error(f"Error in async ingestion task for {title}: {e}")
@@ -54,7 +54,7 @@ def async_navigate(origin: str, destination: str, target_year: int, energy_level
     scheduler = QuantumJobScheduler()
     geometry = FieldGeometryTensor(
         warp_factor=energy_level * 1.2,
-        spatial_metric=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        metric_tensor=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         extrinsic_curvature=[[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]]
     )
     

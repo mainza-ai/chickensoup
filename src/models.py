@@ -56,8 +56,7 @@ class ModelsResponse(BaseModel):
 
 class LLMProviderStatus(BaseModel):
     available: bool = False
-    models: List[str] = Field(default_factory=list)
-    error: Optional[str] = None
+    models: List[str] = []
 
 class ConfigRequest(BaseModel):
     quantum_backend: str
@@ -98,7 +97,6 @@ class LLMProbeResponse(BaseModel):
     provider: str
     available: bool = False
     models: List[str] = Field(default_factory=list)
-    error: Optional[str] = None
 
 class AnalyzeRequest(BaseModel):
     content: str = Field(..., description="Raw text content to analyze for wiki page extraction")
@@ -137,6 +135,24 @@ class FolderIngestResponse(BaseModel):
     total_relationships_created: int = 0
     file_results: List[FileIngestResponse] = Field(default_factory=list)
     failed_files: List[Dict[str, str]] = Field(default_factory=list)
+
+
+class PdfFolderIngestRequest(BaseModel):
+    folder_path: str = "Papers/"
+    dry_run: bool = False
+    skip_neo4j: bool = False
+
+
+class PdfFolderIngestResponse(BaseModel):
+    success: bool
+    total_pdfs: int = 0
+    pdfs_processed: int = 0
+    pages_created: List[str] = Field(default_factory=list)
+    pages_updated: List[str] = Field(default_factory=list)
+    failed_files: List[Dict[str, str]] = Field(default_factory=list)
+    dry_run: bool = False
+    neo4j_bulk_triggered: bool = False
+
 
 class WikiClearResponse(BaseModel):
     success: bool

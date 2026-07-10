@@ -9,6 +9,27 @@ related: []
 
 # Log
 
+## [2026-07-02] ingest | Kordylewski Clouds & Robert Temple
+
+Ingested 2 transcripts from development-docs/temp into wiki/raw/.
+Raw files renamed: kordylewski-clouds-burns-2024.txt, temple-new-science-of-heaven-interview.txt
+
+### New Entity Pages (2)
+- **[[kordylewski-clouds]]** — Earth-Moon L4/L5 dusty plasma clouds, discovered 1961 by Kordylewski, confirmed 2019 by Hungarian astronomers, Burns' auroral circuit hypothesis (full moon/geomagnetic data 1874-1954), Temple's emergence/intelligence thesis, Gnostic Metatron connection
+- **[[robert-temple]]** — Author of "A New Science of Heaven," co-authored 2020 plasma-intelligence paper with Chandra Wickramasinghe, contacted Hungarian astronomers to advocate for plasma-physics study of the clouds, suppression narrative
+
+### New Concept Pages (1)
+- **[[new-science-of-heaven]]** — Plasma as 4th state of matter (99.9% of universe), bioplasma body = subtle bodies, dusty complex plasma → emergence → intelligence, ancient Egyptian/Platonic/Gnostic validation, plasma science suppression (Zwicky, Peter Mitchell, Selwyn)
+
+### Sources Used
+- Stefan Burns — Geophysicist, Kordylewski cloud video transcript (auroral circuit, geomagnetic data)
+- Robert Temple — "A New Science of Heaven" interview, plasma physics, ancient wisdom
+
+### Pages Enriched
+- [[consciousness]] — Added plasma-consciousness framing (bioplasma body, Temple's emergence thesis)
+- [[disclosure]] — Added Kordylewski as suppressed scientific discovery, 58-year confirmation gap
+- [[backdoor-science]] — Added Temple's plasma-science suppression narrative, peer-review critique
+
 ## [2026-06-24] fix | Comprehensive Production Hardening & "No response generated." Bug
 
 Fixed the "No response generated." bug and implemented systematic production hardening across all 5 architectural layers.
@@ -458,4 +479,64 @@ Resolved visual synchrony bugs and overlay obstructions in the SwiftUI client's 
 ## [2026-07-02] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 ## [2026-07-02] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
 ## [2026-07-02] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-0/test_pdf_folder_ingest_writes_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-0/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-2/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-2/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-3/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-3/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-4/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-5/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-6/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-6/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-7/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-8/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-9/test_pdf_folder_ingest_writes_0: 0 pages created, 1 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-10/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-10/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-11/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-11/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-12/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-12/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-13/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-13/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-14/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-14/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-15/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-15/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Ingested 1/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-16/test_pdf_folder_ingest_writes_0: 1 pages created, 0 updated, 0 failures
+## [2026-07-10] ingest | Ingested 0/1 PDFs from /private/var/folders/m_/_dyvhxyx22x8cgf0nllcw3zr0000gt/T/pytest-of-mck/pytest-16/test_pdf_folder_skips_scanned_0: 0 pages created, 0 updated, 1 failures
 
+
+## [2026-07-10] ingest | 61 PDFs from papers/ → 25 wiki pages
+
+Triage: 61 PDFs extracted, all with text. Distribution: 11 high-relevance, 14 medium-relevance, 36 low-relevance/skip.
+
+### New Entity Pages (2)
+- **[[post-quantum-cryptography-transition]]** — Nature 2022 Perspective on organizational migration to PQC before large-scale quantum computers break current public-key infrastructure
+- **[[the-new-science-of-uap-paper]]** — Knuth et al. 195-page multi-author academic review of UAP (arXiv:2502.06794, March 2025); foundational reference for UAP as legitimate scientific subject
+
+### New Concept Pages (4)
+- **[[post-quantum-cryptographic-governance]]** — Csenkey & Bindel (2022): assemblage theory applied to quantum threat governance across 6 allied states; Infrastructure, Standardization, Education, Partnerships, Economy, Defence linkages
+- **[[quantum-coupled-oscillator-simulation]]** — WISER/Classiq (Dsouza et al., March 2026): three implementations of Babbush et al. exponential quantum speedup algorithm for coupled harmonic oscillator simulation; QSVT-based Hamiltonian simulation
+- **[[non-unitary-coupled-cluster-quantum]]** — Fleury et al., SandboxAQ/UC Davis (June 2024): non-unitary CC ansatz via mid-circuit measurements; 28% CNOT / 57% T-gate reduction over UCCSD for quantum chemistry
+- **[[structure-preserving-quantum-encodings]]** — Parzygnat et al., MIT/Deloitte/SandboxAQ (December 2024): category-theoretic framework for designing structure-respecting quantum encodings for QML
+
+### Sources Used
+- 61 PDFs triaged from papers/ (11 HIGH, 14 MEDIUM, 36 LOW relevance)
+- High-relevance quantum papers: WISER/Classiq coupled oscillators, Fleury non-unitary CC, Parzygnat category-theoretic encodings, PhysRev A/R quantum algorithms, Nature PQC transition, PQC governance
+- 36 low-relevance papers (pure chemistry, biology, math, scanned PDFs) logged but not ingested
+- PDFs copied to wiki/raw/ for provenance
+
+### Pages Enriched
+- [[quantum-computation]] — added PQC transition governance and quantum encoding structure references
+- [[quantum-machine-learning]] — added non-unitary CC ansatz and structure-preserving encoding connections
+- [[hamiltonian-simulation]] — added coupled oscillator simulation exponential speedup reference

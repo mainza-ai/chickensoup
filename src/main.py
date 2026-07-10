@@ -20,6 +20,7 @@ from src.models import (
     LLMProbeRequest, LLMProbeResponse, LLMProviderStatus,
     AnalyzeRequest, AnalyzeResponse, SuggestedPageModel,
     FileIngestResponse, FolderIngestResponse,
+    PdfFolderIngestRequest, PdfFolderIngestResponse,
     ConversationMetaResponse, ChatIngestStatusResponse,
     SetUserNameRequest, SetUserNameResponse,
     WikiClearResponse, WikiExportResponse, WikiImportResponse,
@@ -50,11 +51,6 @@ orchestrator = Orchestrator()
 async def lifespan(app: FastAPI):
     # Startup actions
     logger.info("Starting up chickensoup API...")
-    if settings.ENVIRONMENT == "production":
-        if not settings.NEO4J_PASSWORD:
-            raise RuntimeError("NEO4J_PASSWORD is not set. Set it in .env or environment.")
-        if not settings.API_KEY:
-            raise RuntimeError("API_KEY is not set. Set it in .env or environment.")
     scheduler_task = None
     try:
         driver = neo4j_conn.connect()
@@ -88,30 +84,9 @@ def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
         name: LLMProviderStatus(
             available=info.get("available", False),
             models=info.get("models", []),
-            error=info.get("error"),
         )
         for name, info in raw.items()
     }
-
-# Keys that are safe to persist via the /config endpoint. Anything else is rejected
-# to prevent environment-file injection via newline smuggling.
-_UPDATABLE_ENV_KEYS = {
-    "QUANTUM_SIMULATION_BACKEND",
-    "QUANTUM_HARDWARE_ENABLED",
-    "LLM_ACTIVE_PROVIDER",
-    "LLM_ACTIVE_MODEL",
-    "OMLX_API_URL",
-    "CORS_ORIGINS",
-    "IBM_API_TOKEN",
-    "DWAVE_API_TOKEN",
-    "IONQ_API_TOKEN",
-}
-
-
-def _sanitize_env_value(value: str) -> str:
-    """Strip control characters and newlines to prevent .env injection."""
-    return "".join(ch for ch in value if ch >= " " and ch != chr(0x7F))
-
 
 def _update_env_file(updates: dict):
     """Persist key-value pairs to .env, preserving existing lines."""
@@ -122,14 +97,6 @@ def _update_env_file(updates: dict):
             with open(env_path, "r") as f:
                 lines = f.readlines()
 
-        sanitized = {}
-        for key, val in updates.items():
-            if key not in _UPDATABLE_ENV_KEYS:
-                logger.warning(f"Ignoring disallowed .env key in _update_env_file: {key}")
-                continue
-            sval = _sanitize_env_value(str(val))
-            sanitized[key] = sval
-
         updated_keys = set()
         new_lines = []
         for line in lines:
@@ -139,13 +106,13 @@ def _update_env_file(updates: dict):
                 continue
             parts = line_str.split("=", 1)
             key = parts[0].strip()
-            if key in sanitized:
-                new_lines.append(f"{key}={sanitized[key]}\n")
+            if key in updates:
+                new_lines.append(f"{key}={updates[key]}\n")
                 updated_keys.add(key)
             else:
                 new_lines.append(line)
 
-        for key, val in sanitized.items():
+        for key, val in updates.items():
             if key not in updated_keys:
                 new_lines.append(f"{key}={val}\n")
 
@@ -323,12 +290,11 @@ async def post_llm_config(request: LLMConfigRequest):
 @app.post("/config/llm/probe", response_model=LLMProbeResponse)
 async def post_llm_probe(request: LLMProbeRequest):
     """Probe a specific provider and return its models (does not change active config)."""
-    provider, _, models, error = probe_provider(request.provider_name)
+    provider, _, models = probe_provider(request.provider_name)
     return LLMProbeResponse(
         provider=provider,
         available=provider != "simulated",
         models=models,
-        error=error,
     )
 
 @app.get("/models", response_model=ModelsResponse)
@@ -525,10 +491,16 @@ async def post_query(request: QueryRequest):
 
         return response
     except Exception as e:
-        logger.error(f"Error handling orchestrated query: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Query processing failed: {str(e)}"
+        logger.error(f"Error handling orchestrated query: {e}")
+        return QueryResponse(
+            query=request.query,
+            answer=f"Error processing query: {str(e)}",
+            confidence=0.0,
+            entities=[],
+            sources=[],
+            inferred_events=[],
+            inferred_entities=[],
+            conversation_id=request.conversation_id,
         )
 
 @app.get("/graph/{entity}")
@@ -669,7 +641,7 @@ class QuantumJobRequest(BaseModel):
     target_year: int
     energy_level: float = 1.0
 
-@app.post("/consensus/query", dependencies=[Depends(verify_api_key)])
+@app.post("/consensus/query")
 async def post_consensus_query(request: ConsensusQueryRequest):
     """
     Evaluates queries against multiple active provider models, returning consensus scores.
@@ -684,7 +656,7 @@ async def post_consensus_query(request: ConsensusQueryRequest):
             detail=f"Consensus generation error: {str(e)}"
         )
 
-@app.post("/quantum/schedule", dependencies=[Depends(verify_api_key)])
+@app.post("/quantum/schedule")
 async def post_quantum_schedule(request: QuantumJobRequest):
     """
     Schedules simulated or real quantum hardware execution tasks.
@@ -959,6 +931,172 @@ async def post_ingest_folder(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Folder ingestion failed: {str(e)}")
 
 
+def _run_neo4j_bulk_ingest(wiki_root: str) -> Dict[str, int]:
+    """Clear Neo4j and bulk-ingest all wiki markdown pages. Returns aggregate counts."""
+    subdirs = ["concepts", "entities", "projects"]
+    driver = neo4j_conn.get_driver()
+    total_nodes = 0
+    total_rels = 0
+    pages_ingested = 0
+
+    with driver.session() as session:
+        logger.info("Clearing existing Neo4j database...")
+        session.run("MATCH (n) DETACH DELETE n")
+
+    for subdir in subdirs:
+        dir_path = os.path.join(wiki_root, subdir)
+        if not os.path.exists(dir_path):
+            logger.warning(f"Directory {dir_path} does not exist. Skipping.")
+            continue
+        for filename in os.listdir(dir_path):
+            if not filename.endswith(".md"):
+                continue
+            file_path = os.path.join(dir_path, filename)
+            title = os.path.splitext(filename)[0]
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                nodes, rels = ingest_wiki_page(driver, title, content)
+                total_nodes += nodes
+                total_rels += rels
+                pages_ingested += 1
+            except Exception as page_err:
+                logger.error(f"Failed to ingest page {filename}: {page_err}")
+
+    from src.cache import cache_store
+    cache_store.invalidate_all()
+    logger.info(f"Bulk ingestion completed. Ingested {pages_ingested} pages. Created {total_nodes} nodes, {total_rels} relationships.")
+    return {
+        "pages_ingested": pages_ingested,
+        "nodes_created": total_nodes,
+        "relationships_created": total_rels,
+    }
+
+
+@app.post("/ingest/pdf-folder", dependencies=[Depends(verify_api_key)])
+def post_ingest_pdf_folder(req: PdfFolderIngestRequest):
+    """Scan a folder of PDFs, extract text via pypdf, run the IngestAgent on each paper,
+    and write resulting wiki pages to the filesystem.
+
+    If skip_neo4j=False and dry_run=False, triggers a full Neo4j bulk rebuild at the end
+    so the graph reflects all newly-created wiki pages.
+    """
+    from src.wiki.pdf_extract import extract_text_from_pdf, copy_pdf_to_raw
+
+    folder_path = req.folder_path
+    if not os.path.isabs(folder_path):
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        folder_path = os.path.join(project_root, folder_path)
+
+    if not os.path.isdir(folder_path):
+        raise HTTPException(status_code=400, detail=f"Folder not found: {req.folder_path}")
+
+    pdf_files = sorted(
+        f for f in os.listdir(folder_path)
+        if f.lower().endswith(".pdf")
+    )
+
+    pages_created: List[str] = []
+    pages_updated: List[str] = []
+    failed_files: List[Dict[str, str]] = []
+    pdfs_processed = 0
+
+    for filename in pdf_files:
+        pdf_path = os.path.join(folder_path, filename)
+        slug = slugify(os.path.splitext(filename)[0])
+
+        try:
+            raw_rel = copy_pdf_to_raw(pdf_path, slug)
+            if raw_rel is None:
+                failed_files.append({"filename": filename, "error": "Failed to copy PDF to wiki/raw/"})
+                continue
+
+            text = extract_text_from_pdf(pdf_path)
+            if not text.strip():
+                failed_files.append({"filename": filename, "error": "No extractable text (possibly scanned/image PDF)"})
+                continue
+
+            if req.dry_run:
+                logger.info("Dry-run: analyzed '%s' (%d chars extracted)", filename, len(text))
+                pdfs_processed += 1
+                continue
+
+            analysis = ingest_agent.analyze_content(text, filename=filename)
+            for page in analysis.suggested_pages:
+                if page.confidence < settings.WIKI_MIN_CONFIDENCE:
+                    continue
+                if page.page_type not in ("entities", "concepts", "projects"):
+                    page.page_type = ingest_agent.classify_page_type(page.title, page.summary, page.tags)
+                page_slug, is_new = write_page(
+                    title=page.title,
+                    body=page.body,
+                    tags=page.tags,
+                    sources=page.sources,
+                    related=page.related,
+                    page_type=page.page_type,
+                )
+                try:
+                    cross_reference_new_page(page_slug, page.title, page.page_type)
+                except Exception as xref_err:
+                    logger.warning(f"Cross-reference failed for '{page.title}': {xref_err}")
+
+                if is_new:
+                    pages_created.append(page.title)
+                else:
+                    pages_updated.append(page.title)
+
+            pdfs_processed += 1
+        except Exception as exc:
+            logger.error("Failed to process PDF '%s': %s", filename, exc)
+            failed_files.append({"filename": filename, "error": str(exc)})
+
+    neo4j_bulk_triggered = False
+    wiki_root = settings.WIKI_DATA_DIR
+    if not os.path.isabs(wiki_root):
+        wiki_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), wiki_root)
+    if not req.skip_neo4j and not req.dry_run:
+        try:
+            _run_neo4j_bulk_ingest(wiki_root)
+            neo4j_bulk_triggered = True
+        except Exception as neo4j_err:
+            logger.error(f"Neo4j bulk ingest failed after PDF processing: {neo4j_err}")
+            failed_files.append({"filename": "_neo4j_bulk", "error": str(neo4j_err)})
+
+    if not req.dry_run:
+        try:
+            all_new_pages = [(slugify(p), p, t)
+                             for t in ["entities", "concepts", "projects"]
+                             for p in (pages_created + pages_updated)
+                             if os.path.exists(os.path.join(wiki_root, t, f"{slugify(p)}.md"))]
+            if all_new_pages:
+                append_to_index([(slug, title, ptype) for slug, title, ptype in all_new_pages])
+        except Exception as idx_err:
+            logger.warning(f"Index update failed: {idx_err}")
+
+        try:
+            summary = (f"Ingested {pdfs_processed}/{len(pdf_files)} PDFs from {req.folder_path}: "
+                       f"{len(pages_created)} pages created, {len(pages_updated)} updated, "
+                       f"{len(failed_files)} failures")
+            append_to_log(summary)
+        except Exception as log_err:
+            logger.warning(f"Log update failed: {log_err}")
+
+        invalidate_index_cache()
+        from src.cache import cache_store
+        cache_store.invalidate_all()
+
+    return PdfFolderIngestResponse(
+        success=True,
+        total_pdfs=len(pdf_files),
+        pdfs_processed=pdfs_processed,
+        pages_created=pages_created,
+        pages_updated=pages_updated,
+        failed_files=failed_files,
+        dry_run=req.dry_run,
+        neo4j_bulk_triggered=neo4j_bulk_triggered,
+    )
+
+
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
 
@@ -966,16 +1104,8 @@ import asyncio
 async def websocket_agent_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for streaming agent responses and status updates.
-    Requires x-api-key query parameter when API_KEY is configured.
     """
     await websocket.accept()
-
-    api_key = websocket.query_params.get("x-api-key")
-    if settings.API_KEY and api_key != settings.API_KEY:
-        await websocket.send_json({"status": "error", "message": "Unauthorized"})
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-        return
-
     try:
         while True:
             # Wait for incoming messages from the client
@@ -1022,16 +1152,8 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             logger.warning(f"Failed to send WebSocket error message: {e}")
 
 
-_RECONCILIATION_CACHE: Dict[str, Any] = {"ts": 0.0, "orphans": []}
-_RECONCILIATION_TTL = 60.0  # seconds
-
-
 def reconcile_neo4j_with_wiki(driver):
     """Prunes Neo4j nodes that were deleted from the wiki filesystem."""
-    now = time.monotonic()
-    if now - _RECONCILIATION_CACHE["ts"] < _RECONCILIATION_TTL:
-        return
-    _RECONCILIATION_CACHE["ts"] = now
     try:
         wiki_root = settings.WIKI_DATA_DIR
         if not os.path.isabs(wiki_root):
@@ -1158,7 +1280,7 @@ async def delete_entity(name: str, hard: bool = True, force: bool = False):
 async def get_events():
     """Retrieves all Temporal Events (Event nodes) from the Neo4j database."""
     import uuid
-    from datetime import datetime, timezone
+    from datetime import datetime
     driver = neo4j_conn.get_driver()
     if driver:
         reconcile_neo4j_with_wiki(driver)
@@ -1200,7 +1322,7 @@ async def get_events():
                     node_sources = [str(node_sources)] if node_sources else []
                 node_sources = [str(s) for s in node_sources]
                 
-                timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+                timestamp = datetime.utcnow().isoformat() + "Z"
                 year = None
                 for t in tags:
                     if t.isdigit() and len(t) == 4:

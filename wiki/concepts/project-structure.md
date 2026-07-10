@@ -25,7 +25,7 @@ chickensoup/
 ├── docker-compose.yml      # Neo4j + Redis services
 ├── assets/                 # Logos, favicons, images, slide decks
 ├── development-docs/       # Implementation plan, temp transcripts, videos
-├── papers/                 # 3 academic PDFs
+├── papers/                 # 61 academic PDFs (quantum, PQC, chemistry, bio/ML; triaged; 25 wiki pages created; see papers/triage-report-full.json)
 ├── wiki/                   # Obsidian vault (181 pages)
 ├── src/                    # Python backend (22 source files)
 ├── tests/                  # Python test suite (9 files, ~30 tests)

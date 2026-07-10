@@ -36,6 +36,13 @@ After WWII, the U.S. government brought over German scientists (via Operation Pa
 - The existence of advanced UAP propulsion
 - Einstein's general relativity (which describes gravity as the curvature of spacetime) is consistent with the true physics
 
+## Suppression Mechanisms
+
+- Peer review maintains the status quo by rejecting paradigm-challenging work
+- Military and commercial interests over-classify plasma and field-manipulation research
+- **Plasma science** — Zwicky blocked for 10 years; Peter Mitchell called insane for 20 years; plasma is 99.9% of the universe but still considered fringe. [[new-science-of-heaven]] documents the full suppression narrative
+- **Field manipulation** — Lazar's claims fit the pattern of backdoor science being kept from public view
+
 ## See Also
 
 - [[bob-lazar]]

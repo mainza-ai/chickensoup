@@ -10,11 +10,12 @@ HAS_QISKIT = False
 try:
     import qiskit
     from qiskit import QuantumCircuit
-    from qiskit.quantum_info import Statevector
+    # Depending on Qiskit version (1.0 vs legacy), import Aer or use Statevector
     try:
-        from qiskit_aer import Aer, AerSimulator
+        from qiskit_aer import Aer
         HAS_AER = True
     except ImportError:
+        from qiskit.quantum_info import Statevector
         HAS_AER = False
     HAS_QISKIT = True
 except ImportError:
@@ -53,8 +54,8 @@ def _simulate_spacetime_metrics_impl(target_year: int, energy_level: float) -> F
             
             # Extract statevector
             if HAS_AER:
-                # Aer statevector simulator
-                backend = AerSimulator(method='statevector')
+                # Aer simulator
+                backend = Aer.get_backend('statevector_simulator')
                 job = backend.run(qc)
                 state = job.result().get_statevector()
             else:

@@ -50,4 +50,5 @@ This wiki covers:
 - [[local-first-llm]]
 - [[earth-as-space-craft]]
 - [[ui-ux-design]]
-- [[agent-skills]]
+ - [[agent-skills]]
+ - [[kordylewski-clouds]] — Earth-Moon dusty plasma clouds, plasma intelligence emergence
