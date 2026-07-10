@@ -580,3 +580,10 @@ All written from extracted PDF content, not filenames.
 - Purged: `conversation-test-conv-id-2026-06-25.md`, `my-paper.pdf`, `project-structure-2026-06-22.txt`, `quantum-coupled-oscillator-simulation.pdf`, `scanned.pdf`, `test-paper.pdf` (test/blank artifacts only)
 - Added raw: `wiki/raw/mannheim-conformal-gravity-interview.txt` (Mannheim podcast transcript)
 - All 61 PDFs confirmed present in `wiki/raw/` with exact filename match against `papers/`
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+

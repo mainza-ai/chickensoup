@@ -58,6 +58,13 @@ class Settings(BaseSettings):
     # Orchestrator graph timeout (seconds)
     ORCHESTRATOR_TIMEOUT_SECONDS: int = 120
 
+    # LLM edge classification (knowledge graph ingest)
+    # Number of retries with exponential backoff before falling back to heuristics.
+    # Each retry doubles the base timeout. A value of 3 means attempts at
+    # 30s, 60s, 120s (total max wait ~210s per classification).
+    LLM_EDGE_CLASSIFICATION_TIMEOUT: int = 30
+    LLM_EDGE_CLASSIFICATION_MAX_RETRIES: int = 3
+
     @property
     def fallback_chain_list(self) -> List[str]:
         return [provider.strip() for provider in self.LLM_FALLBACK_CHAIN.split(",") if provider.strip()]

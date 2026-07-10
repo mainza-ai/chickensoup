@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import time
 import yaml
 import json
 import urllib.request
@@ -102,65 +103,50 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, target
     """
     Probes the active LLM (or heuristics) to determine the best relationship type.
     Returns (relationship_type, should_reverse_direction).
+
+    Retries with exponential backoff on timeout/network errors before falling
+    back to heuristics. The timeout and retry count are controlled by:
+      settings.LLM_EDGE_CLASSIFICATION_TIMEOUT
+      settings.LLM_EDGE_CLASSIFICATION_MAX_RETRIES
     """
     reverse = False
     s_label = source_label
     t_label = target_label
-    
+
     # If the target-to-source fits a schema matrix entry, swap for semantic analysis and reverse later
     if (t_label, s_label) in SCHEMA_RELATIONSHIPS and (s_label, t_label) not in SCHEMA_RELATIONSHIPS:
         s_label, t_label = t_label, s_label
         source, target = target, source
         reverse = True
-        
+
     pair = (s_label, t_label)
     options = SCHEMA_RELATIONSHIPS.get(pair, {"valid": ["RELATED_TO"], "default": "RELATED_TO"})
     valid_options = options["valid"]
     default_option = options["default"]
-    
+
     provider, base_url, models = discover_active_provider()
-    if provider == "simulated" or not models:
-        # Refined keyword heuristical fallbacks constrained by schema options
-        body_lower = body.lower()
-        if "WORKED_AT" in valid_options or "EMPLOYED_BY" in valid_options:
-            if "worked" in body_lower or "employed" in body_lower or "researcher" in body_lower:
-                return "EMPLOYED_BY" if "EMPLOYED_BY" in valid_options else "WORKED_AT", reverse
-        if "TESTIFIED_AT" in valid_options:
-            if "testified" in body_lower or "testimony" in body_lower:
-                return "TESTIFIED_AT", reverse
-        if "PROPOSED" in valid_options:
-            if "proposed" in body_lower or "developed" in body_lower or "formulated" in body_lower:
-                return "PROPOSED", reverse
-        if "IMPLEMENTS" in valid_options:
-            if "implements" in body_lower or "realizes" in body_lower:
-                return "IMPLEMENTS", reverse
-        if "USES" in valid_options:
-            if "uses" in body_lower or "utilizes" in body_lower:
-                return "USES", reverse
-        if "OCCURRED_AT" in valid_options:
-            if "occurred" in body_lower or "crashed" in body_lower or "landed" in body_lower:
-                return "OCCURRED_AT", reverse
-                
-        return default_option, reverse
+    use_llm = provider != "simulated" and bool(models)
+    if not use_llm:
+        return _fallback_heuristic_edge_type(source, source_label, target, target_label, body, valid_options, default_option)
 
     url = f"{base_url}/chat/completions"
     options_str = "\n".join([f"- {opt}" for opt in valid_options])
     prompt = f"""
-    You are an expert knowledge graph schema engineer. Given the source node, its label, the target node, its label, and the context, determine the single most appropriate relationship type between them.
-    
-    Permitted Options for a connection from {s_label} to {t_label}:
-    {options_str}
-    
-    Source Name: "{source}" (Label: {s_label})
-    Target Name: "{target}" (Label: {t_label})
-    Context:
-    {body[:500]}
-    
-    Return ONLY a JSON object:
-    {{
-        "relationship": "<One of the permitted options listed above>"
-    }}
-    """
+You are an expert knowledge graph schema engineer. Given the source node, its label, the target node, its label, and the context, determine the single most appropriate relationship type between them.
+
+Permitted Options for a connection from {s_label} to {t_label}:
+{options_str}
+
+Source Name: "{source}" (Label: {s_label})
+Target Name: "{target}" (Label: {t_label})
+Context:
+{body[:500]}
+
+Return ONLY a JSON object:
+{{
+    "relationship": "<One of the permitted options listed above>"
+}}
+"""
     payload = {
         "model": models[0],
         "messages": [
@@ -170,25 +156,80 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, target
         "temperature": 0.1,
         "response_format": {"type": "json_object"}
     }
-    try:
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        with urllib.request.urlopen(req, timeout=30.0) as response:
-            if response.status == 200:
-                res_data = json.loads(response.read().decode("utf-8"))
-                content = res_data["choices"][0]["message"]["content"]
-                result = json.loads(content)
-                rel = result.get("relationship", default_option)
-                if rel in valid_options:
-                    return rel, reverse
-    except Exception as e:
-        logger.debug(f"LLM edge promotion failed: {e}. Using heuristic fallback.")
-        
-    return default_option, reverse
+
+    last_exc = None
+    timeout = settings.LLM_EDGE_CLASSIFICATION_TIMEOUT
+    max_retries = settings.LLM_EDGE_CLASSIFICATION_MAX_RETRIES
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                if response.status == 200:
+                    res_data = json.loads(response.read().decode("utf-8"))
+                    content = res_data["choices"][0]["message"]["content"]
+                    result = json.loads(content)
+                    rel = result.get("relationship", default_option)
+                    if rel in valid_options:
+                        return rel, reverse
+                    logger.warning(
+                        "LLM returned out-of-schema relationship '%s' for %s -> %s; using default '%s'",
+                        rel, source, target, default_option
+                    )
+                    return default_option, reverse
+        except Exception as e:
+            last_exc = e
+            logger.warning(
+                "LLM edge classification attempt %d/%d failed for %s -> %s: %s",
+                attempt, max_retries, source, target, e
+            )
+
+        if attempt < max_retries:
+            backoff = timeout * (2 ** (attempt - 1))
+            logger.info(
+                "Retrying LLM edge classification for %s -> %s in %ds (attempt %d/%d)",
+                source, target, backoff, attempt + 1, max_retries
+            )
+            time.sleep(backoff)
+
+    logger.error(
+        "LLM edge classification exhausted %d retries for %s -> %s; falling back to heuristics. Last error: %s",
+        max_retries, source, target, last_exc
+    )
+    return _fallback_heuristic_edge_type(source, source_label, target, target_label, body, valid_options, default_option)
+
+
+def _fallback_heuristic_edge_type(
+    source: str, source_label: str,
+    target: str, target_label: str,
+    body: str,
+    valid_options: List[str],
+    default_option: str
+) -> Tuple[str, bool]:
+    """Heuristic fallback when LLM is unavailable or all retries are exhausted."""
+    body_lower = body.lower()
+    for keyword, rel, options_field in [
+        ("worked", "EMPLOYED_BY", ["EMPLOYED_BY", "WORKED_AT"]),
+        ("employ", "EMPLOYED_BY", ["EMPLOYED_BY", "WORKED_AT"]),
+        ("testified", "TESTIFIED_AT", ["TESTIFIED_AT"]),
+        ("proposed", "PROPOSED", ["PROPOSED"]),
+        ("developed", "PROPOSED", ["PROPOSED"]),
+        ("formulated", "PROPOSED", ["PROPOSED"]),
+        ("implements", "IMPLEMENTS", ["IMPLEMENTS"]),
+        ("uses", "USES", ["USES"]),
+        ("utilizes", "USES", ["USES"]),
+        ("occurred", "OCCURRED_AT", ["OCCURRED_AT"]),
+        ("crashed", "OCCURRED_AT", ["OCCURRED_AT"]),
+        ("landed", "OCCURRED_AT", ["OCCURRED_AT"]),
+    ]:
+        if keyword in body_lower and rel in valid_options:
+            return rel, False
+    return default_option, False
 
 def ingest_wiki_page(
     driver: Driver,
