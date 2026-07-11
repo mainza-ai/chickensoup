@@ -587,3 +587,21 @@ All written from extracted PDF content, not filenames.
 ## [2026-07-10] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
 ## [2026-07-10] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 
+## [2026-07-11] ingest | Apple Reference Guides (20 docs)
+
+Imported 20 Apple platform development guides from `development-docs/AppleAdditionalDocumentation/` into `wiki/raw/`.
+
+### New Concept Page (1)
+- **[[apple-reference-guides]]** — Master index of all 20 Apple development references with per-document descriptions and link to raw source files
+
+### Sources Used
+- development-docs/AppleAdditionalDocumentation/ (20 Markdown files)
+
+### Raw Provenance
+- 20 files imported to `wiki/raw/`:
+  - AppIntents-Updates.md (12K), AppKit-Liquid-Glass (13K), Foundation-AttributedString (6.6K), FoundationModels-on-device-LLM (12K)
+  - Implementing-Assistive-Access (6.3K), Implementing-Visual-Intelligence (11K), MapKit-GeoToolbox (9.5K), StoreKit-Updates (9.3K)
+  - Swift-Charts-3D (9.0K), Swift-Concurrency-Updates (10K), Swift-InlineArray-Span (8.7K), SwiftData-Class-Inheritance (9.6K)
+  - SwiftUI-AlarmKit (23K), SwiftUI-Liquid-Glass (8.0K), SwiftUI-New-Toolbar (6.5K), SwiftUI-Styled-Text-Edit (11K)
+  - SwiftUI-WebKit (12K), UIKit-Liquid-Glass (9.8K), WidgetKit-Liquid-Glass (7.5K), Widgets-for-visionOS (8.5K)
+

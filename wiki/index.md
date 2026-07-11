@@ -48,6 +48,7 @@ related: []
 - [[pytest]] — Testing framework
 - [[pyproject-toml]] — Build configuration
 - [[docker-compose]] — Multi-container orchestration
+- [[apple-reference-guides]] — Apple platform coding references (AppIntents, Liquid Glass, AlarmKit, WebKit, FoundationModels, Swift concurrency, SwiftData, MapKit, StoreKit, visionOS, more)
 - [[swiftui-pro]] — Agent skill: SwiftUI best practices (twostraws)
 - [[swiftdata-pro]] — Agent skill: SwiftData best practices (twostraws)
 - [[swift-concurrency-pro]] — Agent skill: Swift concurrency best practices (twostraws)
