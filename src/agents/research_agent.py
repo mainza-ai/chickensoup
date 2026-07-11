@@ -169,41 +169,110 @@ def neo4j_lookup_node(state: ResearchState) -> Dict[str, Any]:
         "graph_context": graph_context
     }
 
-def credibility_scoring_node(state: ResearchState) -> Dict[str, Any]:
-    """Node: Evaluates credibility scores for extracted claims/nodes based on sources and properties."""
-    logger.info("Running ResearchAgent Credibility Scoring Node...")
-    found_nodes = state.get("found_nodes", [])
-    
-    scores = {}
+def _compute_wavefunction_scores(
+    entities: List[str],
+    found_nodes: List[Dict[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    from src.wiki.pulse_writer import load_recent_pulse_evidence
+    from src.quantum_credibility.wavefunction import ClaimWavefunction
+
+    wavefunction = ClaimWavefunction()
+    scored: Dict[str, Any] = {}
+    any_pulse = False
+
     for node in found_nodes:
         name = node.get("name", "")
-        # Start with base confidence
-        base_conf = node.get("confidence", 0.5)
-        # Increase if there are explicit sources
-        # We can look up properties
-        labels = node.get("labels", [])
-        
-        # Simple heuristic rule-based scoring
-        score = base_conf
-        if "Person" in labels:
-            score += 0.1  # slightly higher weight
-        if "Project" in labels:
-            score += 0.15
-            
-        scores[name] = min(1.0, max(0.0, score))
-        
-    # Check if we need human-in-the-loop validation
-    # If any score is exceptionally low but entity is critical, trigger human approval
+        if not name:
+            continue
+        try:
+            evidence = load_recent_pulse_evidence(name, max_age_days=14)
+            if not evidence:
+                continue
+            any_pulse = True
+            claim_text = node.get("preview", "") or name
+            cc = wavefunction.score_claim(claim_text, evidence)
+            scored[name] = {
+                "epistemic_confidence": cc.epistemic_confidence,
+                "social_traction": cc.social_traction,
+                "state_label": cc.state_label,
+                "collapsed": cc.collapsed,
+                "evidence_count": cc.evidence_count,
+                "last_pulse_at": cc.last_pulse_at,
+                "scoring_version": cc.scoring_version,
+                "scoring_inputs": cc.scoring_inputs,
+                "claim_text": cc.claim_text,
+            }
+        except Exception as e:
+            logger.debug(f"Wavefunction scoring failed for '{name}': {e}")
+            continue
+
+    if not any_pulse:
+        return None
+
+    return scored
+
+
+def credibility_scoring_node(state: ResearchState) -> Dict[str, Any]:
+    logger.info("Running ResearchAgent Credibility Scoring Node...")
+    found_nodes = state.get("found_nodes", [])
+    entities = state.get("entities", [])
+
+    # Try wavefunction scoring when recent pulse data exists
+    wf_scores: Optional[Dict[str, Any]] = None
+    try:
+        wf_scores = _compute_wavefunction_scores(entities, found_nodes)
+    except Exception as e:
+        logger.warning(f"Wavefunction scoring path error, falling back to heuristic: {e}")
+        wf_scores = None
+
+    scores: Dict[str, float] = {}
+    wf_details: Dict[str, Any] = {}
+
+    if wf_scores:
+        logger.info(f"Wavefunction scoring active — {len(wf_scores)} nodes with pulse evidence")
+        for node in found_nodes:
+            name = node.get("name", "")
+            if name in wf_scores:
+                detail = wf_scores[name]
+                scores[name] = detail["epistemic_confidence"]
+                wf_details[name] = detail
+            else:
+                # No pulse evidence for this node — heuristic fallback
+                base_conf = node.get("confidence", 0.5)
+                labels = node.get("labels", [])
+                score = base_conf
+                if "Person" in labels:
+                    score += 0.1
+                if "Project" in labels:
+                    score += 0.15
+                scores[name] = min(1.0, max(0.0, score))
+    else:
+        # Heuristic fallback — existing behaviour preserved
+        for node in found_nodes:
+            name = node.get("name", "")
+            base_conf = node.get("confidence", 0.5)
+            labels = node.get("labels", [])
+            score = base_conf
+            if "Person" in labels:
+                score += 0.1
+            if "Project" in labels:
+                score += 0.15
+            scores[name] = min(1.0, max(0.0, score))
+
     human_approval_required = False
     for name, val in scores.items():
         if val < 0.4:
             human_approval_required = True
             break
-            
-    return {
+
+    result: Dict[str, Any] = {
         "credibility_scores": scores,
-        "human_approval_required": human_approval_required
+        "human_approval_required": human_approval_required,
     }
+    if wf_details:
+        result["wavefunction_scores"] = wf_details
+
+    return result
 
 def context_assembly_node(state: ResearchState) -> Dict[str, Any]:
     """Node: Synthesizes all gathered information into an assembled context block."""
@@ -340,12 +409,50 @@ class ResearchAgent:
         if final_state.get("assembled_context"):
             summary = self._generate_summary(query, final_state["assembled_context"])
             
+        # Build inferred events/entities from wavefunction scores if available
+        inferred_events: list = []
+        inferred_entities: list = []
+        try:
+            wf_details = final_state.get("wavefunction_scores", {}) if isinstance(final_state, dict) else {}
+            if wf_details:
+                from src.models import ClaimConfidence
+                for node_name, detail in wf_details.items():
+                    # Inferred entities carry wavefunction metadata
+                    inferred_entities.append({
+                        "name": node_name,
+                        "epistemic_confidence": detail.get("epistemic_confidence", 0.5),
+                        "social_traction": detail.get("social_traction", 0.0),
+                        "state_label": detail.get("state_label", "unverified"),
+                        "collapsed": detail.get("collapsed", False),
+                        "evidence_count": detail.get("evidence_count", 0),
+                        "last_pulse_at": detail.get("last_pulse_at"),
+                        "scoring_inputs": detail.get("scoring_inputs", {}),
+                        "source_tier": "network_opt_in",
+                    })
+                # Any contested/collapsed claims become inferred events
+                for node_name, detail in wf_details.items():
+                    if detail.get("state_label") in ("corroborated", "contested") and detail.get("collapsed"):
+                        inferred_events.append({
+                            "entity": node_name,
+                            "type": "claim_collapse",
+                            "state_label": detail.get("state_label"),
+                            "epistemic_confidence": detail.get("epistemic_confidence"),
+                            "social_traction": detail.get("social_traction"),
+                            "evidence_count": detail.get("evidence_count"),
+                            "last_pulse_at": detail.get("last_pulse_at"),
+                        })
+        except Exception as inf_err:
+            logger.debug(f"Failed to build inferred events/entities: {inf_err}")
+
         return {
             "assembled_context": final_state.get("assembled_context", ""),
             "credibility_scores": final_state.get("credibility_scores", {}),
+            "wavefunction_scores": final_state.get("wavefunction_scores", {}),
             "human_approval_required": final_state.get("human_approval_required", False) and not final_state.get("human_approved", False),
             "summary": summary or "Summary generation fallback.",
-            "thread_id": thread_id
+            "thread_id": thread_id,
+            "inferred_events": inferred_events,
+            "inferred_entities": inferred_entities,
         }
 
     @cache_decorator(prefix="mcp", ttl=300)

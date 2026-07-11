@@ -706,6 +706,71 @@ def get_recent_notifications(limit: int = 10) -> List[dict]:
     return notifications[:limit]
 
 
+# ── Phase 6: Almanac Scheduled Job ────────────────────────────────────
+
+_ALMANAC_RUNNING = False
+_ALMANAC_LAST_RUN: Optional[str] = None
+_ALMANAC_CHECK_INTERVAL_SECONDS = 3600  # check hourly, but only generate at configured interval
+
+
+async def periodic_almanac_loop():
+    global _ALMANAC_RUNNING, _ALMANAC_LAST_RUN
+
+    _ALMANAC_RUNNING = True
+    logger.info(
+        f"Almanac scheduler started (interval={settings.ALMANAC_GENERATION_INTERVAL_HOURS}h)"
+    )
+
+    while _ALMANAC_RUNNING:
+        try:
+            # Check interval is hourly, but actual generation respects the configured interval
+            await asyncio.sleep(_ALMANAC_CHECK_INTERVAL_SECONDS)
+
+            if not settings.LAST30DAYS_ENABLED:
+                continue
+
+            # Respect last run interval
+            if _ALMANAC_LAST_RUN:
+                try:
+                    last_dt = datetime.fromisoformat(_ALMANAC_LAST_RUN)
+                    if last_dt.tzinfo is None:
+                        last_dt = last_dt.replace(tzinfo=timezone.utc)
+                    now = datetime.now(timezone.utc)
+                    elapsed_h = (now - last_dt).total_seconds() / 3600.0
+                    if elapsed_h < settings.ALMANAC_GENERATION_INTERVAL_HOURS:
+                        continue
+                except Exception:
+                    pass
+
+            logger.info("Almanac scheduler triggering daily generation")
+            try:
+                from src.almanac.almanac_generator import generate_daily_almanac
+                result = await generate_daily_almanac(dry_run=False)
+                _ALMANAC_LAST_RUN = datetime.now(timezone.utc).isoformat()
+                if result.status == "no_material_change":
+                    logger.info("Almanac scheduler: no material change, skipping brief")
+            except Exception as e:
+                logger.error(f"Almanac scheduled generation failed: {e}", exc_info=True)
+
+        except asyncio.CancelledError:
+            logger.info("Almanac scheduler cancelled")
+            break
+        except Exception as e:
+            logger.error(f"Almanac scheduler error: {e}", exc_info=True)
+
+    _ALMANAC_RUNNING = False
+
+
+def get_almanac_status() -> dict:
+    return {
+        "enabled": settings.LAST30DAYS_ENABLED,
+        "last_run": _ALMANAC_LAST_RUN,
+        "interval_hours": settings.ALMANAC_GENERATION_INTERVAL_HOURS,
+        "running": _ALMANAC_RUNNING,
+    }
+
+
 def stop():
-    global _RUNNING
+    global _RUNNING, _ALMANAC_RUNNING
     _RUNNING = False
+    _ALMANAC_RUNNING = False

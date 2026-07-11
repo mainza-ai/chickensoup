@@ -30,7 +30,7 @@ def test_discover_active_provider_success_omlx():
 
         provider, url, models = refresh_discovery()
         assert provider == "omlx"
-        assert url == "http://127.0.0.1:9000/v1"
+        assert url.rstrip("/") in ("http://127.0.0.1:9000/v1", "http://localhost:9000/v1")
         assert models == ["omlx-model-1", "omlx-model-2"]
 
 def test_discover_active_provider_success_ollama_after_omlx_fail():

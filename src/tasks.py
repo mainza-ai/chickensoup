@@ -54,8 +54,8 @@ def async_navigate(origin: str, destination: str, target_year: int, energy_level
     scheduler = QuantumJobScheduler()
     geometry = FieldGeometryTensor(
         warp_factor=energy_level * 1.2,
-        metric_tensor=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
-        extrinsic_curvature=[[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]]
+        spatial_metric=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        extrinsic_curvature=[[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]],
     )
     
     try:

@@ -9,10 +9,14 @@ logger = logging.getLogger("chickensoup.wiki.writer")
 
 from src.config import settings
 
-WIKI_DIR = settings.WIKI_DATA_DIR
-if not os.path.isabs(WIKI_DIR):
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    WIKI_DIR = os.path.join(project_root, WIKI_DIR)
+try:
+    from src.wiki.paths import get_wiki_dir as _central_get_wiki_dir
+    WIKI_DIR = str(_central_get_wiki_dir())
+except Exception:
+    WIKI_DIR = settings.WIKI_DATA_DIR
+    if not os.path.isabs(WIKI_DIR):
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        WIKI_DIR = os.path.join(project_root, WIKI_DIR)
 SUBDIRS = {
     "entities": "entities",
     "concepts": "concepts",
@@ -186,7 +190,26 @@ def append_to_index(slugs: List[Tuple[str, str, str]]):
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(md["frontmatter_yaml"] + body)
 
+LOG_IGNORE_PATTERNS = [
+    "/tmp/",
+    "/private/var/folders/",
+    "pytest-of-",
+    "test_pdf_folder_",
+]
+
+def _should_ignore_log_entry(entry_text: str) -> bool:
+    lower = entry_text.lower()
+    for pat in LOG_IGNORE_PATTERNS:
+        if pat.lower() in lower:
+            return True
+    return False
+
+
 def append_to_log(entry_text: str):
+    if _should_ignore_log_entry(entry_text):
+        logger.debug(f"Ignoring log entry matching ignore pattern: {entry_text[:100]}")
+        return
+
     log_path = os.path.join(WIKI_DIR, "log.md")
     if not os.path.isfile(log_path):
         return

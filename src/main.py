@@ -25,6 +25,8 @@ from src.models import (
     SetUserNameRequest, SetUserNameResponse,
     WikiClearResponse, WikiExportResponse, WikiImportResponse,
     WikiPageListItem, WikiPageListResponse, WikiPageDetailResponse, WikiDeleteResponse,
+    PulseResult, DivergenceResult, ClaimConfidence, TimelinePoint, BudgetStatus,
+    ClaimEvidence,
 )
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
@@ -49,9 +51,9 @@ orchestrator = Orchestrator()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup actions
     logger.info("Starting up chickensoup API...")
     scheduler_task = None
+    almanac_task = None
     try:
         driver = neo4j_conn.connect()
         initialize_schema(driver)
@@ -65,15 +67,22 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Could not start chat-to-wiki scheduler: {e}")
 
+    try:
+        from src.scheduler import periodic_almanac_loop
+        almanac_task = asyncio.create_task(periodic_almanac_loop())
+        logger.info("Almanac scheduler started")
+    except Exception as e:
+        logger.warning(f"Could not start almanac scheduler: {e}")
+
     yield
-    # Shutdown actions
     logger.info("Shutting down chickensoup API...")
-    if scheduler_task:
-        scheduler_task.cancel()
-        try:
-            await scheduler_task
-        except asyncio.CancelledError:
-            pass
+    for task in (scheduler_task, almanac_task):
+        if task:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
     neo4j_conn.close()
 
 def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
@@ -163,14 +172,11 @@ app.add_middleware(ObservabilityAndRateLimitMiddleware)
 @app.get("/status", response_model=StatusResponse)
 async def get_status():
     """Returns system status, showing connectivity of local LLMs, database, and cache."""
-    # Check LLM
     provider, _, _ = get_discovered(depth="fresh")
     llm_connected = provider != "simulated"
 
-    # Check Neo4j
     neo4j_ok = neo4j_conn.check_health()
 
-    # Check Redis
     redis_ok = False
     try:
         r = redis.from_url(settings.REDIS_URL)
@@ -179,13 +185,25 @@ async def get_status():
     except Exception as e:
         logger.warning(f"Redis connection failed: {e}")
 
+    last30days_enabled = settings.LAST30DAYS_ENABLED
+    budget_remaining = None
+    try:
+        if last30days_enabled:
+            from src.budget import budget_tracker
+            bs = budget_tracker.get_status()
+            budget_remaining = bs.remaining_usd
+    except Exception:
+        pass
+
     return StatusResponse(
         status="healthy" if (neo4j_ok or llm_connected) else "degraded",
         llm_provider=provider,
         llm_connected=llm_connected,
         neo4j_connected=neo4j_ok,
         redis_connected=redis_ok,
-        quantum_backend=settings.QUANTUM_SIMULATION_BACKEND
+        quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
+        last30days_enabled=last30days_enabled,
+        budget_remaining=budget_remaining,
     )
 
 @app.get("/config", response_model=ConfigResponse)
@@ -307,11 +325,32 @@ async def get_models():
     )
 
 def _build_query_response(query: str, output: Dict[str, Any], conversation_id: Optional[str] = None, history: Optional[List[Dict[str, str]]] = None) -> QueryResponse:
-    """Shared helper: extract answer/confidence/entities/sources from orchestrator output,
-    handling paused and error states consistently."""
     answer = output.get("answer", "No response generated.")
     if output.get("status") == "paused_for_human_approval":
         answer = f"PENDING APPROVAL: {output.get('summary', '')}"
+
+    # Claim confidences from wavefunction scoring — now actually populated
+    claim_confs = []
+    try:
+        wf_scores = output.get("wavefunction_scores", {}) or output.get("research_details", {}).get("wavefunction_scores", {})
+        if wf_scores:
+            for name, detail in wf_scores.items():
+                if isinstance(detail, dict):
+                    try:
+                        from src.models import ClaimConfidence
+                        claim_confs.append(ClaimConfidence(**{
+                            k: v for k, v in detail.items()
+                            if k in ClaimConfidence.model_fields
+                        }))
+                    except Exception:
+                        continue
+    except Exception:
+        pass
+
+    inferred_events = output.get("inferred_events", []) or output.get("research_details", {}).get("inferred_events", [])
+    inferred_entities = output.get("inferred_entities", []) or output.get("research_details", {}).get("inferred_entities", [])
+
+    source_tier = "network_opt_in" if claim_confs else "local"
 
     return QueryResponse(
         query=query,
@@ -319,10 +358,12 @@ def _build_query_response(query: str, output: Dict[str, Any], conversation_id: O
         confidence=output.get("confidence", 0.5),
         entities=output.get("entities", []),
         sources=output.get("sources", ["Orchestrated Search"]) if not output.get("status") == "paused_for_human_approval" else [],
-        inferred_events=[],
-        inferred_entities=[],
+        inferred_events=inferred_events,
+        inferred_entities=inferred_entities,
         conversation_id=conversation_id,
         history=history or [],
+        claim_confidences=claim_confs,
+        source_tier=source_tier,
     )
 
 
@@ -1775,4 +1816,255 @@ async def debug_routing(query: str = ""):
                      ("NavigateNode" if parsed.intent == "navigate" else "StatusNode"),
         "confidence_gated": parsed.confidence < 0.6,
     }
+
+
+# ── Living Almanac endpoints ─────────────────────────────────────────────
+
+class PulseRequest(BaseModel):
+    handles: Optional[Dict[str, Any]] = None
+
+
+@app.post("/pulse/{entity_name}", response_model=PulseResult, dependencies=[Depends(verify_api_key)])
+async def post_pulse(entity_name: str, request: PulseRequest = None):
+    handles = None
+    if request and request.handles:
+        handles = request.handles
+    try:
+        from src.agents.pulse_agent import PulseAgent
+        agent = PulseAgent()
+        result = agent.run_pulse(entity_name, handles=handles)
+        return result
+    except Exception as e:
+        logger.error(f"Pulse failed for '{entity_name}': {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Pulse failed: {str(e)}")
+
+
+@app.get("/entities/{name}/divergence", response_model=DivergenceResult)
+async def get_entity_divergence(name: str):
+    slug = slugify(name)
+    wiki_page = read_page(slug, "entities") or read_page(slug, "concepts") or read_page(slug, "projects")
+    if not wiki_page:
+        raise HTTPException(status_code=404, detail=f"Wiki page for entity '{name}' not found")
+
+    try:
+        from src.wiki.pulse_writer import load_recent_pulse_evidence
+        fresh_evidence = load_recent_pulse_evidence(name, max_age_days=14)
+    except Exception as e:
+        logger.debug(f"Failed to load pulse evidence for divergence: {e}")
+        fresh_evidence = []
+
+    try:
+        from src.quantum_credibility.divergence_engine import compute_narrative_divergence
+        result = compute_narrative_divergence(name, wiki_page, fresh_evidence)
+        return result
+    except Exception as e:
+        logger.error(f"Divergence computation failed for '{name}': {e}")
+        raise HTTPException(status_code=500, detail=f"Divergence computation failed: {str(e)}")
+
+
+@app.get("/entities/{name}/timeline")
+async def get_entity_timeline(name: str, days: int = 30):
+    try:
+        from src.almanac.timeline import build_timeline
+        timeline_result = build_timeline(name, days=days)
+        return {
+            "entity_name": name,
+            "days": days,
+            "points": [p.model_dump() for p in timeline_result.points],
+            "total": len(timeline_result.points),
+        }
+    except Exception as e:
+        logger.error(f"Timeline build failed for '{name}': {e}")
+        raise HTTPException(status_code=500, detail=f"Timeline build failed: {str(e)}")
+
+
+@app.get("/entities/{name}/entanglement")
+async def get_entity_entanglement(name: str, candidate: Optional[str] = None, limit: int = 10):
+    try:
+        from src.wiki.pulse_writer import load_recent_pulse_evidence
+        evidence = load_recent_pulse_evidence(name, max_age_days=30)
+    except Exception:
+        evidence = []
+
+    if not evidence:
+        return {
+            "entity_name": name,
+            "entanglements": [],
+            "total": 0,
+            "note": "No recent pulse evidence found — run a pulse first",
+        }
+
+    try:
+        from src.quantum_credibility.entanglement_corr import compute_entanglement_correlation, compute_all_entanglements
+
+        if candidate:
+            res = compute_entanglement_correlation(name, candidate, evidence)
+            return {
+                "entity_name": name,
+                "entanglements": [res],
+                "total": 1,
+            }
+        else:
+            all_res = compute_all_entanglements(name, evidence)
+            return {
+                "entity_name": name,
+                "entanglements": all_res[:limit],
+                "total": len(all_res),
+            }
+    except Exception as e:
+        logger.error(f"Entanglement computation failed for '{name}': {e}")
+        raise HTTPException(status_code=500, detail=f"Entanglement computation failed: {str(e)}")
+
+
+class TribunalRequest(BaseModel):
+    claim_text: str = Field(..., min_length=1)
+    divergence_risk: float = Field(0.0, ge=0.0, le=1.0)
+
+
+@app.post("/entities/{name}/tribunal")
+async def post_entity_tribunal(name: str, request: TribunalRequest):
+    try:
+        from src.wiki.pulse_writer import load_recent_pulse_evidence
+        evidence = load_recent_pulse_evidence(name, max_age_days=30)
+    except Exception:
+        evidence = []
+
+    # Also try to get wavefunction score for the claim
+    wavefunction = {"state_label": "contested", "epistemic_confidence": 0.5, "social_traction": 0.0}
+
+    try:
+        from src.quantum_credibility.wavefunction import ClaimWavefunction
+        wf = ClaimWavefunction()
+        if evidence:
+            cc = wf.score_claim(request.claim_text, evidence[:20])
+            wavefunction = {
+                "state_label": cc.state_label,
+                "epistemic_confidence": cc.epistemic_confidence,
+                "social_traction": cc.social_traction,
+                "collapsed": cc.collapsed,
+                "evidence_count": cc.evidence_count,
+                "scoring_inputs": cc.scoring_inputs,
+            }
+    except Exception as e:
+        logger.debug(f"Wavefunction scoring for tribunal failed: {e}")
+
+    try:
+        from src.agents.tribunal_agent import TribunalAgent
+        agent = TribunalAgent()
+        result = agent.run_tribunal(
+            claim_text=request.claim_text,
+            evidence=evidence[:30] if evidence else [],
+            wavefunction=wavefunction,
+            divergence_risk=request.divergence_risk,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Tribunal failed for '{name}': {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Tribunal failed: {str(e)}")
+
+
+@app.get("/budget/status", response_model=BudgetStatus)
+async def get_budget_status():
+    try:
+        from src.budget import budget_tracker
+        return budget_tracker.get_status()
+    except Exception as e:
+        logger.error(f"Budget status failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Budget status failed: {str(e)}")
+
+
+@app.post("/budget/approve", dependencies=[Depends(verify_api_key)])
+async def post_budget_approve():
+    try:
+        from src.budget import budget_tracker
+        status = budget_tracker.approve_hold()
+        return {"success": True, "budget": status.model_dump()}
+    except Exception as e:
+        logger.error(f"Budget approve failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Budget approve failed: {str(e)}")
+
+
+@app.post("/almanac/generate")
+async def post_almanac_generate(dry_run: bool = True):
+    try:
+        from src.almanac.almanac_generator import generate_daily_almanac
+        result = await generate_daily_almanac(dry_run=dry_run)
+        return {
+            "status": result.status,
+            "date": result.date_str,
+            "html_path": result.html_path,
+            "md_path": result.md_path,
+            "entities_processed": result.entities_processed,
+            "claims_moved": result.claims_moved,
+            "claims_collapsed": result.claims_collapsed,
+            "newly_contested": result.newly_contested,
+            "entanglements": result.entanglements,
+            "elapsed_seconds": result.elapsed_seconds,
+            "error": result.error,
+            "dry_run": result.dry_run,
+        }
+    except Exception as e:
+        logger.error(f"Almanac generation failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Almanac generation failed: {str(e)}")
+
+
+@app.get("/almanac/history")
+async def get_almanac_history(limit: int = 20):
+    try:
+        from src.wiki.paths import get_almanac_dir as _get_ad
+        ad = _get_ad()
+        if not ad.exists():
+            return {"almanacs": [], "total": 0}
+
+        html_files = sorted(ad.glob("*.html"), reverse=True)
+        results = []
+        for f in html_files[:limit]:
+            try:
+                stat = f.stat()
+                from datetime import timezone as _tz
+                results.append({
+                    "date": f.stem,
+                    "filename": f.name,
+                    "path": str(f),
+                    "size_kb": round(stat.st_size / 1024, 1),
+                    "created": datetime.fromtimestamp(stat.st_mtime, tz=_tz.utc).isoformat(),
+                })
+            except Exception:
+                continue
+
+        return {"almanacs": results, "total": len(results)}
+    except Exception as e:
+        logger.error(f"Almanac history failed: {e}")
+        return {"almanacs": [], "total": 0}
+
+
+@app.get("/pulse/history")
+async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
+    try:
+        from src.wiki.paths import get_pulse_dir
+        from src.wiki.pulse_writer import list_pulse_snapshots, load_pulse_snapshot
+
+        pulse_dir = get_pulse_dir()
+        if not pulse_dir.exists():
+            return {"pulses": [], "total": 0}
+
+        files = list_pulse_snapshots(entity_name) if entity_name else sorted(pulse_dir.glob("*.json"), reverse=True)
+        files = files[:limit]
+
+        pulses = []
+        for f in files:
+            data = load_pulse_snapshot(f)
+            if data:
+                pulses.append({
+                    "entity_name": data.get("entity_name", f.stem),
+                    "date": data.get("date", ""),
+                    "timestamp": data.get("timestamp", ""),
+                    "evidence_count": data.get("evidence_count", 0),
+                    "file": str(f),
+                })
+
+        return {"pulses": pulses, "total": len(pulses)}
+    except Exception as e:
+        logger.error(f"Pulse history failed: {e}")
+        return {"pulses": [], "total": 0}
 

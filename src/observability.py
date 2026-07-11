@@ -55,3 +55,52 @@ cache_misses: Counter = meter.create_counter(
     description="Total cache misses",
     unit="1"
 )
+
+# Living Almanac metrics
+pulse_runs_total: Counter = meter.create_counter(
+    name="pulse_runs_total",
+    description="Number of pulse runs by status",
+    unit="1"
+)
+
+pulse_latency_seconds: Histogram = meter.create_histogram(
+    name="pulse_latency_seconds",
+    description="Pulse execution latency",
+    unit="s"
+)
+
+budget_spent_usd: Counter = meter.create_counter(
+    name="budget_spent_usd",
+    description="Total budget spent in USD",
+    unit="1"
+)
+
+wavefunction_state_total: Counter = meter.create_counter(
+    name="wavefunction_state_total",
+    description="Wavefunction scoring by state label",
+    unit="1"
+)
+
+divergence_risk_histogram: Histogram = meter.create_histogram(
+    name="divergence_risk",
+    description="Divergence risk distribution",
+    unit="1"
+)
+
+tribunal_runs_total: Counter = meter.create_counter(
+    name="tribunal_runs_total",
+    description="Tribunal runs by trigger type",
+    unit="1"
+)
+
+almanac_generated_total: Counter = meter.create_counter(
+    name="almanac_generated_total",
+    description="Almanac generation runs by status",
+    unit="1"
+)
+
+almanac_generation_duration: Histogram = meter.create_histogram(
+    name="almanac_generation_duration_seconds",
+    description="Almanac generation duration",
+    unit="s"
+)

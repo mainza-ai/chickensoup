@@ -65,6 +65,32 @@ class Settings(BaseSettings):
     LLM_EDGE_CLASSIFICATION_TIMEOUT: int = 30
     LLM_EDGE_CLASSIFICATION_MAX_RETRIES: int = 3
 
+    # Living Almanac / last30days integration
+    LAST30DAYS_ENABLED: bool = False
+    LAST30DAYS_BINARY_PATH: str = ""
+    LAST30DAYS_MONTHLY_BUDGET_USD: float = 20.0
+    LAST30DAYS_COST_PER_PULL_USD: float = 0.50
+    LAST30DAYS_ENTITY_CADENCE_TIER1_HOURS: int = 24
+    LAST30DAYS_ENTITY_CADENCE_TIER2_HOURS: int = 168
+    LAST30DAYS_PULSE_TIMEOUT_SECONDS: int = 60
+    LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
+    LAST30DAYS_PULSE_ENABLED: bool = False
+
+    CLAIM_WAVEFUNCTION_SOCIAL_TRACTION_WEIGHT: float = 0.15
+    SOCIAL_TRACTION_HALF_LIFE_DAYS: float = 7.0
+    SOCIAL_TRACTION_DECAY_ENABLED: bool = True
+
+    ALMANAC_GENERATION_INTERVAL_HOURS: int = 24
+    ALMANAC_DRY_RUN_DEFAULT: bool = True
+    ALMANAC_MIN_ENTITIES: int = 2
+
+    BUDGET_REDIS_KEY_PREFIX: str = "budget"
+    BUDGET_HOLD_THRESHOLD_REMAINING: float = 2.0  # multiples of cost_per_pull
+
+    # Quantum credibility
+    WAVEFUNCTION_SCORING_VERSION: str = "v1-wavefunction"
+    DIVERGENCE_SPIKE_THRESHOLD: float = 0.7
+
     @property
     def fallback_chain_list(self) -> List[str]:
         return [provider.strip() for provider in self.LLM_FALLBACK_CHAIN.split(",") if provider.strip()]
