@@ -2,25 +2,25 @@
 title: "Key Decisions"
 tags: [project, decisions, architecture]
 created: 2026-06-22
-updated: 2026-06-24
-sources: [PROJECT_SPEC-2026]
-related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge-graph-schema, technology-stack]
+updated: 2026-07-12
+sources: [PROJECT_SPEC-2026, living-almanac]
+related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge-graph-schema, technology-stack, credibility-scoring, living-almanac, frontend-settings-menu]
 ---
 
 # Key Decisions
 
-## Decision Table
+## Decision Table (Current — 30+ decisions)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Agent framework | pydantic-graph + LangGraph | Type-safety (pydantic-graph) + features (LangGraph) |
-| Knowledge graph | Neo4j | Natural fit for entity-relationship data |
+| Agent framework | pydantic-graph + LangGraph | Type-safety (pydantic-graph) + features (LangGraph) — tribunal is LangGraph 4-node workflow |
+| Knowledge graph | Neo4j | Natural fit for entity-relationship data, Cypher queries |
 | LLM | oMLX (Mac default), Ollama, LM Studio | Local-first, auto-discovery, fallback chain |
-| API | FastAPI + OpenAPI | Modern, type-safe, auto-generated docs |
+| API | FastAPI + OpenAPI | Modern, type-safe, auto-generated docs — now 40+ endpoints |
 | MCP | FastMCP | Standard protocol, simple integration |
-| Cache | Redis | Industry standard, fast, scalable |
+| Cache | Redis | Industry standard + Lua atomic budget tracker |
 | Container | Docker | Simple, portable, reproducible |
-| CI/CD | GitHub Actions | Simple, integrated, free for open source |
+| CI/CD | GitHub Actions | Simple, integrated, free |
 | UI | SwiftUI | Native Apple design, macOS + iOS |
 | UI theme | Light mode default | Warm, inviting, "chicken soup" |
 | UI accent | #FF9500 (systemOrange) | Warm, distinctive |
@@ -32,136 +32,106 @@ related: [agent-architecture, local-first-llm, api-design, mcp-server, knowledge
 | Simulation tier | Three modes (light/medium/heavy) | CI through production, classical fallbacks |
 | Confidence gate | 0.6 threshold for intent routing | Prevents low-confidence LLM misclassifications from reaching wrong sub-agent |
 | Wiki file fallback | Direct file read when Neo4j unavailable | Research agent functional without running Neo4j |
-| Timeout architecture | 3 tiers (15s/30s/60s) | Stops hung LLM calls from blocking the system for 90s |
-| Conversation storage | Redis, last 20 turns, 24h TTL | Enables multi-turn queries without conversation state on the client |
+| Timeout architecture | 3 tiers (15s/30s/60s) + 120s orchestrator | Stops hung LLM calls from blocking |
+| Conversation storage | Redis, last 20 turns, 24h TTL | Multi-turn without client state |
+| **Wiki paths centralization** | `src/wiki/paths.py` | Resolves `WIKI_DATA_DIR` once, replaces 6 duplications |
+| **Log ignore patterns** | `LOG_IGNORE_PATTERNS` in writer.py | Prevents pytest temp paths from polluting `wiki/log.md` |
+| **Claim wavefunction** | 3-basis {corroborated,contested,unverified} via AerEstimatorV2 | Replaces hardcoded `0.95/0.5/0.8/+0.1/+0.15` constants, falsifiable inputs logged, named constant `SOCIAL_TRACTION_WEIGHT=0.15` not buried |
+| **Social vs epistemic** | Two separate numbers, never merged | `ClaimConfidence` carries both; calibration test asserts decoupling; UI shows two badges/gauges side-by-side |
+| **Meyer-Wallach extractor** | `src/spacetime_engine/entanglement.py` reusable | VQE rejection at <0.3 + entanglement correlation share same scorer |
+| **Divergence reuse** | `claims_to_vector` + `vector_to_field_geometry` + `find_optimal_path` | Spec requires grep-able shared function call, not duplicate warp formula |
+| **Timeline reconstruction** | `wiki/raw/pulse/*.json` + `git log`, no new TSDB | Chartable shape trivially plottable for SwiftUI |
+| **Tribunal gate** | Contested or divergence>0.7, uncontested never triggers | Cost control — 0 LLM calls for uncontested (tested) |
+| **Budget guardrails** | Lua atomic check+incr + HOLD | Redis `BUDGET_LUA_CHECK` + `BUDGET_HOLD_LUA`, `budget:YYYY-MM` hash, `POST /budget/approve` to clear |
+| **Network opt-in tier** | `LAST30DAYS_ENABLED=false` default, `source_tier` labeling | Local-first boundary explicit, same gate shape as `QUANTUM_HARDWARE_ENABLED` |
+| **Subprocess security** | `shell=False` always, list args | Entity name with `; rm -rf /` passed as single arg, not shell interpreted (tested) |
+| **Almanac idempotency** | Hash of confidence states | Same hash → `no_material_change` logged not redundant brief |
+| **Almanac HTML quality** | Inline CSS, no JS, dark mode media query, print-friendly | Self-contained brief opens offline |
 
 ## Agent Framework
 
 **Decision:** pydantic-graph + LangGraph
 
-**Rationale:** pydantic-graph provides type-safety for core agent orchestration. LangGraph provides advanced features (checkpointing, streaming, human-in-the-loop) for complex sub-workflows. The two-framework approach adds complexity but provides the best of both worlds.
+**Rationale:** pydantic-graph type-safety for core routing. LangGraph for complex sub-workflows: research graph (6 nodes, checkpointing, human-in-the-loop), tribunal (4 nodes, 3 roles + referee), time travel workflows. See [[agent-architecture]].
 
 ## Knowledge Graph
 
-**Decision:** Neo4j
+**Decision:** Neo4j with wiki file fallback + LLM edge classification (retry + backoff + heuristic fallback)
 
-**Rationale:** Neo4j is a natural fit for entity-relationship data. It supports Cypher queries, which are readable and powerful. It scales well for the expected data volume.
+**Rationale:** Cypher queries for entity/relationship data. Wiki file fallback when Neo4j unavailable. LLM edge classification with exponential backoff (`LLM_EDGE_CLASSIFICATION_TIMEOUT=30`, `MAX_RETRIES=3`). See [[knowledge-graph-schema]].
 
 ## LLM
 
-**Decision:** oMLX (Mac default), Ollama, LM Studio
+**Decision:** oMLX (Mac default), Ollama, LM Studio — auto-discovery fallback chain
 
-**Rationale:** Local-first approach with auto-discovery and fallback chain. oMLX is the default for Mac users. Ollama and LM Studio provide alternatives. All three provide OpenAI-compatible APIs.
+**Rationale:** Local-first. All OpenAI-compatible `/v1` endpoints. Discovery via `/v1/models` probe with 5s timeout. See [[local-first-llm]].
+
+## Quantum Credibility
+
+**Decision:** Every claim gets a wavefunction over 3 basis states, scored via real `FieldGeometryTensor` math + Qiskit VQE (AerEstimatorV2 pattern)
+
+**Rationale:** Spec says "Do not build sentiment-analysis wrapper with quantum-flavored naming. The scoring math must actually run through the existing tensor/circuit infrastructure — reuse `FieldGeometryTensor`, reuse the Meyer-Wallach entanglement scorer, reuse the VQE estimator pattern."
+
+Implementation:
+- `src/spacetime_engine/entanglement.py: meyer_wallach()` — reusable Q measurement
+- `src/spacetime_engine/vqe_runner.py: score_claim_state()` — AerEstimatorV2 wrapper, claim state circuits via RY encoding
+- `src/quantum_credibility/vectorizer.py: claims_to_vector()` — 16-dim interpretable vector (diversity, eng_mag, platforms, polymarket, contradiction, recency)
+- `src/quantum_credibility/wavefunction.py: ClaimWavefunction.score_claim()` — full pipeline with audit inputs + named constant weight
+
+See [[credibility-scoring]] and [[living-almanac]]. If honestly can't route through quantum computation, label classical approximation in PR (spec instruction).
+
+## Budget & Network Tier
+
+**Decision:** Hard monthly ceiling + HOLD + atomic Lua + two-stage REVIEW→HOLD approval shape
+
+**Rationale:** `last30days` hits paid APIs (ScrapeCreators, Perplexity). Must have budget guard before any scheduled/autonomous run.
+
+- Redis hash `budget:YYYY-MM` {spent, pulls, last_pull, last_description}
+- Lua `BUDGET_LUA_CHECK`: if spent+cost > ceiling → refuse, else incr spent+pulls atomically
+- HOLD when remaining < threshold*cost (default 2x) — requires `POST /budget/approve`
+- `LAST30DAYS_ENABLED=false` default — same gate as `QUANTUM_HARDWARE_ENABLED`
+- `source_tier: local | network_opt_in` explicit labeling in QueryResponse and API docs per non-negotiable #2
+- See `src/budget.py` and [[api-design]].
 
 ## API
 
-**Decision:** FastAPI + OpenAPI
+**Decision:** FastAPI + OpenAPI — now 40+ endpoints
 
-**Rationale:** FastAPI is modern, type-safe, and auto-generates OpenAPI documentation. All request/response schemas are Pydantic models.
+**Rationale:** FastAPI modern, type-safe, auto-generates docs. All schemas Pydantic v2. See [[api-design]] for full 40+ endpoint table including Living Almanac: `/pulse`, `/divergence`, `/timeline`, `/entanglement`, `/tribunal`, `/budget/status|approve`, `/almanac/generate|history`.
 
-## MCP
+## Security
 
-**Decision:** FastMCP
+**Decision:** Defense in depth for network tier
 
-**Rationale:** FastMCP is a simple, standard implementation of the Model Context Protocol. It integrates well with FastAPI and Pydantic AI.
-
-## Cache
-
-**Decision:** Redis
-
-**Rationale:** Redis is the industry standard for in-memory caching. It is fast, scalable, and has excellent Python support.
-
-## Container
-
-**Decision:** Docker
-
-**Rationale:** Docker is simple, portable, and reproducible. It provides a consistent environment for development, testing, and production.
-
-## CI/CD
-
-**Decision:** GitHub Actions
-
-**Rationale:** GitHub Actions is simple, integrated with GitHub, and free for open source projects.
+- `pulse_agent.py` `shell=False` always — no command injection
+- `_sanitize_entity_name` rejects null bytes, newlines, caps 200 chars
+- `LOG_IGNORE_PATTERNS` prevents pytest from polluting `log.md`
+- `CORS_ORIGINS` configurable
+- `verify_api_key` on mutating endpoints; read-only divergence/timeline/entanglement public
+- Budget refusal logged, not silently throttled — `PulseResult(status=budget_exceeded)` with reason
+- Disabled returns no-op `PulseResult(status=disabled)` not error
 
 ## UI
 
-**Decision:** SwiftUI (not React + Vite)
+**Decision:** SwiftUI + Living Almanac settings plan
 
-**Rationale:** Native Apple design, native performance, Apple's design system, future direction. Works on macOS, iOS, iPadOS, watchOS, visionOS from a single codebase.
+- Light mode default, #FF9500 accent, warm design
+- SwiftData for offline cache
+- Settings: quantum backend picker + LLM config + chat-to-wiki + new Living Almanac section (budget display with HOLD approve, pulse triggers per entity, pulse history with platform icons, almanac dry-run sheet with WKWebView, almanac history list, timeline slider chart)
+- Timeline: Swift Charts 3D for epistemic/social/divergence over time + scrubber
+- Entity detail: divergence badge + driving claims + claim confidence rows with distinct epi/trac gauges, no blended number
 
-## UI Theme
-
-**Decision:** Light mode as default, dark mode as toggle
-
-**Rationale:** Warm, inviting, approachable, more accessible, more "chicken soup". Light mode feels more like a book, more like a research journal.
-
-## UI Accent
-
-**Decision:** #FF9500 (systemOrange)
-
-**Rationale:** Warm, inviting, feels like chicken soup. Not cold like blue, not too sweet like pink. A strong accent that works well with Apple's light mode aesthetic.
-
-## UI Data
-
-**Decision:** SwiftData (not Core Data)
-
-**Rationale:** Simpler, more intuitive, future direction. Less powerful than Core Data, but plenty for Chicken Soup.
-
-## Quantum Integration
-
-**Decision:** Sequential pipeline with pure functional interfaces
-
-**Rationale:** Each quantum layer (Qiskit → CUDA-Q → PennyLane) is a pure function taking and returning a [[field-geometry-tensor]]. This makes layers independently testable, traceable (data flows left-to-right), and parallelization is additive (wrap in a bus adapter later without changing core logic). See [[integration-architecture]] for details.
-
-## Knowledge Graph Storage
-
-**Decision:** Neo4j as source of truth, SwiftData as read-through cache
-
-**Rationale:** Neo4j's Cypher graph traversals (shortest-path, multi-hop, pattern matching) are too valuable to replicate in SwiftData. SwiftData handles offline cache, recent results, and write queues. Sync at entity level with timestamps.
-
-## Wiki Ingestion
-
-**Decision:** Two-phase ingestion (deterministic → LLM)
-
-**Rationale:** Phase 1 parses YAML frontmatter and `[[wikiname]]` links for free edge extraction — zero LLM cost, complete correctness. Phase 2 enriches edges with semantic types via LLM, adding edges that wikiname syntax missed. See [[integration-architecture]].
-
-## Platform Strategy
-
-**Decision:** 50/50 macOS + iOS from a single shared codebase with structural platform overrides
-
-**Rationale:** NavigationSplitView on macOS/iPad, TabView + NavigationStack on iPhone. Shared models, services, and business logic. Platform-adaptive views via conditional compilation and horizontalSizeClass.
-
-## Simulation Tier
-
-**Decision:** Three simulation modes: light (CI), medium (dev), heavy (production)
-
-**Rationale:** All quantum layers have classical CPU/GPU fallbacks. Light mode completes in seconds for CI without quantum hardware. Heavy mode uses full resolution with GPU acceleration. See [[quantum-simulation-tier]].
-
-## Tensor Summaries
-
-**Decision:** MCP tensor summaries are computed on the server and cached in SwiftData. Client does not recompute locally.
-
-**Rationale:** Full tensors are large (64³ × 4×4 × 8 bytes ≈ 8 MB per metric). Summaries (a few floats + validity flags) are trivial to cache. Server has the authoritative physics pipeline. Cached summaries display with "last refreshed" indicator; a refresh button makes a lightweight API call.
-
-## Sync Merge Strategy
-
-**Decision:** Field-level merge strategy, not blanket last-write-wins.
-
-**Rationale:** Different fields need different strategies: `confidence` is server-authoritative, `user_notes` is client-authoritative, `sources[]` is union-with-dedup. Conflicts with confidence discrepancy > 0.1 are logged for manual review. See [[integration-architecture]] for the full merge table.
-
-## Wiki Edge Promotion
-
-**Decision:** Phase 2 (LLM enrichment) runs as a batch post-processing pass, not per-page.
-
-**Rationale:** LLM calls are expensive and rate-limited. Batching 5-10 pages per call gives the LLM more context. Phase 1 (deterministic) runs per-page during ingestion and already produces a complete, correct graph. Phase 2 promotes `RELATED_TO` edges to typed edges only above a confidence threshold (default 0.7). See [[integration-architecture]].
+See [[frontend-settings-menu]] (wiki/plan/frontend-settings-menu.md), [[swift-frontend-architecture]], [[ui-ux-design]], [[apple-reference-guides]].
 
 ## See Also
 
-- [[agent-architecture]]
-- [[technology-stack]]
+- [[agent-architecture]] — includes tribunal cost control
+- [[technology-stack]] — updated with 48 py files, 19 test files
 - [[local-first-llm]]
-- [[api-design]]
+- [[api-design]] — 40+ endpoints
 - [[mcp-server]]
 - [[knowledge-graph-schema]]
-- [[production-readiness]]
+- [[production-readiness]] — checklist + phases
 - [[ui-ux-design]]
+- [[living-almanac]] — 7-phase implementation (all phases done, 75 tests green)
+- [[frontend-settings-menu]] — final DOD plan

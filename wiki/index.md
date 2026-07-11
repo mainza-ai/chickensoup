@@ -208,8 +208,16 @@ related: []
 
 ## Other Concepts (in wiki/concepts/)
 
-- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening
-- [[project-structure]] — Full directory tree of the project
-- [[technology-stack]] — Layer-to-technology mapping
-- [[key-decisions]] — 21 key decisions including confidence gate, wiki fallback, timeout architecture, conversation storage
+- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening (implemented phases 0–6, 75 tests green)
+- [[credibility-scoring]] — Claim wavefunction scoring with VQE over 3-basis, decoupled epi/traction, falsifiable inputs, calibration fixtures
+- [[api-design]] — 40+ endpoints including Living Almanac: pulse, divergence, timeline, entanglement, tribunal, budget, almanac
+- [[agent-architecture]] — Multi-agent with wavefunction wiring, tribunal gated cost control, inferred_events fix
+- [[project-structure]] — Full directory tree (48 py files, 19 test files, wiki/raw/pulse + almanac dirs)
+- [[technology-stack]] — Layer-to-technology mapping including quantum credibility + almanac
+- [[key-decisions]] — Now 30+ decisions including wavefunction, budget Lua atomic, network opt-in tier, HOLD approval, shell=False
 - [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent, custom layout, timeline-first, floating query overlay, integrated AI Navigator, 2D with depth
+- [[swift-frontend-architecture]] — Now includes pulse/budget/almanac service methods, models, charts, WKWebView for briefs
+
+## Plans (in wiki/plan/)
+
+- [[frontend-settings-menu]] — SwiftUI Settings menu plan to reach final DOD: budget display, HOLD approval, pulse triggers, almanac dry-run/live, timeline slider, entity divergence rows, DOD checklist
