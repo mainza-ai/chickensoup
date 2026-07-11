@@ -208,6 +208,7 @@ related: []
 
 ## Other Concepts (in wiki/concepts/)
 
+- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening
 - [[project-structure]] — Full directory tree of the project
 - [[technology-stack]] — Layer-to-technology mapping
 - [[key-decisions]] — 21 key decisions including confidence gate, wiki fallback, timeout architecture, conversation storage
