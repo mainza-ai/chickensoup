@@ -19,14 +19,39 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _has_recent_empty_snapshot(slug: str, max_age_hours: int = 24) -> bool:
+    pulse_dir = get_pulse_dir()
+    if not pulse_dir.exists():
+        return False
+
+    cutoff = datetime.now(timezone.utc).timestamp() - (max_age_hours * 3600)
+    pattern = f"{slug}-*.json"
+    for snap_path in pulse_dir.glob(pattern):
+        try:
+            if snap_path.stat().st_mtime < cutoff:
+                continue
+            data = load_pulse_snapshot(snap_path)
+            if data and data.get("evidence_count", -1) == 0:
+                return True
+        except Exception:
+            continue
+    return False
+
+
 def write_pulse_snapshot(
     entity_name: str,
     evidence: List[ClaimEvidence],
     raw_output: str = "",
     extra_meta: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
-    pulse_dir = ensure_pulse_dir()
     slug = slugify(entity_name)
+
+    if not evidence:
+        if _has_recent_empty_snapshot(slug):
+            logger.info(f"Skipping duplicate empty snapshot for '{entity_name}' — empty snapshot written within last 24h")
+            return {"json_path": "", "md_path": "", "base_name": ""}
+
+    pulse_dir = ensure_pulse_dir()
     today = _today_str()
     now_iso = _now_iso()
 

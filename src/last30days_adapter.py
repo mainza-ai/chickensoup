@@ -42,12 +42,7 @@ def _extract_urls(text: str) -> List[str]:
     return cleaned
 
 
-def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence]]:
-    try:
-        data = json.loads(raw)
-    except (json.JSONDecodeError, ValueError):
-        return None
-
+def _extract_claims_from_json(data: Any, entity_name: str) -> List[ClaimEvidence]:
     evidence_list: List[ClaimEvidence] = []
 
     # Support multiple shapes
@@ -74,13 +69,14 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
         if not isinstance(item, dict):
             continue
         claim_text = (
-            item.get("explanation")
+            item.get("snippet")
+            or item.get("title")
+            or item.get("body")
             or item.get("claim_text")
             or item.get("claim")
             or item.get("text")
-            or item.get("title")
             or item.get("summary")
-            or item.get("snippet")
+            or item.get("explanation")
             or ""
         )
         if not claim_text:
@@ -113,7 +109,20 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
             urls = _extract_urls(claim_text)
             url = urls[0] if urls else ""
 
-        engagement = item.get("engagement_count") or item.get("engagement") or item.get("upvotes") or 0
+        engagement = item.get("engagement_count") or item.get("engagement") or item.get("upvotes")
+        
+        # Check inside source_items list if not found or 0
+        if not engagement and "source_items" in item and isinstance(item["source_items"], list) and item["source_items"]:
+            for s_item in item["source_items"]:
+                if isinstance(s_item, dict):
+                    s_eng = s_item.get("engagement")
+                    if s_eng:
+                        engagement = s_eng
+                        break
+
+        if not engagement:
+            engagement = 0
+
         if isinstance(engagement, dict):
              engagement = sum(float(v) for v in engagement.values() if isinstance(v, (int, float)))
         try:
@@ -149,11 +158,56 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
                 provenance_chain=[f"last30days:{entity_name}", f"cluster:{cluster_id}"],
             )
             evidence_list.append(ev)
-        except Exception as e:
-            logger.debug(f"Skipping invalid evidence item {idx}: {e}")
-            continue
+        except Exception:
+            pass
 
-    return evidence_list if evidence_list else None
+    return evidence_list
+
+
+def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence]]:
+    if not raw or not raw.strip():
+        return None
+    try:
+        data = json.loads(raw)
+        return _extract_claims_from_json(data, entity_name)
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    # Substring extraction search
+    first_brace = raw.find('{')
+    first_bracket = raw.find('[')
+    
+    start_idx = -1
+    if first_brace != -1 and first_bracket != -1:
+        start_idx = min(first_brace, first_bracket)
+    elif first_brace != -1:
+        start_idx = first_brace
+    elif first_bracket != -1:
+        start_idx = first_bracket
+        
+    if start_idx == -1:
+        return None
+        
+    last_brace = raw.rfind('}')
+    last_bracket = raw.rfind(']')
+    
+    end_idx = -1
+    if last_brace != -1 and last_bracket != -1:
+        end_idx = max(last_brace, last_bracket)
+    elif last_brace != -1:
+        end_idx = last_brace
+    elif last_bracket != -1:
+        end_idx = last_bracket
+        
+    if end_idx == -1 or end_idx <= start_idx:
+        return None
+        
+    json_str = raw[start_idx:end_idx+1]
+    try:
+        data = json.loads(json_str)
+        return _extract_claims_from_json(data, entity_name)
+    except (json.JSONDecodeError, ValueError):
+        return None
 
 
 def parse_markdown_output(raw: str, entity_name: str) -> List[ClaimEvidence]:

@@ -234,4 +234,21 @@ public final class AlmanacService {
             return nil
         }
     }
+
+    public func purgeEmptyPulses() async -> Bool {
+        do {
+            struct PurgeResponse: Codable {
+                var purged_count: Int
+                var status: String
+            }
+            let res: PurgeResponse = try await APIClient.shared.request(
+                path: "/pulse/purge-empty",
+                method: "POST"
+            )
+            return res.status == "success"
+        } catch {
+            logger.error("Failed to purge empty pulses: \(error.localizedDescription)")
+            return false
+        }
+    }
 }

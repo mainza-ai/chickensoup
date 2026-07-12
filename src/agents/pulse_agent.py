@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -246,11 +247,18 @@ class PulseAgent:
                 
                 # 1. Semantic Disambiguation check
                 ent_lower = entity_name.lower()
-                ent_words = [w.strip("(),.-_") for w in ent_lower.split() if len(w) > 2]
+                ent_words = [w for w in re.split(r"[-_ ]+", ent_lower) if len(w) > 2]
                 if ent_words:
-                    match_count = sum(1 for w in ent_words if w in claim_lower or w in url_lower)
-                    threshold = len(ent_words) / 2.0 if len(ent_words) > 1 else 1.0
-                    if match_count < threshold:
+                    STOP_WORDS = {"the", "and", "for", "from", "with", "that", "this", "were", "was", "his", "her", "their"}
+                    ent_words = [w for w in ent_words if w not in STOP_WORDS]
+                if not ent_words:
+                    ent_words = [ent_lower]
+                match_count = sum(1 for w in ent_words if w in claim_lower or w in url_lower)
+                if len(ent_words) > 1:
+                    required = len(ent_words)
+                else:
+                    required = 1
+                if match_count < required:
                         logger.info(f"Filtering out cross-contamination candidate for '{entity_name}': {ev.claim_text}")
                         continue
 

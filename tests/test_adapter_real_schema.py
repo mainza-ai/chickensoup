@@ -99,3 +99,40 @@ def test_pulse_agent_filters_hiring_for_non_org():
          # Database Engineer - Element 115 should be filtered out because Bob Lazar is NOT an organization!
          assert len(result.evidence) == 1
          assert result.evidence[0].source_platform == "reddit"
+
+
+def test_adapter_parses_nested_engagement():
+    # A candidate where engagement count is missing or 0 at the top level,
+    # but nested inside source_items lists.
+    nested_json = json.dumps({
+        "topic": "Aldo Rebelo",
+        "ranked_candidates": [
+            {
+                "candidate_id": "cand-1",
+                "title": "IronTalks ao vivo com Super Xandao",
+                "explanation": "Aldo Rebelo was interviewed on IronTalks podcast",
+                "source": "youtube",
+                "url": "https://www.youtube.com/watch?v=VxDQzBCQ-Es",
+                "cluster_id": "cluster-3",
+                "source_items": [
+                    {
+                        "author": "Dr. Felipe Sestaro",
+                        "body": "IronTalks podcast interview with Aldo Rebelo",
+                        "engagement": {
+                            "comments": 234,
+                            "likes": 5420
+                        },
+                        "source": "youtube"
+                    }
+                ]
+            }
+        ]
+    })
+    
+    adapter = Last30daysAdapter()
+    evidence = adapter.parse_output(nested_json, "Aldo Rebelo")
+    evidence = adapter.normalize_engagement(evidence)
+    
+    assert len(evidence) == 1
+    assert evidence[0].engagement_count == 5654
+    assert evidence[0].engagement_decayed is not None

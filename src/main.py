@@ -1841,6 +1841,32 @@ class PulseRequest(BaseModel):
     handles: Optional[Dict[str, Any]] = None
 
 
+@app.post("/pulse/purge-empty", dependencies=[Depends(verify_api_key)])
+async def purge_empty_pulses():
+    """Deletes all pulse snapshot JSON and MD files with zero evidence items."""
+    try:
+        from src.wiki.paths import get_pulse_dir
+        from src.wiki.pulse_writer import load_pulse_snapshot
+        
+        pulse_dir = get_pulse_dir()
+        if not pulse_dir.exists():
+            return {"purged_count": 0, "status": "success"}
+
+        purged = 0
+        for json_path in list(pulse_dir.glob("*.json")):
+            data = load_pulse_snapshot(json_path)
+            if data and data.get("evidence_count", 0) == 0:
+                json_path.unlink(missing_ok=True)
+                md_path = json_path.with_suffix(".md")
+                md_path.unlink(missing_ok=True)
+                purged += 1
+
+        return {"purged_count": purged, "status": "success"}
+    except Exception as e:
+        logger.error(f"Purge empty pulses failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/pulse/{entity_name}", response_model=AsyncTaskResponse, dependencies=[Depends(verify_api_key)])
 async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, request: PulseRequest = None):
     handles = None
@@ -2118,18 +2144,20 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
         if not pulse_dir.exists():
             return {"pulses": [], "total": 0}
 
-        files = list_pulse_snapshots(entity_name) if entity_name else sorted(pulse_dir.glob("*.json"), reverse=True)
+        files = list(reversed(list_pulse_snapshots(entity_name))) if entity_name else sorted(pulse_dir.glob("*.json"), reverse=True)
         files = files[:limit]
 
         pulses = []
         for f in files:
             data = load_pulse_snapshot(f)
             if data:
+                evidence_trimmed = data.get("evidence", [])[:10]
                 pulses.append({
                     "entity_name": data.get("entity_name", f.stem),
                     "date": data.get("date", ""),
                     "timestamp": data.get("timestamp", ""),
                     "evidence_count": data.get("evidence_count", 0),
+                    "evidence": evidence_trimmed,
                     "file": str(f),
                 })
 
@@ -2137,6 +2165,7 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
     except Exception as e:
         logger.error(f"Pulse history failed: {e}")
         return {"pulses": [], "total": 0}
+
 
 
 @app.get("/almanac/file/{date}")
