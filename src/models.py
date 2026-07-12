@@ -162,6 +162,7 @@ class ConfigResponse(BaseModel):
     llm_active_model: str
     llm_available_models: List[str]
     llm_providers: Dict[str, LLMProviderStatus] = {}
+    last30days_enabled: bool = False
 
 
 class LLMConfigRequest(BaseModel):

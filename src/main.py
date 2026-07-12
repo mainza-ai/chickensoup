@@ -228,6 +228,7 @@ async def get_config():
         llm_active_model=get_active_model(),
         llm_available_models=models,
         llm_providers=llm_providers,
+        last30days_enabled=settings.LAST30DAYS_ENABLED,
     )
 
 @app.post("/config", response_model=ConfigResponse, dependencies=[Depends(verify_api_key)])
@@ -276,6 +277,7 @@ async def post_config(request: ConfigRequest):
         llm_active_model=get_active_model(),
         llm_available_models=models,
         llm_providers=_build_llm_providers(),
+        last30days_enabled=settings.LAST30DAYS_ENABLED,
     )
 
 @app.post("/config/llm", response_model=LLMConfigResponse, dependencies=[Depends(verify_api_key)])

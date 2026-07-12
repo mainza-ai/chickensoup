@@ -66,6 +66,7 @@ public final class BackendService {
     public let wiki = WikiService.shared
     public let chat = ChatService.shared
     public let config = ConfigService.shared
+    public let almanac = AlmanacService.shared
 
     private init() {}
     
