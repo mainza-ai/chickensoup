@@ -2,7 +2,7 @@
 title: "Living Almanac — The Last 30 Days Integration"
 tags: [project, living-almanac, last30days, quantum-credibility, production, architecture]
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-07-12
 sources: [chickensoup-living-almanac-implementation-spec, agent-architecture, field-geometry-tensor, credibility-scoring, integration-architecture]
 related: [credibility-scoring, agent-architecture, field-geometry-tensor, time-travel-machinery-architecture, integration-architecture, science-reference-library, chat-to-wiki-pipeline, production-readiness, quantum-simulation-tier, multi-llm-consensus]
 ---
@@ -503,5 +503,98 @@ Bug 1 (workspace root) → _resolve_binary() returns None → PulseResult(status
                          ↓
                    All entities skipped → 0/0/0/0 almanac HTML
                          ↓
-                   divergence/entanglement endpoints: zero evidence → empty results
+                    divergence/entanglement endpoints: zero evidence → empty results
 ```
+
+---
+
+## Section 15 — iOS Client Layout Fixes (2026-07-12)
+
+### Bug 5 — CRITICAL: Sheet `.frame(minWidth:)` overflow on iPhone
+
+**Symptom**: On iPhone, tapping any almanac sheet (Task Console, Brief Reader, Pulse Snapshot) opened a sheet whose content extended beyond the screen bounds. The `List` inside each sheet could not be scrolled to its rightmost edge. Same bug also affected the Data Ingestion sheet and the Settings task console sheet.
+
+**Root cause**: Five `.sheet` modifiers across three files applied `.frame(minWidth:)` with desktop-oriented pixel values (400–700 pt) unconditionally, with no `#if os(macOS)` guard. An iPhone screen is ~375 pt wide; a `minWidth: 600` constraint cannot be satisfied, so SwiftUI lets the content overflow its bounds rather than compress it.
+
+**Affected sheets**:
+
+| File | Sheet | Removed constraint |
+|------|-------|--------------------|
+| `LivingAlmanacView.swift:91` | Task Console (pulse/almanac task monitor) | `.frame(minWidth: 500, minHeight: 400)` |
+| `LivingAlmanacView.swift:126` | Brief Reader (daily almanac HTML) | `.frame(minWidth: 700, minHeight: 600)` |
+| `LivingAlmanacView.swift:159` | Pulse Snapshot Details | `.frame(minWidth: 600, minHeight: 500)` |
+| `SettingsView.swift:217` | Task Console (in Settings) | `.frame(minWidth: 500, minHeight: 400)` |
+| `ContentView.swift:206` | Data Ingestion | `.frame(minWidth: 500, minHeight: 600)` |
+
+**Fix**: Wrapped each `.frame(minWidth:, minHeight:)` in `#if os(macOS) ... #endif`. On iOS the sheets use the full screen width with no hard minimum; on macOS the minimum frame sizes are preserved unchanged.
+
+**Verify**: All five sheets open full-width on iPhone simulator, `List` scrolls normally within screen bounds. On macOS, each sheet still opens at its specified minimum size.
+
+---
+
+### Bug 6 — HIGH: Briefs+Pulses HStack side-by-side on iPhone
+
+**Symptom**: In `LivingAlmanacView`, the "DAILY ALMANAC BRIEFS" and "SNAPSHOT FEED" sections were laid out side-by-side in an `HStack`. On iPhone (~375 pt), each card received ~167 pt usable width after spacing and padding. Button rows with date text, file sizes, and claim-count badges were all truncated.
+
+**Fix**: Wrapped the pair in `#if os(macOS) HStack / #else VStack`. On macOS the two sections remain side-by-side. On iOS they stack vertically with 16 pt spacing.
+
+**File**: `LivingAlmanacView.swift:46–61`
+
+---
+
+### Bug 7 — MEDIUM: Divergence card 3-column HStack on iPhone
+
+**Symptom**: Inside the divergence risk card, three `VStack` columns (risk label, CANON HASH, LIVE SNAPSHOT HASH) were laid out in an `HStack`. On iPhone each column received ~50–60 pt, enough for 8 monospaced hash characters but insufficient for the label text, which wrapped or truncated.
+
+**Fix**: Wrapped the layout in `#if os(macOS) HStack (3-column) / #else VStack (risk row + hashes row)`. On iOS the risk percentage and label sit on top, and the two hash values sit below side-by-side.
+
+**File**: `LivingAlmanacView.swift:565–655`
+
+---
+
+### Fix 8 — MEDIUM: Filter preset dialog fixed width on iPhone
+
+**Symptom**: `AdvancedTimelineFilterView`'s save-preset dialog used `.frame(width: 250, height: 160)` unconditionally. On iPhone the 250 pt width was acceptable but oversized; the height constraint was fine.
+
+**Fix**: Moved `.frame(width: 250)` inside `#if os(macOS)`. iOS retains only `.frame(height: 160)`.
+
+**File**: `AdvancedTimelineFilterView.swift:222`
+
+---
+
+### Fix 9 — Preview crash: `SettingsView`, `TaskConsoleView`, `LivingAlmanacView`
+
+**Symptom**: Opening any of these three files in Xcode Canvas caused `EXC_BREAKPOINT / SIGTRAP` in `EnvironmentValues.subscript.getter`. The crash path went through `UIHostingController.prepareNavigationBar` → `PreferenceCombiner` → an absent environment key read.
+
+**Root causes**:
+1. None of the three files had a `#Preview` block, so Xcode rendered them in a bare environment with no service injections.
+2. All three contain inner `NavigationStack` + `.toolbar` combinations (in `.sheet`), which internally call `prepareNavigationBar` and resolve environment values that are absent in a bare preview.
+3. `ContentView_PreviewHelper` injected `.modelContainer` but not `.environment(AlmanacService.shared)`.
+
+**Fix**:
+- Added `#Preview` blocks to all three files, each with a `_PreviewHelper` struct that seeds an in-memory `ModelContainer` and chains `.environment(AlmanacService.shared)` and `.environment(BackendService.shared)`.
+- Updated `ContentView_PreviewHelper.body` to also inject `.environment(AlmanacService.shared)` and `.environment(BackendService.shared)`.
+- Added `assert(Thread.isMainThread)` guard in `ConfigService.isDarkMode` before `UserDefaults.standard` access to prevent premature init during preview injection.
+
+**Files**:
+- `SettingsView.swift` — `SettingsView_PreviewHelper` + `#Preview`
+- `TaskConsoleView.swift` — `#Preview` with `.environment(AlmanacService.shared)`
+- `LivingAlmanacView.swift` — `LivingAlmanacView_PreviewHelper` + `#Preview`
+- `ContentView.swift` — added two `.environment(...)` chains to `ContentView_PreviewHelper.body`
+- `ConfigService.swift` — main-actor assertion on `isDarkMode`
+
+---
+
+### Fix 10 — iOS default tab aligned with macOS
+
+**Symptom**: On iPhone the app opened to the Timeline tab. On macOS it opened to the Lore Graph tab. The user expectation (and macOS behaviour) was Lore Graph first.
+
+**Root cause**: Two independent `@State` variables with mismatched defaults:
+- `activeDetailTab: DetailTab = .graph` (macOS, iPad)
+- `activeTab: TabSelection = .timeline` (iPhone)
+
+The two enums were never synchronised.
+
+**Fix**: Changed `activeTab` default from `.timeline` to `.graph`.
+
+**File**: `ContentView.swift:47`

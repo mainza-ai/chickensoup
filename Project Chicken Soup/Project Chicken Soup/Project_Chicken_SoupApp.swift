@@ -33,6 +33,9 @@ struct Project_Chicken_SoupApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(AlmanacService.shared)
+                .environment(BackendService.shared)
+                .environment(LLMDiscoveryService.shared)
         }
         .modelContainer(sharedModelContainer)
     }

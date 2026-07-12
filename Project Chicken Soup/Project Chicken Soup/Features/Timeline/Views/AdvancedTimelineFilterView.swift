@@ -219,7 +219,9 @@ struct AdvancedTimelineFilterView: View {
                 }
             }
             .padding()
+            #if os(macOS)
             .frame(width: 250, height: 160)
+            #endif
         }
     }
     

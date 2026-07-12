@@ -1,0 +1,716 @@
+{
+  "entity_name": "david-grusch",
+  "slug": "david-grusch",
+  "date": "2026-07-11",
+  "timestamp": "2026-07-12T02:04:19.598338+00:00",
+  "evidence_count": 50,
+  "evidence": [
+    {
+      "claim_text": "\"https://youtube.com/watch?v=78k0w9_wi2u\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=78k0w9_wi2u",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:0",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:0"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=78k0w9_wi2u\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=78k0w9_wi2u",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:1",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:1"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"New MYSTERIOUS orb sightings released in latest UFO files\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:2",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:2"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:3",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:3"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:4",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:4"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"US Rep. Eric Burlison stated (in a recorded Space on X) that he was told directly by David Grusch there are \\u201cNordics\\u201d a few hundred years ahead of us, and the \\u201cGreys\\u201d are being sent here by another far more advanced species\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:5",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:5"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:6",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:6"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:7",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:7"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Retired naval pilot and Commander, David Fravor: \\u201cThere are people inside the Government that do not want this out\\u201d \\u201cJust be honest and say, \\u2018We\\u2019ve known for the last 80+ years that we\\u2019re not alone, we recovered stuff at Roswell.\\u2019 I think the world deserves that.\\u201d\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:8",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:8"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:9",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:9"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:10",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:10"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch may have just broken his security oath! He reveals he had access to UFO crash retrieval photos and lists the various shapes of recovered UFOs he saw\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:11",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:11"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:12",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:12"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:13",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:13"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch: \\\"I have seen photos of UFO Crash Retrievals. They were everything from flying discs to egg shape craft & every other morphology\\\"\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:14",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:14"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:15",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:15"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:16",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:16"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch Describes UFO Crash Retrieval Vehicles\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:17",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:17"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:18",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:18"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:19",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:19"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Anti-gravity studies in the 1950s were quelled thanks to the Bohm-Aranhov effect in 1959 that lead to Allen Dulles\\u2019s Breakaway Civilization as referenced to by David Grusch in his press conference about the Harry Turner 1971 document, and Spielberg\\u2019s Disclosure Day\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:20",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:20"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=t5uuqpicjjm\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=t5uuqpicjjm",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:21",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:21"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=t5uuqpicjjm\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=t5uuqpicjjm",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:22",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:22"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"BOMBSHELL: David Grusch's Shocking New Confession\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:23",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:23"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u4ve3l/the_mainstream_medias_silence_on_david_grusch\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u4ve3l/the_mainstream_medias_silence_on_david_grusch",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:24",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:24"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u4ve3l/the_mainstream_medias_silence_on_david_grusch\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u4ve3l/the_mainstream_medias_silence_on_david_grusch",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:25",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:25"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The Mainstream Media\\u2019s Silence on David Grusch Should Raise Serious Questions\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:26",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:26"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u9vk31/david_gruschs_mention_of_the_importance_of_the\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u9vk31/david_gruschs_mention_of_the_importance_of_the",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:27",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:27"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u9vk31/david_gruschs_mention_of_the_importance_of_the\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u9vk31/david_gruschs_mention_of_the_importance_of_the",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:28",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:28"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch\\u2019s mention of the importance of the 1933 Magenta, Italy UFO crash-retrieval story when he first came forward with Ross Coulthart that lead to the immediate hearing in Congress lead me and my friends and fellow researchers on a journey since that leads back around to the 1971 Turner JOIA\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:29",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:29"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1ufok51/david_grusch_uapgerb_christopher_mellon_lue\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1ufok51/david_grusch_uapgerb_christopher_mellon_lue",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:30",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:30"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1ufok51/david_grusch_uapgerb_christopher_mellon_lue\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1ufok51/david_grusch_uapgerb_christopher_mellon_lue",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:31",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:31"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch, UAPGerb, Christopher Mellon, Lue Elizondo, Censorship & Call To Action\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:32",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:32"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1ubklvy/david_grusch_says_weve_made_contact_with_alien\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1ubklvy/david_grusch_says_weve_made_contact_with_alien",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:33",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:33"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1ubklvy/david_grusch_says_weve_made_contact_with_alien\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1ubklvy/david_grusch_says_weve_made_contact_with_alien",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:34",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:34"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch Says We've Made Contact With Alien Races - Congressman\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:35",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:35"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/aliens/comments/1uaoi99/serious_david_grusch_says_weve_made_contact_with\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/aliens/comments/1uaoi99/serious_david_grusch_says_weve_made_contact_with",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:36",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:36"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/aliens/comments/1uaoi99/serious_david_grusch_says_weve_made_contact_with\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/aliens/comments/1uaoi99/serious_david_grusch_says_weve_made_contact_with",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:37",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:37"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Serious - David Grusch Says We've Made Contact With Alien Races - Congressman\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:38",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:38"
+      ]
+    },
+    {
+      "claim_text": "\"https://news.ycombinator.com/item?id=48519952\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://news.ycombinator.com/item?id=48519952",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:39",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:39"
+      ]
+    },
+    {
+      "claim_text": "\"https://news.ycombinator.com/item?id=48519952\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://news.ycombinator.com/item?id=48519952",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:40",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:40"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"There is not 'sentient plasma', refuting the claims of David Grusch\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:41",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:41"
+      ]
+    },
+    {
+      "claim_text": "\"https://github.com/dgonzamat/mercadopublico/pull/319\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "https://github.com/dgonzamat/mercadopublico/pull/319",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:42",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:42"
+      ]
+    },
+    {
+      "claim_text": "\"https://github.com/dgonzamat/mercadopublico/pull/319\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "https://github.com/dgonzamat/mercadopublico/pull/319",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:43",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:43"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"data(cases): el plasmoide de junio 2026 \\u2014 AARO (plasma natural) vs Grusch (vida sintiente)\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:44",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:44"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=dqoyfwlewpq\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=dqoyfwlewpq",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:45",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:45"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=dqoyfwlewpq\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=dqoyfwlewpq",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:46",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:46"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"UAP disclosure: Whistleblower David Grusch has pushed for transparency | NewsNation Prime\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:47",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:47"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1uic740/david_grusch_signals_imminent_public_disclosure\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1uic740/david_grusch_signals_imminent_public_disclosure",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:48",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:48"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1uic740/david_grusch_signals_imminent_public_disclosure\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1uic740/david_grusch_signals_imminent_public_disclosure",
+      "timestamp": "2026-07-12T02:04:19.585516+00:00",
+      "cluster_id": "david-grusch:md:49",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:david-grusch:md",
+        "cluster:david-grusch:md:49"
+      ]
+    }
+  ],
+  "raw_output_preview": "{\n  \"artifacts\": {\n    \"grounding\": [\n      {\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"keyless\",\n        \"reason\": \"keyless-search-unavailable\",\n        \"resultCount\": 0,\n        \"webSearchQueries\": [\n          \"david-grusch\"\n        ]\n      }\n    ],\n    \"hiring_signals_mode\": false,\n    \"plan_source\": \"deterministic\",\n    \"pre_research_flags_present\": false,\n    \"resolved\": {\n      \"context\": \"\",\n      \"entity\": \"david-grusch\",\n      \"github_repos\": [],\n      \"github_user\": \"\",\n      \"subreddits\": [],\n      \"trustpilot_domain\": \"\",\n      \"x_handle\": \"\"\n    }\n  },\n  \"clusters\": [\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=78k0w9_wi2u\"\n      ],\n      \"cluster_id\": \"cluster-1\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=78k0w9_wi2u\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"New MYSTERIOUS orb sightings released in latest UFO files\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space\"\n      ],\n      \"cluster_id\": \"cluster-2\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u5hxe6/us_rep_eric_burlison_stated_in_a_recorded_space\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"US Rep. Eric Burlison stated (in a recorded Space on X) that he was told directly by David Grusch there are \\u201cNordics\\u201d a few hundred years ahead of us, and the \\u201cGreys\\u201d are being sent here by another far more advanced species\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor\"\n      ],\n      \"cluster_id\": \"cluster-3\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u44ica/retired_naval_pilot_and_commander_david_fravor\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Retired naval pilot and Commander, David Fravor: \\u201cThere are people inside the Government that do not want this out\\u201d \\u201cJust be honest and say, \\u2018We\\u2019ve known for the last 80+ years that we\\u2019re not alone, we recovered stuff at Roswell.\\u2019 I think the world deserves that.\\u201d\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security\"\n      ],\n      \"cluster_id\": \"cluster-4\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/strangeearth/comments/1u5nzvc/david_grusch_may_have_just_broken_his_security\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"David Grusch may have just broken his security oath! He reveals he had access to UFO crash retrieval photos and lists the various shapes of recovered UFOs he saw\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash\"\n      ],\n      \"cluster_id\": \"cluster-5\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/interdimensionalnhi/comments/1u5z30j/david_grusch_i_have_seen_photos_of_ufo_crash\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"David Grusch: \\\"I have seen photos of UFO Crash Retrievals. They were everything from flying discs to egg shape craft & every other morphology\\\"\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval\"\n      ],\n      \"cluster_id\": \"cluster-6\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufob/comments/1u5763u/david_grusch_describes_ufo_crash_retrieval\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"David Grusch Describes UFO Crash Retrieval Vehicles\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled\"\n      ],\n      \"cluster_id\": \"cluster-7\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1uasdvu/antigravity_studies_in_the_1950s_were_quelled\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Anti-gravity studies in the 1950s were quelled thanks to the Bohm-Aranhov effect in 1959 that lead to Allen Dulles\\u2019s Breakaway Civilization as referenced to by David Grusch in his press conference about the Harry Turner 1971 document, and Spielberg\\u2019s Disclosure Day\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=t5uuqpicjjm\"\n      ],\n      \"cluster_id\": \"cluster-8\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=t5uuqpicjjm\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"BOMBSHELL: David Grusch's Shocking New Confession\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 1984.0,
+    "binary": "/Users/mck/Desktop/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py",
+    "cost_usd": 0.5
+  }
+}

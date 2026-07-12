@@ -1,5 +1,7 @@
 import SwiftUI
+import SwiftData
 
+@MainActor
 struct SettingsView: View {
     var backendService = BackendService.shared
     
@@ -33,6 +35,21 @@ struct SettingsView: View {
     @State private var showingAlmanacResult: APIAlmanacGenerateResponse? = nil
     @State private var showingAlmanacResultSheet = false
     
+    // Background task log console states
+    @State private var activeTaskId: String? = nil
+    @State private var activeTaskName: String? = nil
+    @State private var showConsoleSheet = false
+
+    private var hasUnsavedChanges: Bool {
+        selectedBackend != backendService.config.quantumBackend ||
+        hardwareEnabled != backendService.config.quantumHardwareEnabled ||
+        !ibmToken.isEmpty ||
+        !dwaveToken.isEmpty ||
+        !ionqToken.isEmpty ||
+        selectedProvider != (backendService.config.llmActiveProvider.isEmpty ? "auto" : backendService.config.llmActiveProvider) ||
+        (!llmSelectedModel.isEmpty && llmSelectedModel != backendService.config.llmActiveModel)
+    }
+    
     private let providerOptions = [
         ("auto", "Auto-detect"),
         ("omlx", "oMLX"),
@@ -62,7 +79,6 @@ struct SettingsView: View {
                 chatToWikiSection
                 livingAlmanacSection
                 apiTokenSection
-                saveButtonSection
             }
         }
         .background(DesignConstants.warmBackground)
@@ -169,6 +185,89 @@ struct SettingsView: View {
                 .presentationDetents([.medium])
             }
         }
+        .sheet(isPresented: $showConsoleSheet) {
+            if let taskId = activeTaskId, let taskName = activeTaskName {
+                NavigationStack {
+                    TaskConsoleView(
+                        taskId: taskId,
+                        taskName: taskName,
+                        onFinished: {
+                            Task {
+                                await backendService.almanac.fetchPulseHistory()
+                                await backendService.almanac.fetchAlmanacHistory()
+                                await backendService.almanac.fetchBudgetStatus()
+                            }
+                        },
+                        onDismiss: {
+                            showConsoleSheet = false
+                            activeTaskId = nil
+                            activeTaskName = nil
+                        }
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") {
+                                showConsoleSheet = false
+                                activeTaskId = nil
+                                activeTaskName = nil
+                            }
+                        }
+                    }
+                }
+                #if os(macOS)
+                .frame(minWidth: 500, minHeight: 400)
+                #endif
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if hasUnsavedChanges {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Unsaved Changes")
+                            .font(.caption)
+                            .bold()
+                            .foregroundStyle(DesignConstants.systemOrangeText)
+                        Text("You have pending configuration updates.")
+                            .font(.caption2)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: saveAllSettings) {
+                        HStack {
+                            if isSaving {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .scaleEffect(0.8)
+                                    .padding(.trailing, 4)
+                            } else {
+                                Image(systemName: "arrow.up.doc.fill")
+                            }
+                            Text(isSaving ? "Saving..." : "Apply Changes")
+                                .bold()
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            LinearGradient(
+                                colors: [DesignConstants.systemOrange, .purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isSaving)
+                }
+                .padding()
+                .background(.ultraThinMaterial)
+                .overlay(VStack { Divider(); Spacer() })
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
     }
 
     @ViewBuilder
@@ -240,8 +339,15 @@ struct SettingsView: View {
                             }
                             Spacer()
                             if selectedBackend == item.0 {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(DesignConstants.systemOrange)
+                                HStack(spacing: 6) {
+                                    if selectedBackend != backendService.config.quantumBackend {
+                                        Circle()
+                                            .fill(DesignConstants.systemOrange)
+                                            .frame(width: 6, height: 6)
+                                    }
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(DesignConstants.systemOrange)
+                                }
                             }
                         }
                         .padding(.vertical, 12)
@@ -302,10 +408,20 @@ struct SettingsView: View {
                 Divider().background(DesignConstants.dividerColor)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Select Provider")
-                        .font(.body)
-                        .bold()
-                        .foregroundStyle(DesignConstants.primaryText)
+                    HStack {
+                        Text("Select Provider")
+                            .font(.body)
+                            .bold()
+                            .foregroundStyle(DesignConstants.primaryText)
+                        
+                        let sProvider = backendService.config.llmActiveProvider
+                        let activeProv = sProvider.isEmpty ? "auto" : sProvider
+                        if selectedProvider != activeProv {
+                            Circle()
+                                .fill(DesignConstants.systemOrange)
+                                .frame(width: 6, height: 6)
+                        }
+                    }
 
                     Picker("Provider", selection: $selectedProvider) {
                         ForEach(providerOptions, id: \.0) { option in
@@ -338,6 +454,13 @@ struct SettingsView: View {
                             .font(.body)
                             .bold()
                             .foregroundStyle(DesignConstants.primaryText)
+                        
+                        if !llmSelectedModel.isEmpty && llmSelectedModel != backendService.config.llmActiveModel {
+                            Circle()
+                                .fill(DesignConstants.systemOrange)
+                                .frame(width: 6, height: 6)
+                        }
+                        
                         Spacer()
                         if isProbingProvider {
                             ProgressView()
@@ -367,46 +490,7 @@ struct SettingsView: View {
                     }
                 }
 
-                Divider().background(DesignConstants.dividerColor)
 
-                if !llmSaveMessage.isEmpty {
-                    HStack {
-                        Image(systemName: llmSaveSuccess ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
-                            .foregroundStyle(llmSaveSuccess ? DesignConstants.systemGreenText : DesignConstants.systemRed)
-                        Text(llmSaveMessage)
-                            .font(.caption)
-                            .foregroundStyle(DesignConstants.primaryText)
-                    }
-                    .padding(8)
-                    .background(llmSaveSuccess ? Color.green.opacity(0.1) : Color.red.opacity(0.1), in: Capsule())
-                    .transition(.scale.combined(with: .opacity))
-                }
-
-                Button(action: saveLLMSettings) {
-                    HStack {
-                        if isSavingLLM {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .scaleEffect(0.8)
-                                .padding(.trailing, 4)
-                        } else {
-                            Image(systemName: "brain")
-                        }
-                        Text(isSavingLLM ? "Saving..." : "Apply Model Selection")
-                            .bold()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(DesignConstants.systemOrange.opacity(0.15))
-                    .foregroundStyle(DesignConstants.systemOrangeText)
-                    .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius)
-                            .stroke(DesignConstants.systemOrange.opacity(0.3), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(isSavingLLM || llmAvailableModels.isEmpty)
             }
             .padding(DesignConstants.standardPadding)
             .background(DesignConstants.cardBackground)
@@ -735,10 +819,15 @@ struct SettingsView: View {
                                 ForEach(entities.prefix(10)) { ent in
                                     Button(action: {
                                         selectedEntityForPulse = ent.slug
+                                        activeTaskName = "Pulse: \(ent.title)"
+                                        showConsoleSheet = true
                                         Task {
-                                            if let res = await backendService.almanac.triggerPulse(entityName: ent.slug) {
-                                                showingPulseResult = res
-                                                showingPulseResultAlert = true
+                                            if let res = await backendService.almanac.triggerPulseAsync(entityName: ent.slug) {
+                                                await MainActor.run {
+                                                    self.activeTaskId = res.taskId
+                                                }
+                                            } else {
+                                                showConsoleSheet = false
                                             }
                                         }
                                     }) {
@@ -756,7 +845,7 @@ struct SettingsView: View {
                                         .clipShape(Capsule())
                                         .overlay(Capsule().stroke(DesignConstants.dividerColor, lineWidth: 1))
                                     }
-                                    .disabled(backendService.almanac.isPulsing || !backendService.config.last30daysEnabled)
+                                    .disabled(activeTaskId != nil || !backendService.config.last30daysEnabled)
                                 }
                             }
                         }
@@ -775,22 +864,22 @@ struct SettingsView: View {
                     
                     HStack(spacing: 12) {
                         Button(action: {
+                            activeTaskName = "Almanac Dry Run"
+                            showConsoleSheet = true
                             Task {
-                                if let res = await backendService.almanac.generateAlmanac(dryRun: true) {
-                                    showingAlmanacResult = res
-                                    showingAlmanacResultSheet = true
+                                if let res = await backendService.almanac.generateAlmanacAsync(dryRun: true) {
+                                    await MainActor.run {
+                                        self.activeTaskId = res.taskId
+                                    }
+                                } else {
+                                    showConsoleSheet = false
                                 }
                             }
                         }) {
                             HStack {
                                 Spacer()
-                                if backendService.almanac.isGeneratingAlmanac {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Text("Dry Run Brief")
-                                        .bold()
-                                }
+                                Text("Dry Run Brief")
+                                    .bold()
                                 Spacer()
                             }
                             .padding(.vertical, 10)
@@ -798,25 +887,25 @@ struct SettingsView: View {
                             .foregroundStyle(.blue)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .disabled(backendService.almanac.isGeneratingAlmanac)
+                        .disabled(activeTaskId != nil)
 
                         Button(action: {
+                            activeTaskName = "Generate Daily Almanac Brief"
+                            showConsoleSheet = true
                             Task {
-                                if let res = await backendService.almanac.generateAlmanac(dryRun: false) {
-                                    showingAlmanacResult = res
-                                    showingAlmanacResultSheet = true
+                                if let res = await backendService.almanac.generateAlmanacAsync(dryRun: false) {
+                                    await MainActor.run {
+                                        self.activeTaskId = res.taskId
+                                    }
+                                } else {
+                                    showConsoleSheet = false
                                 }
                             }
                         }) {
                             HStack {
                                 Spacer()
-                                if backendService.almanac.isGeneratingAlmanac {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Text("Generate Live")
-                                        .bold()
-                                }
+                                Text("Generate Live")
+                                    .bold()
                                 Spacer()
                             }
                             .padding(.vertical, 10)
@@ -824,7 +913,7 @@ struct SettingsView: View {
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .disabled(backendService.almanac.isGeneratingAlmanac || !backendService.config.last30daysEnabled)
+                        .disabled(activeTaskId != nil || !backendService.config.last30daysEnabled)
                     }
 
                     if !backendService.almanac.almanacHistory.isEmpty {
@@ -874,19 +963,27 @@ struct SettingsView: View {
                 .foregroundStyle(DesignConstants.systemOrangeText)
 
             VStack(spacing: 16) {
-                Toggle(isOn: $hardwareEnabled) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Enable Quantum QPU Dispatch")
-                            .font(.body)
-                            .bold()
-                            .foregroundStyle(DesignConstants.primaryText)
-                        Text("Allows submitting real quantum circuits to IBM, D-Wave, or IonQ instead of fallback local simulation threads.")
-                            .font(.caption)
-                            .foregroundStyle(DesignConstants.secondaryText)
+                HStack {
+                    Toggle(isOn: $hardwareEnabled) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Enable Quantum QPU Dispatch")
+                                .font(.body)
+                                .bold()
+                                .foregroundStyle(DesignConstants.primaryText)
+                            Text("Allows submitting real quantum circuits to IBM, D-Wave, or IonQ instead of fallback local simulation threads.")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                        }
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: DesignConstants.systemOrange))
+                    .padding(.vertical, 4)
+                    
+                    if hardwareEnabled != backendService.config.quantumHardwareEnabled {
+                        Circle()
+                            .fill(DesignConstants.systemOrange)
+                            .frame(width: 6, height: 6)
                     }
                 }
-                .toggleStyle(SwitchToggleStyle(tint: DesignConstants.systemOrange))
-                .padding(.vertical, 4)
 
                 Divider()
                     .background(DesignConstants.dividerColor)
@@ -896,7 +993,8 @@ struct SettingsView: View {
                     placeholder: "Enter IBMQ Token...",
                     text: $ibmToken,
                     show: $showIbmToken,
-                    isSetOnServer: backendService.config.ibmApiTokenSet
+                    isSetOnServer: backendService.config.ibmApiTokenSet,
+                    isDirty: !ibmToken.isEmpty
                 )
 
                 Divider()
@@ -907,7 +1005,8 @@ struct SettingsView: View {
                     placeholder: "Enter D-Wave API Token...",
                     text: $dwaveToken,
                     show: $showDwaveToken,
-                    isSetOnServer: backendService.config.dwaveApiTokenSet
+                    isSetOnServer: backendService.config.dwaveApiTokenSet,
+                    isDirty: !dwaveToken.isEmpty
                 )
 
                 Divider()
@@ -918,7 +1017,8 @@ struct SettingsView: View {
                     placeholder: "Enter IonQ API Token...",
                     text: $ionqToken,
                     show: $showIonqToken,
-                    isSetOnServer: backendService.config.ionqApiTokenSet
+                    isSetOnServer: backendService.config.ionqApiTokenSet,
+                    isDirty: !ionqToken.isEmpty
                 )
             }
             .padding(DesignConstants.standardPadding)
@@ -932,53 +1032,7 @@ struct SettingsView: View {
         .padding(.horizontal)
     }
 
-    @ViewBuilder
-    private var saveButtonSection: some View {
-        VStack(spacing: 12) {
-            if !saveMessage.isEmpty {
-                HStack {
-                    Image(systemName: saveSuccess ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
-                        .foregroundStyle(saveSuccess ? DesignConstants.systemGreenText : DesignConstants.systemRed)
-                    Text(saveMessage)
-                        .font(.caption)
-                        .foregroundStyle(DesignConstants.primaryText)
-                }
-                .padding(8)
-                .background(saveSuccess ? Color.green.opacity(0.1) : Color.red.opacity(0.1), in: Capsule())
-                .transition(.scale.combined(with: .opacity))
-            }
 
-            Button(action: saveSettings) {
-                HStack {
-                    if isSaving {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .scaleEffect(0.8)
-                            .padding(.trailing, 4)
-                    } else {
-                        Image(systemName: "arrow.up.doc.fill")
-                    }
-                    Text(isSaving ? "Persisting..." : "Save Configuration")
-                        .bold()
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    LinearGradient(
-                        colors: [DesignConstants.systemOrange, .purple],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
-            }
-            .buttonStyle(.plain)
-            .disabled(isSaving)
-        }
-        .padding(.horizontal)
-        .padding(.bottom, DesignConstants.loosePadding)
-    }
 
     @ViewBuilder
     private func credentialField(
@@ -986,14 +1040,23 @@ struct SettingsView: View {
         placeholder: String,
         text: Binding<String>,
         show: Binding<Bool>,
-        isSetOnServer: Bool
+        isSetOnServer: Bool,
+        isDirty: Bool = false
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(title)
-                    .font(.subheadline)
-                    .bold()
-                    .foregroundStyle(DesignConstants.primaryText)
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(DesignConstants.primaryText)
+                    
+                    if isDirty {
+                        Circle()
+                            .fill(DesignConstants.systemOrange)
+                            .frame(width: 6, height: 6)
+                    }
+                }
                 
                 Spacer()
                 
@@ -1079,64 +1142,60 @@ struct SettingsView: View {
         }
     }
     
-    private func saveLLMSettings() {
-        guard !llmSelectedModel.isEmpty else { return }
-        isSavingLLM = true
-        llmSaveMessage = ""
-        
-        Task {
-            let providerToUse = selectedProvider == "auto" ? nil : selectedProvider
-            let success = await backendService.config.saveLLMConfig(
-                provider: providerToUse,
-                model: llmSelectedModel
-            )
-            
-            await MainActor.run {
-                isSavingLLM = false
-                llmSaveSuccess = success
-                if success {
-                    llmSaveMessage = "Model selection updated successfully."
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        withAnimation {
-                            if llmSaveMessage.contains("success") {
-                                llmSaveMessage = ""
-                            }
-                        }
-                    }
-                } else {
-                    llmSaveMessage = "Failed to update model selection on server."
-                }
-            }
-        }
-    }
-    
-    private func saveSettings() {
+    private func saveAllSettings() {
         isSaving = true
         saveMessage = ""
         
         Task {
-            let success = await backendService.config.saveConfig(
-                backend: selectedBackend,
-                ibmToken: ibmToken,
-                dwaveToken: dwaveToken,
-                ionqToken: ionqToken,
-                hardwareEnabled: hardwareEnabled
-            )
+            var success = true
+            
+            // 1. Save Quantum if modified
+            let quantumModified = selectedBackend != backendService.config.quantumBackend ||
+                                  hardwareEnabled != backendService.config.quantumHardwareEnabled ||
+                                  !ibmToken.isEmpty ||
+                                  !dwaveToken.isEmpty ||
+                                  !ionqToken.isEmpty
+            
+            if quantumModified {
+                let qSuccess = await backendService.config.saveConfig(
+                    backend: selectedBackend,
+                    ibmToken: ibmToken,
+                    dwaveToken: dwaveToken,
+                    ionqToken: ionqToken,
+                    hardwareEnabled: hardwareEnabled
+                )
+                if !qSuccess { success = false }
+            }
+            
+            // 2. Save LLM if modified
+            let providerToUse = selectedProvider == "auto" ? nil : selectedProvider
+            let llmModified = selectedProvider != (backendService.config.llmActiveProvider.isEmpty ? "auto" : backendService.config.llmActiveProvider) ||
+                              (!llmSelectedModel.isEmpty && llmSelectedModel != backendService.config.llmActiveModel)
+            
+            if llmModified && !llmSelectedModel.isEmpty {
+                let lSuccess = await backendService.config.saveLLMConfig(
+                    provider: providerToUse,
+                    model: llmSelectedModel
+                )
+                if !lSuccess { success = false }
+            }
             
             await MainActor.run {
                 isSaving = false
                 saveSuccess = success
                 if success {
-                    saveMessage = "Quantum engine config updated successfully."
-                    // Clear inputs on success so they return to password mask
+                    saveMessage = "Configuration updated successfully."
+                    // Clear typed tokens so they return to mask state
                     ibmToken = ""
                     dwaveToken = ""
                     ionqToken = ""
                     
-                    // Dismiss message after delay
+                    // Reload to reflect server state
+                    loadCurrentConfig()
+                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                         withAnimation {
-                            if saveMessage.contains("success") {
+                            if saveMessage.contains("successfully") {
                                 saveMessage = ""
                             }
                         }
@@ -1147,4 +1206,62 @@ struct SettingsView: View {
             }
         }
     }
+}
+
+// MARK: - Preview
+
+struct SettingsView_PreviewHelper: View {
+    let container: ModelContainer
+
+    init() {
+        let schema = Schema([
+            TemporalEvent.self,
+            TimelineBranch.self,
+            LoreEntity.self
+        ])
+        let container = try! ModelContainer(for: schema, configurations: [ModelConfiguration(isStoredInMemoryOnly: true)])
+        let context = container.mainContext
+
+        let mainBranch = TimelineBranch(name: "Universe Prime", isActive: true)
+        context.insert(mainBranch)
+
+        let events = [
+            TemporalEvent(
+                title: "Magenta UFO Crash Recovery",
+                eventDescription: "A circular flying craft crash-landed in northern Italy, recovered by Mussolini's secret cabinet.",
+                timestamp: Calendar.current.date(from: DateComponents(year: 1933, month: 6, day: 13)) ?? Date(),
+                confidence: 0.94,
+                source: "Mussolini Archives",
+                type: "crash"
+            ),
+            TemporalEvent(
+                title: "S-4 Propulsion Research",
+                eventDescription: "Bob Lazar worked on back-engineering gravity amplifiers utilizing Element 115.",
+                timestamp: Calendar.current.date(from: DateComponents(year: 1989, month: 12, day: 1)) ?? Date(),
+                confidence: 0.92,
+                source: "Bob Lazar Testimony",
+                type: "theory"
+            )
+        ]
+
+        for event in events {
+            event.branch = mainBranch
+            context.insert(event)
+        }
+
+        context.insert(LoreEntity(name: "Bob Lazar", type: "Person", summary: "S-4 whistleblower.", confidence: 0.90, source: "S-4 Records"))
+
+        self.container = container
+    }
+
+    var body: some View {
+        SettingsView()
+            .modelContainer(container)
+            .environment(AlmanacService.shared)
+            .environment(BackendService.shared)
+    }
+}
+
+#Preview {
+    SettingsView_PreviewHelper()
 }

@@ -2,12 +2,42 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-06-24
+updated: 2026-07-12
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-07-12] fix | iOS Layout + Preview Crash + Living Almanac Client Fixes
+
+### iOS sheet overflow fixes (PRs 1–5)
+
+Five `.sheet` modifiers across three files used `.frame(minWidth:)` with desktop pixel values (400–700 pt) applied unconditionally, causing content to overflow the ~375 pt iPhone screen. Fix: wrapped each in `#if os(macOS)`.
+
+- `LivingAlmanacView.swift` — Task Console (`minWidth:500`), Brief Reader (`minWidth:700`), Pulse Snapshot (`minWidth:600`)
+- `SettingsView.swift` — Task Console (`minWidth:500`)
+- `ContentView.swift` — Data Ingestion (`minWidth:500`)
+
+### iOS adaptive layout fixes (PRs 6–8)
+
+- `LivingAlmanacView.swift:46` — Briefs+Pulses sections: `HStack` → `#if os(macOS) HStack / #else VStack`
+- `LivingAlmanacView.swift:565` — Divergence card: 3-col `HStack` → `#if os(macOS) HStack / #else VStack` (risk row + hashes row)
+- `AdvancedTimelineFilterView.swift:222` — Filter preset dialog `.frame(width:250)` → macOS only
+
+### iOS preview crash fixes (PRs 9)
+
+- Added `#Preview` + `_PreviewHelper` to `SettingsView`, `TaskConsoleView`, `LivingAlmanacView`
+- `ContentView_PreviewHelper.body` now chains `.environment(AlmanacService.shared)` and `.environment(BackendService.shared)`
+- `ConfigService.isDarkMode` now asserts `Thread.isMainThread` before `UserDefaults.standard` access
+
+### iOS default tab fix (PR 10)
+
+- `ContentView.swift:47`: `activeTab: TabSelection = .timeline` → `.graph` — aligns iPhone first-page with macOS
+
+### Related docs
+
+- `wiki/projects/living-almanac.md` — Section 15 added documenting all 6 bug/fix entries above
 
 ## [2026-07-02] ingest | Kordylewski Clouds & Robert Temple
 
@@ -604,4 +634,43 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
   - Swift-Charts-3D (9.0K), Swift-Concurrency-Updates (10K), Swift-InlineArray-Span (8.7K), SwiftData-Class-Inheritance (9.6K)
   - SwiftUI-AlarmKit (23K), SwiftUI-Liquid-Glass (8.0K), SwiftUI-New-Toolbar (6.5K), SwiftUI-Styled-Text-Edit (11K)
   - SwiftUI-WebKit (12K), UIKit-Liquid-Glass (9.8K), WidgetKit-Liquid-Glass (7.5K), Widgets-for-visionOS (8.5K)
+## [2026-07-11] ingest | pulse | Bob Lazar | 5 evidence | $0.50 | remaining=$19.50 | bob-lazar
+## [2026-07-11] ingest | pulse | Element 115 | 5 evidence | $0.50 | remaining=$19.00 | element-115
+## [2026-07-11] ingest | pulse | Roswell Crash | 5 evidence | $0.50 | remaining=$18.50 | roswell-crash
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=723f7c3c991fae96 | 2026-07-11.html
+## [2026-07-11] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-11] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-11] ingest | pulse | Bob Lazar | 5 evidence | $0.50 | remaining=$18.00 | bob-lazar
+## [2026-07-11] ingest | pulse | Element 115 | 5 evidence | $0.50 | remaining=$17.50 | element-115
+## [2026-07-11] ingest | pulse | Roswell Crash | 5 evidence | $0.50 | remaining=$17.00 | roswell-crash
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=588dcb04cb0a2424 | 2026-07-11.html
+## [2026-07-11] ingest | pulse | Bob Lazar | 5 evidence | $0.50 | remaining=$16.50 | bob-lazar
+## [2026-07-11] ingest | pulse | Element 115 | 5 evidence | $0.50 | remaining=$16.00 | element-115
+## [2026-07-11] ingest | pulse | Roswell Crash | 5 evidence | $0.50 | remaining=$15.50 | roswell-crash
+## [2026-07-11] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-11] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-11] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-11] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+
+## [2026-07-12] fix | Almanac Integrations & Git Submodule
+- Linked `last30days-skill` as a git submodule under `last30days-skill/` to prevent conflicts and allow remote tracking updates.
+- Upgraded `AnyDecodableValue` to support recursive dictionary/array decoding, fixing client-side "missing pulse data" view parsing.
+- Corrected `last30days.py` CLI parameter formatting to support `--emit json` instead of `--json`.
+- Integrated `fetchConfig()` inside the Almanac tab's `.onAppear` callback to display active/enabled badge status on startup.
+- Aligned both `.env` and `.env.example` configurations to match the unified parameter naming.
+## [2026-07-11] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-11] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=12 contested=0 | hash=7ae7679190901f56 | 2026-07-11.html
+## [2026-07-11] ingest | almanac | 2026-07-11 | no material change | hash=7ae7679190901f56 | 3 entities checked
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=empty-no-evidence | 2026-07-11.html
+## [2026-07-11] ingest | pulse | Bob Lazar | 50 evidence | $0.50 | remaining=$1987.50 | bob-lazar
+## [2026-07-11] ingest | pulse | Bob Lazar | 50 evidence | $0.50 | remaining=$1987.00 | bob-lazar
+## [2026-07-11] ingest | pulse | Element 115 | 50 evidence | $0.50 | remaining=$1986.50 | element-115
+## [2026-07-11] ingest | pulse | Roswell Crash | 50 evidence | $0.50 | remaining=$1986.00 | roswell-crash
+## [2026-07-11] ingest | pulse | Bob Lazar | 50 evidence | $0.50 | remaining=$1985.50 | bob-lazar
+## [2026-07-11] ingest | pulse | Roswell Crash | 50 evidence | $0.50 | remaining=$1984.50 | roswell-crash
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=3ca4e5f8653ce2db | 2026-07-11.html
+## [2026-07-11] ingest | pulse | david-grusch | 50 evidence | $0.50 | remaining=$1984.00 | david-grusch
+## [2026-07-11] ingest | pulse | ariel-school-ufo-incident | 50 evidence | $0.50 | remaining=$1983.50 | ariel-school-ufo-incident
+## [2026-07-11] ingest | pulse | kordylewski-clouds | 50 evidence | $0.50 | remaining=$1983.00 | kordylewski-clouds
 

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State of the Anomaly — 2026-07-11</title>
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --fg: #1A1A1A;
+    --muted: #6B6B6B;
+    --border: #E5E5E0;
+    --accent: #FF9500;
+    --card-bg: #FFFFFF;
+    --corroborated: #2D7D46;
+    --contested: #C45D00;
+    --unverified: #6B6B6B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121212;
+      --fg: #E8E8E8;
+      --muted: #9A9A9A;
+      --border: #2A2A2A;
+      --card-bg: #1E1E1E;
+      --accent: #FF9500;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+  h2 { font-size: 1.3rem; font-weight: 600; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+  .stat-value { font-size: 1.8rem; font-weight: 700; }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+  .entity-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin: 1rem 0; }
+  .badge { display: inline-block; padding: 0.2em 0.6em; border-radius: 999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; }
+  .badge-collapsed { background: var(--corroborated); color: white; }
+  .badge-contested { background: var(--contested); color: white; }
+  .badge-unverified { background: var(--border); color: var(--muted); }
+  .badge-superposition { background: #8B5CF6; color: white; }
+  .evidence-item { padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .evidence-item:last-child { border-bottom: none; }
+  .meta { font-size: 0.8rem; color: var(--muted); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .tribunal { background: var(--card-bg); border-left: 3px solid var(--accent); padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+  .disagreement { margin: 0.75rem 0; padding: 0.5rem; background: var(--bg); border-radius: 8px; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); text-align: center; }
+  @media print {
+    body { background: white; color: black; max-width: 100%; padding: 1rem; }
+    .stat-card, .entity-card { border: 1px solid #CCC; break-inside: avoid; }
+    a { color: black; text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+<header>
+<h1>🌀 State of the Anomaly</h1>
+<p class="subtitle">Daily briefing — 2026-07-11 — 3 entities, 0 moved, 0 collapsed, 0 newly contested</p>
+</header>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Entities</div></div>
+  <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Moved</div></div>
+  <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Collapsed</div></div>
+  <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Contested</div></div>
+</div>
+<div class="entity-card">
+<h3>Bob Lazar <span class="meta">(success, 50 evidence)</span></h3>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://youtube.com/watch?v=iahz3bj6xeg"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Before He Dies, Bob Lazar Finally Reveals What Was Inside Area 51's \u2014 And He Has Proof"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/boblazarnew/comments/1ur2izg/bob_lazar_on_how_old_the_s4_facility_looked_1990s"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Bob Lazar on how old the S4 facility looked 1990s vs today"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/ufos/comments/1upm7bv/was_it_dennis_or_denise_i_was_able_to_have_my"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Was it Dennis or Denise? I was able to have my question asked to Eric Davis on The Good Trouble Show about Bob Lazar's past employment at Area 51. He replied that based on his contacts, Bob </em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://youtube.com/watch?v=ntps0mr68xs"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Bob Lazar & Travis Walton: The Truth They're Hiding - The Flying Saucer Ep 01"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/ufos/comments/1ugbgat/bob_lazar_meets_travis_walton_for_the_first_time"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Bob Lazar Meets Travis Walton for the First Time - The Flying Saucer Diner"</em>
+</div>
+<p class="meta">Divergence risk: 43.6% — driven by 5 claim(s): <em>"https://youtube.com/watch?v=iahz3bj6xeg"</em>, <em>"https://youtube.com/watch?v=iahz3bj6xeg"</em>, <em>"title": "Before He Dies, Bob Lazar Finally Reveals What Was Inside Area 51's \u</em></p>
+</div>
+<div class="entity-card">
+<h3>Element 115 <span class="meta">(error, 50 evidence)</span></h3>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Database Engineer - Element 115",</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"url": "https://www.element115.ai/career/database-engineer"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Element 115 - Business Development Executive",</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"url": "https://www.element115.ai/career/business-development-executive"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Element - Current Openings - Workable",</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"url": "https://apply.workable.com/elementio/"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Element Materials Technology | Careers Center | Welcome",</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"url": "https://element-ext-hub.icims.com/jobs/intro?mobile=true&needsRedirect=false"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"interpretation": "appears to be increasing focus on ai and machine learning",</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://youtube.com/watch?v=oitffbioguq"</em>
+</div>
+<p class="meta">Divergence risk: 40.2% — driven by 5 claim(s): <em>"title": "Database Engineer - Element 115",</em>, <em>"url": "https://www.element115.ai/career/database-engineer"</em>, <em>"title": "Element 115 - Business Development Executive",</em></p>
+</div>
+<div class="entity-card">
+<h3>Roswell Crash <span class="meta">(success, 50 evidence)</span></h3>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "30 years later: video of Roswell parts moving in 500kV field"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "Real 1947 Roswell UFO Crash Footage Finally Surfaced"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://youtube.com/watch?v=n1jcxhlqthy"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "The Roswell UFO Crash: Uncovering the Truth Behind the Legend"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"title": "90s UFO documentary containing alleged real Roswell crash debris"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real"</em>
+</div>
+<div class="evidence-item">
+  <span class="badge badge-unverified">unverified ◐ superposition</span>
+  <span class="meta"> epi=0.16 trac=0.00</span><br>
+  <em>"https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans"</em>
+</div>
+<p class="meta">Divergence risk: 42.8% — driven by 5 claim(s): <em>"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_part</em>, <em>"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_part</em>, <em>"title": "30 years later: video of Roswell parts moving in 500kV field"</em></p>
+</div>
+
+<footer>
+  <p>Generated by Project Chicken Soup — The Living Almanac Engine — 2026-07-11</p>
+  <p class="meta">Epistemic confidence and social traction are separate numbers, never merged into one. Market odds shown as probability priors when available.</p>
+  <p class="meta">Source tier: network_opt_in (last30days) + local (wiki canon)</p>
+</footer>
+</body>
+</html>

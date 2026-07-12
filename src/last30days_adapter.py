@@ -59,6 +59,8 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
             candidates = data["evidence"]
         elif "results" in data and isinstance(data["results"], list):
             candidates = data["results"]
+        elif "findings" in data and isinstance(data["findings"], list):
+            candidates = data["findings"]
         else:
             # Treat whole dict as single claim if it has claim-ish keys
             if any(k in data for k in ("claim", "text", "title", "summary", "claim_text")):
@@ -75,6 +77,7 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
             or item.get("text")
             or item.get("title")
             or item.get("summary")
+            or item.get("snippet")
             or ""
         )
         if not claim_text or len(claim_text.strip()) < 10:

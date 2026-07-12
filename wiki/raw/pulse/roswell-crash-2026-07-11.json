@@ -1,0 +1,716 @@
+{
+  "entity_name": "Roswell Crash",
+  "slug": "roswell-crash",
+  "date": "2026-07-11",
+  "timestamp": "2026-07-12T01:52:06.580430+00:00",
+  "evidence_count": 50,
+  "evidence": [
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:0",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:0"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:1",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:1"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"30 years later: video of Roswell parts moving in 500kV field\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:2",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:2"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:3",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:3"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:4",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:4"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Real 1947 Roswell UFO Crash Footage Finally Surfaced\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:5",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:5"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=n1jcxhlqthy\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=n1jcxhlqthy",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:6",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:6"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=n1jcxhlqthy\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=n1jcxhlqthy",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:7",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:7"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The Roswell UFO Crash: Uncovering the Truth Behind the Legend\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:8",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:8"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:9",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:9"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:10",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:10"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"90s UFO documentary containing alleged real Roswell crash debris\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:11",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:11"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:12",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:12"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:13",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:13"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"90s UFO documentary containing alleged real Roswell crash debris\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:14",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:14"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:15",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:15"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:16",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:16"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"[independence day movie] how come the humans couldn't reverse engineer the alien shuttle that crash landed in roswell in 1947 but by the second movie they were able to reverse engineer the alien technology?\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:17",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:17"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:18",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:18"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:19",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:19"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Eric Davis Details Roswell Crash, Gray Alien Bodies, and Hidden Reverse-Engineering Efforts\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:20",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:20"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:21",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:21"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:22",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:22"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Some really incredible documents from the recent release from period immediately after the Roswell crash. #roswell\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:23",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:23"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/no/comments/1uh2h3r/did_any_ufos_crash_in_roswell_ga\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/no/comments/1uh2h3r/did_any_ufos_crash_in_roswell_ga",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:24",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:24"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/no/comments/1uh2h3r/did_any_ufos_crash_in_roswell_ga\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/no/comments/1uh2h3r/did_any_ufos_crash_in_roswell_ga",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:25",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:25"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Did any UFOs crash in Roswell, GA?\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:26",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:26"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/strangeearth/comments/1ufo30b/did_an_alien_spacecraft_crash_100_years_before\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/strangeearth/comments/1ufo30b/did_an_alien_spacecraft_crash_100_years_before",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:27",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:27"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/strangeearth/comments/1ufo30b/did_an_alien_spacecraft_crash_100_years_before\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/strangeearth/comments/1ufo30b/did_an_alien_spacecraft_crash_100_years_before",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:28",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:28"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Did an Alien Spacecraft Crash 100 Years Before Roswell? The Aurora, Texas Mystery\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:29",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:29"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1uec5fs/the_roswell_incident_witnesses_break_silence_on\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1uec5fs/the_roswell_incident_witnesses_break_silence_on",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:30",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:30"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1uec5fs/the_roswell_incident_witnesses_break_silence_on\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1uec5fs/the_roswell_incident_witnesses_break_silence_on",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:31",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:31"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The Roswell Incident: Witnesses Break Silence on Crash Debris & Threats\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:32",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:32"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u43exh/some_really_incredible_documents_from_the_recent\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u43exh/some_really_incredible_documents_from_the_recent",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:33",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:33"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1u43exh/some_really_incredible_documents_from_the_recent\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1u43exh/some_really_incredible_documents_from_the_recent",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:34",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:34"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Some really incredible documents from the recent release from period immediately after the Roswell crash.\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:35",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:35"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1u56p57/david_grusch_links_1933_magenta_crash_vatican\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1u56p57/david_grusch_links_1933_magenta_crash_vatican",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:36",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:36"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/uapdrop/comments/1u56p57/david_grusch_links_1933_magenta_crash_vatican\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/uapdrop/comments/1u56p57/david_grusch_links_1933_magenta_crash_vatican",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:37",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:37"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"David Grusch Links 1933 Magenta Crash, Vatican Channels, Roswell and NASA Missions to Long-Running UAP Secrecy\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:38",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:38"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"A Wild Register Appears: Hunting the 30-Year-Old World of Xeen MT-32 Crash\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:39",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:39"
+      ]
+    },
+    {
+      "claim_text": "\"https://github.com/dgonzamat/mercadopublico/pull/435\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "https://github.com/dgonzamat/mercadopublico/pull/435",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:40",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:40"
+      ]
+    },
+    {
+      "claim_text": "\"https://github.com/dgonzamat/mercadopublico/pull/435\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "https://github.com/dgonzamat/mercadopublico/pull/435",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:41",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:41"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"A\\u00f1adir 3 casos (abducci\\u00f3n + ola + crash-hoax) al corpus (246-248)\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:42",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:42"
+      ]
+    },
+    {
+      "claim_text": "\"generated_at\": \"2026-07-12T01:52:06.532682+00:00\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:43",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:43"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"A\\u00f1adir 3 casos (abducci\\u00f3n + ola + crash-hoax) al corpus (246-248)\\n## Qu\\u00e9 hace\\n\\nA\\u00f1ade **3 casos** al corpus, con fuente primaria y cumpliendo el est\\u00e1ndar editorial (narrativa \\u22651 p\\u00e1gina A4 ES+EN, `evidence`, `sources`, `posterior` MECE que suma 1). Tres registros distintos: una abducci\\u00f3n de alto perfil, una ola hist\\u00f3rica y un fraude de crash-retrieval.\\n\\n> Complement\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:44",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:44"
+      ]
+    },
+    {
+      "claim_text": "\"snippet\": \"## Qu\\u00e9 hace\\n\\nA\\u00f1ade **3 casos** al corpus, con fuente primaria y cumpliendo el est\\u00e1ndar editorial (narrativa \\u22651 p\\u00e1gina A4 ES+EN, `evidence`, `sources`, `posterior` MECE que suma 1). Tres registros distintos: una abducci\\u00f3n de alto perfil, una ola hist\\u00f3rica y un fraude de crash-retrieval.\\n\\n> Complement\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:45",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:45"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"A\\u00f1adir 3 casos (abducci\\u00f3n + ola + crash-hoax) al corpus (246-248)\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:46",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:46"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://github.com/dgonzamat/Mercadopublico/pull/435\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "https://github.com/dgonzamat/Mercadopublico/pull/435",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:47",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:47"
+      ]
+    },
+    {
+      "claim_text": "\"why_relevant\": \"GitHub PR: A\\u00f1adir 3 casos (abducci\\u00f3n + ola + crash-hoax) al corpus (246\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:48",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:48"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"A Wild Register Appears: Hunting the 30-Year-Old World of Xeen MT-32 Crash\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T01:52:06.568462+00:00",
+      "cluster_id": "Roswell Crash:md:49",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:Roswell Crash:md",
+        "cluster:Roswell Crash:md:49"
+      ]
+    }
+  ],
+  "raw_output_preview": "{\n  \"artifacts\": {\n    \"grounding\": [\n      {\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"keyless\",\n        \"reason\": \"keyless-search-unavailable\",\n        \"resultCount\": 0,\n        \"webSearchQueries\": [\n          \"\\\"Roswell Crash\\\" roswell crash\"\n        ]\n      },\n      {\n        \"attempted\": [\n          \"probe:greenhouse:roswellcrash\",\n          \"probe:ashby:roswellcrash\",\n          \"probe:lever:roswellcrash\",\n          \"probe:greenhouse:roswell-crash\",\n          \"probe:ashby:roswell-crash\",\n          \"probe:lever:roswell-crash\"\n        ],\n        \"company\": \"Roswell Crash\",\n        \"explicit\": false,\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"jobs-web\",\n        \"reason\": \"keyless-search-unavailable\",\n        \"resultCount\": 0,\n        \"tier\": \"web\",\n        \"webSearchQueries\": [\n          \"Roswell Crash careers jobs hiring\"\n        ]\n      }\n    ],\n    \"hiring_signals_mode\": false,\n    \"plan_source\": \"deterministic\",\n    \"pre_research_flags_present\": false,\n    \"resolved\": {\n      \"context\": \"\",\n      \"entity\": \"Roswell Crash\",\n      \"github_repos\": [],\n      \"github_user\": \"\",\n      \"subreddits\": [],\n      \"trustpilot_domain\": \"\",\n      \"x_handle\": \"\"\n    }\n  },\n  \"clusters\": [\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in\"\n      ],\n      \"cluster_id\": \"cluster-1\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1um48vu/30_years_later_video_of_roswell_parts_moving_in\"\n      ],\n      \"score\": 45.34548009367681,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"30 years later: video of Roswell parts moving in 500kV field\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally\"\n      ],\n      \"cluster_id\": \"cluster-2\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufo/comments/1ulolty/real_1947_roswell_ufo_crash_footage_finally\"\n      ],\n      \"score\": 44.676036866359446,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Real 1947 Roswell UFO Crash Footage Finally Surfaced\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=n1jcxhlqthy\"\n      ],\n      \"cluster_id\": \"cluster-3\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=n1jcxhlqthy\"\n      ],\n      \"score\": 42.99548009367682,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"The Roswell UFO Crash: Uncovering the Truth Behind the Legend\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real\"\n      ],\n      \"cluster_id\": \"cluster-4\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1urorqg/90s_ufo_documentary_containing_alleged_real\"\n      ],\n      \"score\": 39.54945054945055,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"90s UFO documentary containing alleged real Roswell crash debris\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real\"\n      ],\n      \"cluster_id\": \"cluster-5\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/aliensrhere/comments/1urovtd/90s_ufo_documentary_containing_alleged_real\"\n      ],\n      \"score\": 39.54112554112554,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"90s UFO documentary containing alleged real Roswell crash debris\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans\"\n      ],\n      \"cluster_id\": \"cluster-6\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/asksciencefiction/comments/1unriyl/independence_day_movie_how_come_the_humans\"\n      ],\n      \"score\": 37.57803571428572,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"[independence day movie] how come the humans couldn't reverse engineer the alien shuttle that crash landed in roswell in 1947 but by the second movie they were able to reverse engineer the alien technology?\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien\"\n      ],\n      \"cluster_id\": \"cluster-7\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/uapdrop/comments/1ut19w8/eric_davis_details_roswell_crash_gray_alien\"\n      ],\n      \"score\": 36.253049040511726,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Eric Davis Details Roswell Crash, Gray Alien Bodies, and Hidden Reverse-Engineering Efforts\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent\"\n      ],\n      \"cluster_id\": \"cluster-8\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1u3x6ag/some_really_incredible_documents_from_the_recent\"\n      ],\n      \"score\": 36.086893424036276,\n    ",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 1986.0,
+    "binary": "/Users/mck/Desktop/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py",
+    "cost_usd": 0.5
+  }
+}

@@ -22,6 +22,7 @@ public final class ConfigService {
     public var last30daysEnabled: Bool = false
 
     public var isDarkMode: Bool = {
+        assert(Thread.isMainThread, "ConfigService.isDarkMode must only be read on @MainActor")
         if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
             return true
         }
