@@ -2151,11 +2151,13 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
         for f in files:
             data = load_pulse_snapshot(f)
             if data:
+                evidence_trimmed = data.get("evidence", [])[:10]
                 pulses.append({
                     "entity_name": data.get("entity_name", f.stem),
                     "date": data.get("date", ""),
                     "timestamp": data.get("timestamp", ""),
                     "evidence_count": data.get("evidence_count", 0),
+                    "evidence": evidence_trimmed,
                     "file": str(f),
                 })
 

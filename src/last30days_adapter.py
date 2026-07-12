@@ -69,13 +69,14 @@ def _extract_claims_from_json(data: Any, entity_name: str) -> List[ClaimEvidence
         if not isinstance(item, dict):
             continue
         claim_text = (
-            item.get("explanation")
+            item.get("snippet")
+            or item.get("title")
+            or item.get("body")
             or item.get("claim_text")
             or item.get("claim")
             or item.get("text")
-            or item.get("title")
             or item.get("summary")
-            or item.get("snippet")
+            or item.get("explanation")
             or ""
         )
         if not claim_text:

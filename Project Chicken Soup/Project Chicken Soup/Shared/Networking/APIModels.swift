@@ -1165,6 +1165,7 @@ public struct APIPulseHistoryEntry: Codable, Identifiable, Hashable {
     public var date: String
     public var timestamp: String
     public var evidenceCount: Int
+    public var evidence: [APIClaimEvidence]
     public var file: String
 
     enum CodingKeys: String, CodingKey {
@@ -1172,7 +1173,17 @@ public struct APIPulseHistoryEntry: Codable, Identifiable, Hashable {
         case date
         case timestamp
         case evidenceCount = "evidence_count"
+        case evidence
         case file
+    }
+
+    public init(entityName: String, date: String, timestamp: String, evidenceCount: Int = 0, evidence: [APIClaimEvidence] = [], file: String) {
+        self.entityName = entityName
+        self.date = date
+        self.timestamp = timestamp
+        self.evidenceCount = evidenceCount
+        self.evidence = evidence
+        self.file = file
     }
 }
 
