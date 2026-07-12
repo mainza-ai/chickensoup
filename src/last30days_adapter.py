@@ -53,7 +53,9 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
     # Support multiple shapes
     candidates = []
     if isinstance(data, dict):
-        if "claims" in data and isinstance(data["claims"], list):
+        if "ranked_candidates" in data and isinstance(data["ranked_candidates"], list):
+            candidates = data["ranked_candidates"]
+        elif "claims" in data and isinstance(data["claims"], list):
             candidates = data["claims"]
         elif "evidence" in data and isinstance(data["evidence"], list):
             candidates = data["evidence"]
@@ -72,7 +74,8 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
         if not isinstance(item, dict):
             continue
         claim_text = (
-            item.get("claim_text")
+            item.get("explanation")
+            or item.get("claim_text")
             or item.get("claim")
             or item.get("text")
             or item.get("title")
@@ -80,24 +83,49 @@ def parse_json_output(raw: str, entity_name: str) -> Optional[List[ClaimEvidence
             or item.get("snippet")
             or ""
         )
-        if not claim_text or len(claim_text.strip()) < 10:
+        if not claim_text:
             continue
 
-        platform = item.get("source_platform") or item.get("platform") or _infer_platform(claim_text + " " + str(item.get("source", "")))
+        claim_text = claim_text.strip()
+        # Clean JSON key-value pattern formatting if present
+        m = re.match(r'^["\']?(?:title|url|claim_text|claim|text|summary|snippet)["\']?\s*:\s*["\']?(.*?)["\']?$', claim_text)
+        if m:
+            claim_text = m.group(1).strip()
+        if claim_text.startswith('"') and claim_text.endswith('"'):
+            claim_text = claim_text[1:-1].strip()
+        if claim_text.startswith("'") and claim_text.endswith("'"):
+            claim_text = claim_text[1:-1].strip()
+
+        # Data-quality filter: skip claims that are just raw URLs
+        if claim_text.startswith("http://") or claim_text.startswith("https://") or len(claim_text) < 10:
+            continue
+
+        platform = item.get("source_platform") or item.get("source") or item.get("platform")
+        if isinstance(platform, dict):
+             platform = platform.get("source") or "unknown"
+        if not platform or not isinstance(platform, str):
+             platform = _infer_platform(claim_text + " " + str(item.get("url", "")))
+
         url = item.get("url") or item.get("source") or ""
-        if not url:
+        if isinstance(url, dict):
+             url = url.get("url") or ""
+        if not url or not isinstance(url, str):
             urls = _extract_urls(claim_text)
             url = urls[0] if urls else ""
 
         engagement = item.get("engagement_count") or item.get("engagement") or item.get("upvotes") or 0
+        if isinstance(engagement, dict):
+             engagement = sum(float(v) for v in engagement.values() if isinstance(v, (int, float)))
         try:
-            engagement = int(engagement)
+            engagement = int(float(engagement))
         except (ValueError, TypeError):
             engagement = 0
 
         polymarket = item.get("polymarket_odds")
         if polymarket is None:
             polymarket = item.get("market_odds")
+        if polymarket is None and "metadata" in item and isinstance(item["metadata"], dict):
+            polymarket = item["metadata"].get("polymarket_odds") or item["metadata"].get("market_odds")
         if polymarket is not None:
             try:
                 polymarket = float(polymarket)

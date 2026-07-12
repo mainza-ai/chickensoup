@@ -58,23 +58,23 @@ def test_pulse_enabled_writes_one_immutable_file():
 
         pulse_dir = Path(tmpdir) / "pulse"
 
-        with patch("src.agents.pulse_agent.budget_tracker") as mock_budget, \
+        with patch("src.agents.pulse_agent.ResourceLedger") as mock_budget, \
              patch("src.wiki.pulse_writer.ensure_pulse_dir", return_value=pulse_dir), \
              patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir), \
              patch("src.wiki.paths.ensure_pulse_dir", return_value=pulse_dir), \
              patch("src.wiki.writer.append_to_log"), \
-             patch("src.agents.pulse_agent.budget_tracker") as mock_budget2:
+             patch("src.agents.pulse_agent.ResourceLedger") as mock_budget2:
 
             mock_status = MagicMock()
-            mock_status.remaining_usd = 19.5
+            mock_status.paid_remaining = 19.5
             mock_budget.get_status.return_value = mock_status
             mock_budget.check_budget.return_value = (True, 19.5, "ok")
-            mock_budget.record_spend.return_value = mock_status
+            mock_budget.record_spend.return_value = (19.5, "recorded")
             mock_budget2.get_status.return_value = mock_status
             mock_budget2.check_budget.return_value = (True, 19.5, "ok")
-            mock_budget2.record_spend.return_value = mock_status
+            mock_budget2.record_spend.return_value = (19.5, "recorded")
 
-            # We need to patch budget_tracker inside pulse_agent module separately
+            # We need to patch ResourceLedger inside pulse_agent module separately
 
         # Second variant with correct patch targets
         with tempfile.TemporaryDirectory() as tmpdir2:
@@ -91,13 +91,13 @@ def test_pulse_enabled_writes_one_immutable_file():
 
             mock_budget_tracker = MagicMock()
             status_mock = MagicMock()
-            status_mock.remaining_usd = 19.5
+            status_mock.paid_remaining = 19.5
             mock_budget_tracker.get_status.return_value = status_mock
             mock_budget_tracker.check_budget.return_value = (True, 19.5, "ok")
-            mock_budget_tracker.record_spend.return_value = status_mock
+            mock_budget_tracker.record_spend.return_value = (19.5, "recorded")
 
             try:
-                with patch("src.agents.pulse_agent.budget_tracker", mock_budget_tracker), \
+                with patch("src.agents.pulse_agent.ResourceLedger", mock_budget_tracker), \
                      patch.object(pw_mod, "ensure_pulse_dir", return_value=pulse_dir2), \
                      patch.object(pw_mod, "get_pulse_dir", return_value=pulse_dir2), \
                      patch("src.wiki.writer.append_to_log"), \
@@ -148,12 +148,12 @@ def test_pulse_budget_exceeded_refused_and_logged():
 
     mock_tracker = MagicMock()
     status_mock = MagicMock()
-    status_mock.remaining_usd = 0.1
+    status_mock.paid_remaining = 0.1
     mock_tracker.get_status.return_value = status_mock
     mock_tracker.check_budget.return_value = (False, 0.1, "Budget ceiling $20.00 would be exceeded")
 
     try:
-        with patch("src.agents.pulse_agent.budget_tracker", mock_tracker), \
+        with patch("src.agents.pulse_agent.ResourceLedger", mock_tracker), \
              patch("src.wiki.writer.append_to_log") as mock_log, \
              patch("src.agents.pulse_agent.subprocess.run") as mock_run:
 
@@ -178,15 +178,15 @@ def test_pulse_never_shell_true():
     from src.agents.pulse_agent import PulseAgent
     import src.agents.pulse_agent as pa_mod
 
-    with patch.object(pa_mod, "budget_tracker") as mock_tracker, \
+    with patch.object(pa_mod, "ResourceLedger") as mock_tracker, \
          patch("src.wiki.writer.append_to_log"), \
          patch.object(pa_mod, "subprocess") as mock_subp:
 
         status_mock = MagicMock()
-        status_mock.remaining_usd = 20.0
+        status_mock.paid_remaining = 20.0
         mock_tracker.get_status.return_value = status_mock
         mock_tracker.check_budget.return_value = (True, 20.0, "ok")
-        mock_tracker.record_spend.return_value = status_mock
+        mock_tracker.record_spend.return_value = (20.0, "recorded")
 
         mock_subp.run.return_value = MagicMock(returncode=0, stdout=_mock_evidence_json(), stderr="")
         mock_subp.TimeoutExpired = __import__("subprocess").TimeoutExpired

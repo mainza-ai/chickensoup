@@ -2,7 +2,7 @@
 title: "Index"
 tags: [index]
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-07-12
 sources: []
 related: []
 ---
@@ -205,10 +205,11 @@ related: []
 - [[quantum-systems]] (in concepts/) — Quantum platform comparison
 - [[quantum-systems-comparison]] (in projects/)
 - [[langgraph-workflows]] (in projects/)
+- [[master-implementation-plan]] (in projects/) — Master Implementation Plan: Living Almanac hardening, idle-driven scheduling redesign, evidence pipeline fix, XSS fix, 6-stage execution with dependency graph
 
 ## Other Concepts (in wiki/concepts/)
 
-- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening (implemented phases 0–6, 75 tests green)
+- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening (fully implemented, 90 tests green, idle scheduler, resource ledger, staleness queue, semantic disambiguation)
 - [[credibility-scoring]] — Claim wavefunction scoring with VQE over 3-basis, decoupled epi/traction, falsifiable inputs, calibration fixtures
 - [[api-design]] — 40+ endpoints including Living Almanac: pulse, divergence, timeline, entanglement, tribunal, budget, almanac
 - [[agent-architecture]] — Multi-agent with wavefunction wiring, tribunal gated cost control, inferred_events fix
@@ -221,3 +222,4 @@ related: []
 ## Plans (in wiki/plan/)
 
 - [[frontend-settings-menu]] — SwiftUI Settings menu plan to reach final DOD: budget display, HOLD approval, pulse triggers, almanac dry-run/live, timeline slider, entity divergence rows, DOD checklist
+- [[master-implementation-plan]] — Master implementation plan: 6-stage sequenced execution (XSS → evidence pipeline → cohesion → idle-driven scheduling → query intelligence → verification), 8 PRs, conflict resolution, dependency graph

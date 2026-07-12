@@ -65,7 +65,33 @@ def write_page(
     page_type: str = "entities",
 ) -> Tuple[str, bool]:
     slug = slugify(title)
-    existing = read_page(slug, page_type)
+    
+    is_draft = False
+    if page_type == "entities":
+        published_path = _page_path(slug, "entities")
+        if not os.path.isfile(published_path):
+            is_draft = True
+
+    if is_draft:
+        from src.discovery_agent import get_draft_path
+        draft_path = get_draft_path(slug)
+        existing = None
+        if os.path.isfile(draft_path):
+            try:
+                with open(draft_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                meta = {}
+                dbody = content
+                yaml_match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
+                if yaml_match:
+                    meta = yaml.safe_load(yaml_match.group(1)) or {}
+                    dbody = content[yaml_match.end():]
+                existing = {"frontmatter": meta, "body": dbody, "path": draft_path}
+            except Exception:
+                pass
+    else:
+        existing = read_page(slug, page_type)
+
     today = date.today().isoformat()
     created = today
 
@@ -98,11 +124,16 @@ def write_page(
     yaml_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip()
     full_content = f"---\n{yaml_str}\n---\n\n{body}\n"
 
-    path = _page_path(slug, page_type)
+    if is_draft:
+        from src.discovery_agent import get_draft_path
+        path = get_draft_path(slug)
+    else:
+        path = _page_path(slug, page_type)
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(full_content)
-    logger.info(f"{'Created' if is_new else 'Updated'} wiki page: {path}")
+    logger.info(f"{'Created' if is_new else 'Updated'} {'draft' if is_draft else 'wiki'} page: {path}")
     return slug, is_new
 
 def delete_page(slug: str, page_type: str = "entities") -> bool:

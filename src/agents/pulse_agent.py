@@ -10,7 +10,7 @@ from typing import Optional, Dict, List
 
 from src.config import settings
 from src.models import ClaimEvidence, PulseResult
-from src.budget import budget_tracker
+from src.resource_ledger import ResourceLedger
 from src.last30days_adapter import Last30daysAdapter
 from src.wiki.pulse_writer import write_pulse_snapshot
 from src.wiki.writer import slugify
@@ -100,8 +100,30 @@ class PulseAgent:
         entity_name = _sanitize_entity_name(entity_name)
         slug = slugify(entity_name)
 
-        budget_status = budget_tracker.get_status()
+        # Check wiki page frontmatter for handles or tags
+        from src.wiki.writer import read_page
+        is_org = False
+        wiki_handles = None
+        try:
+            page_data = read_page(slug)
+            if page_data and "frontmatter" in page_data:
+                fm = page_data["frontmatter"]
+                # 1. Extract handles
+                wiki_handles = fm.get("last30days_handles")
+                # 2. Check if organization
+                tags = [str(t).lower() for t in fm.get("tags", [])]
+                if any(org_tag in tags for org_tag in ("organization", "company", "business", "corp")):
+                    is_org = True
+        except Exception as e:
+            logger.debug(f"Failed to read wiki page frontmatter for handles/tags: {e}")
 
+        if not handles and wiki_handles:
+            handles = wiki_handles
+
+        # Determine if paid or free based on presence of API keys
+        is_paid = bool(os.environ.get("PERPLEXITY_API_KEY") or os.environ.get("BRAVE_API_KEY") or os.environ.get("XAI_API_KEY"))
+        cost = settings.LAST30DAYS_COST_PER_PULL_USD if is_paid else 0.0
+        
         # Disabled gate — clean no-op
         if not settings.LAST30DAYS_ENABLED:
             logger.info(f"Pulse disabled (LAST30DAYS_ENABLED=false) for '{entity_name}' — returning no-op")
@@ -110,18 +132,22 @@ class PulseAgent:
                 status="disabled",
                 evidence=[],
                 raw_snapshot_path=None,
-                budget_remaining=budget_status.remaining_usd,
+                budget_remaining=ResourceLedger.get_status().paid_remaining,
             )
 
         # Budget check before any network call
-        cost = settings.LAST30DAYS_COST_PER_PULL_USD
-        allowed, remaining, reason = budget_tracker.check_budget(cost)
+        allowed, remaining, reason = ResourceLedger.check_budget(is_paid=is_paid)
+        if not allowed and is_paid:
+            logger.info("Paid budget limit reached/blocked, attempting free fallback...")
+            is_paid = False
+            allowed, remaining, reason = ResourceLedger.check_budget(is_paid=False)
+
         if not allowed:
-            logger.warning(f"Pulse refused for '{entity_name}': budget exceeded — {reason} (remaining ${remaining:.2f})")
+            logger.warning(f"Pulse refused for '{entity_name}': budget/rate limit exceeded — {reason}")
             try:
                 from src.wiki.writer import append_to_log
                 safe_name = entity_name.replace("\n", " ").replace("\r", " ")[:100]
-                append_to_log(f"pulse | {safe_name} | budget_exceeded | {reason} | remaining=${remaining:.2f}")
+                append_to_log(f"pulse | {safe_name} | budget_exceeded | {reason}")
             except Exception as log_err:
                 logger.debug(f"Failed to append budget refusal to log: {log_err}")
 
@@ -130,7 +156,7 @@ class PulseAgent:
                 status="budget_exceeded",
                 evidence=[],
                 raw_snapshot_path=None,
-                budget_remaining=remaining,
+                budget_remaining=ResourceLedger.get_status().paid_remaining,
                 error=reason,
             )
 
@@ -212,6 +238,34 @@ class PulseAgent:
         # Parse output into ClaimEvidence
         try:
             evidence = self.adapter.parse_output(raw_output, entity_name)
+            filtered_evidence = []
+            for ev in evidence:
+                url_lower = ev.url.lower() if ev.url else ""
+                claim_lower = ev.claim_text.lower() if ev.claim_text else ""
+                platform_lower = ev.source_platform.lower() if ev.source_platform else ""
+                
+                # 1. Semantic Disambiguation check
+                ent_lower = entity_name.lower()
+                ent_words = [w.strip("(),.-_") for w in ent_lower.split() if len(w) > 2]
+                if ent_words:
+                    match_count = sum(1 for w in ent_words if w in claim_lower or w in url_lower)
+                    threshold = len(ent_words) / 2.0 if len(ent_words) > 1 else 1.0
+                    if match_count < threshold:
+                        logger.info(f"Filtering out cross-contamination candidate for '{entity_name}': {ev.claim_text}")
+                        continue
+
+                # 2. Hiring/jobs check for non-organizations
+                if not is_org:
+                    hiring_domains = ("greenhouse.io", "ashbyhq.com", "lever.co", "workable.com", "apply.workable.com")
+                    hiring_keywords = ("hiring", "careers", "database engineer", "business development executive", "job openings", "current openings")
+                    if (platform_lower in ("jobs-web", "careers") or
+                        any(dom in url_lower for dom in hiring_domains) or
+                        any(kw in claim_lower for kw in hiring_keywords)):
+                        logger.debug(f"Filtering out hiring-signal/jobs evidence from non-org '{entity_name}': {ev.claim_text}")
+                        continue
+                        
+                filtered_evidence.append(ev)
+            evidence = filtered_evidence
             evidence = self.adapter.normalize_engagement(evidence)
         except Exception as e:
             logger.error(f"Failed to parse last30days output for '{entity_name}': {e}")
@@ -221,7 +275,7 @@ class PulseAgent:
             logger.info(f"No evidence parsed for '{entity_name}' — returning no_data")
             # Still record spend (API was hit) and write raw snapshot for audit
             try:
-                budget_tracker.record_spend(cost, f"pulse:{entity_name}:no_data")
+                ResourceLedger.record_spend(is_paid, f"pulse:{entity_name}:no_data")
             except Exception as rec_err:
                 logger.debug(f"Failed to record spend for no_data pulse: {rec_err}")
 
@@ -246,7 +300,7 @@ class PulseAgent:
                 status="no_data",
                 evidence=[],
                 raw_snapshot_path=json_path,
-                budget_remaining=budget_tracker.get_status().remaining_usd,
+                budget_remaining=ResourceLedger.get_status().paid_remaining,
             )
 
         # Cap claims per pulse
@@ -282,11 +336,11 @@ class PulseAgent:
 
         # Record spend
         try:
-            budget_tracker.record_spend(cost, f"pulse:{entity_name}:{len(evidence)}")
+            ResourceLedger.record_spend(is_paid, f"pulse:{entity_name}:{len(evidence)}")
         except Exception as rec_err:
             logger.debug(f"Failed to record spend after success: {rec_err}")
 
-        final_remaining = budget_tracker.get_status().remaining_usd
+        final_remaining = ResourceLedger.get_status().paid_remaining
 
         # Append to log.md — provenance, not pytest temp paths
         try:

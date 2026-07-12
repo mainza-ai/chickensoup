@@ -100,21 +100,24 @@ def _compute_amplitudes(
     engagement_magnitude: float,
     polymarket_prior: Optional[float],
     contradiction_signal: float,
+    reinforcement_count: int = 0,
 ) -> List[float]:
     # Three basis states: CORROBORATED, CONTESTED, UNVERIFIED
     # We compute unnormalised amplitudes, then normalise
 
-    # Corroborated amplitude: grows with diversity + magnitude + market prior
-    # Polymarket is weighted heavily as market-priced belief
+    # Corroborated amplitude: grows with diversity + magnitude + market prior + conversation reinforcement
     market_term = 0.0
     if polymarket_prior is not None:
         # Map 0.5 → neutral, 0.9 → high corroborated, 0.1 → low
         market_term = (polymarket_prior - 0.5) * 1.5
 
+    reinforcement_term = min(1.0, reinforcement_count / 5.0) * 0.25
+
     corroborated_raw = (
         source_diversity * 0.4
         + engagement_magnitude * SOCIAL_TRACTION_WEIGHT_IN_EPISTEMIC
         + max(0.0, market_term) * 0.6
+        + reinforcement_term
         + 0.1  # bias
     )
 
@@ -133,6 +136,9 @@ def _compute_amplitudes(
         + (0.5 if polymarket_prior is None else 0.0)
         + 0.1
     )
+
+    if reinforcement_count > 0:
+        unverified_raw *= (1.0 - min(0.5, reinforcement_count / 10.0))
 
     # Adjust: if market strongly contradicts (odds < 0.2) and diversity high, boost contested over corroborated
     if polymarket_prior is not None and polymarket_prior < 0.3 and source_diversity > 0.4:
@@ -154,7 +160,7 @@ class ClaimWavefunction:
     def __init__(self):
         self.scoring_version = settings.WAVEFUNCTION_SCORING_VERSION
 
-    def score_claim(self, claim_text: str, evidence: List[ClaimEvidence]) -> ClaimConfidence:
+    def score_claim(self, claim_text: str, evidence: List[ClaimEvidence], reinforcement_count: int = 0) -> ClaimConfidence:
         if not evidence:
             # No evidence → unverified with low epistemic, zero traction
             return ClaimConfidence(
@@ -171,6 +177,7 @@ class ClaimWavefunction:
                     "polymarket_prior": None,
                     "contradiction_signal": 0.0,
                     "social_traction": 0.0,
+                    "reinforcement_count": reinforcement_count,
                     "note": "no evidence — fallback heuristic",
                 },
                 claim_text=claim_text[:500] if claim_text else None,
@@ -185,7 +192,9 @@ class ClaimWavefunction:
         if contra_sig == 0.0:
             logger.debug("Contradiction signal stub 0.0 — lint/contradiction agent not yet built (TODO)")
 
-        amplitudes = _compute_amplitudes(diversity, eng_mag, market_prior, contra_sig)
+        amplitudes = _compute_amplitudes(
+            diversity, eng_mag, market_prior, contra_sig, reinforcement_count=reinforcement_count
+        )
 
         # Route through quantum VQE scorer
         try:
@@ -283,6 +292,7 @@ class ClaimWavefunction:
             "contradiction_signal": contra_sig,
             "social_traction": traction,
             "social_traction_weight": SOCIAL_TRACTION_WEIGHT_IN_EPISTEMIC,
+            "reinforcement_count": reinforcement_count,
             "amplitudes": amplitudes,
             "probabilities": probs_arr.tolist() if hasattr(probs_arr, 'tolist') else list(probs_arr),
             "vqe_backend": vqe_backend,

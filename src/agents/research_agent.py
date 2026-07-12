@@ -92,6 +92,7 @@ class ResearchState(TypedDict):
     query: str
     entities: List[str]
     structured_filters: Dict[str, Any]
+    history: List[Dict[str, str]]
     
     # Internal & Outputs
     found_nodes: List[Dict[str, Any]]
@@ -190,7 +191,13 @@ def _compute_wavefunction_scores(
                 continue
             any_pulse = True
             claim_text = node.get("preview", "") or name
-            cc = wavefunction.score_claim(claim_text, evidence)
+            
+            from src.scheduler import _get_reinforcement_count
+            from src.wiki.writer import slugify
+            slug = slugify(name)
+            rc = _get_reinforcement_count(slug)
+            
+            cc = wavefunction.score_claim(claim_text, evidence, reinforcement_count=rc)
             scored[name] = {
                 "epistemic_confidence": cc.epistemic_confidence,
                 "social_traction": cc.social_traction,
@@ -374,13 +381,15 @@ class ResearchAgent:
         entities: List[str] = None,
         structured_filters: Dict[str, Any] = None,
         thread_id: str = "default_thread",
-        human_approved: bool = False
+        human_approved: bool = False,
+        history: List[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         
         initial_state = ResearchState(
             query=query,
             entities=entities or [],
             structured_filters=structured_filters or {},
+            history=history or [],
             found_nodes=[],
             graph_context=[],
             credibility_scores={},
@@ -407,7 +416,7 @@ class ResearchAgent:
         # Generate summary using local LLM if possible
         summary = ""
         if final_state.get("assembled_context"):
-            summary = self._generate_summary(query, final_state["assembled_context"])
+            summary = self._generate_summary(query, final_state["assembled_context"], history=history)
             
         # Build inferred events/entities from wavefunction scores if available
         inferred_events: list = []
@@ -456,7 +465,7 @@ class ResearchAgent:
         }
 
     @cache_decorator(prefix="mcp", ttl=300)
-    def _generate_summary(self, query: str, context: str) -> str:
+    def _generate_summary(self, query: str, context: str, history: List[Dict[str, str]] = None) -> str:
         if get_active_provider() == "simulated":
             return f"Lore Summary: Detailed report matches query '{query}'."
             
@@ -472,12 +481,20 @@ class ResearchAgent:
         Synthesize a clean summary including references to specific entities, credibility values, and connections.
         """
         
+        messages = [
+            {"role": "system", "content": "You are a helpful researcher summarizing UFO/anomalous lore."}
+        ]
+        if history:
+            for turn in history:
+                role = turn.get("role")
+                content = turn.get("content")
+                if role in ("user", "assistant") and content:
+                    messages.append({"role": role, "content": content})
+        messages.append({"role": "user", "content": prompt})
+
         payload = {
             "model": model_name,
-            "messages": [
-                {"role": "system", "content": "You are a helpful researcher summarizing UFO/anomalous lore."},
-                {"role": "user", "content": prompt}
-            ],
+            "messages": messages,
             "temperature": 0.3
         }
         

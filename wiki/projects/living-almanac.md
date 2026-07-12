@@ -443,6 +443,7 @@ Logs:
 - [[apple-reference-guides]] — SwiftUI coding refs for timeline slider UI
 - [[chat-to-wiki-pipeline]] — existing scheduler pattern to extend
 - [[chickensoup-living-almanac-implementation-spec]] — upstream spec (if ingested as wiki page, else raw file)
+- [[master-implementation-plan]] — next phase: 6-stage hardening plan (XSS → evidence pipeline → cohesion → idle-driven scheduling → query intelligence → verification)
 
 ---
 

@@ -187,72 +187,88 @@ class TribunalAgent:
 
         logger.info(f"Tribunal triggered for claim '{claim_text[:60]}' — state={state_label}, divergence={divergence_risk:.3f}")
 
-        evidence_context = self._build_evidence_context(claim_text, evidence, wavefunction)
-
-        # Three adversarial positions — same evidence, different priors
-        skeptic_prompt = f"{evidence_context}\n\nProvide your skeptical position on this claim with citations."
-        empiricist_prompt = f"{evidence_context}\n\nProvide your empiricist position with quantitative assessment and citations."
-        believer_prompt = f"{evidence_context}\n\nProvide your narrativist/believer position with lore-consistency analysis and citations."
-
-        skeptic_pos, skeptic_cites = self._query_llm(SKEPTIC_SYSTEM, skeptic_prompt, "Skeptic")
-        empiricist_pos, empiricist_cites = self._query_llm(EMPIRICIST_SYSTEM, empiricist_prompt, "Empiricist")
-        believer_pos, believer_cites = self._query_llm(BELIEVER_SYSTEM, believer_prompt, "Believer")
-
-        # Referee synthesis
-        referee_input = (
-            f"CLAIM: {claim_text}\n\n"
-            f"WAVEFUNCTION: {json.dumps(wavefunction, indent=2)}\n\n"
-            f"SKEPTIC POSITION:\n{skeptic_pos}\n\n"
-            f"EMPIRICIST POSITION:\n{empiricist_pos}\n\n"
-            f"BELIEVER POSITION:\n{believer_pos}\n\n"
-            f"All three positions must have their citations preserved. Do not collapse disagreement away."
-        )
-
-        referee_raw, _ = self._query_llm(REFEREE_SYSTEM, referee_input, "Referee")
-
-        # Try to parse referee JSON
-        final_label = state_label
-        synthesis = referee_raw
-        disagreements: List[Dict[str, str]] = []
-
+        from src.idle_sentinel import IdleSentinel
+        IdleSentinel.update_activity("tribunal", "start")
         try:
-            # Extract JSON block if wrapped in ```json
-            import re
-            json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", referee_raw, re.DOTALL)
-            if json_match:
-                parsed = json.loads(json_match.group(1))
-            else:
-                parsed = json.loads(referee_raw)
+            evidence_context = self._build_evidence_context(claim_text, evidence, wavefunction)
 
-            final_label = parsed.get("final_state_label", state_label)
-            synthesis = parsed.get("synthesis", referee_raw)
-            disagreements = parsed.get("disagreements", [])
-        except Exception as parse_err:
-            logger.debug(f"Failed to parse referee JSON, using raw: {parse_err}")
-            # Heuristic: extract disagreements from position differences
-            disagreements = [
-                {
-                    "topic": "Overall assessment",
-                    "skeptic": skeptic_pos[:500],
-                    "empiricist": empiricist_pos[:500],
-                    "believer": believer_pos[:500],
-                    "resolution": f"Unparsed referee output — see synthesis field. Original label {state_label} retained as {final_label}.",
-                }
-            ]
+            # Three adversarial positions — same evidence, different priors
+            skeptic_prompt = f"{evidence_context}\n\nProvide your skeptical position on this claim with citations."
+            empiricist_prompt = f"{evidence_context}\n\nProvide your empiricist position with quantitative assessment and citations."
+            believer_prompt = f"{evidence_context}\n\nProvide your narrativist/believer position with lore-consistency analysis and citations."
 
-        return {
-            "triggered": True,
-            "claim_text": claim_text,
-            "wavefunction": wavefunction,
-            "divergence_risk": divergence_risk,
-            "skeptic_position": skeptic_pos,
-            "empiricist_position": empiricist_pos,
-            "believer_position": believer_pos,
-            "skeptic_citations": skeptic_cites,
-            "empiricist_citations": empiricist_cites,
-            "believer_citations": believer_cites,
-            "referee_synthesis": synthesis,
-            "final_state_label": final_label,
-            "disagreements": disagreements,
-            "all_citations": list(set(skeptic_cites + empiricist_cites + believer_cites)),
-        }
+            skeptic_pos, skeptic_cites = self._query_llm(SKEPTIC_SYSTEM, skeptic_prompt, "Skeptic")
+            empiricist_pos, empiricist_cites = self._query_llm(EMPIRICIST_SYSTEM, empiricist_prompt, "Empiricist")
+            believer_pos, believer_cites = self._query_llm(BELIEVER_SYSTEM, believer_prompt, "Believer")
+
+            # Referee synthesis
+            referee_input = (
+                f"CLAIM: {claim_text}\n\n"
+                f"WAVEFUNCTION: {json.dumps(wavefunction, indent=2)}\n\n"
+                f"SKEPTIC POSITION:\n{skeptic_pos}\n\n"
+                f"EMPIRICIST POSITION:\n{empiricist_pos}\n\n"
+                f"BELIEVER POSITION:\n{believer_pos}\n\n"
+                f"All three positions must have their citations preserved. Do not collapse disagreement away."
+            )
+
+            referee_raw, _ = self._query_llm(REFEREE_SYSTEM, referee_input, "Referee")
+
+            # Parse final state and disagreements
+            synthesis = referee_raw
+            final_label = state_label
+            if "FINAL STATE:" in referee_raw:
+                try:
+                    parts = referee_raw.split("FINAL STATE:")
+                    lbl = parts[-1].strip().split()[0].strip().lower().replace(".", "").replace('"', '').replace("'", "")
+                    if lbl in ("corroborated", "contested", "unverified"):
+                        final_label = lbl
+                except Exception:
+                    pass
+
+            # Extract structured disagreements
+            disagreements = []
+            try:
+                # Basic parser for [DISAGREEMENT] blocks
+                blocks = referee_raw.split("[DISAGREEMENT]")
+                for b in blocks[1:]:
+                    lines = b.strip().split("\n")
+                    topic = lines[0].strip() if lines else "disagreement"
+                    disagreements.append({
+                        "topic": topic,
+                        "skeptic": skeptic_pos[:500],
+                        "empiricist": empiricist_pos[:500],
+                        "believer": believer_pos[:500],
+                        "resolution": b.strip()[:1000]
+                    })
+            except Exception:
+                pass
+
+            if not disagreements:
+                disagreements = [
+                    {
+                        "topic": "Overall assessment",
+                        "skeptic": skeptic_pos[:500],
+                        "empiricist": empiricist_pos[:500],
+                        "believer": believer_pos[:500],
+                        "resolution": f"Unparsed referee output — see synthesis field. Original label {state_label} retained as {final_label}.",
+                    }
+                ]
+
+            return {
+                "triggered": True,
+                "claim_text": claim_text,
+                "wavefunction": wavefunction,
+                "divergence_risk": divergence_risk,
+                "skeptic_position": skeptic_pos,
+                "empiricist_position": empiricist_pos,
+                "believer_position": believer_pos,
+                "skeptic_citations": skeptic_cites,
+                "empiricist_citations": empiricist_cites,
+                "believer_citations": believer_cites,
+                "referee_synthesis": synthesis,
+                "final_state_label": final_label,
+                "disagreements": disagreements,
+                "all_citations": list(set(skeptic_cites + empiricist_cites + believer_cites)),
+            }
+        finally:
+            IdleSentinel.update_activity("tribunal", "end")

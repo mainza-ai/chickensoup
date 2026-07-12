@@ -70,11 +70,11 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Could not start chat-to-wiki scheduler: {e}")
 
     try:
-        from src.scheduler import periodic_almanac_loop
-        almanac_task = asyncio.create_task(periodic_almanac_loop())
-        logger.info("Almanac scheduler started")
+        from src.scheduler import idle_ingestion_loop
+        almanac_task = asyncio.create_task(idle_ingestion_loop())
+        logger.info("Idle-driven ingestion loop started")
     except Exception as e:
-        logger.warning(f"Could not start almanac scheduler: {e}")
+        logger.warning(f"Could not start idle-driven ingestion loop: {e}")
 
     yield
     logger.info("Shutting down chickensoup API...")
@@ -502,6 +502,8 @@ async def post_query(request: QueryRequest):
     """Submits a query to search the knowledge graph and generate an answer summary using Orchestrator."""
     try:
         import uuid
+        from src.idle_sentinel import IdleSentinel
+        IdleSentinel.update_activity("query")
 
         conversation_id = request.conversation_id or str(uuid.uuid4())
         history: List[Dict[str, str]] = []
@@ -1164,6 +1166,9 @@ async def websocket_agent_endpoint(websocket: WebSocket):
             # Wait for incoming messages from the client
             data = await websocket.receive_text()
             logger.info(f"WebSocket received query: {data}")
+            
+            from src.idle_sentinel import IdleSentinel
+            IdleSentinel.update_activity("websocket")
             
             # Start a span for tracing this WebSocket interaction
             with tracer.start_as_current_span("ws_agent_query"):
@@ -2166,6 +2171,33 @@ async def get_pulse_snapshot(filepath: str):
         return data
     except Exception as e:
         logger.error(f"Failed to load snapshot: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/entities/drafts", dependencies=[Depends(verify_api_key)])
+async def get_entities_drafts():
+    """Lists all entity drafts proposed in the system."""
+    try:
+        from src.discovery_agent import list_drafts
+        return list_drafts()
+    except Exception as e:
+        logger.error(f"Failed to list drafts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/entities/{slug}/promote", dependencies=[Depends(verify_api_key)])
+async def post_entity_promote(slug: str):
+    """Promotes an entity draft to published wiki entities."""
+    try:
+        from src.discovery_agent import promote_draft
+        success = promote_draft(slug)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Draft '{slug}' not found or promotion failed")
+        return {"success": True, "slug": slug}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to promote draft '{slug}': {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
