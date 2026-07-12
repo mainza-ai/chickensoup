@@ -3,14 +3,18 @@ import SwiftUI
 struct PulsesHistorySection: View {
     let history: [APIPulseHistoryEntry]
     let onPulseSelected: (APIPulseHistoryEntry) -> Void
+    let onPulseRerun: (String) -> Void
     
     @State private var showAllSnapshots = false
     @State private var selectedFilter: IngestionFilter = .all
+    @State private var isPurging = false
+    
+    @Environment(AlmanacService.self) private var almanacService
 
     enum IngestionFilter: String, CaseIterable, Identifiable {
-        case all = "All"
-        case sourced = "Sourced"
-        case empty = "Empty"
+        case all = "[ All ]"
+        case sourced = "[ Sourced ]"
+        case empty = "[ Empty ]"
         
         var id: String { rawValue }
     }
@@ -28,12 +32,28 @@ struct PulsesHistorySection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("SNAPSHOT FEED")
-                .font(.caption)
-                .bold()
-                .foregroundStyle(DesignConstants.systemOrangeText)
+            HStack {
+                Text("SNAPSHOT FEED")
+                    .font(.caption)
+                    .bold()
+                    .foregroundStyle(DesignConstants.systemOrangeText)
+                
+                Spacer()
+                
+                if isPurging {
+                    ProgressView().scaleEffect(0.6)
+                } else if history.contains(where: { $0.evidenceCount == 0 }) {
+                    Button(action: purgeEmpty) {
+                        Label("Purge Empty Logs", systemImage: "trash")
+                            .font(.caption2)
+                            .bold()
+                            .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Purge all empty pulse snapshots")
+                }
+            }
             
-            // Status filter segmented picker
             Picker("Status Filter", selection: $selectedFilter) {
                 ForEach(IngestionFilter.allCases) { filter in
                     Text(filter.rawValue).tag(filter)
@@ -50,7 +70,6 @@ struct PulsesHistorySection: View {
                         .foregroundStyle(DesignConstants.secondaryText)
                         .padding(.vertical, 20)
                 } else {
-                    // Show only first 5 on dashboard
                     ForEach(displayed.prefix(5), id: \.file) { entry in
                         pulseRow(for: entry)
                     }
@@ -92,44 +111,68 @@ struct PulsesHistorySection: View {
                 }
             }
             #if os(macOS)
-            .frame(minWidth: 500, minHeight: 500)
+            .frame(minWidth: 550, minHeight: 500)
             #endif
         }
     }
 
     @ViewBuilder
     private func pulseRow(for entry: APIPulseHistoryEntry) -> some View {
-        Button(action: {
-            onPulseSelected(entry)
-            showAllSnapshots = false
-        }) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(entry.entityName)
-                        .font(.subheadline)
+        HStack(spacing: 12) {
+            Button(action: {
+                onPulseSelected(entry)
+                showAllSnapshots = false
+            }) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(entry.entityName)
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Text("Pulsed: \(entry.date)")
+                            .font(.caption2)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("\(entry.evidenceCount) claims")
+                        .font(.system(.caption2, design: .monospaced))
                         .bold()
-                        .foregroundStyle(DesignConstants.primaryText)
-                    Text("Pulsed: \(entry.date)")
-                        .font(.caption2)
-                        .foregroundStyle(DesignConstants.secondaryText)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(DesignConstants.systemOrange.opacity(0.15))
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                        .clipShape(Capsule())
                 }
-                
-                Spacer()
-                
-                Text("\(entry.evidenceCount) claims")
-                    .font(.system(.caption2, design: .monospaced))
-                    .bold()
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(DesignConstants.systemOrange.opacity(0.15))
-                    .foregroundStyle(DesignConstants.systemOrangeText)
-                    .clipShape(Capsule())
             }
-            .padding(10)
-            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open pulse details for \(entry.entityName)")
+            
+            Button(action: {
+                onPulseRerun(entry.entityName)
+                showAllSnapshots = false
+            }) {
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(DesignConstants.systemOrange)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Re-run ingestion pulse for \(entry.entityName)")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Open pulse details for \(entry.entityName)")
+        .padding(10)
+        .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+    }
+    
+    private func purgeEmpty() {
+        isPurging = true
+        Task {
+            let success = await almanacService.purgeEmptyPulses()
+            if success {
+                await almanacService.fetchPulseHistory()
+            }
+            isPurging = false
+        }
     }
 }

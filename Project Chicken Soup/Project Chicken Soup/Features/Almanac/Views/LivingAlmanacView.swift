@@ -67,7 +67,8 @@ struct LivingAlmanacView: View {
                     )
                     PulsesHistorySection(
                         history: almanacService.pulseHistory,
-                        onPulseSelected: { openPulseSnapshot($0) }
+                        onPulseSelected: { openPulseSnapshot($0) },
+                        onPulseRerun: { triggerPulse(for: $0) }
                     )
                 }
                 .padding(.horizontal)
@@ -130,7 +131,8 @@ struct LivingAlmanacView: View {
                     case .feed:
                         PulsesHistorySection(
                             history: almanacService.pulseHistory,
-                            onPulseSelected: { openPulseSnapshot($0) }
+                            onPulseSelected: { openPulseSnapshot($0) },
+                            onPulseRerun: { triggerPulse(for: $0) }
                         )
                         
                         EntanglementMatrixSection(
