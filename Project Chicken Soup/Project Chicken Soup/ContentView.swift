@@ -12,13 +12,18 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TemporalEvent.timestamp) private var events: [TemporalEvent]
     @Query private var entities: [LoreEntity]
-    
+
+    @Environment(DataStoreBackupService.self) private var backupService
+
     @State private var selectedEvent: TemporalEvent?
     @State private var queryText = ""
     @State private var isStructuredQuery = false
     @State private var showIngestion = false
     @State private var showSettings = false
     @State private var messages: [ChatMessage] = []
+
+    // Migration guard prompt
+    @State private var showMigrationAlert = false
     
     // Desktop Tab Selection picker
     enum DetailTab: String, CaseIterable, Identifiable {
@@ -51,8 +56,20 @@ struct ContentView: View {
         desktopLayout
             .task {
                 await fetchInitialData()
+                showMigrationAlertIfNeeded()
             }
             .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
+            .alert("Restore from Backup?", isPresented: $showMigrationAlert) {
+                Button("Restore Latest Backup") {
+                    restoreFromLatestBackup()
+                }
+                Button("Start Fresh", role: .destructive) {
+                    backupService.clearMigrationGuardFlags()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Your data store is empty, but a backup exists. You can restore your previous data or start with fresh seed data.")
+            }
         #else
         Group {
             if horizontalSizeClass == .compact {
@@ -63,9 +80,43 @@ struct ContentView: View {
         }
         .task {
             await fetchInitialData()
+            showMigrationAlertIfNeeded()
         }
         .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
+        .alert("Restore from Backup?", isPresented: $showMigrationAlert) {
+            Button("Restore Latest Backup") {
+                restoreFromLatestBackup()
+            }
+            Button("Start Fresh", role: .destructive) {
+                backupService.clearMigrationGuardFlags()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Your data store is empty, but a backup exists. You can restore your previous data or start with fresh seed data.")
+        }
         #endif
+    }
+    
+    private func showMigrationAlertIfNeeded() {
+        guard backupService.storeIsEmptyAndBackupAvailable || backupService.missingStoreDetected else { return }
+        backupService.refreshBackupList()
+        guard backupService.storeIsEmptyAndBackupAvailable else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.showMigrationAlert = true
+        }
+    }
+
+    private func restoreFromLatestBackup() {
+        guard let latestBackup = backupService.availableBackups.first else { return }
+        Task {
+            let success = await backupService.restoreFromBackup(latestBackup)
+            if !success, let err = backupService.lastRestoreError {
+                print("Migration restore failed: \(err)")
+            } else {
+                backupService.clearMigrationGuardFlags()
+            }
+            backupService.refreshBackupList()
+        }
     }
     
     private func fetchInitialData() async {
