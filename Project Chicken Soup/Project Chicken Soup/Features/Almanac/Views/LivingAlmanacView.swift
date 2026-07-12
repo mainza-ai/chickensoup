@@ -618,6 +618,9 @@ struct LivingAlmanacView: View {
                                     .font(.system(.caption2, design: .monospaced))
                             }
                         }
+                        .padding()
+                        .background(DesignConstants.controlBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                         #else
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(spacing: 8) {
@@ -648,10 +651,10 @@ struct LivingAlmanacView: View {
                                 }
                             }
                         }
-                        #endif
                         .padding()
                         .background(DesignConstants.controlBackground)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        #endif
                         
                         if !div.drivingClaims.isEmpty {
                             VStack(alignment: .leading, spacing: 6) {
