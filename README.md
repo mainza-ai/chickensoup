@@ -324,7 +324,7 @@ chickensoup/
 - **Python**: 3.12+ (managed with `uv` or `.python-version`)
 - **Xcode**: 16.0+ (for SwiftUI client)
 - **Services**: Docker (for Neo4j & Redis)
-- **Optional (Living Almanac)**: `last30days` CLI (`npx last30days`) + API keys for X, Perplexity, ScrapeCreators, Brave (only if `LAST30DAYS_ENABLED=true`)
+- **Optional (Living Almanac)**: `last30days-skill/` cloned repo (not an npm package). `npx last30days` returns E404. Script auto-resolved from repo. API keys for X, Reddit, YouTube, Brave optional (only if `LAST30DAYS_ENABLED=true`)
 
 ### 2. Backend Setup
 ```bash
@@ -339,9 +339,15 @@ uv run uvicorn src.main:app --reload
 ### 3. Living Almanac — To Reach Final DOD
 
 ```bash
-# 1. Install last30days skill (optional, only for live data)
-npm install -g last30days
-# or use npx last30days
+# 1. Initialize and update last30days-skill submodule (or clone directly)
+git submodule update --init --recursive
+# If not using submodules:
+# git clone https://github.com/mvanhorn/last30days-skill.git last30days-skill
+# Ensure the script is executable:
+chmod +x last30days-skill/skills/last30days/scripts/last30days.py
+
+# Update to latest upstream release whenever needed:
+# git submodule update --remote last30days-skill
 
 # 2. Enable in .env
 echo "LAST30DAYS_ENABLED=true" >> .env
@@ -371,6 +377,16 @@ curl -X POST "http://127.0.0.1:8000/almanac/generate?dry_run=false"
 # 7. Let scheduler run overnight (set Tier-1 entities in wiki frontmatter tier: 1)
 # By morning, a dated brief appears unattended in wiki/raw/almanac/
 ```
+
+### Living Almanac Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| All entities show `(error, 0 evidence)` | Ensure `LAST30DAYS_ENABLED=true`, `LAST30DAYS_BINARY_PATH` set or workspace root resolves to 3 dirname hops in `pulse_agent.py`, script has execute permission, timeout ≥ 120s |
+| `npm error 404 GET https://registry.npmjs.org/last30days` | `last30days` is not an npm package — it's a cloned repo at `last30days-skill/`. Set `LAST30DAYS_BINARY_PATH` so the server uses the Python script instead of `npx`. |
+| `/entities/{name}/divergence` returns 404 or empty | Swift `AlmanacService` must NOT percent-encode entity names before passing to `APIClient.request`. Double-encoding (`%20` → `%2520`) causes FastAPI 404. |
+| Pulse fails with `Permission denied` | `chmod +x last30days-skill/skills/last30days/scripts/last30days.py` |
+| Pulse times out after 60s | Increase `LAST30DAYS_PULSE_TIMEOUT_SECONDS` to 120 (script takes ~58s cold start) |
 
 ### 4. SwiftUI Client Setup
 ```bash

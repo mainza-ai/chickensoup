@@ -19,6 +19,7 @@ public final class ConfigService {
     public var llmActiveModel: String = ""
     public var llmAvailableModels: [String] = []
     public var isSavingLLMConfig = false
+    public var last30daysEnabled: Bool = false
 
     public var isDarkMode: Bool = {
         if UserDefaults.standard.object(forKey: "isDarkMode") == nil {
@@ -48,6 +49,7 @@ public final class ConfigService {
             self.llmActiveProvider = response.llmActiveProvider
             self.llmActiveModel = response.llmActiveModel
             self.llmAvailableModels = response.llmAvailableModels
+            self.last30daysEnabled = response.last30daysEnabled
         } catch {
             logger.error("Failed to fetch configurations: \(error.localizedDescription)")
         }
@@ -78,6 +80,7 @@ public final class ConfigService {
             self.llmActiveProvider = response.llmActiveProvider
             self.llmActiveModel = response.llmActiveModel
             self.llmAvailableModels = response.llmAvailableModels
+            self.last30daysEnabled = response.last30daysEnabled
             return true
         } catch {
             logger.error("Failed to save configurations: \(error.localizedDescription)")
@@ -115,6 +118,7 @@ public final class ConfigService {
             self.llmAvailableModels = response.llmAvailableModels
             self.llmActiveProvider = response.llmActiveProvider
             self.llmActiveModel = response.llmActiveModel
+            self.last30daysEnabled = response.last30daysEnabled
         } catch {
             logger.error("Failed to refresh LLM discovery: \(error.localizedDescription)")
         }

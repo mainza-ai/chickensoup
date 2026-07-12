@@ -43,11 +43,16 @@ class PulseAgent:
             path = settings.LAST30DAYS_BINARY_PATH.strip()
             if os.path.isfile(path) and os.access(path, os.X_OK):
                 return [path]
-            # If it's not executable file, treat as command template? For now return as single binary
             if os.path.isfile(path):
                 return [path]
             logger.warning(f"LAST30DAYS_BINARY_PATH set but not found/executable: {path}")
-            # Fall through to npx attempt
+
+        # Check for cloned workspace repository last30days.py
+        import sys
+        workspace_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        cloned_script = os.path.join(workspace_root, "last30days-skill", "skills", "last30days", "scripts", "last30days.py")
+        if os.path.exists(cloned_script):
+            return [sys.executable, cloned_script]
 
         # Try npx last30days
         npx_path = shutil.which("npx")
@@ -81,8 +86,12 @@ class PulseAgent:
                     cmd.append(val)
 
         # Prefer JSON output
-        if "--json" not in cmd:
-            cmd.append("--json")
+        is_python_script = any("last30days.py" in p for p in binary_parts)
+        if is_python_script:
+            cmd.extend(["--emit", "json"])
+        else:
+            if "--json" not in cmd:
+                cmd.append("--json")
 
         return cmd
 
@@ -152,10 +161,9 @@ class PulseAgent:
                 shell=False,
                 env={**os.environ, "NO_COLOR": "1"},
             )
-            raw_output = result.stdout or result.stderr or ""
+            raw_output = result.stdout or ""
 
             if result.returncode != 0:
-                # Even on non-zero, we try to parse stdout if it exists
                 logger.warning(f"last30days CLI exited {result.returncode} for '{entity_name}': stderr={result.stderr[:500]}")
                 if not raw_output.strip():
                     return PulseResult(

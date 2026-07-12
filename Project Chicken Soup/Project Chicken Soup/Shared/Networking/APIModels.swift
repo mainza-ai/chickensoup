@@ -258,6 +258,7 @@ public struct APIConfigResponse: Codable {
     public var llmActiveModel: String
     public var llmAvailableModels: [String]
     public var llmProviders: [String: APILLMProviderStatus]
+    public var last30daysEnabled: Bool
 
     enum CodingKeys: String, CodingKey {
         case success
@@ -270,9 +271,10 @@ public struct APIConfigResponse: Codable {
         case llmActiveModel = "llm_active_model"
         case llmAvailableModels = "llm_available_models"
         case llmProviders = "llm_providers"
+        case last30daysEnabled = "last30days_enabled"
     }
 
-    public init(success: Bool, quantumBackend: String, quantumHardwareEnabled: Bool, ibmApiTokenSet: Bool, dwaveApiTokenSet: Bool, ionqApiTokenSet: Bool, llmActiveProvider: String, llmActiveModel: String, llmAvailableModels: [String], llmProviders: [String: APILLMProviderStatus]) {
+    public init(success: Bool, quantumBackend: String, quantumHardwareEnabled: Bool, ibmApiTokenSet: Bool, dwaveApiTokenSet: Bool, ionqApiTokenSet: Bool, llmActiveProvider: String, llmActiveModel: String, llmAvailableModels: [String], llmProviders: [String: APILLMProviderStatus], last30daysEnabled: Bool = false) {
         self.success = success
         self.quantumBackend = quantumBackend
         self.quantumHardwareEnabled = quantumHardwareEnabled
@@ -283,6 +285,7 @@ public struct APIConfigResponse: Codable {
         self.llmActiveModel = llmActiveModel
         self.llmAvailableModels = llmAvailableModels
         self.llmProviders = llmProviders
+        self.last30daysEnabled = last30daysEnabled
     }
 }
 
@@ -818,5 +821,439 @@ public struct APIBulkIngestResponse: Codable {
         self.pagesIngested = pagesIngested
         self.nodesCreated = nodesCreated
         self.relationshipsCreated = relationshipsCreated
+    }
+}
+
+// MARK: - AnyDecodableValue Utility
+
+public enum AnyDecodableValue: Codable, Hashable {
+    case string(String)
+    case double(Double)
+    case bool(Bool)
+    case null
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let str = try? container.decode(String.self) {
+            self = .string(str)
+        } else if let dbl = try? container.decode(Double.self) {
+            self = .double(dbl)
+        } else if let bl = try? container.decode(Bool.self) {
+            self = .bool(bl)
+        } else {
+            self = .null
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let s): try container.encode(s)
+        case .double(let d): try container.encode(d)
+        case .bool(let b): try container.encode(b)
+        case .null: try container.encodeNil()
+        }
+    }
+    
+    public var stringValue: String {
+        switch self {
+        case .string(let s): return s
+        case .double(let d): return String(d)
+        case .bool(let b): return String(b)
+        case .null: return "null"
+        }
+    }
+}
+
+// MARK: - Living Almanac Models
+
+public struct APIClaimEvidence: Codable, Identifiable, Hashable {
+    public var id: String { clusterId.isEmpty ? UUID().uuidString : clusterId }
+    public var claimText: String
+    public var sourcePlatform: String
+    public var engagementCount: Int
+    public var url: String
+    public var timestamp: String
+    public var clusterId: String
+    public var polymarketOdds: Double?
+    public var engagementDecayed: Double?
+    public var provenanceChain: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case claimText = "claim_text"
+        case sourcePlatform = "source_platform"
+        case engagementCount = "engagement_count"
+        case url
+        case timestamp
+        case clusterId = "cluster_id"
+        case polymarketOdds = "polymarket_odds"
+        case engagementDecayed = "engagement_decayed"
+        case provenanceChain = "provenance_chain"
+    }
+
+    public init(claimText: String, sourcePlatform: String, engagementCount: Int = 0, url: String = "", timestamp: String = "", clusterId: String = "", polymarketOdds: Double? = nil, engagementDecayed: Double? = nil, provenanceChain: [String] = []) {
+        self.claimText = claimText
+        self.sourcePlatform = sourcePlatform
+        self.engagementCount = engagementCount
+        self.url = url
+        self.timestamp = timestamp
+        self.clusterId = clusterId
+        self.polymarketOdds = polymarketOdds
+        self.engagementDecayed = engagementDecayed
+        self.provenanceChain = provenanceChain
+    }
+}
+
+public struct APIClaimConfidence: Codable, Hashable {
+    public var epistemicConfidence: Double
+    public var socialTraction: Double
+    public var stateLabel: String
+    public var collapsed: Bool
+    public var evidenceCount: Int
+    public var lastPulseAt: String?
+    public var scoringVersion: String
+    public var scoringInputs: [String: AnyDecodableValue]?
+    public var claimText: String?
+
+    enum CodingKeys: String, CodingKey {
+        case epistemicConfidence = "epistemic_confidence"
+        case socialTraction = "social_traction"
+        case stateLabel = "state_label"
+        case collapsed
+        case evidenceCount = "evidence_count"
+        case lastPulseAt = "last_pulse_at"
+        case scoringVersion = "scoring_version"
+        case scoringInputs = "scoring_inputs"
+        case claimText = "claim_text"
+    }
+
+    public init(epistemicConfidence: Double, socialTraction: Double, stateLabel: String, collapsed: Bool = false, evidenceCount: Int = 0, lastPulseAt: String? = nil, scoringVersion: String = "v1-wavefunction", scoringInputs: [String: AnyDecodableValue]? = nil, claimText: String? = nil) {
+        self.epistemicConfidence = epistemicConfidence
+        self.socialTraction = socialTraction
+        self.stateLabel = stateLabel
+        self.collapsed = collapsed
+        self.evidenceCount = evidenceCount
+        self.lastPulseAt = lastPulseAt
+        self.scoringVersion = scoringVersion
+        self.scoringInputs = scoringInputs
+        self.claimText = claimText
+    }
+}
+
+public struct APIDrivingClaim: Codable, Identifiable, Hashable {
+    public var id: String { claimText }
+    public var claimText: String
+    public var platform: String
+    public var oldConfidence: Double?
+    public var newConfidence: Double
+    public var delta: Double
+
+    enum CodingKeys: String, CodingKey {
+        case claimText = "claim_text"
+        case platform
+        case oldConfidence = "old_confidence"
+        case newConfidence = "new_confidence"
+        case delta
+    }
+
+    public init(claimText: String, platform: String = "", oldConfidence: Double? = nil, newConfidence: Double, delta: Double = 0.0) {
+        self.claimText = claimText
+        self.platform = platform
+        self.oldConfidence = oldConfidence
+        self.newConfidence = newConfidence
+        self.delta = delta
+    }
+}
+
+public struct APIDivergenceResult: Codable, Hashable {
+    public var entityName: String
+    public var divergenceRisk: Double
+    public var canonVectorHash: String
+    public var liveVectorHash: String
+    public var drivingClaims: [APIDrivingClaim]
+    public var computedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case entityName = "entity_name"
+        case divergenceRisk = "divergence_risk"
+        case canonVectorHash = "canon_vector_hash"
+        case liveVectorHash = "live_vector_hash"
+        case drivingClaims = "driving_claims"
+        case computedAt = "computed_at"
+    }
+
+    public init(entityName: String, divergenceRisk: Double, canonVectorHash: String = "", liveVectorHash: String = "", drivingClaims: [APIDrivingClaim] = [], computedAt: String = "") {
+        self.entityName = entityName
+        self.divergenceRisk = divergenceRisk
+        self.canonVectorHash = canonVectorHash
+        self.liveVectorHash = liveVectorHash
+        self.drivingClaims = drivingClaims
+        self.computedAt = computedAt
+    }
+}
+
+public struct APIPulseResult: Codable, Hashable {
+    public var entityName: String
+    public var status: String // "success", "disabled", "budget_exceeded", "error", "no_data"
+    public var evidence: [APIClaimEvidence]
+    public var rawSnapshotPath: String?
+    public var budgetRemaining: Double
+    public var error: String?
+
+    enum CodingKeys: String, CodingKey {
+        case entityName = "entity_name"
+        case status
+        case evidence
+        case rawSnapshotPath = "raw_snapshot_path"
+        case budgetRemaining = "budget_remaining"
+        case error
+    }
+
+    public init(entityName: String, status: String, evidence: [APIClaimEvidence] = [], rawSnapshotPath: String? = nil, budgetRemaining: Double = 0.0, error: String? = nil) {
+        self.entityName = entityName
+        self.status = status
+        self.evidence = evidence
+        self.rawSnapshotPath = rawSnapshotPath
+        self.budgetRemaining = budgetRemaining
+        self.error = error
+    }
+}
+
+public struct APITimelinePoint: Codable, Identifiable, Hashable {
+    public var id: String { date }
+    public var date: String
+    public var epistemicConfidence: Double
+    public var socialTraction: Double
+    public var divergenceRisk: Double
+    public var activeClaims: [String]
+    public var pulseFile: String?
+    public var wikiCommit: String?
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case epistemicConfidence = "epistemic_confidence"
+        case socialTraction = "social_traction"
+        case divergenceRisk = "divergence_risk"
+        case activeClaims = "active_claims"
+        case pulseFile = "pulse_file"
+        case wikiCommit = "wiki_commit"
+    }
+
+    public init(date: String, epistemicConfidence: Double = 0.5, socialTraction: Double = 0.0, divergenceRisk: Double = 0.0, activeClaims: [String] = [], pulseFile: String? = nil, wikiCommit: String? = nil) {
+        self.date = date
+        self.epistemicConfidence = epistemicConfidence
+        self.socialTraction = socialTraction
+        self.divergenceRisk = divergenceRisk
+        self.activeClaims = activeClaims
+        self.pulseFile = pulseFile
+        self.wikiCommit = wikiCommit
+    }
+}
+
+public struct APITimelineResponse: Codable {
+    public var entityName: String
+    public var days: Int
+    public var points: [APITimelinePoint]
+    public var total: Int
+
+    enum CodingKeys: String, CodingKey {
+        case entityName = "entity_name"
+        case days
+        case points
+        case total
+    }
+}
+
+public struct APIPulseHistoryEntry: Codable, Identifiable, Hashable {
+    public var id: String { file }
+    public var entityName: String
+    public var date: String
+    public var timestamp: String
+    public var evidenceCount: Int
+    public var file: String
+
+    enum CodingKeys: String, CodingKey {
+        case entityName = "entity_name"
+        case date
+        case timestamp
+        case evidenceCount = "evidence_count"
+        case file
+    }
+}
+
+public struct APIPulseHistoryResponse: Codable {
+    public var pulses: [APIPulseHistoryEntry]
+    public var total: Int
+}
+
+public struct APIBudgetStatus: Codable, Hashable {
+    public var monthKey: String
+    public var spentUsd: Double
+    public var pullsCount: Int
+    public var remainingUsd: Double
+    public var ceilingUsd: Double
+    public var onHold: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case monthKey = "month_key"
+        case spentUsd = "spent_usd"
+        case pullsCount = "pulls_count"
+        case remainingUsd = "remaining_usd"
+        case ceilingUsd = "ceiling_usd"
+        case onHold = "on_hold"
+    }
+
+    public init(monthKey: String = "", spentUsd: Double = 0.0, pullsCount: Int = 0, remainingUsd: Double = 0.0, ceilingUsd: Double = 0.0, onHold: Bool = false) {
+        self.monthKey = monthKey
+        self.spentUsd = spentUsd
+        self.pullsCount = pullsCount
+        self.remainingUsd = remainingUsd
+        self.ceilingUsd = ceilingUsd
+        self.onHold = onHold
+    }
+}
+
+public struct APIAlmanacHistoryEntry: Codable, Identifiable, Hashable {
+    public var id: String { path }
+    public var date: String
+    public var filename: String
+    public var path: String
+    public var sizeKb: Double
+    public var created: String
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case filename
+        case path
+        case sizeKb = "size_kb"
+        case created
+    }
+}
+
+public struct APIAlmanacHistoryResponse: Codable {
+    public var almanacs: [APIAlmanacHistoryEntry]
+    public var total: Int
+}
+
+public struct APIAlmanacGenerateResponse: Codable, Hashable {
+    public var status: String
+    public var date: String
+    public var htmlPath: String?
+    public var mdPath: String?
+    public var entitiesProcessed: Int
+    public var claimsMoved: Int
+    public var claimsCollapsed: Int
+    public var newlyContested: Int
+    public var entanglements: Int
+    public var elapsedSeconds: Double
+    public var error: String?
+    public var dryRun: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case date
+        case htmlPath = "html_path"
+        case mdPath = "md_path"
+        case entitiesProcessed = "entities_processed"
+        case claimsMoved = "claims_moved"
+        case claimsCollapsed = "claims_collapsed"
+        case newlyContested = "newly_contested"
+        case entanglements
+        case elapsedSeconds = "elapsed_seconds"
+        case error
+        case dryRun = "dry_run"
+    }
+
+    public init(status: String, date: String, htmlPath: String? = nil, mdPath: String? = nil, entitiesProcessed: Int = 0, claimsMoved: Int = 0, claimsCollapsed: Int = 0, newlyContested: Int = 0, entanglements: Int = 0, elapsedSeconds: Double = 0.0, error: String? = nil, dryRun: Bool = true) {
+        self.status = status
+        self.date = date
+        self.htmlPath = htmlPath
+        self.mdPath = mdPath
+        self.entitiesProcessed = entitiesProcessed
+        self.claimsMoved = claimsMoved
+        self.claimsCollapsed = claimsCollapsed
+        self.newlyContested = newlyContested
+        self.entanglements = entanglements
+        self.elapsedSeconds = elapsedSeconds
+        self.error = error
+        self.dryRun = dryRun
+    }
+}
+
+
+public struct APIEntanglementEntry: Codable, Identifiable, Hashable {
+    public var id: String { "\(entityA)-\(entityB)" }
+    public var entityA: String
+    public var entityB: String
+    public var entanglementScore: Double
+    public var coOccurrenceCount: Int
+    public var independentPlatforms: [String]
+    public var independentClusters: Int
+    public var isStrong: Bool
+    public var meyerWallachRaw: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case entityA = "entity_a"
+        case entityB = "entity_b"
+        case entanglementScore = "entanglement_score"
+        case coOccurrenceCount = "co_occurrence_count"
+        case independentPlatforms = "independent_platforms"
+        case independentClusters = "independent_clusters"
+        case isStrong = "is_strong"
+        case meyerWallachRaw = "meyer_wallach_raw"
+    }
+}
+
+public struct APIEntanglementResponse: Codable {
+    public var entityName: String
+    public var entanglements: [APIEntanglementEntry]
+    public var total: Int
+
+    enum CodingKeys: String, CodingKey {
+        case entityName = "entity_name"
+        case entanglements
+        case total
+    }
+}
+
+public struct APITribunalDisagreement: Codable, Hashable {
+    public var topic: String?
+    public var skeptic: String?
+    public var empiricist: String?
+    public var believer: String?
+    public var resolution: String?
+}
+
+public struct APITribunalResponse: Codable, Hashable {
+    public var triggered: Bool
+    public var claimText: String?
+    public var wavefunction: APIClaimConfidence?
+    public var divergenceRisk: Double?
+    public var skepticPosition: String?
+    public var empiricistPosition: String?
+    public var believerPosition: String?
+    public var skepticCitations: [String]?
+    public var empiricistCitations: [String]?
+    public var believerCitations: [String]?
+    public var refereeSynthesis: String?
+    public var finalStateLabel: String?
+    public var disagreements: [APITribunalDisagreement]?
+    public var allCitations: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case triggered
+        case claimText = "claim_text"
+        case wavefunction
+        case divergenceRisk = "divergence_risk"
+        case skepticPosition = "skeptic_position"
+        case empiricistPosition = "empiricist_position"
+        case believerPosition = "believer_position"
+        case skepticCitations = "skeptic_citations"
+        case empiricistCitations = "empiricist_citations"
+        case believerCitations = "believer_citations"
+        case refereeSynthesis = "referee_synthesis"
+        case finalStateLabel = "final_state_label"
+        case disagreements
+        case allCitations = "all_citations"
     }
 }

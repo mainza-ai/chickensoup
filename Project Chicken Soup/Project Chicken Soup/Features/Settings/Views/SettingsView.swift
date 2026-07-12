@@ -26,6 +26,13 @@ struct SettingsView: View {
     @State private var providerModels: [String: [String]] = [:]
     @State private var isProbingProvider = false
     
+    // Living Almanac states
+    @State private var selectedEntityForPulse: String = ""
+    @State private var showingPulseResult: APIPulseResult? = nil
+    @State private var showingPulseResultAlert = false
+    @State private var showingAlmanacResult: APIAlmanacGenerateResponse? = nil
+    @State private var showingAlmanacResultSheet = false
+    
     private let providerOptions = [
         ("auto", "Auto-detect"),
         ("omlx", "oMLX"),
@@ -41,6 +48,10 @@ struct SettingsView: View {
         ("ionq", "IonQ Aria Trapped-Ion QPU")
     ]
     
+    private var entities: [APIWikiPageListItem] {
+        backendService.wiki.wikiPages.filter { $0.pageType == "entities" }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: DesignConstants.loosePadding) {
@@ -49,6 +60,7 @@ struct SettingsView: View {
                 backendPickerSection
                 llmConfigSection
                 chatToWikiSection
+                livingAlmanacSection
                 apiTokenSection
                 saveButtonSection
             }
@@ -60,6 +72,102 @@ struct SettingsView: View {
         #endif
         .onAppear {
             loadCurrentConfig()
+            Task {
+                await backendService.wiki.fetchWikiPages(pageType: "entities")
+                await backendService.almanac.fetchBudgetStatus()
+                await backendService.almanac.fetchPulseHistory()
+                await backendService.almanac.fetchAlmanacHistory()
+            }
+        }
+        .alert("Pulse Ingestion Completed", isPresented: $showingPulseResultAlert, presenting: showingPulseResult) { res in
+            Button("OK", role: .cancel) { }
+        } message: { res in
+            if res.status == "success" {
+                Text("Successfully ingested \(res.evidence.count) claims for \(res.entityName).\nRemaining budget: $\(String(format: "%.2f", res.budgetRemaining))")
+            } else {
+                Text("Ingestion failed: \(res.error ?? res.status)")
+            }
+        }
+        .sheet(isPresented: $showingAlmanacResultSheet) {
+            if let res = showingAlmanacResult {
+                VStack(spacing: 20) {
+                    Text(res.dryRun ? "Almanac Dry Run Summary" : "Almanac Generated")
+                        .font(.title2)
+                        .bold()
+                        .padding(.top)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Status:")
+                                .bold()
+                            Spacer()
+                            Text(res.status)
+                                .foregroundStyle(res.status == "success" ? .green : .red)
+                        }
+                        HStack {
+                            Text("Date:")
+                                .bold()
+                            Spacer()
+                            Text(res.date)
+                        }
+                        HStack {
+                            Text("Entities Processed:")
+                                .bold()
+                            Spacer()
+                            Text("\(res.entitiesProcessed)")
+                        }
+                        HStack {
+                            Text("Claims Moved:")
+                                .bold()
+                            Spacer()
+                            Text("\(res.claimsMoved)")
+                        }
+                        HStack {
+                            Text("Claims Collapsed:")
+                                .bold()
+                            Spacer()
+                            Text("\(res.claimsCollapsed)")
+                        }
+                        HStack {
+                            Text("Newly Contested:")
+                                .bold()
+                            Spacer()
+                            Text("\(res.newlyContested)")
+                        }
+                        HStack {
+                            Text("Elapsed Time:")
+                                .bold()
+                            Spacer()
+                            Text("\(String(format: "%.1f", res.elapsedSeconds))s")
+                        }
+                        if let err = res.error {
+                            Text("Error: \(err)")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                    Spacer()
+
+                    Button(action: {
+                        showingAlmanacResultSheet = false
+                    }) {
+                        Text("Dismiss")
+                            .bold()
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(DesignConstants.systemOrange)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                }
+                .padding()
+                .presentationDetents([.medium])
+            }
         }
     }
 
@@ -473,6 +581,277 @@ struct SettingsView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                }
+            }
+            .padding(DesignConstants.standardPadding)
+            .background(DesignConstants.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
+                    .stroke(DesignConstants.glassBorderColor, lineWidth: 1)
+            )
+        }
+        .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var livingAlmanacSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("LIVING ALMANAC & EVIDENCE")
+                .font(.caption)
+                .bold()
+                .foregroundStyle(DesignConstants.systemOrangeText)
+
+            VStack(spacing: 16) {
+                // Subsection A: Status & Toggle info
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("last30days Ingestion Engine")
+                            .font(.headline)
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Text(backendService.config.last30daysEnabled ? "Active — ingesting live evidence feeds" : "Disabled — set LAST30DAYS_ENABLED=true in .env")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    Spacer()
+                    Circle()
+                        .fill(backendService.config.last30daysEnabled ? Color.green : Color.gray)
+                        .frame(width: 10, height: 10)
+                }
+                
+                Divider()
+                    .background(DesignConstants.dividerColor)
+
+                // Subsection B: Budget
+                if let budget = backendService.almanac.budgetStatus {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Monthly Budget Status")
+                                .font(.subheadline)
+                                .bold()
+                                .foregroundStyle(DesignConstants.primaryText)
+                            Spacer()
+                            Text("\(budget.monthKey)")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(Color.blue.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+
+                        let spent = budget.spentUsd
+                        let ceiling = budget.ceilingUsd
+                        let ratio = ceiling > 0 ? spent / ceiling : 0.0
+                        
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(height: 8)
+                                Capsule()
+                                    .fill(ratio > 0.8 ? Color.red : DesignConstants.systemOrange)
+                                    .frame(width: geo.size.width * CGFloat(min(ratio, 1.0)), height: 8)
+                            }
+                        }
+                        .frame(height: 8)
+
+                        HStack {
+                            Text("Spent $\(String(format: "%.2f", spent)) of $\(String(format: "%.2f", ceiling))")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                            Spacer()
+                            Text("\(budget.pullsCount) pulls")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                        }
+
+                        if budget.onHold {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundStyle(.red)
+                                    Text("Budget on HOLD (Remaining < 2× cost per pull)")
+                                        .font(.caption)
+                                        .bold()
+                                        .foregroundStyle(.red)
+                                }
+                                
+                                Button(action: {
+                                    Task {
+                                        _ = await backendService.almanac.approveBudgetHold()
+                                    }
+                                }) {
+                                    Text("Approve Hold & Release Budget")
+                                        .font(.caption)
+                                        .bold()
+                                        .padding(.vertical, 6)
+                                        .padding(.horizontal, 12)
+                                        .background(Color.red.opacity(0.15))
+                                        .foregroundStyle(.red)
+                                        .clipShape(Capsule())
+                                        .overlay(Capsule().stroke(Color.red, lineWidth: 1))
+                                }
+                            }
+                            .padding(8)
+                            .background(Color.red.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                    }
+                } else {
+                    HStack {
+                        Text("Budget status not fetched")
+                            .font(.subheadline)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                        Spacer()
+                        Button(action: {
+                            Task {
+                                await backendService.almanac.fetchBudgetStatus()
+                            }
+                        }) {
+                            Text("Fetch")
+                                .font(.caption)
+                                .bold()
+                        }
+                    }
+                }
+
+                Divider()
+                    .background(DesignConstants.dividerColor)
+
+                // Subsection C: Pulse Controls (Entity List)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Entity Pulse Ingestion")
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(DesignConstants.primaryText)
+                    
+                    if entities.isEmpty {
+                        Text("No entities found to pulse. Check the wiki pages list.")
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(entities.prefix(10)) { ent in
+                                    Button(action: {
+                                        selectedEntityForPulse = ent.slug
+                                        Task {
+                                            if let res = await backendService.almanac.triggerPulse(entityName: ent.slug) {
+                                                showingPulseResult = res
+                                                showingPulseResultAlert = true
+                                            }
+                                        }
+                                    }) {
+                                        HStack(spacing: 4) {
+                                            Text(ent.title)
+                                                .font(.caption)
+                                                .foregroundStyle(DesignConstants.primaryText)
+                                            Image(systemName: "bolt.fill")
+                                                .font(.system(size: 10))
+                                                .foregroundStyle(DesignConstants.systemOrange)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(DesignConstants.controlBackground)
+                                        .clipShape(Capsule())
+                                        .overlay(Capsule().stroke(DesignConstants.dividerColor, lineWidth: 1))
+                                    }
+                                    .disabled(backendService.almanac.isPulsing || !backendService.config.last30daysEnabled)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Divider()
+                    .background(DesignConstants.dividerColor)
+
+                // Subsection D: Almanac Generation & History
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Almanac Generation")
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundStyle(DesignConstants.primaryText)
+                    
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            Task {
+                                if let res = await backendService.almanac.generateAlmanac(dryRun: true) {
+                                    showingAlmanacResult = res
+                                    showingAlmanacResultSheet = true
+                                }
+                            }
+                        }) {
+                            HStack {
+                                Spacer()
+                                if backendService.almanac.isGeneratingAlmanac {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Text("Dry Run Brief")
+                                        .bold()
+                                }
+                                Spacer()
+                            }
+                            .padding(.vertical, 10)
+                            .background(Color.blue.opacity(0.15))
+                            .foregroundStyle(.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .disabled(backendService.almanac.isGeneratingAlmanac)
+
+                        Button(action: {
+                            Task {
+                                if let res = await backendService.almanac.generateAlmanac(dryRun: false) {
+                                    showingAlmanacResult = res
+                                    showingAlmanacResultSheet = true
+                                }
+                            }
+                        }) {
+                            HStack {
+                                Spacer()
+                                if backendService.almanac.isGeneratingAlmanac {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Text("Generate Live")
+                                        .bold()
+                                }
+                                Spacer()
+                            }
+                            .padding(.vertical, 10)
+                            .background(backendService.config.last30daysEnabled ? DesignConstants.systemOrange : Color.gray)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .disabled(backendService.almanac.isGeneratingAlmanac || !backendService.config.last30daysEnabled)
+                    }
+
+                    if !backendService.almanac.almanacHistory.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Recent Generated Briefs")
+                                .font(.caption)
+                                .bold()
+                                .foregroundStyle(DesignConstants.secondaryText)
+                            
+                            ForEach(backendService.almanac.almanacHistory.prefix(3)) { brief in
+                                HStack {
+                                    Image(systemName: "doc.plaintext.fill")
+                                        .foregroundStyle(DesignConstants.systemOrange)
+                                    Text(brief.date)
+                                        .font(.caption)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", brief.sizeKb)) KB")
+                                        .font(.caption)
+                                        .foregroundStyle(DesignConstants.secondaryText)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
                 }
             }
             .padding(DesignConstants.standardPadding)

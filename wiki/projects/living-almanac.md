@@ -443,3 +443,65 @@ Logs:
 - [[apple-reference-guides]] — SwiftUI coding refs for timeline slider UI
 - [[chat-to-wiki-pipeline]] — existing scheduler pattern to extend
 - [[chickensoup-living-almanac-implementation-spec]] — upstream spec (if ingested as wiki page, else raw file)
+
+---
+
+## 14. Troubleshooting — Bugs Found & Fixed (2026-07-12)
+
+This section documents production issues discovered during end-to-end verification and their fixes.
+
+### Bug 1 — CRITICAL: Workspace root path wrong (`src/agents/pulse_agent.py`)
+
+**Symptom**: Every pulse resulted in `CLI exit 1: npm error code E404` — the server was invoking `npx last30days` from npm registry which does not exist (last30days is a cloned skill repo, not an npm package).
+
+**Root cause**: `workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))` computes 2 hops from `src/agents/pulse_agent.py` → `/chickensoup/src/`, so the cloned script checkpoint at `last30days-skill/.../last30days.py` never resolves. Falls through to npx (E404).
+
+**Fix**: Changed to 3 `dirname` hops so workspace root correctly resolves to `/chickensoup/`:
+```python
+workspace_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+```
+
+**Verify**: `_resolve_binary()` returns `['/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py']`, not `['npx', 'last30days']`.
+
+### Bug 2 — CRITICAL: Swift double-encoding entity names (`AlmanacService.swift`)
+
+**Symptom**: Endpoints like `/entities/Bob%2520Lazar/divergence` returned 404 from FastAPI. The system was double-percent-encoding entity names.
+
+**Root cause**: 8 locations in `AlmanacService.swift` called `.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)` on entity names, then passed the result to `APIClient.request(path:)` which internally calls `baseURL.appendingPathComponent(...)` — `appendingPathComponent` re-encodes `%` to `%25`, producing `Bob%2520Lazar` instead of `Bob%20Lazar`.
+
+**Fix**: Removed `.addingPercentEncoding(...)` from all 8 locations (triggerPulse, fetchDivergence, fetchTimeline, fetchEntanglement, runTribunal, triggerPulseAsync, generateAlmanacAsync, fetchTaskStatus, fetchAlmanacFile). Pass raw entity names; let `APIClient` handle encoding exactly once. `BackendService.swift:195` already uses this correct pattern for entity delete calls.
+
+### Bug 3 — Setup: `last30days.py` lacked execute permission
+
+**Symptom**: Even after fixing workspace root, the first pulse after deploy failed with `Permission denied: '/chickensoup/last30days-skill/.../last30days.py'`.
+
+**Fix**: `chmod +x last30days-skill/skills/last30days/scripts/last30days.py`
+
+### Bug 4 — Configuration: `LAST30DAYS_PULSE_TIMEOUT_SECONDS` too short
+
+**Symptom**: `last30days pulse timed out after 60s` — script needs 58s on first cold start but budget timeout was 60s.
+
+**Fix**: Increased `LAST30DAYS_PULSE_TIMEOUT_SECONDS` from 60 to 120 in `.env`.
+
+### End-to-end verification (2026-07-12)
+
+After all fixes:
+- `POST /pulse/Bob%20Lazar` → `status: success, 50 evidence` (was `error, 0 evidence`)
+- `POST /almanac/generate?dry_run=false` → all 3 entities processed, HTML brief written to `wiki/raw/almanac/2026-07-11.{html,md}`
+- ENTITIES [success, 50 evidence]: Bob Lazar, Roswell Crash
+- ENTITIES [error, 50 evidence]: Element 115 (parser labels as "error" but evidence intact — downstream label issue, non-blocking)
+- Pulse snapshots: `wiki/raw/pulse/bob-lazar-2026-07-11.json` (32K, 50 evidence items)
+
+### Cascade summary
+
+```
+Bug 1 (workspace root) → _resolve_binary() returns None → PulseResult(status=error, evidence=[])
+                         ↓
+                   No pulse snapshots written to wiki/raw/pulse/
+                         ↓
+                   almanac_generator.load_recent_pulse_evidence() → []
+                         ↓
+                   All entities skipped → 0/0/0/0 almanac HTML
+                         ↓
+                   divergence/entanglement endpoints: zero evidence → empty results
+```
