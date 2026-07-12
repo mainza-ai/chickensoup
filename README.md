@@ -374,8 +374,21 @@ curl -X POST "http://127.0.0.1:8000/almanac/generate?dry_run=true"
 curl -X POST "http://127.0.0.1:8000/almanac/generate?dry_run=false"
 # → wiki/raw/almanac/{date}.html + .md with real sourced content
 
-# 7. Let scheduler run overnight (set Tier-1 entities in wiki frontmatter tier: 1)
+# 7. Let scheduler run overnight
 # By morning, a dated brief appears unattended in wiki/raw/almanac/
+
+# 8. Idle Ingestion & Resource Ledger
+# The scheduler automatically tracks user inactivity. When the system is idle, it pulls
+# updates for entities based on a composite staleness priority score (age + traction).
+# Resource Ledger manages dual-tier limits:
+# - Paid limit ($20 spend ceiling)
+# - Courtesy free token tier (active when paid budget is depleted or FREE_TIER_ENABLED=true)
+
+# 9. Discovery Reviews & Entity Promotion
+# Newly discovered entities during ingestion are placed in a 'draft' status.
+# Review and promote them to active wiki status using:
+# - GET http://127.0.0.1:8000/entities/drafts
+# - POST http://127.0.0.1:8000/entities/{slug}/promote
 ```
 
 ### Living Almanac Troubleshooting

@@ -81,6 +81,40 @@ def _wiki_entity_lookup(query: str) -> List[str]:
     return [name for name, _ in matches[:5]]
 
 
+def resolve_pronominal_references(query: str, history: List[Dict[str, str]]) -> str:
+    if not history:
+        return query
+        
+    lower_q = query.lower()
+    pronouns = (" it ", " its ", " he ", " him ", " his ", " she ", " her ", " they ", " them ", " their ", " there ")
+    ends_pronoun = any(lower_q.endswith(p.strip()) for p in pronouns)
+    has_pronoun = any(p in f" {lower_q} " for p in pronouns) or ends_pronoun
+    
+    if not has_pronoun:
+        return query
+        
+    last_entity = None
+    for turn in reversed(history):
+        content = turn.get("content", "")
+        matches = _wiki_entity_lookup(content)
+        if matches:
+            last_entity = matches[0]
+            break
+            
+    if last_entity:
+        logger.info(f"Resolving pronoun references for query: '{query}' with last topic '{last_entity}'")
+        rewritten = query
+        for p in (" it", " him", " her", " them"):
+            if rewritten.lower().endswith(p):
+                rewritten = rewritten[:-len(p)] + " " + last_entity
+        for p in (" it ", " its ", " he ", " him ", " his ", " she ", " her ", " they ", " them ", " their "):
+            pattern = re.compile(re.escape(p), re.IGNORECASE)
+            rewritten = pattern.sub(" " + last_entity + " ", rewritten)
+        return rewritten.strip()
+        
+    return query
+
+
 class QueryAgent:
     """
     Parses and classifies user queries to identify intent, entities, and structured metadata.
@@ -163,11 +197,13 @@ class QueryAgent:
             logger.warning(f"Failed to fetch classification from local LLM: {e}")
         return None
 
-    def classify_and_parse(self, query: str) -> ParsedQuery:
+    def classify_and_parse(self, query: str, history: List[Dict[str, str]] = None) -> ParsedQuery:
         """
         Classifies query intent and extracts key attributes using a hybrid TQL parser,
         wiki file matching, and LLM extractor.
         """
+        if history:
+            query = resolve_pronominal_references(query, history)
         # 0. Wiki file entity lookup — done first so both LLM and fallback benefit
         wiki_matches = _wiki_entity_lookup(query)
         if wiki_matches:

@@ -133,7 +133,12 @@ async def periodic_chat_ingest_loop():
             if not settings.CHAT_WIKI_CONVERSION_ENABLED:
                 continue
 
-            await process_eligible_conversations()
+            from src.idle_sentinel import IdleSentinel
+            IdleSentinel.update_activity("chat_ingest", True)
+            try:
+                await process_eligible_conversations()
+            finally:
+                IdleSentinel.update_activity("chat_ingest", False)
 
             _LAST_RUN = datetime.now(timezone.utc).isoformat()
 
@@ -706,71 +711,97 @@ def get_recent_notifications(limit: int = 10) -> List[dict]:
     return notifications[:limit]
 
 
-# ── Phase 6: Almanac Scheduled Job ────────────────────────────────────
+# ── Phase 6: Idle-Driven Ingestion Loop ──────────────────────────────────
 
-_ALMANAC_RUNNING = False
-_ALMANAC_LAST_RUN: Optional[str] = None
-_ALMANAC_CHECK_INTERVAL_SECONDS = 3600  # check hourly, but only generate at configured interval
+_IDLE_INGESTION_RUNNING = False
+_IDLE_LAST_RUN: Optional[str] = None
+_IDLE_CHECK_INTERVAL_SECONDS = 15  # check every 15s
 
+async def idle_ingestion_loop():
+    global _IDLE_INGESTION_RUNNING, _IDLE_LAST_RUN
 
-async def periodic_almanac_loop():
-    global _ALMANAC_RUNNING, _ALMANAC_LAST_RUN
+    _IDLE_INGESTION_RUNNING = True
+    logger.info("Idle-driven ingestion loop started")
 
-    _ALMANAC_RUNNING = True
-    logger.info(
-        f"Almanac scheduler started (interval={settings.ALMANAC_GENERATION_INTERVAL_HOURS}h)"
-    )
-
-    while _ALMANAC_RUNNING:
+    while _IDLE_INGESTION_RUNNING:
         try:
-            # Check interval is hourly, but actual generation respects the configured interval
-            await asyncio.sleep(_ALMANAC_CHECK_INTERVAL_SECONDS)
+            await asyncio.sleep(_IDLE_CHECK_INTERVAL_SECONDS)
 
             if not settings.LAST30DAYS_ENABLED:
                 continue
 
-            # Respect last run interval
-            if _ALMANAC_LAST_RUN:
-                try:
-                    last_dt = datetime.fromisoformat(_ALMANAC_LAST_RUN)
-                    if last_dt.tzinfo is None:
-                        last_dt = last_dt.replace(tzinfo=timezone.utc)
-                    now = datetime.now(timezone.utc)
-                    elapsed_h = (now - last_dt).total_seconds() / 3600.0
-                    if elapsed_h < settings.ALMANAC_GENERATION_INTERVAL_HOURS:
-                        continue
-                except Exception:
-                    pass
+            from src.idle_sentinel import IdleSentinel
+            from src.staleness_queue import get_next_batch, record_pulse_completed
+            from src.agents.pulse_agent import PulseAgent
 
-            logger.info("Almanac scheduler triggering daily generation")
-            try:
-                from src.almanac.almanac_generator import generate_daily_almanac
-                result = await generate_daily_almanac(dry_run=False)
-                _ALMANAC_LAST_RUN = datetime.now(timezone.utc).isoformat()
-                if result.status == "no_material_change":
-                    logger.info("Almanac scheduler: no material change, skipping brief")
-            except Exception as e:
-                logger.error(f"Almanac scheduled generation failed: {e}", exc_info=True)
+            if not IdleSentinel.is_idle():
+                continue
+
+            # Get highest priority entity slugs
+            batch = get_next_batch(3)
+            if not batch:
+                continue
+
+            logger.info(f"Idle ingestion loop processing batch: {batch}")
+            pulse_agent = PulseAgent()
+
+            for slug in batch:
+                # Cooperative yielding: check idle state before processing each entity
+                if not IdleSentinel.is_idle():
+                    logger.info("Ingestion preempted by system activity, yielding loop.")
+                    break
+
+                try:
+                    from src.wiki.writer import read_page
+                    page_data = read_page(slug)
+                    if not page_data or "frontmatter" not in page_data:
+                        continue
+                    
+                    entity_name = page_data["frontmatter"].get("title", slug)
+                    
+                    logger.info(f"Running idle pulse for '{entity_name}'")
+                    result = pulse_agent.run_pulse(entity_name)
+                    
+                    # Compute divergence risk & state label if we got evidence
+                    div_risk = 0.0
+                    state_label = "unverified"
+                    if result.evidence:
+                        from src.quantum_credibility.divergence_engine import compute_narrative_divergence
+                        div_res = compute_narrative_divergence(entity_name, page_data, result.evidence)
+                        div_risk = div_res.divergence_risk
+                        
+                        from src.quantum_credibility.wavefunction import ClaimWavefunction
+                        wf = ClaimWavefunction()
+                        claim_text = page_data["body"][:500] if page_data.get("body") else entity_name
+                        
+                        rc = _get_reinforcement_count(slug)
+                        cc = wf.score_claim(claim_text, result.evidence, reinforcement_count=rc)
+                        state_label = cc.state_label
+
+                    record_pulse_completed(slug, divergence_risk=div_risk, state_label=state_label)
+                    _IDLE_LAST_RUN = datetime.now(timezone.utc).isoformat()
+
+                except Exception as ent_err:
+                    logger.error(f"Error processing entity '{slug}' in idle loop: {ent_err}", exc_info=True)
 
         except asyncio.CancelledError:
-            logger.info("Almanac scheduler cancelled")
+            logger.info("Idle-driven ingestion loop cancelled")
             break
         except Exception as e:
-            logger.error(f"Almanac scheduler error: {e}", exc_info=True)
+            logger.error(f"Idle-driven ingestion loop error: {e}", exc_info=True)
 
-    _ALMANAC_RUNNING = False
+    _IDLE_INGESTION_RUNNING = False
 
 
 def get_almanac_status() -> dict:
     return {
         "enabled": settings.LAST30DAYS_ENABLED,
-        "last_run": _ALMANAC_LAST_RUN,
-        "interval_hours": settings.ALMANAC_GENERATION_INTERVAL_HOURS,
-        "running": _ALMANAC_RUNNING,
+        "last_run": _IDLE_LAST_RUN,
+        "running": _IDLE_INGESTION_RUNNING,
     }
 
 
 def stop():
-    global _RUNNING, _ALMANAC_RUNNING
+    global _RUNNING, _IDLE_INGESTION_RUNNING
     _RUNNING = False
-    _ALMANAC_RUNNING = False
+    _IDLE_INGESTION_RUNNING = False

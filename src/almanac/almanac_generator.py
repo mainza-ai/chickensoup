@@ -1,4 +1,5 @@
 import hashlib
+import html
 import json
 import logging
 import os
@@ -231,7 +232,7 @@ def _render_html(tier_results: List[Dict[str, Any]], meta: Dict[str, Any]) -> st
             evidence_count = er.get("evidence_count", 0)
 
             html_parts.append(f'<div class="entity-card">\n')
-            html_parts.append(f'<h3>{entity_name} <span class="meta">({pulse_status}, {evidence_count} evidence)</span></h3>\n')
+            html_parts.append(f'<h3>{html.escape(entity_name)} <span class="meta">({html.escape(pulse_status)}, {evidence_count} evidence)</span></h3>\n')
 
             if confidences:
                 for cc in confidences:
@@ -250,10 +251,10 @@ def _render_html(tier_results: List[Dict[str, Any]], meta: Dict[str, Any]) -> st
                     badge_text = f"{state}" + (" ✓ collapsed" if coll else " ◐ superposition")
 
                     html_parts.append(f'<div class="evidence-item">\n')
-                    html_parts.append(f'  <span class="badge {badge_class}">{badge_text}</span>\n')
+                    html_parts.append(f'  <span class="badge {badge_class}">{html.escape(badge_text)}</span>\n')
                     html_parts.append(f'  <span class="meta"> epi={epi:.2f} trac={trac:.2f}</span><br>\n')
                     if claim_t:
-                        html_parts.append(f'  <em>{claim_t}</em>\n')
+                        html_parts.append(f'  <em>{html.escape(claim_t)}</em>\n')
                     html_parts.append(f'</div>\n')
 
             if divergence:
@@ -262,20 +263,20 @@ def _render_html(tier_results: List[Dict[str, Any]], meta: Dict[str, Any]) -> st
                 driving = divergence.get("driving_claims", [])
                 if driving:
                     html_parts.append(f'driven by {len(driving)} claim(s): ')
-                    html_parts.append(", ".join(f"<em>{dc.get('claim_text','')[:80]}</em>" for dc in driving[:3]))
+                    html_parts.append(", ".join(f"<em>{html.escape(dc.get('claim_text','')[:80])}</em>" for dc in driving[:3]))
                 html_parts.append('</p>\n')
 
             tribunal = er.get("tribunal")
             if tribunal and tribunal.get("triggered"):
                 html_parts.append(f'<div class="tribunal">\n')
-                html_parts.append(f'<strong>⚖️ Tribunal — {tribunal.get("final_state_label", "contested")}</strong><br>\n')
-                html_parts.append(f'<p>{tribunal.get("referee_synthesis", "")[:1000]}</p>\n')
+                html_parts.append(f'<strong>⚖️ Tribunal — {html.escape(tribunal.get("final_state_label", "contested"))}</strong><br>\n')
+                html_parts.append(f'<p>{html.escape(tribunal.get("referee_synthesis", "")[:1000])}</p>\n')
                 for dis in tribunal.get("disagreements", [])[:3]:
                     html_parts.append(f'<div class="disagreement">\n')
-                    html_parts.append(f'<strong>{dis.get("topic","Disagreement")}</strong><br>\n')
-                    html_parts.append(f'<span class="meta">Skeptic: {dis.get("skeptic","")[:200]}<br>\n')
-                    html_parts.append(f'Empiricist: {dis.get("empiricist","")[:200]}<br>\n')
-                    html_parts.append(f'Believer: {dis.get("believer","")[:200]}</span>\n')
+                    html_parts.append(f'<strong>{html.escape(dis.get("topic","Disagreement"))}</strong><br>\n')
+                    html_parts.append(f'<span class="meta">Skeptic: {html.escape(dis.get("skeptic","")[:200])}<br>\n')
+                    html_parts.append(f'Empiricist: {html.escape(dis.get("empiricist","")[:200])}<br>\n')
+                    html_parts.append(f'Believer: {html.escape(dis.get("believer","")[:200])}</span>\n')
                     html_parts.append(f'</div>\n')
                 html_parts.append(f'</div>\n')
 
@@ -285,7 +286,7 @@ def _render_html(tier_results: List[Dict[str, Any]], meta: Dict[str, Any]) -> st
         html_parts.append('<h2>🔗 Entanglement Discoveries</h2>\n')
         for ent in entanglements[:10]:
             html_parts.append(f'<div class="entity-card">\n')
-            html_parts.append(f'  <strong>{ent.get("entity_a")} ↔ {ent.get("entity_b")}</strong> — '
+            html_parts.append(f'  <strong>{html.escape(str(ent.get("entity_a")))} ↔ {html.escape(str(ent.get("entity_b")))}</strong> — '
                               f'score {ent.get("entanglement_score",0):.2f} '
                               f'({ent.get("independent_clusters",0)} clusters, '
                               f'{len(ent.get("independent_platforms",[]))} platforms)<br>\n')

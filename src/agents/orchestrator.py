@@ -2,7 +2,7 @@ import asyncio
 import re
 import logging
 from typing import Dict, Any, List, Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pydantic_graph import BaseNode, End, GraphBuilder, GraphRunContext, StepContext
 
@@ -28,13 +28,14 @@ class OrchestratorState:
     final_output: Dict[str, Any] | None = None
     thread_id: str = "default_thread"
     human_approved: bool = False
+    history: List[Dict[str, str]] = field(default_factory=list)
 
 # Define Nodes using pydantic-graph BaseNode
 @dataclass
 class ClassifyNode(BaseNode[OrchestratorState, OrchestratorDeps]):
     async def run(self, ctx: GraphRunContext[OrchestratorState, OrchestratorDeps]) -> Union["ResearchNode", "NavigateNode", "StatusNode"]:
         logger.info("Orchestrator Graph -> Classifying query...")
-        parsed = ctx.deps.query_agent.classify_and_parse(ctx.state.query)
+        parsed = ctx.deps.query_agent.classify_and_parse(ctx.state.query, history=ctx.state.history)
         ctx.state.parsed_query = parsed
         
         if parsed.confidence < 0.6:
@@ -65,7 +66,8 @@ class ResearchNode(BaseNode[OrchestratorState, OrchestratorDeps]):
             entities=entities,
             structured_filters=filters,
             thread_id=ctx.state.thread_id,
-            human_approved=ctx.state.human_approved
+            human_approved=ctx.state.human_approved,
+            history=ctx.state.history
         )
         
         ctx.state.research_results = res
@@ -213,8 +215,8 @@ class Orchestrator:
             navigation_agent=self.navigation_agent
         )
 
-    async def execute(self, query: str, thread_id: str = "default_thread", human_approved: bool = False) -> Dict[str, Any]:
-        state = OrchestratorState(query=query, thread_id=thread_id, human_approved=human_approved)
+    async def execute(self, query: str, thread_id: str = "default_thread", human_approved: bool = False, history: List[Dict[str, str]] = None) -> Dict[str, Any]:
+        state = OrchestratorState(query=query, thread_id=thread_id, human_approved=human_approved, history=history or [])
         try:
             result_state = await asyncio.wait_for(
                 orchestrator_graph.run(state=state, deps=self.deps),

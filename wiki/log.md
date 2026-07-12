@@ -9,6 +9,36 @@ related: []
 
 # Log
 
+## [2026-07-12] impl | Living Almanac Hardening & Idle-Driven Ingestion Execution
+
+Successfully completed implementation and verification of all 6 stages of the master implementation plan:
+- **Stage 1 (XSS Remediation)**: HTML escaping in `src/almanac/almanac_generator.py` for all dynamic claim/entity outputs, verified in `tests/test_almanac_xss.py`.
+- **Stage 2 (Robust Schema Adaptability)**: Flexible key lookup and markdown extraction chain in `src/last30days_adapter.py`, verified in `tests/test_adapter_real_schema.py`.
+- **Stage 3 (Cohesion & Wavefunction Feedback Loop)**: Epistemic confidence damping using `reinforcement_count` in `src/quantum_credibility/wavefunction.py` and Neo4j integration in `src/agents/research_agent.py`, verified in `tests/test_cohesion_wavefunction.py`.
+- **Stage 4 (Idle-Driven Ingestion)**: Created `src/idle_sentinel.py`, `src/resource_ledger.py`, and `src/staleness_queue.py`. Updated `src/scheduler.py` to trigger the idle loop with composite prioritizing, and created `src/discovery_agent.py` to gate new drafts. Added `/entities/drafts` and `/entities/{slug}/promote` to `src/main.py`. Verified in `tests/test_idle_driven_ingestion.py`.
+- **Stage 5 (Query Intelligence & Multi-Turn History)**: Built history-aware pronominal resolution in `src/agents/query_agent.py` and semantic disambiguation in `src/agents/pulse_agent.py`. Verified in `tests/test_query_history_disambiguation.py`.
+- **Stage 6 (End-to-End Verification)**: Fully passed the 90-test suite successfully.
+
+## [2026-07-12] ingest | Master Implementation Plan — Living Almanac Hardening & Idle-Driven Redesign
+
+Deep analysis and synthesis of 4 source documents into single authoritative wiki page:
+- `chickensoup-master-implementation-prompt.md` (sequencing/conflict-resolution layer)
+- `chickensoup-almanac-live-diagnosis-and-roadmap.md` (live data diagnosis: 604 evidence items, 0.7% with engagement)
+- `chickensoup-deeper-bug-sweep.md` (XSS, dead cadence config, disconnected confidence systems)
+- `chickensoup-idle-driven-scheduling-spec.md` (idle sentinel, staleness queue, resource ledger, discovery agent)
+
+### New Project Page
+- **[[master-implementation-plan]]** — 6-stage execution plan with conflict resolution, dependency graph, 9 bugs cataloged, 14 new files, 9 modified files, 8 PRs, full verification checklist
+
+### Key Insights Captured
+- **Conflict resolved**: Bug sweep's patch-cadence-config vs idle-spec's delete-and-replace → delete wins (skip wasted patch work)
+- **9 bugs cataloged**: B1 (XSS), B2 (adapter schema mismatch), B3 (entity-resolution mode), B4 (dead cadence config, superseded), B5 (3 disconnected confidence systems), B6 (no multi-turn context), B7 (no semantic entity resolution), B8 (uniform divergence scores), B9 (flat-cost budget assumption)
+- **Root cause traced**: Evidence pipeline noise (epi=0.16 across all entities) → adapter parsing `candidate_ids` as claims → JSON key-value pairs as claim text
+- **Parallelization mapped**: Track A (scheduling: idle sentinel → resource ledger → staleness queue → idle loop → discovery) || Track B (query intelligence: multi-turn context + semantic resolution)
+
+### Pages Enriched
+- [[index]] — Added master-implementation-plan to Projects and Plans sections
+
 ## [2026-07-12] fix | iOS Layout + Preview Crash + Living Almanac Client Fixes
 
 ### iOS sheet overflow fixes (PRs 1–5)
@@ -678,4 +708,27 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=be68f349a3ee2050 | 2026-07-11.html
 ## [2026-07-12] ingest | pulse | aldo-rebelo | 50 evidence | $0.50 | remaining=$1981.00 | aldo-rebelo
 ## [2026-07-12] ingest | pulse | ufo-retrieval-program | 50 evidence | $0.50 | remaining=$1980.50 | ufo-retrieval-program
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.50 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.50 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
 
