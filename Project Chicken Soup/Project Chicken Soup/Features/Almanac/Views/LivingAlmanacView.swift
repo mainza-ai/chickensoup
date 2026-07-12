@@ -62,6 +62,11 @@ struct LivingAlmanacView: View {
                 
                 // Entanglement & Spacetime Metric Matrix Explorer
                 entanglementMatrixSection
+                
+                // Reserve space for macOS desktop QueryOverlayView + ChatHistory overlay
+                #if os(macOS)
+                Color.clear.frame(height: 130)
+                #endif
             }
             .padding(.vertical)
         }
