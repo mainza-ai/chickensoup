@@ -51,7 +51,7 @@ public final class AlmanacService {
             let req = PulseReq(handles: handles)
             let bodyData = try JSONEncoder().encode(req)
             let res: APIPulseResult = try await APIClient.shared.request(
-                path: "/pulse/\(entityName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entityName)",
+                path: "/pulse/\(entityName)",
                 method: "POST",
                 body: bodyData
             )
@@ -82,8 +82,7 @@ public final class AlmanacService {
 
     public func fetchDivergence(entityName: String) async -> APIDivergenceResult? {
         do {
-            let nameEncoded = entityName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entityName
-            let res: APIDivergenceResult = try await APIClient.shared.request(path: "/entities/\(nameEncoded)/divergence")
+            let res: APIDivergenceResult = try await APIClient.shared.request(path: "/entities/\(entityName)/divergence")
             return res
         } catch {
             logger.error("Failed to fetch divergence for \(entityName): \(error.localizedDescription)")
@@ -93,9 +92,8 @@ public final class AlmanacService {
 
     public func fetchTimeline(entityName: String, days: Int = 30) async -> APITimelineResponse? {
         do {
-            let nameEncoded = entityName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entityName
             let res: APITimelineResponse = try await APIClient.shared.request(
-                path: "/entities/\(nameEncoded)/timeline",
+                path: "/entities/\(entityName)/timeline",
                 queryItems: [URLQueryItem(name: "days", value: String(days))]
             )
             return res
@@ -107,8 +105,7 @@ public final class AlmanacService {
 
     public func fetchEntanglement(entityName: String) async -> APIEntanglementResponse? {
         do {
-            let nameEncoded = entityName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entityName
-            let res: APIEntanglementResponse = try await APIClient.shared.request(path: "/entities/\(nameEncoded)/entanglement")
+            let res: APIEntanglementResponse = try await APIClient.shared.request(path: "/entities/\(entityName)/entanglement")
             return res
         } catch {
             logger.error("Failed to fetch entanglement for \(entityName): \(error.localizedDescription)")
@@ -118,7 +115,6 @@ public final class AlmanacService {
 
     public func runTribunal(entityName: String, claimText: String, divergenceRisk: Double = 0.0) async -> APITribunalResponse? {
         do {
-            let nameEncoded = entityName.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? entityName
             struct TribunalReq: Codable {
                 var claim_text: String
                 var divergence_risk: Double
@@ -126,7 +122,7 @@ public final class AlmanacService {
             let req = TribunalReq(claim_text: claimText, divergence_risk: divergenceRisk)
             let bodyData = try JSONEncoder().encode(req)
             let res: APITribunalResponse = try await APIClient.shared.request(
-                path: "/entities/\(nameEncoded)/tribunal",
+                path: "/entities/\(entityName)/tribunal",
                 method: "POST",
                 body: bodyData
             )
@@ -157,6 +153,51 @@ public final class AlmanacService {
         }
     }
 
+    public func triggerPulseAsync(entityName: String, handles: [String: String]? = nil) async -> APIAsyncTaskResponse? {
+        do {
+            struct PulseReq: Codable {
+                var handles: [String: String]?
+            }
+            let req = PulseReq(handles: handles)
+            let bodyData = try JSONEncoder().encode(req)
+            let res: APIAsyncTaskResponse = try await APIClient.shared.request(
+                path: "/pulse/\(entityName)",
+                method: "POST",
+                body: bodyData
+            )
+            return res
+        } catch {
+            logger.error("Failed to trigger async pulse for \(entityName): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func generateAlmanacAsync(dryRun: Bool = true) async -> APIAsyncTaskResponse? {
+        do {
+            let res: APIAsyncTaskResponse = try await APIClient.shared.request(
+                path: "/almanac/generate",
+                method: "POST",
+                queryItems: [URLQueryItem(name: "dry_run", value: String(dryRun))]
+            )
+            return res
+        } catch {
+            logger.error("Failed to trigger async almanac generation (dryRun: \(dryRun)): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func fetchTaskStatus(taskId: String) async -> APITaskStatus? {
+        do {
+            let res: APITaskStatus = try await APIClient.shared.request(
+                path: "/tasks/\(taskId)"
+            )
+            return res
+        } catch {
+            logger.error("Failed to fetch status for task \(taskId): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     public func fetchAlmanacHistory(limit: Int = 20) async {
         do {
             let res: APIAlmanacHistoryResponse = try await APIClient.shared.request(
@@ -166,6 +207,31 @@ public final class AlmanacService {
             self.almanacHistory = res.almanacs
         } catch {
             logger.error("Failed to fetch almanac history: \(error.localizedDescription)")
+        }
+    }
+
+    public func fetchAlmanacFile(date: String) async -> String? {
+        do {
+            let res: APIAlmanacFileResponse = try await APIClient.shared.request(
+                path: "/almanac/file/\(date)"
+            )
+            return res.content
+        } catch {
+            logger.error("Failed to fetch almanac content for \(date): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func fetchPulseSnapshot(filePath: String) async -> [String: AnyDecodableValue]? {
+        do {
+            let res: [String: AnyDecodableValue] = try await APIClient.shared.request(
+                path: "/pulse/snapshot",
+                queryItems: [URLQueryItem(name: "filepath", value: filePath)]
+            )
+            return res
+        } catch {
+            logger.error("Failed to fetch pulse snapshot for \(filePath): \(error.localizedDescription)")
+            return nil
         }
     }
 }
