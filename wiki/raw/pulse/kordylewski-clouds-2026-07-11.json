@@ -1,0 +1,716 @@
+{
+  "entity_name": "kordylewski-clouds",
+  "slug": "kordylewski-clouds",
+  "date": "2026-07-11",
+  "timestamp": "2026-07-12T02:24:18.443299+00:00",
+  "evidence_count": 50,
+  "evidence": [
+    {
+      "claim_text": "\"https://youtube.com/watch?v=8aojgr12wpw\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=8aojgr12wpw",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:0",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:0"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=8aojgr12wpw\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=8aojgr12wpw",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:1",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:1"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Ever seen a Kordylewski Cloud?\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:2",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:2"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=amunjw9fhmo\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=amunjw9fhmo",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:3",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:3"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=amunjw9fhmo\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=amunjw9fhmo",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:4",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:4"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Scientists Have Spotted Something Huge Following Our Planet\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:5",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:5"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=53m11p87eoe\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=53m11p87eoe",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:6",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:6"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=53m11p87eoe\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=53m11p87eoe",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:7",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:7"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The Mysterious Invisible Clouds That Surround Earth in Deep Space\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:8",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:8"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=xqo2rcm1cb4\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=xqo2rcm1cb4",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:9",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:9"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=xqo2rcm1cb4\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=xqo2rcm1cb4",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:10",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:10"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Kordylewski Clouds: The Reason Scientists Are Disappearing\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:11",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:11"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:12",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:12"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:13",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:13"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=xu8odh1kdxu\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=xu8odh1kdxu",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:14",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:14"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=xu8odh1kdxu\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=xu8odh1kdxu",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:15",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:15"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Earth's Hidden Moons - The Kordylewski Dust Satellites\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:16",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:16"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=s_ujgg_ifoi\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=s_ujgg_ifoi",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:17",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:17"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=s_ujgg_ifoi\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=s_ujgg_ifoi",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:18",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:18"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Plasma Secrets They Don't Want You To Know | EP 15\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:19",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:19"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=rx5guug8m-o\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=rx5guug8m-o",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:20",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:20"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=rx5guug8m-o\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=rx5guug8m-o",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:21",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:21"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Earth's Ghost Moons: The Mystery of the Kordylewski Clouds Explained\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:22",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:22"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:23",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:23"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:24",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:24"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"u/mickeyWatch approved a post in r/UFOs\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:25",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:25"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=p38li-bnv5y\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=p38li-bnv5y",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:26",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:26"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=p38li-bnv5y\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=p38li-bnv5y",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:27",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:27"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The Kordylewski clouds, sometimes called the lunar libration clouds,[1] are concentrations of dust\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:28",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:28"
+      ]
+    },
+    {
+      "claim_text": "\"generated_at\": \"2026-07-12T02:24:18.403313+00:00\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:29",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:29"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"Sentient plasmoid\\nBelow is a scientific overview of the subject of sentient plasma: Plasma holds the key to understanding not only the structure of the universe, but also the origins of life and consciousness itself. Across multiple disciplines: astrophysics, plasma physics, and astrobiology, a growing body of research suggests that plasma is far more than a passive state of matter. It is a dynamic, self-organizing, and intelligent medium that forms the vast majority of the cosmos. It is a settled scientific fact\\nGreat post as always Pix. Consciousness research has a category problem. Modern day / the dominant framework assumes that awareness, responsiveness, and information integration are exclusively product You said a lot of this. I skimmed it, then just added some of what I\\u2019ve found. Didn\\u2019t realize until I went through your post properly. Hope you\\u2019ve been well! I\\u2019ve been experiencing it nearly every night along with the little ones that also zip around. There\\u2019s a smaller orb that goes back and forth 3 times in the first 30 seconds of this video. I\\u2019ve been ca\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:30",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:30"
+      ]
+    },
+    {
+      "claim_text": "\"Great post as always Pix. Consciousness research has a category problem.\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:31",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:31"
+      ]
+    },
+    {
+      "claim_text": "\"You said a lot of this. I skimmed it, then just added some of what I\\u2019ve found.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:32",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:32"
+      ]
+    },
+    {
+      "claim_text": "\"I\\u2019ve been experiencing it nearly every night along with the little ones that also zip around.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:33",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:33"
+      ]
+    },
+    {
+      "claim_text": "\"Sorry, something went wrong when loading this video.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:34",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:34"
+      ]
+    },
+    {
+      "claim_text": "\"Happy for you. You must radiate beautiful energy :)\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:35",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:35"
+      ]
+    },
+    {
+      "claim_text": "\"Thanks babe\\u2763\\ufe0fI try but it\\u2019s not always easy..\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:36",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:36"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Great post as always Pix. Consciousness research has a category problem. Modern day / the dominant framework assumes that awareness, responsiveness, and information integration are exclusively product\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:37",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:37"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov22ylu/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov22ylu/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:38",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:38"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"You said a lot of this. I skimmed it, then just added some of what I\\u2019ve found. Didn\\u2019t realize until I went through your post properly. Hope you\\u2019ve been well!\",",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:39",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:39"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov23an7/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov23an7/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:40",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:40"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"I\\u2019ve been experiencing it nearly every night along with the little ones that also zip around. There\\u2019s a smaller orb that goes back and forth 3 times in the first 30 seconds of this video. I\\u2019ve been ca\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:41",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:41"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9h9ii/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9h9ii/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:42",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:42"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Sorry, something went wrong when loading this video. I go out every night at 2am to vibe with them. It took awhile to earn their trust enough to show up nightly.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:43",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:43"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ovbzdab/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ovbzdab/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:44",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:44"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Happy for you. You must radiate beautiful energy :)\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:45",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:45"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9k3lr/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9k3lr/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:46",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:46"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Thanks babe\\u2763\\ufe0fI try but it\\u2019s not always easy..\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:47",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:47"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9kyjk/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/TheOrbservatory/comments/1ul4yie/comment/ov9kyjk/",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:48",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:48"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Love it thank you for sharing that!\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T02:24:18.429972+00:00",
+      "cluster_id": "kordylewski-clouds:md:49",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.0,
+      "provenance_chain": [
+        "last30days:kordylewski-clouds:md",
+        "cluster:kordylewski-clouds:md:49"
+      ]
+    }
+  ],
+  "raw_output_preview": "{\n  \"artifacts\": {\n    \"grounding\": [\n      {\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"keyless\",\n        \"reason\": \"keyless-search-unavailable\",\n        \"resultCount\": 0,\n        \"webSearchQueries\": [\n          \"kordylewski-clouds\"\n        ]\n      }\n    ],\n    \"hiring_signals_mode\": false,\n    \"plan_source\": \"deterministic\",\n    \"pre_research_flags_present\": false,\n    \"resolved\": {\n      \"context\": \"\",\n      \"entity\": \"kordylewski-clouds\",\n      \"github_repos\": [],\n      \"github_user\": \"\",\n      \"subreddits\": [],\n      \"trustpilot_domain\": \"\",\n      \"x_handle\": \"\"\n    }\n  },\n  \"clusters\": [\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=8aojgr12wpw\"\n      ],\n      \"cluster_id\": \"cluster-1\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=8aojgr12wpw\"\n      ],\n      \"score\": 17.813060109289616,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Ever seen a Kordylewski Cloud?\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=amunjw9fhmo\"\n      ],\n      \"cluster_id\": \"cluster-2\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=amunjw9fhmo\"\n      ],\n      \"score\": 8.142043010752687,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Scientists Have Spotted Something Huge Following Our Planet\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=53m11p87eoe\"\n      ],\n      \"cluster_id\": \"cluster-3\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=53m11p87eoe\"\n      ],\n      \"score\": 8.131375661375657,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"The Mysterious Invisible Clouds That Surround Earth in Deep Space\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=xqo2rcm1cb4\"\n      ],\n      \"cluster_id\": \"cluster-4\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=xqo2rcm1cb4\"\n      ],\n      \"score\": 8.121041666666663,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Kordylewski Clouds: The Reason Scientists Are Disappearing\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid\"\n      ],\n      \"cluster_id\": \"cluster-5\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/theorbservatory/comments/1ul4yie/sentient_plasmoid\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Sentient plasmoid\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=xu8odh1kdxu\"\n      ],\n      \"cluster_id\": \"cluster-6\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=xu8odh1kdxu\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Earth's Hidden Moons - The Kordylewski Dust Satellites\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=s_ujgg_ifoi\"\n      ],\n      \"cluster_id\": \"cluster-7\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=s_ujgg_ifoi\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Plasma Secrets They Don't Want You To Know | EP 15\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=rx5guug8m-o\"\n      ],\n      \"cluster_id\": \"cluster-8\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=rx5guug8m-o\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Earth's Ghost Moons: The Mystery of the Kordylewski Clouds Explained\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos\"\n      ],\n      \"cluster_id\": \"cluster-9\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufosmodlogs/comments/1ub4f74/umickeywatch_approved_a_post_in_rufos\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"u/mickeyWatch approved a post in r/UFOs\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=p38li-bnv5y\"\n      ],\n      \"cluster_id\": \"cluster-10\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=p38li-bnv5y\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"The Kordylewski clouds, sometimes called the lunar libration clouds,[1] are concentrations of dust\"\n    }\n  ],\n  \"errors_by_source\": {},\n  \"generated_at\": \"2026-07-12T02:24:18.403313+00:00\",\n  \"items_by_source\": {\n    \"github\": [],\n    \"grounding\": [],\n    \"hackernews\": [],\n    \"reddit\": [\n      {\n        \"body\": \"Sentient plasmoid\\nBelow is a scientific overview of the subject of sentient plasma: Plasma holds the key to understanding not only the structure of the universe, but also the origins of life and consciousness itself. Across multiple disciplines: astrophysics, plasma physics, and astrobiology, a growing body of research suggests that plasma is far more than a passive state of matter. It is a dy",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 1983.0,
+    "binary": "/Users/mck/Desktop/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py",
+    "cost_usd": 0.5
+  }
+}

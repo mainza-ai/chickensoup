@@ -24,6 +24,7 @@ struct ContentView: View {
     enum DetailTab: String, CaseIterable, Identifiable {
         case graph = "Lore Graph"
         case timeline = "Spacetime Timeline"
+        case almanac = "Living Almanac"
         var id: String { self.rawValue }
     }
     @State private var activeDetailTab: DetailTab = .graph
@@ -41,8 +42,9 @@ struct ContentView: View {
         case graph
         case navigator
         case ingest
+        case almanac
     }
-    @State private var activeTab: TabSelection = .timeline
+    @State private var activeTab: TabSelection = .graph
     
     var body: some View {
         #if os(macOS)
@@ -104,6 +106,11 @@ struct ContentView: View {
                     TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
                         .opacity(activeDetailTab == .timeline ? 1 : 0)
                         .disabled(activeDetailTab != .timeline)
+                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+                    
+                    LivingAlmanacView()
+                        .opacity(activeDetailTab == .almanac ? 1 : 0)
+                        .disabled(activeDetailTab != .almanac)
                         .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -195,10 +202,12 @@ struct ContentView: View {
                                 Button("Close") { showIngestion = false }
                             }
                         }
-                }
-                .frame(minWidth: 500, minHeight: 600)
-            }
-            .sheet(isPresented: $showSettings) {
+                 }
+                 #if os(macOS)
+                 .frame(minWidth: 500, minHeight: 600)
+                 #endif
+             }
+             .sheet(isPresented: $showSettings) {
                 NavigationStack {
                     SettingsView()
                         .toolbar {
@@ -344,6 +353,19 @@ struct ContentView: View {
             }
             .badge(backendService.chat.unreadWikiPagesFromChat)
             .tag(TabSelection.ingest)
+            
+            // Tab 5: Living Almanac
+            NavigationStack {
+                LivingAlmanacView()
+                    #if !os(macOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .withAppToolbar(showSettings: $showSettings)
+                    #endif
+            }
+            .tabItem {
+                Label("Almanac", systemImage: "book.pages.fill")
+            }
+            .tag(TabSelection.almanac)
         }
         .tint(DesignConstants.systemOrange)
         .errorBanner(backendService: backendService)
@@ -488,6 +510,8 @@ struct ContentView_PreviewHelper: View {
     var body: some View {
         ContentView()
             .modelContainer(container)
+            .environment(AlmanacService.shared)
+            .environment(BackendService.shared)
     }
 }
 

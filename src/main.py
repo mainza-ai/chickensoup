@@ -5,9 +5,11 @@ import os
 import io
 import zipfile
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, status, UploadFile, File, Depends
+from fastapi import FastAPI, HTTPException, status, UploadFile, File, Depends, BackgroundTasks
 import redis
 
+from src.tasks import task_registry, TaskStatusModel
+from src.models import AsyncTaskResponse
 from src.api.auth import verify_api_key
 
 from src.config import settings
@@ -205,6 +207,14 @@ async def get_status():
         last30days_enabled=last30days_enabled,
         budget_remaining=budget_remaining,
     )
+
+@app.get("/tasks/{task_id}", response_model=TaskStatusModel)
+async def get_task_status(task_id: str):
+    """Retrieves status, progress, and logs for a background task."""
+    task = task_registry.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task with ID '{task_id}' not found")
+    return task.to_model()
 
 @app.get("/config", response_model=ConfigResponse)
 async def get_config():
@@ -1826,19 +1836,45 @@ class PulseRequest(BaseModel):
     handles: Optional[Dict[str, Any]] = None
 
 
-@app.post("/pulse/{entity_name}", response_model=PulseResult, dependencies=[Depends(verify_api_key)])
-async def post_pulse(entity_name: str, request: PulseRequest = None):
+@app.post("/pulse/{entity_name}", response_model=AsyncTaskResponse, dependencies=[Depends(verify_api_key)])
+async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, request: PulseRequest = None):
     handles = None
     if request and request.handles:
         handles = request.handles
-    try:
-        from src.agents.pulse_agent import PulseAgent
-        agent = PulseAgent()
-        result = agent.run_pulse(entity_name, handles=handles)
-        return result
-    except Exception as e:
-        logger.error(f"Pulse failed for '{entity_name}': {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Pulse failed: {str(e)}")
+
+    task = task_registry.create_task(f"Pulse: {entity_name}")
+
+    def execute_pulse():
+        try:
+            task.log(f"Starting pulse for '{entity_name}'...")
+            task.update_progress(0.1)
+
+            from src.agents.pulse_agent import PulseAgent
+            agent = PulseAgent()
+
+            task.log("Contacting last30days evidence collector...")
+            task.update_progress(0.3)
+
+            result = agent.run_pulse(entity_name, handles=handles)
+
+            if result.status == "error":
+                task.log(f"Pulse execution reported error: {result.error or 'Unknown CLI error'}")
+                task.set_failed(result.error or "CLI execution failed")
+            else:
+                task.log(f"Pulse succeeded! Ingested {len(result.evidence)} evidence items.")
+                task.log(f"Remaining monthly budget: ${result.budget_remaining:.2f}")
+                task.update_progress(1.0)
+                task.set_success(result)
+        except Exception as e:
+            logger.error(f"Async pulse failed for '{entity_name}': {e}", exc_info=True)
+            task.set_failed(str(e))
+
+    background_tasks.add_task(execute_pulse)
+    return AsyncTaskResponse(
+        task_id=task.id,
+        status=task.status,
+        message=f"Pulse task for '{entity_name}' initiated in background."
+    )
 
 
 @app.get("/entities/{name}/divergence", response_model=DivergenceResult)
@@ -1986,28 +2022,55 @@ async def post_budget_approve():
         raise HTTPException(status_code=500, detail=f"Budget approve failed: {str(e)}")
 
 
-@app.post("/almanac/generate")
-async def post_almanac_generate(dry_run: bool = True):
-    try:
-        from src.almanac.almanac_generator import generate_daily_almanac
-        result = await generate_daily_almanac(dry_run=dry_run)
-        return {
-            "status": result.status,
-            "date": result.date_str,
-            "html_path": result.html_path,
-            "md_path": result.md_path,
-            "entities_processed": result.entities_processed,
-            "claims_moved": result.claims_moved,
-            "claims_collapsed": result.claims_collapsed,
-            "newly_contested": result.newly_contested,
-            "entanglements": result.entanglements,
-            "elapsed_seconds": result.elapsed_seconds,
-            "error": result.error,
-            "dry_run": result.dry_run,
-        }
-    except Exception as e:
-        logger.error(f"Almanac generation failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Almanac generation failed: {str(e)}")
+@app.post("/almanac/generate", response_model=AsyncTaskResponse)
+async def post_almanac_generate(background_tasks: BackgroundTasks, dry_run: bool = True):
+    task = task_registry.create_task("Almanac Generation")
+
+    def execute_almanac():
+        try:
+            task.log(f"Initializing Daily Almanac Generation (dry_run={dry_run})...")
+            task.update_progress(0.1)
+
+            import asyncio
+            from src.almanac.almanac_generator import generate_daily_almanac
+
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                task.log("Analyzing active wiki entities...")
+                task.update_progress(0.2)
+
+                task.log("Running scheduled pulses & narrative analysis (this may take a few seconds)...")
+                task.update_progress(0.5)
+
+                result = loop.run_until_complete(generate_daily_almanac(dry_run=dry_run))
+
+                task.log(f"Almanac generation completed. Status: {result.status}")
+                if result.error:
+                    task.log(f"Generator warnings: {result.error}")
+
+                task.log(f"Processed {result.entities_processed} entities.")
+                task.log(f"Wavefunctions: {result.claims_collapsed} collapsed, {result.newly_contested} newly contested.")
+
+                if result.html_path:
+                    task.log(f"HTML brief compiled: {result.html_path}")
+                if result.md_path:
+                    task.log(f"Markdown brief compiled: {result.md_path}")
+
+                task.update_progress(1.0)
+                task.set_success(result)
+            finally:
+                loop.close()
+        except Exception as e:
+            logger.error(f"Async almanac generation failed: {e}", exc_info=True)
+            task.set_failed(str(e))
+
+    background_tasks.add_task(execute_almanac)
+    return AsyncTaskResponse(
+        task_id=task.id,
+        status=task.status,
+        message="Almanac generation task initiated in background."
+    )
 
 
 @app.get("/almanac/history")
@@ -2069,4 +2132,40 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
     except Exception as e:
         logger.error(f"Pulse history failed: {e}")
         return {"pulses": [], "total": 0}
+
+
+@app.get("/almanac/file/{date}")
+async def get_almanac_file(date: str):
+    """Retrieves the HTML content of a specific daily almanac brief."""
+    from src.wiki.paths import get_almanac_dir
+    ad = get_almanac_dir()
+    filepath = ad / f"{date}.html"
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail=f"Almanac file for date '{date}' not found")
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+        return {"date": date, "content": content}
+    except Exception as e:
+        logger.error(f"Failed to read almanac file: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to read almanac file: {str(e)}")
+
+
+@app.get("/pulse/snapshot")
+async def get_pulse_snapshot(filepath: str):
+    """Retrieves the full JSON data of a pulse snapshot by file path."""
+    from pathlib import Path
+    p = Path(filepath)
+    if not p.exists() or not filepath.endswith(".json"):
+        raise HTTPException(status_code=404, detail="Snapshot file not found")
+    try:
+        from src.wiki.pulse_writer import load_pulse_snapshot
+        data = load_pulse_snapshot(p)
+        if not data:
+            raise HTTPException(status_code=404, detail="Could not parse pulse snapshot")
+        return data
+    except Exception as e:
+        logger.error(f"Failed to load snapshot: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 

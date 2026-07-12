@@ -338,3 +338,10 @@ class SetUserNameResponse(BaseModel):
     previous_name: str
     current_name: str
     slug: str
+
+
+class AsyncTaskResponse(BaseModel):
+    task_id: str
+    status: str
+    message: str
+

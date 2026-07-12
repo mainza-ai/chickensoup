@@ -830,28 +830,80 @@ public enum AnyDecodableValue: Codable, Hashable {
     case string(String)
     case double(Double)
     case bool(Bool)
+    case array([AnyDecodableValue])
+    case dictionary([String: AnyDecodableValue])
     case null
     
+    private struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        var intValue: Int?
+        init?(intValue: Int) {
+            return nil
+        }
+    }
+    
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let str = try? container.decode(String.self) {
-            self = .string(str)
-        } else if let dbl = try? container.decode(Double.self) {
-            self = .double(dbl)
-        } else if let bl = try? container.decode(Bool.self) {
-            self = .bool(bl)
+        if let container = try? decoder.container(keyedBy: DynamicCodingKeys.self) {
+            var dict = [String: AnyDecodableValue]()
+            for key in container.allKeys {
+                if let val = try? container.decode(AnyDecodableValue.self, forKey: key) {
+                    dict[key.stringValue] = val
+                }
+            }
+            self = .dictionary(dict)
+        } else if var container = try? decoder.unkeyedContainer() {
+            var array = [AnyDecodableValue]()
+            while !container.isAtEnd {
+                if let val = try? container.decode(AnyDecodableValue.self) {
+                    array.append(val)
+                }
+            }
+            self = .array(array)
         } else {
-            self = .null
+            let container = try decoder.singleValueContainer()
+            if let str = try? container.decode(String.self) {
+                self = .string(str)
+            } else if let dbl = try? container.decode(Double.self) {
+                self = .double(dbl)
+            } else if let int = try? container.decode(Int.self) {
+                self = .double(Double(int))
+            } else if let bl = try? container.decode(Bool.self) {
+                self = .bool(bl)
+            } else {
+                self = .null
+            }
         }
     }
     
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
         switch self {
-        case .string(let s): try container.encode(s)
-        case .double(let d): try container.encode(d)
-        case .bool(let b): try container.encode(b)
-        case .null: try container.encodeNil()
+        case .string(let s):
+            var container = encoder.singleValueContainer()
+            try container.encode(s)
+        case .double(let d):
+            var container = encoder.singleValueContainer()
+            try container.encode(d)
+        case .bool(let b):
+            var container = encoder.singleValueContainer()
+            try container.encode(b)
+        case .array(let arr):
+            var container = encoder.unkeyedContainer()
+            for item in arr {
+                try container.encode(item)
+            }
+        case .dictionary(let dict):
+            var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+            for (key, val) in dict {
+                if let codingKey = DynamicCodingKeys(stringValue: key) {
+                    try container.encode(val, forKey: codingKey)
+                }
+            }
+        case .null:
+            var container = encoder.singleValueContainer()
+            try container.encodeNil()
         }
     }
     
@@ -860,8 +912,51 @@ public enum AnyDecodableValue: Codable, Hashable {
         case .string(let s): return s
         case .double(let d): return String(d)
         case .bool(let b): return String(b)
+        case .array(let arr): return "[\(arr.map { $0.stringValue }.joined(separator: ", "))]"
+        case .dictionary(let dict): return "{\(dict.map { "\($0): \($1.stringValue)" }.joined(separator: ", "))}"
         case .null: return "null"
         }
+    }
+
+    public var value: AnyHashable {
+        switch self {
+        case .string(let s): return s
+        case .double(let d): return d
+        case .bool(let b): return b
+        case .array(let arr): return arr.map { $0.value }
+        case .dictionary(let dict): return dict.mapValues { $0.value }
+        case .null: return ""
+        }
+    }
+
+    public var asArray: [AnyDecodableValue]? {
+        if case .array(let arr) = self { return arr }
+        return nil
+    }
+    
+    public var asDictionary: [String: AnyDecodableValue]? {
+        if case .dictionary(let dict) = self { return dict }
+        return nil
+    }
+    
+    public var asString: String? {
+        if case .string(let s) = self { return s }
+        return nil
+    }
+
+    public var asDouble: Double? {
+        if case .double(let d) = self { return d }
+        return nil
+    }
+
+    public var asInt: Int? {
+        if case .double(let d) = self { return Int(d) }
+        return nil
+    }
+
+    public var asBool: Bool? {
+        if case .bool(let b) = self { return b }
+        return nil
     }
 }
 
@@ -1257,3 +1352,60 @@ public struct APITribunalResponse: Codable, Hashable {
         case allCitations = "all_citations"
     }
 }
+
+
+
+public struct APIAsyncTaskResponse: Codable, Hashable {
+    public var taskId: String
+    public var status: String
+    public var message: String
+
+    enum CodingKeys: String, CodingKey {
+        case taskId = "task_id"
+        case status
+        case message
+    }
+
+    public init(taskId: String, status: String, message: String) {
+        self.taskId = taskId
+        self.status = status
+        self.message = message
+    }
+}
+
+public struct APITaskStatus: Codable, Hashable {
+    public var id: String
+    public var name: String
+    public var status: String
+    public var progress: Double
+    public var logs: [String]
+    public var result: [String: AnyDecodableValue]?
+    public var elapsed: Double
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case status
+        case progress
+        case logs
+        case result
+        case elapsed
+    }
+
+    public init(id: String, name: String, status: String, progress: Double, logs: [String], result: [String: AnyDecodableValue]? = nil, elapsed: Double = 0.0) {
+        self.id = id
+        self.name = name
+        self.status = status
+        self.progress = progress
+        self.logs = logs
+        self.result = result
+        self.elapsed = elapsed
+    }
+}
+
+public struct APIAlmanacFileResponse: Codable, Hashable {
+    public var date: String
+    public var content: String
+}
+
+

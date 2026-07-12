@@ -30,7 +30,8 @@ def test_research_agent_flow(mock_conn):
     
     agent = ResearchAgent()
     with patch("src.agents.research_agent.search_entities", return_value=[{"name": "Bob Lazar", "confidence": 0.85, "labels": ["Person"]}]), \
-         patch("src.agents.research_agent.get_entity_neighborhood", return_value={"entity": {"name": "Bob Lazar", "labels": ["Person"], "properties": {"confidence": 0.85}}, "connections": []}):
+         patch("src.agents.research_agent.get_entity_neighborhood", return_value={"entity": {"name": "Bob Lazar", "labels": ["Person"], "properties": {"confidence": 0.85}}, "connections": []}), \
+         patch("src.agents.research_agent._compute_wavefunction_scores", return_value=None):
         
         res = agent.run_research(query="Bob Lazar", entities=["Bob Lazar"], thread_id="test_thread")
         assert "Bob Lazar" in res["assembled_context"]
