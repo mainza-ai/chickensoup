@@ -258,7 +258,7 @@ public final class DataStoreBackupService {
                         let dest = backupDir!.appendingPathComponent(item.lastPathComponent)
                         try fm.copyItem(at: item, to: dest)
                         fileCount += 1
-                        if let size = try? fm.attributesOfItem(forPath: item.path)[.size] as? NSNumber {
+                        if let size = try? fm.attributesOfItem(atPath: item.path)[.size] as? NSNumber {
                             totalSize += size.int64Value
                         }
                     }
