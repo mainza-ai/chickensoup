@@ -1,0 +1,716 @@
+{
+  "entity_name": "ufo-retrieval-program",
+  "slug": "ufo-retrieval-program",
+  "date": "2026-07-12",
+  "timestamp": "2026-07-12T20:19:30.514475+00:00",
+  "evidence_count": 50,
+  "evidence": [
+    {
+      "claim_text": "\"https://youtube.com/watch?v=waur0awdejw\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=waur0awdejw",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:0",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:0"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=waur0awdejw\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=waur0awdejw",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:1",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:1"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Road to Disclosure FULL SHOW |  Reality Check with Ross Coulthart\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:2",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:2"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:3",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:3"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:4",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:4"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Avi Loeb has been told by a Lockheed Martin executive that they had UFO retrieval programs\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:5",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:5"
+      ]
+    },
+    {
+      "claim_text": "\"https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:6",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:6"
+      ]
+    },
+    {
+      "claim_text": "\"https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:7",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:7"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"White House picks Avi Loeb with polarizing alien theories to lead UFO council\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:8",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:8"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:9",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:9"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:10",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:10"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The man who invented radio led Mussolini's secret UFO retrieval program, refused to hand over a death ray, and then suddenly died. 45 years later, scientists at the company carrying his name started dying too. I went down this rabbit hole and I can't get out.\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:11",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:11"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:12",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:12"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:13",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:13"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Right after George H W Bush was elected, SecDef Carlucci showed off the Fluxliner ARV to Brad Sorenson, the MJ-12 files were deemed BOGUS, the CIA remote-viewed the Ark of the Covenant, and the MJ-12 program and the DIA's knowledge of the 1948 Aztec, NM UFO crash-retrieval was assessed weeks later\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:14",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:14"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:15",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:15"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:16",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:16"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Right after George H W Bush was elected, SecDef Carlucci showed off the Fluxliner ARV to Brad Sorenson, the MJ-12 files were deemed BOGUS, the CIA remote-viewed the Ark of the Covenant, and the MJ-12 program and the DIA's knowledge of the 1948 Aztec, NM UFO crash-retrieval was assessed weeks later\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:17",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:17"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:18",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:18"
+      ]
+    },
+    {
+      "claim_text": "\"https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:19",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:19"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"The man who invented radio led Mussolini's secret UFO retrieval program, refused to hand over a death ray, and then suddenly died. 45 years later, scientists at the company carrying his name started dying too. I went down this rabbit hole and I can't get out.\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:20",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:20"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=6msmprpqqa8\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=6msmprpqqa8",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:21",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:21"
+      ]
+    },
+    {
+      "claim_text": "\"https://youtube.com/watch?v=6msmprpqqa8\"",
+      "source_platform": "youtube",
+      "engagement_count": 0,
+      "url": "https://youtube.com/watch?v=6msmprpqqa8",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:22",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:22"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"Special Access Required  - the Secrecy of UFO Crash Retrieval Programs [VOL.2]\"",
+      "source_platform": "github",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:23",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:23"
+      ]
+    },
+    {
+      "claim_text": "\"https://bbc.com/news/videos/c8e2w83kxryo\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://bbc.com/news/videos/c8e2w83kxryo",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:24",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:24"
+      ]
+    },
+    {
+      "claim_text": "\"https://bbc.com/news/videos/c8e2w83kxryo\"",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://bbc.com/news/videos/c8e2w83kxryo",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:25",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:25"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"UFO footage just released by FBI\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:26",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:26"
+      ]
+    },
+    {
+      "claim_text": "\"generated_at\": \"2026-07-12T20:19:30.480854+00:00\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:27",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:27"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"White House picks Avi Loeb with polarizing alien theories to lead UFO council\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:28",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:28"
+      ]
+    },
+    {
+      "claim_text": "\"hn_url\": \"https://news.ycombinator.com/item?id=48741021\",",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://news.ycombinator.com/item?id=48741021",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:29",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:29"
+      ]
+    },
+    {
+      "claim_text": "\"snippet\": \"White House picks Avi Loeb with polarizing alien theories to lead UFO council\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:30",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:30"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"White House picks Avi Loeb with polarizing alien theories to lead UFO council\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:31",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:31"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://www.pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council\",",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://www.pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:32",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:32"
+      ]
+    },
+    {
+      "claim_text": "\"why_relevant\": \"HN story about White House picks Avi Loeb with polarizing alien theories to\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:33",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:33"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"UFO footage just released by FBI\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:34",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:34"
+      ]
+    },
+    {
+      "claim_text": "\"hn_url\": \"https://news.ycombinator.com/item?id=48506029\",",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://news.ycombinator.com/item?id=48506029",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:35",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:35"
+      ]
+    },
+    {
+      "claim_text": "\"snippet\": \"UFO footage just released by FBI\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:36",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:36"
+      ]
+    },
+    {
+      "claim_text": "\"title\": \"UFO footage just released by FBI\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:37",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:37"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://www.bbc.com/news/videos/c8e2w83kxryo\",",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "https://www.bbc.com/news/videos/c8e2w83kxryo",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:38",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:38"
+      ]
+    },
+    {
+      "claim_text": "\"why_relevant\": \"HN story about UFO footage just released by FBI\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:39",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:39"
+      ]
+    },
+    {
+      "claim_text": "\"body\": \"Avi Loeb has been told by a Lockheed Martin executive that they had UFO retrieval programs\\nAvi Loeb, the leader of Trump\\u2019s UAP Science Advisory Council, revealed on Congressman Eric Burlison\\u2019s (R-MO) podcast \\u201cFresh Freedom\\u201d that an executive of the $137 billion military contractor Lockheed Martin claimed the company operated a crashed-UFO retrieval program. \\u201cI had a [former] high level executive from Lockheed Martin visit my home and I asked him, \\u2018Is there any truth to these claims?\\u2019 And he said \\u2018It\\u2019s not wrong,&#39;\\u201d Loeb revealed on the podcast. Loeb claims retrieved tech would be e\\nJust want to point out that he has been saying this for the last two years at least. It's not new at all https://www.reddit.com/r/UFOs/comments/1dajd16/avi_loeb_asked_a_former_lockheed_martin_official If they reveal working TR-3B ship, this is gonna be wild.Who is gonna buy f35 then? Still learning these nukey codes Ignoring those deep state chodes My TR-3B flies low\",",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://www.reddit.com/r/UFOs/comments/1dajd16/avi_loeb_asked_a_former_lockheed_martin_official",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:40",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:40"
+      ]
+    },
+    {
+      "claim_text": "\"Just want to point out that he has been saying this for the last two years at least.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:41",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:41"
+      ]
+    },
+    {
+      "claim_text": "\"If they reveal working TR-3B ship, this is gonna be wild.Who is gonna buy f35 then?\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:42",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:42"
+      ]
+    },
+    {
+      "claim_text": "\"Still learning these nukey codes Ignoring those deep state chodes My TR-3B flies low\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:43",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:43"
+      ]
+    },
+    {
+      "claim_text": "\"Need some more specifics of the claims being referred to.\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:44",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:44"
+      ]
+    },
+    {
+      "claim_text": "\"In my opinion it doesn't really matter if it's old news or new news.\",",
+      "source_platform": "news",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:45",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:45"
+      ]
+    },
+    {
+      "claim_text": "\"First time I\\u2019ve heard Loeb acknowledge this angle. Always seemed like he was disinterested in those stories and more keen on conventional/scientific S...\",",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:46",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:46"
+      ]
+    },
+    {
+      "claim_text": "\"unless he saw some evidence then its all talk\"",
+      "source_platform": "unknown",
+      "engagement_count": 0,
+      "url": "",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:47",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:47"
+      ]
+    },
+    {
+      "claim_text": "\"excerpt\": \"Just want to point out that he has been saying this for the last two years at least. It's not new at all https://www.reddit.com/r/UFOs/comments/1dajd16/avi_loeb_asked_a_former_lockheed_martin_official\",",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://www.reddit.com/r/UFOs/comments/1dajd16/avi_loeb_asked_a_former_lockheed_martin_official",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:48",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:48"
+      ]
+    },
+    {
+      "claim_text": "\"url\": \"https://reddit.com/r/UFOs/comments/1uner9d/comment/ovk0pao/\"",
+      "source_platform": "reddit",
+      "engagement_count": 0,
+      "url": "https://reddit.com/r/UFOs/comments/1uner9d/comment/ovk0pao/",
+      "timestamp": "2026-07-12T20:19:30.503725+00:00",
+      "cluster_id": "ufo-retrieval-program:md:49",
+      "polymarket_odds": null,
+      "engagement_decayed": null,
+      "provenance_chain": [
+        "last30days:ufo-retrieval-program:md",
+        "cluster:ufo-retrieval-program:md:49"
+      ]
+    }
+  ],
+  "raw_output_preview": "{\n  \"artifacts\": {\n    \"grounding\": [\n      {\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"keyless\",\n        \"resultCount\": 5,\n        \"webSearchQueries\": [\n          \"ufo-retrieval-program\"\n        ]\n      }\n    ],\n    \"hiring_signals_mode\": false,\n    \"plan_source\": \"deterministic\",\n    \"pre_research_flags_present\": false,\n    \"resolved\": {\n      \"context\": \"\",\n      \"entity\": \"ufo-retrieval-program\",\n      \"github_repos\": [],\n      \"github_user\": \"\",\n      \"subreddits\": [],\n      \"trustpilot_domain\": \"\",\n      \"x_handle\": \"\"\n    }\n  },\n  \"clusters\": [\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=waur0awdejw\"\n      ],\n      \"cluster_id\": \"cluster-1\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=waur0awdejw\"\n      ],\n      \"score\": 15.11306010928962,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Road to Disclosure FULL SHOW |  Reality Check with Ross Coulthart\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin\"\n      ],\n      \"cluster_id\": \"cluster-2\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufos/comments/1uner9d/avi_loeb_has_been_told_by_a_lockheed_martin\"\n      ],\n      \"score\": 8.983060109289617,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Avi Loeb has been told by a Lockheed Martin executive that they had UFO retrieval programs\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council\"\n      ],\n      \"cluster_id\": \"cluster-3\",\n      \"representative_ids\": [\n        \"https://pbs.org/newshour/politics/white-house-picks-harvard-professor-with-polarizing-alien-theories-to-lead-new-ufo-council\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"hackernews\"\n      ],\n      \"title\": \"White House picks Avi Loeb with polarizing alien theories to lead UFO council\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret\"\n      ],\n      \"cluster_id\": \"cluster-4\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/highstrangeness/comments/1u4zxq9/the_man_who_invented_radio_led_mussolinis_secret\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"The man who invented radio led Mussolini's secret UFO retrieval program, refused to hand over a death ray, and then suddenly died. 45 years later, scientists at the company carrying his name started dying too. I went down this rabbit hole and I can't get out.\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef\"\n      ],\n      \"cluster_id\": \"cluster-5\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufob/comments/1ui4q3d/right_after_george_h_w_bush_was_elected_secdef\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Right after George H W Bush was elected, SecDef Carlucci showed off the Fluxliner ARV to Brad Sorenson, the MJ-12 files were deemed BOGUS, the CIA remote-viewed the Ark of the Covenant, and the MJ-12 program and the DIA's knowledge of the 1948 Aztec, NM UFO crash-retrieval was assessed weeks later\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef\"\n      ],\n      \"cluster_id\": \"cluster-6\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/remoteviewing/comments/1ui4rov/right_after_george_h_w_bush_was_elected_secdef\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Right after George H W Bush was elected, SecDef Carlucci showed off the Fluxliner ARV to Brad Sorenson, the MJ-12 files were deemed BOGUS, the CIA remote-viewed the Ark of the Covenant, and the MJ-12 program and the DIA's knowledge of the 1948 Aztec, NM UFO crash-retrieval was assessed weeks later\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret\"\n      ],\n      \"cluster_id\": \"cluster-7\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/ufo/comments/1u4zxxg/the_man_who_invented_radio_led_mussolinis_secret\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"The man who invented radio led Mussolini's secret UFO retrieval program, refused to hand over a death ray, and then suddenly died. 45 years later, scientists at the company carrying his name started dying too. I went down this rabbit hole and I can't get out.\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=6msmprpqqa8\"\n      ],\n      \"cluster_id\": \"cluster-8\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=6msmprpqqa8\"\n      ],\n      \"score\": 0.",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 1981.0,
+    "binary": "/Users/mck/Desktop/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py",
+    "cost_usd": 0.5
+  }
+}

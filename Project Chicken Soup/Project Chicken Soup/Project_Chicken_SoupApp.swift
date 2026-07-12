@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct Project_Chicken_SoupApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     var sharedModelContainer: ModelContainer = {
         let schema = Schema(versionedSchema: SchemaV1.self)
         let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
@@ -36,6 +37,21 @@ struct Project_Chicken_SoupApp: App {
                 .environment(AlmanacService.shared)
                 .environment(BackendService.shared)
                 .environment(LLMDiscoveryService.shared)
+                .environment(DataStoreBackupService.shared)
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .background {
+                        Task { @MainActor in
+                            await DataStoreBackupService.shared.performAutomaticBackup()
+                            DataStoreBackupService.shared.refreshBackupList()
+                        }
+                    }
+                }
+                .task {
+                    await DataStoreBackupService.shared.performAutomaticBackup()
+                    DataStoreBackupService.shared.startAutomaticBackups()
+                    DataStoreBackupService.shared.performMigrationGuard()
+                    DataStoreBackupService.shared.refreshBackupList()
+                }
         }
         .modelContainer(sharedModelContainer)
     }

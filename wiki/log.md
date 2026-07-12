@@ -677,4 +677,5 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-11] ingest | pulse | Roswell Crash | 50 evidence | $0.50 | remaining=$1981.50 | roswell-crash
 ## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=be68f349a3ee2050 | 2026-07-11.html
 ## [2026-07-12] ingest | pulse | aldo-rebelo | 50 evidence | $0.50 | remaining=$1981.00 | aldo-rebelo
+## [2026-07-12] ingest | pulse | ufo-retrieval-program | 50 evidence | $0.50 | remaining=$1980.50 | ufo-retrieval-program
 

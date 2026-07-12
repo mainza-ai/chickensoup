@@ -40,6 +40,14 @@ struct SettingsView: View {
     @State private var activeTaskName: String? = nil
     @State private var showConsoleSheet = false
 
+    // Data store backup states
+    let backupService = DataStoreBackupService.shared
+    @State private var showingRestoreAlert = false
+    @State private var pendingRestoreBackup: BackupInfo? = nil
+    @State private var showingExportSuccess = false
+    @State private var exportedURLs: [URL] = []
+    @State private var restoreAlertMessage: String? = nil
+
     private var hasUnsavedChanges: Bool {
         selectedBackend != backendService.config.quantumBackend ||
         hardwareEnabled != backendService.config.quantumHardwareEnabled ||
@@ -67,6 +75,15 @@ struct SettingsView: View {
     
     private var entities: [APIWikiPageListItem] {
         backendService.wiki.wikiPages.filter { $0.pageType == "entities" }
+    }
+
+    private var lastBackupSummary: String {
+        if let date = backupService.lastBackupDate {
+            let formatter = RelativeDateTimeFormatter()
+            formatter.unitsStyle = .short
+            return "Last backup: \(formatter.localizedString(for: date, relativeTo: Date()))"
+        }
+        return "No backups yet"
     }
 
     var body: some View {
@@ -676,6 +693,178 @@ struct SettingsView: View {
             )
         }
         .padding(.horizontal)
+
+        VStack(alignment: .leading, spacing: 12) {
+            Text("DATA STORE BACKUP")
+                .font(.caption)
+                .bold()
+                .foregroundStyle(DesignConstants.systemOrangeText)
+
+            VStack(spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Automatic Backups")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Text(lastBackupSummary)
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.secondaryText)
+                    }
+                    Spacer()
+                    Image(systemName: "externaldrive.fill.badge.checkmark")
+                        .foregroundStyle(DesignConstants.systemGreen)
+                        .font(.title3)
+                }
+
+                if let error = backupService.lastBackupError {
+                    Text("Last backup failed: \(error)")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
+                HStack(spacing: 12) {
+                    Button(action: {
+                        Task {
+                            let success = await backupService.performManualBackup()
+                            backupService.refreshBackupList()
+                            if !success, let err = backupService.lastBackupError {
+                                print("Manual backup failed: \(err)")
+                            }
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.clockwise")
+                            Text("Back Up Now")
+                                .bold()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(DesignConstants.systemGreen.opacity(0.15))
+                        .foregroundStyle(DesignConstants.systemGreen)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .disabled(backupService.isBackingUp)
+                    .buttonStyle(.plain)
+
+                    Button(action: {
+                        backupService.refreshBackupList()
+                    }) {
+                        HStack {
+                            Image(systemName: "list.bullet")
+                            Text("Refresh")
+                                .bold()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.gray.opacity(0.15))
+                        .foregroundStyle(.secondary)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                if !backupService.availableBackups.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Available Backups (\(backupService.availableBackups.count))")
+                            .font(.caption)
+                            .bold()
+                            .foregroundStyle(DesignConstants.secondaryText)
+
+                        ForEach(backupService.availableBackups.prefix(5)) { backup in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(backup.formattedDate)
+                                        .font(.caption)
+                                        .bold()
+                                        .foregroundStyle(DesignConstants.primaryText)
+                                    Text("\(backup.storeFiles) files · \(backup.formattedSize)")
+                                        .font(.caption2)
+                                        .foregroundStyle(DesignConstants.secondaryText)
+                                }
+                                Spacer()
+                                Button("Restore") {
+                                    showingRestoreAlert = true
+                                    pendingRestoreBackup = backup
+                                }
+                                .font(.caption)
+                                .tint(.orange)
+                                .disabled(backupService.isRestoring || backupService.isBackingUp)
+                                .buttonStyle(.plain)
+
+                                Button("Export") {
+                                    Task {
+                                        if let exportedURL = await backupService.exportBackupToDocuments(backup) {
+                                            await MainActor.run {
+                                                exportedURLs.append(exportedURL)
+                                                showingExportSuccess = true
+                                            }
+                                        }
+                                    }
+                                }
+                                .font(.caption)
+                                .buttonStyle(.plain)
+                            }
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 10)
+                            .background(DesignConstants.controlBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+            }
+            .padding(DesignConstants.standardPadding)
+            .background(DesignConstants.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignConstants.cardCornerRadius)
+                    .stroke(DesignConstants.glassBorderColor, lineWidth: 1)
+            )
+        }
+        .padding(.horizontal)
+        .alert("Restore Backup", isPresented: $showingRestoreAlert) {
+            Button("Cancel", role: .cancel) { pendingRestoreBackup = nil }
+            Button("Restore", role: .destructive) {
+                if let backup = pendingRestoreBackup {
+                    Task {
+                        let success = await backupService.restoreFromBackup(backup)
+                        if !success, let err = backupService.lastRestoreError {
+                            await MainActor.run {
+                                restoreAlertMessage = "Restore failed: \(err)"
+                            }
+                        } else {
+                            await MainActor.run {
+                                restoreAlertMessage = "Backup restored successfully. Restart the app to use the restored data."
+                            }
+                        }
+                        backupService.refreshBackupList()
+                        pendingRestoreBackup = nil
+                    }
+                }
+            }
+        } message: {
+            if let backup = pendingRestoreBackup {
+                Text("This will replace your current data store with the backup from \(backup.formattedDate). Your current data will be quarantined and can be recovered manually. Continue?")
+            } else {
+                Text("Select a backup to restore.")
+            }
+            if let message = restoreAlertMessage {
+                Text(message)
+                    .foregroundStyle(message.hasPrefix("Backup restored") ? DesignConstants.systemGreen : .red)
+            }
+        }
+        .alert("Backup Exported", isPresented: $showingExportSuccess) {
+            Button("OK", role: .cancel) {
+                exportedURLs.removeAll()
+            }
+        } message: {
+            if !exportedURLs.isEmpty, let url = exportedURLs.first {
+                Text("Backup exported to your Documents folder: \(url.lastPathComponent)")
+            } else {
+                Text("Export failed. Check that the backup folder is accessible.")
+            }
+        }
     }
 
     @ViewBuilder
