@@ -673,4 +673,7 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-11] ingest | pulse | david-grusch | 50 evidence | $0.50 | remaining=$1984.00 | david-grusch
 ## [2026-07-11] ingest | pulse | ariel-school-ufo-incident | 50 evidence | $0.50 | remaining=$1983.50 | ariel-school-ufo-incident
 ## [2026-07-11] ingest | pulse | kordylewski-clouds | 50 evidence | $0.50 | remaining=$1983.00 | kordylewski-clouds
+## [2026-07-11] ingest | pulse | Bob Lazar | 50 evidence | $0.50 | remaining=$1982.50 | bob-lazar
+## [2026-07-11] ingest | pulse | Roswell Crash | 50 evidence | $0.50 | remaining=$1981.50 | roswell-crash
+## [2026-07-11] ingest | almanac | 2026-07-11 | 3 entities | moved=0 collapsed=0 contested=0 | hash=be68f349a3ee2050 | 2026-07-11.html
 
