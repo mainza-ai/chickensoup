@@ -5,12 +5,15 @@ struct ChatMessage: Identifiable, Codable {
     var isUser: Bool
     var text: String
     var timestamp = Date()
+    var taskId: String? = nil
+    var researchStatus: String? = nil
 }
 
 struct ChatHistoryView: View {
     @Binding var messages: [ChatMessage]
     var onClear: () -> Void
     var onClose: () -> Void
+    var onApproveResearch: ((String) -> Void)? = nil
     
     @State private var scrollToBottom = false
     @State private var showWikiInsight = false
@@ -57,7 +60,7 @@ struct ChatHistoryView: View {
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach(messages) { msg in
-                            ChatBubbleView(message: msg, isCompact: isCompact)
+                            ChatBubbleView(message: msg, isCompact: isCompact, onApprove: onApproveResearch)
                                 .id(msg.id)
                         }
                     }
@@ -98,6 +101,11 @@ struct ChatHistoryView: View {
 struct ChatBubbleView: View {
     let message: ChatMessage
     var isCompact: Bool = false
+    var onApprove: ((String) -> Void)? = nil
+    
+    private var isResearching: Bool {
+        !message.isUser && message.taskId != nil && message.researchStatus != "completed" && message.researchStatus != "failed"
+    }
     
     var body: some View {
         HStack(alignment: .top, spacing: isCompact ? 4 : 8) {
@@ -111,14 +119,45 @@ struct ChatBubbleView: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.leading)
             } else {
-                Text(message.text)
-                    .font(.subheadline)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
-                    .foregroundStyle(DesignConstants.primaryText)
-                    .multilineTextAlignment(.leading)
+                VStack(alignment: .leading, spacing: 6) {
+                    if isResearching {
+                        HStack(spacing: 6) {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Researching…")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.systemOrangeText)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                    } else {
+                        Text(message.text)
+                            .font(.subheadline)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 12))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(DesignConstants.dividerColor, lineWidth: 1))
+                            .foregroundStyle(DesignConstants.primaryText)
+                            .multilineTextAlignment(.leading)
+                    }
+                    
+                    if !message.isUser, let taskId = message.taskId {
+                        HStack(spacing: 8) {
+                            if message.researchStatus == "failed" {
+                                Button {
+                                    // Retry handler is wired by ContentView via message replacement
+                                } label: {
+                                    Label("Retry", systemImage: "arrow.clockwise")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
                 Spacer(minLength: 40)
             }
         }

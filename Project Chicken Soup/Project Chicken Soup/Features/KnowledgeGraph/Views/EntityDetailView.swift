@@ -3,7 +3,10 @@ import SwiftUI
 struct EntityDetailView: View {
     let entityName: String
     let entity: NeighborhoodEntity?
-
+    @Environment(AlmanacService.self) private var almanacService
+    @State private var isPulsing = false
+    var onPulseCompleted: (() -> Void)? = nil
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DesignConstants.standardPadding) {
@@ -84,9 +87,56 @@ struct EntityDetailView: View {
         }
         .background(DesignConstants.warmBackground)
         .navigationTitle(entityName)
+        .toolbar {
+            if let entity = entity {
+                ToolbarItem(placement: .primaryAction) {
+                    if isPulsing {
+                        ProgressView("Researching...")
+                            .font(.caption)
+                            .foregroundStyle(DesignConstants.systemOrange)
+                    } else {
+                        Button {
+                            Task { await pulseCurrentEntity(entity.name) }
+                        } label: {
+                            Label("Research Now", systemImage: "bolt.fill")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.systemOrange)
+                        }
+                        .disabled(entity.name.isEmpty)
+                    }
+                }
+            }
+        }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+    }
+
+    private func pulseCurrentEntity(_ name: String) async {
+        isPulsing = true
+        defer { isPulsing = false }
+        let result = await almanacService.triggerPulseAsync(entityName: name)
+        guard let taskId = result?.taskId else { return }
+        _ = await pollPulseStatus(taskId: taskId)
+    }
+    
+    private func pollPulseStatus(taskId: String) async -> Bool {
+        var done = false
+        while !done {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            let status = await almanacService.fetchTaskStatus(taskId: taskId)
+            if let s = status {
+                if s.status == "completed" || s.status == "failed" || s.status == "success" {
+                    done = true
+                }
+            } else {
+                done = true
+            }
+        }
+        await MainActor.run {
+            onPulseCompleted?()
+        }
+        return true
     }
 
     private func confidenceRow(_ confidence: Double) -> some View {

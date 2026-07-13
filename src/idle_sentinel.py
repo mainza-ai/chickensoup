@@ -68,7 +68,7 @@ class IdleSentinel:
                 return False
                 
             chat_ingest_active = cache_store.redis_client.get(IdleSentinel._redis_key("chat_ingest"))
-            if chat_ingest_active and chat_ingest_active.decode() == "running":
+            if chat_ingest_active and chat_ingest_active == "running":
                 return False
                 
             # 2. Check timestamps of last interactive events
@@ -77,7 +77,7 @@ class IdleSentinel:
                 key = IdleSentinel._redis_key(activity)
                 val = cache_store.redis_client.get(key)
                 if val:
-                    last_time = datetime.fromisoformat(val.decode())
+                    last_time = datetime.fromisoformat(val)
                     if last_time.tzinfo is None:
                         last_time = last_time.replace(tzinfo=timezone.utc)
                     elapsed_min = (now - last_time).total_seconds() / 60.0

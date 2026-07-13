@@ -2,6 +2,10 @@ import SwiftUI
 
 struct WikiPageDetailView: View {
     @State var loader: WikiPageLoader?
+    @Environment(AlmanacService.self) private var almanacService
+    @State private var pulsingPageType: String? = nil
+    @State private var pulsingTitle: String? = nil
+    @State private var pulseTaskId: String? = nil
 
     init(loader: WikiPageLoader) {
         self._loader = State(initialValue: loader)
@@ -32,6 +36,59 @@ struct WikiPageDetailView: View {
         }
     }
 
+    @ViewBuilder
+    private func pulseButton(for d: APIWikiPageDetail) -> some View {
+        if let pageType = pulsingPageType, pageType == d.pageType {
+            ProgressView("Pulsing...")
+                .font(.caption)
+                .foregroundStyle(DesignConstants.systemOrange)
+        } else {
+            Button {
+                Task {
+                    pulsingPageType = d.pageType
+                    pulsingTitle = d.title
+                    let result = await almanacService.triggerPulseAsync(entityName: d.title)
+                    guard let taskId = result?.taskId else {
+                        pulsingPageType = nil
+                        pulsingTitle = nil
+                        return
+                    }
+                    pulseTaskId = taskId
+                    _ = await pollPulseStatus(taskId: taskId, title: d.title, pageType: d.pageType)
+                }
+            } label: {
+                Label("Pulse Now", systemImage: "bolt.fill")
+                    .font(.caption)
+                    .foregroundStyle(DesignConstants.systemOrange)
+            }
+        }
+    }
+
+    private func pollPulseStatus(taskId: String, title: String, pageType: String) async -> Bool {
+        var done = false
+        while !done {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            if pulsingPageType != pageType {
+                return false
+            }
+            let status = await almanacService.fetchTaskStatus(taskId: taskId)
+            if let s = status {
+                if s.status == "completed" || s.status == "failed" || s.status == "success" {
+                    done = true
+                }
+            } else {
+                done = true
+            }
+        }
+        await MainActor.run {
+            pulsingPageType = nil
+            pulsingTitle = nil
+            pulseTaskId = nil
+        }
+        await loader?.load()
+        return true
+    }
+
     private func detailContent(_ d: APIWikiPageDetail) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -53,6 +110,9 @@ struct WikiPageDetailView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 ShareLink(item: d.title + "\n\n" + d.body)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                pulseButton(for: d)
             }
         }
     }

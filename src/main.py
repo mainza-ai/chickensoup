@@ -376,6 +376,7 @@ def _build_query_response(query: str, output: Dict[str, Any], conversation_id: O
         history=history or [],
         claim_confidences=claim_confs,
         source_tier=source_tier,
+        task_id=output.get("task_id"),
     )
 
 
@@ -517,8 +518,12 @@ async def post_query(request: QueryRequest):
         except Exception as e:
             logger.warning(f"Failed to retrieve conversation history: {e}")
 
-        output = await orchestrator.execute(request.query)
+        output = await orchestrator.execute(request.query, history=history)
         response = _build_query_response(request.query, output, conversation_id=conversation_id, history=history)
+
+        # Async enrichment: return immediately with task_id instead of blocking answer
+        if output.get("status") == "task_created":
+            return response
 
         # Store updated conversation
         history.append({"role": "user", "content": request.query})
@@ -1155,12 +1160,20 @@ def post_ingest_pdf_folder(req: PdfFolderIngestRequest):
 from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
 
+_ws_conversations: Dict[int, str] = {}
+
 @app.websocket("/ws/agent")
 async def websocket_agent_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint for streaming agent responses and status updates.
     """
     await websocket.accept()
+    ws_id = id(websocket)
+    conversation_id = _ws_conversations.get(ws_id)
+    if not conversation_id:
+        import uuid
+        conversation_id = str(uuid.uuid4())
+        _ws_conversations[ws_id] = conversation_id
     try:
         while True:
             # Wait for incoming messages from the client
@@ -1179,9 +1192,19 @@ async def websocket_agent_endpoint(websocket: WebSocket):
                 await websocket.send_json({"status": "processing", "message": "Initiating search..."})
                 await asyncio.sleep(0.1)
                 
-                # Execute query via orchestrator
-                output = await orchestrator.execute(data)
-                response = _build_query_response(data, output)
+                # Retrieve prior conversation turns from Redis
+                history: List[Dict[str, str]] = []
+                try:
+                    from src.cache import cache_store
+                    raw = cache_store.get(_conversation_redis_key(conversation_id))
+                    if raw:
+                        history = json.loads(raw)
+                except Exception as e:
+                    logger.warning(f"Failed to retrieve WebSocket conversation history: {e}")
+
+                # Execute query via orchestrator with history
+                output = await orchestrator.execute(data, history=history)
+                response = _build_query_response(data, output, conversation_id=conversation_id, history=history)
                 
                 # Stream parts of the response
                 answer = response.answer
@@ -1198,8 +1221,20 @@ async def websocket_agent_endpoint(websocket: WebSocket):
                     "answer": answer,
                     "confidence": response.confidence,
                     "entities": response.entities,
-                    "sources": response.sources
+                    "sources": response.sources,
+                    "conversation_id": conversation_id,
+                    "history": response.history,
                 })
+                
+                # Store updated conversation
+                updated_history = history + [
+                    {"role": "user", "content": data},
+                    {"role": "assistant", "content": answer},
+                ]
+                try:
+                    cache_store.set(_conversation_redis_key(conversation_id), json.dumps(updated_history[-20:]), ttl=604800)
+                except Exception as e:
+                    logger.warning(f"Failed to store WebSocket conversation: {e}")
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected.")
     except Exception as e:
@@ -2063,6 +2098,27 @@ async def post_budget_approve():
         raise HTTPException(status_code=500, detail=f"Budget approve failed: {str(e)}")
 
 
+@app.post("/research/{thread_id}/approve", dependencies=[Depends(verify_api_key)])
+async def post_research_approve(thread_id: str):
+    try:
+        from src.agents.research_agent import research_graph
+        config = {"configurable": {"thread_id": thread_id}}
+        current_state = research_graph.get_state(config)
+        if not current_state or not current_state.values:
+            raise HTTPException(status_code=404, detail=f"No paused research found for thread '{thread_id}'")
+        updated_values = dict(current_state.values)
+        updated_values["human_approved"] = True
+        research_graph.update_state(config, updated_values)
+        final_state = research_graph.invoke({}, config=config)
+        summary = final_state.get("summary", "Approval processed.")
+        return {"success": True, "thread_id": thread_id, "summary": summary}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Research approve failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Research approve failed: {str(e)}")
+
+
 @app.post("/almanac/generate", response_model=AsyncTaskResponse)
 async def post_almanac_generate(background_tasks: BackgroundTasks, dry_run: bool = True):
     task = task_registry.create_task("Almanac Generation")
@@ -2112,6 +2168,35 @@ async def post_almanac_generate(background_tasks: BackgroundTasks, dry_run: bool
         status=task.status,
         message="Almanac generation task initiated in background."
     )
+
+
+@app.get("/almanac/summary")
+async def get_almanac_summary():
+    """Returns top contested claims and newly moved entities from the latest almanac."""
+    try:
+        from src.wiki.paths import get_almanac_dir as _get_ad
+        ad = _get_ad()
+        if not ad.exists():
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
+
+        md_files = sorted(ad.glob("*.md"), reverse=True)
+        if not md_files:
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
+        latest = md_files[0]
+        with open(latest, "r", encoding="utf-8") as f:
+            content = f.read()
+        contested = re.findall(r"- \*\*contested\*\*.*: (.+)", content)
+        entities = re.findall(r"^## (.+)$", content, re.MULTILINE)
+        entities_processed = [e for e in entities if not e.startswith("State of the Anomaly")]
+        return {
+            "date": latest.stem,
+            "contested_claims": contested[:10],
+            "newly_contested": len(contested),
+            "entities_processed": entities_processed,
+        }
+    except Exception as e:
+        logger.error(f"Almanac summary failed: {e}")
+        return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
 
 
 @app.get("/almanac/history")

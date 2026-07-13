@@ -33,7 +33,7 @@ def compute_staleness_score(slug: str) -> float:
         now = datetime.now(timezone.utc)
         last_pulse_val = cache_store.redis_client.get(_last_pulse_key(slug))
         if last_pulse_val:
-            last_pulse = datetime.fromisoformat(last_pulse_val.decode())
+            last_pulse = datetime.fromisoformat(last_pulse_val)
             if last_pulse.tzinfo is None:
                 last_pulse = last_pulse.replace(tzinfo=timezone.utc)
             days_stale = (now - last_pulse).total_seconds() / 86400.0
@@ -50,7 +50,7 @@ def compute_staleness_score(slug: str) -> float:
 
         # 4. State label contested bonus
         label_val = cache_store.redis_client.get(_state_label_key(slug))
-        state_label = label_val.decode() if label_val else "unverified"
+        state_label = label_val if label_val else "unverified"
         contested_bonus = 5.0 if state_label == "contested" else 0.0
 
         # Weights
@@ -108,29 +108,27 @@ def rebuild_queue():
 
     logger.info("Rebuilding staleness priority queue...")
     try:
-        # Find all files in wiki/entities/
         wiki_dir = settings.WIKI_DATA_DIR
-        entities_dir = os.path.join(wiki_dir, "entities")
-        if not os.path.isdir(entities_dir):
-            return
-
         slugs = []
-        for filename in os.listdir(entities_dir):
-            if filename.endswith(".md"):
-                slugs.append(filename[:-3])
+
+        for page_type in ("entities", "concepts", "projects"):
+            type_dir = os.path.join(wiki_dir, page_type)
+            if not os.path.isdir(type_dir):
+                continue
+            for filename in os.listdir(type_dir):
+                if filename.endswith(".md"):
+                    slugs.append(filename[:-3])
 
         if not slugs:
             return
 
-        # Calculate scores and batch load into ZSET
         mapping = {}
         for slug in slugs:
             score = compute_staleness_score(slug)
             mapping[slug] = score
 
-        # Clean queue first
         cache_store.redis_client.delete(QUEUE_REDIS_KEY)
         cache_store.redis_client.zadd(QUEUE_REDIS_KEY, mapping)
-        logger.info(f"Rebuilt staleness queue with {len(mapping)} entities.")
+        logger.info(f"Rebuilt staleness queue with {len(mapping)} pages across entities/concepts/projects.")
     except Exception as e:
         logger.warning(f"Failed to rebuild staleness queue: {e}")

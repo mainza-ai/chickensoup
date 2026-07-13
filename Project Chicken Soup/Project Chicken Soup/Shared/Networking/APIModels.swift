@@ -101,12 +101,14 @@ public struct APIQueryResponse: Codable {
     public var inferredEvents: [APITemporalEvent]
     public var inferredEntities: [APILoreEntity]
     public var conversationId: String?
+    public var taskId: String?
     
     enum CodingKeys: String, CodingKey {
         case responseText = "answer"
         case inferredEvents = "inferred_events"
         case inferredEntities = "inferred_entities"
         case conversationId = "conversation_id"
+        case taskId = "task_id"
     }
     
     public init(from decoder: Decoder) throws {
@@ -115,13 +117,15 @@ public struct APIQueryResponse: Codable {
         self.inferredEvents = try container.decodeIfPresent([APITemporalEvent].self, forKey: .inferredEvents) ?? []
         self.inferredEntities = try container.decodeIfPresent([APILoreEntity].self, forKey: .inferredEntities) ?? []
         self.conversationId = try container.decodeIfPresent(String.self, forKey: .conversationId)
+        self.taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
     }
     
-    public init(responseText: String, inferredEvents: [APITemporalEvent] = [], inferredEntities: [APILoreEntity] = [], conversationId: String? = nil) {
+    public init(responseText: String, inferredEvents: [APITemporalEvent] = [], inferredEntities: [APILoreEntity] = [], conversationId: String? = nil, taskId: String? = nil) {
         self.responseText = responseText
         self.inferredEvents = inferredEvents
         self.inferredEntities = inferredEntities
         self.conversationId = conversationId
+        self.taskId = taskId
     }
 }
 
@@ -1433,6 +1437,27 @@ public struct APITaskStatus: Codable, Hashable {
 public struct APIAlmanacFileResponse: Codable, Hashable {
     public var date: String
     public var content: String
+}
+
+public struct APIAlmanacSummaryResponse: Codable, Hashable {
+    public var date: String?
+    public var contestedClaims: [String]
+    public var newlyContested: Int
+    public var entitiesProcessed: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case contestedClaims = "contested_claims"
+        case newlyContested = "newly_contested"
+        case entitiesProcessed = "entities_processed"
+    }
+
+    public init(date: String?, contestedClaims: [String], newlyContested: Int, entitiesProcessed: [String]) {
+        self.date = date
+        self.contestedClaims = contestedClaims
+        self.newlyContested = newlyContested
+        self.entitiesProcessed = entitiesProcessed
+    }
 }
 
 

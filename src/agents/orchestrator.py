@@ -10,6 +10,8 @@ from src.agents.query_agent import QueryAgent, ParsedQuery
 from src.agents.research_agent import ResearchAgent
 from src.agents.navigation_agent import NavigationAgent
 from src.config import settings
+from src.tasks import task_registry, BackgroundTask
+import logging
 
 logger = logging.getLogger("chickensoup.agents.orchestrator")
 
@@ -33,7 +35,7 @@ class OrchestratorState:
 # Define Nodes using pydantic-graph BaseNode
 @dataclass
 class ClassifyNode(BaseNode[OrchestratorState, OrchestratorDeps]):
-    async def run(self, ctx: GraphRunContext[OrchestratorState, OrchestratorDeps]) -> Union["ResearchNode", "NavigateNode", "StatusNode"]:
+    async def run(self, ctx: GraphRunContext[OrchestratorState, OrchestratorDeps]) -> Union["ResearchNode", "NavigateNode", "StatusNode", "EnrichNode"]:
         logger.info("Orchestrator Graph -> Classifying query...")
         parsed = ctx.deps.query_agent.classify_and_parse(ctx.state.query, history=ctx.state.history)
         ctx.state.parsed_query = parsed
@@ -49,6 +51,8 @@ class ClassifyNode(BaseNode[OrchestratorState, OrchestratorDeps]):
             return NavigateNode()
         elif parsed.intent == "status":
             return StatusNode()
+        elif parsed.intent == "enrich":
+            return EnrichNode()
         else:
             return ResearchNode()
 
@@ -183,6 +187,83 @@ class StatusNode(BaseNode[OrchestratorState, OrchestratorDeps]):
         
         return End(ctx.state)
 
+
+@dataclass
+class EnrichNode(BaseNode[OrchestratorState, OrchestratorDeps]):
+    async def run(self, ctx: GraphRunContext[OrchestratorState, OrchestratorDeps]) -> End[OrchestratorState]:
+        logger.info("Orchestrator Graph -> Async enrichment task...")
+        parsed = ctx.state.parsed_query
+        entities = parsed.entities if parsed else [ctx.state.query]
+
+        task = task_registry.create_task(f"enrich:{entities[0] if entities else ctx.state.query}")
+
+        task.log(f"Starting enrichment for query: {ctx.state.query}")
+        task.log(f"Entities resolved: {entities}")
+        task.update_progress(0.1)
+
+        async def _run_enrichment():
+            try:
+                task.log("Running research agent...")
+                res = ctx.deps.research_agent.run_research(
+                    query=ctx.state.query,
+                    entities=entities,
+                    structured_filters=parsed.structured_filters if parsed else {},
+                    thread_id=ctx.state.thread_id,
+                    human_approved=ctx.state.human_approved,
+                    history=ctx.state.history
+                )
+                task.update_progress(0.8)
+                task.log("Research complete. Writing wiki page...")
+
+                from src.wiki.pulse_writer import write_pulse_snapshot
+                from pathlib import Path
+
+                title = entities[0] if entities else ctx.state.query
+                body = res.get("summary", ctx.state.query)
+                wiki_dir = Path(__file__).resolve().parent.parent / "wiki" / "entities"
+                wiki_dir.mkdir(parents=True, exist_ok=True)
+                page_path = wiki_dir / f"{title.lower().replace(' ', '-')}.md"
+                existing = page_path.read_text() if page_path.exists() else ""
+                if title.lower() not in existing.lower():
+                    page_path.write_text(f"# {title}\n\n{body}\n")
+                write_pulse_snapshot(
+                    entity_name=title,
+                    claims=[],
+                    status="success",
+                    source_count=len(res.get("sources", [])),
+                    tool="orchestrator_enrich",
+                    evidence_items=res.get("research_details", {}).get("evidence_items", []),
+                )
+                task.update_progress(1.0)
+                task.set_success({
+                    "status": "completed",
+                    "answer": res.get("summary", "Enrichment complete."),
+                    "entities": entities,
+                    "confidence": parsed.confidence if parsed else 0.7,
+                    "sources": res.get("sources", ["Local Wiki Knowledge Graph"]),
+                    "research_details": res,
+                })
+            except Exception as e:
+                logger.error(f"Enrichment task failed: {e}")
+                task.set_failed(str(e))
+
+        asyncio.get_event_loop().run_in_executor(None, lambda: asyncio.run(_run_enrichment()))
+
+        ctx.state.final_output = {
+            "status": "task_created",
+            "task_id": task.id,
+            "task_name": task.name,
+            "entities": entities,
+            "answer": (
+                f"Started async enrichment for {', '.join(entities)}. "
+                f"Poll GET /tasks/{task.id} for status."
+            ),
+            "confidence": parsed.confidence if parsed else 0.7,
+            "sources": ["Local Wiki Knowledge Graph"],
+        }
+
+        return End(ctx.state)
+
 # Construct GraphBuilder
 g = GraphBuilder(deps_type=OrchestratorDeps, state_type=OrchestratorState, output_type=OrchestratorState)
 
@@ -196,6 +277,7 @@ g.add(
     g.node(ResearchNode),
     g.node(NavigateNode),
     g.node(StatusNode),
+    g.node(EnrichNode),
     g.edge_from(g.start_node).to(start_step),
 )
 

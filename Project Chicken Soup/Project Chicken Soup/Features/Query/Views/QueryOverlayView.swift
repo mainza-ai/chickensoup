@@ -14,6 +14,7 @@ struct QueryOverlayView: View {
     var messages: [ChatMessage] = []
     var entities: [LoreEntity] = []
     var events: [TemporalEvent] = []
+    var onAlmanacTap: (() -> Void)? = nil
     
     @State private var isExpanded = false
     @FocusState private var isFocused: Bool
@@ -26,8 +27,41 @@ struct QueryOverlayView: View {
         backendService.suggestions
     }
     
+    private var almanacSummaryBanner: some View {
+        let summary = backendService.almanac.almanacSummary
+        let count = summary?.newlyContested ?? 0
+        let date = summary?.date
+        return Group {
+            if count > 0, let date = date {
+                Button {
+                    onAlmanacTap?()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(Color.orange)
+                        Text("Almanac update: \(count) contested claim\(count == 1 ? "" : "s") on \(date)")
+                            .font(.caption)
+                            .bold()
+                            .foregroundStyle(Color.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(DesignConstants.systemOrange.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.systemOrange.opacity(0.3), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 4)
+            }
+        }
+    }
+    
     var body: some View {
         VStack(spacing: DesignConstants.compactPadding) {
+            almanacSummaryBanner
             HStack(spacing: 6) {
                 if !isCompact {
                     Image(systemName: "sparkles")

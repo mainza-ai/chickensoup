@@ -2,12 +2,28 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-07-12
+updated: 2026-07-13
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-07-13] audit + fix | Phase 4 frontend closure + almanac edge case + entity refresh
+
+Completed deep audit comparing integration plan against codebase. Identified and closed all Phase 4 frontend gaps:
+- **A1**: Added `taskId: String?` to `APIQueryResponse` in `APIModels.swift` with proper `CodingKeys(taskId = "task_id")`
+- **A2**: Added `BackendQueryResult` struct to `BackendService.swift`, changed `submitQuery` return from `String?` to `BackendQueryResult`
+- **A3**: Added `taskId` and `researchStatus` to `ChatMessage`
+- **A4**: Updated `ChatHistoryView` with `onApproveResearch` callback, `ChatBubbleView` with `isResearching` state, approval/retry affordances
+- **A5**: Updated `ContentView.handleQuerySubmit` to spawn `pollResearchTask` when `taskId` is present (2s polling via `fetchTaskStatus`)
+- **A6**: Wired `onApproveResearch` closures through both desktop and iPhone `ChatHistoryView` call sites to `backendService.approveResearch(threadId:)`
+- **B**: Added `onPulseCompleted` closure to `EntityDetailView`, wired through `GraphExplorerView` to `backendService.selectEntity(name, context:)` for graph refresh after pulse
+- **D**: Fixed `GET /almanac/summary` regex from strict `\(.*?\) epi=.*?:` to plan's `.*:` pattern; fixed empty-case return to `entities_processed: []` instead of `int 0`
+
+Verified with affirmative `xcodebuild -project "Project Chicken Soup.xcodeproj"` — **BUILD SUCCEEDED**.
+
+Related: [[ai-chat-last30days-wiki-almanac-integration]]
 
 ## [2026-07-12] audit | Snapshot Feed Ecosystem Audit
 
@@ -846,3 +862,65 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-13] ingest | pulse | david-grusch | 14 evidence | $0.00 | remaining=$1980.50 | david-grusch
 ## [2026-07-13] ingest | pulse | aldo-rebelo | 9 evidence | $0.00 | remaining=$1980.50 | aldo-rebelo
 
+
+## [2026-07-13] audit | AI Chat / last30days / Wiki / Almanac Deep Integration Audit
+
+Deep-pass audit of the full AI research pipeline: AI chat query → ResearchAgent → last30days pulse → wiki ingestion → Living Almanac generation. Three live bugs found and documented. Integration plan written to [[ai-chat-last30days-wiki-almanac-integration]].
+
+Key findings:
+- **F10 (live bug)**: `POST /query` does not pass `history=history` to `orchestrator.execute()` (`main.py:520`). WebSocket handler has the same bug plus never fetches history at all (`main.py:1183`). Multi-turn queries have no conversational context.
+- **F11 (live bug)**: `staleness_queue.rebuild_queue()` scans only `wiki/entities/` (`staleness_queue.py:113`). Chat-created concept pages and research-thread project pages are structurally invisible to the idle pulse system.
+- **F12 (live bug)**: Research agent approval gate has no resume endpoint. Queries scoring below 0.4 confidence return `"PENDING APPROVAL"` permanently. No `POST /research/{thread_id}/approve` exists. `/budget/approve` pattern confirmed as template (`main.py:2055-2063`).
+- **F13 (precision correction)**: Almanac tier-1 selection is already dynamic over all three wiki dirs; the hardcoded `bob-lazar`/`element-115`/`roswell-crash` list is only a bootstrap fallback. What's genuinely missing is the promotion path — nothing auto-assigns `tier: 1` to a chat-created page.
+- **F14**: `MultiLLMConsensus` confirmed dead code outside `/consensus/query`. Not called by Orchestrator.
+- **F15**: `EntityDetailView.swift` has zero pulse/research-trigger wiring.
+
+Revised priority order: Phase 0 (3 small bug fixes) → Phase 1 Option C (rescoped, cheaper than original) → Phase 2 Option B → Phase 3 Option D → Phase 4 Option A.
+
+Plan: [[ai-chat-last30days-wiki-almanac-integration]]
+## [2026-07-13] ingest | pulse | area-51-and-s4 | 7 evidence | $0.00 | remaining=$1980.50 | area-51-and-s4
+
+
+## [2026-07-13] impl | Fix Redis `.decode()` calls in idle_sentinel and staleness_queue
+
+Redis client initialized with `decode_responses=True` in `cache.py:18`, meaning all `.get()` responses are already `str`. Two modules were calling `.decode()` on already-decoded strings, causing `AttributeError` on every idle check.
+
+Fixed:
+- `src/idle_sentinel.py:71,80` — removed `.decode()` calls
+- `src/staleness_queue.py:36,53` — removed `.decode()` calls
+
+`src/scheduler.py:59,83` already uses `isinstance(..., bytes)` guards and was not affected.
+
+Effect: Eliminates spurious `WARNING:chickensoup.idle_sentinel:Error checking idle status: 'str' object has no attribute 'decode'` warnings. Before fix, `is_idle()` was falling through to `return True` on every exception, meaning the idle sentinel was effectively blind — always reporting idle even during active periods.
+
+Added to integration plan as Phase 0d in [[ai-chat-last30days-wiki-almanac-integration]].
+## [2026-07-13] impl | Phase 1 — Chat-Triggered Auto-Pulse + Swift Pulse Now button
+
+Committed `77e1589` on develop.
+
+Backend:
+- `src/scheduler.py:process_eligible_conversations()` — after each `write_page()`, if `LAST30DAYS_ENABLED`, calls `staleness_queue.record_pulse_completed(slug)` to seed the Redis sorted set with initial "unverified" status. Eliminates wait for next `rebuild_queue()` cycle.
+- `src/scheduler.py:idle_ingestion_loop()` — after pulse completes with evidence, if page was chat-created (sources contain `conversation:`), appends top 3 claims by engagement as `## External Evidence` section to wiki body via `write_page()`.
+
+Swift:
+- `WikiPageDetailView.swift` — added `Pulse Now` toolbar button wired to `almanacService.triggerPulseAsync(entityName:)`. Polls `fetchTaskStatus(taskId:)` every 2s, refreshes page on completion.
+
+Phase 1 scope per [[ai-chat-last30days-wiki-almanac-integration]] complete.
+
+Phase 2 ("Research Now" button in entity detail views) and Phase 3 (Almanac summary → chat awareness) are next awaiting your review.
+## [2026-07-13] impl | Phase 2+3 — Research Now + Almanac Chat Awareness
+
+Committed `ed8f46f` on develop.
+
+Phase 2 — Research Now in entity views:
+- `EntityDetailView.swift` — added Research Now toolbar button wired to almanacService.triggerPulseAsync, polls fetchTaskStatus every 2s, refreshes page on completion. Button appears in macOS sidebar detail panel and iOS sheet.
+- `GraphExplorerView.swift` — no changes needed; it routes to EntityDetailView in both macOS detail column and iOS sheet, so the button appears automatically.
+
+Phase 3 — Almanac summary chat awareness:
+- `src/main.py` — added GET /almanac/summary endpoint, reads latest almanac markdown, returns contested claims + entities processed
+- `APIModels.swift` — added APIAlmanacSummaryResponse model
+- `AlmanacService.swift` — added almanacSummary state, isFetchingAlmanacSummary, fetchAlmanacSummary() async method
+- `ContentView.swift` — calls fetchAlmanacSummary() on launch via fetchInitialData(); passes onAlmanacTap closures to both QueryOverlayView instances; made activeDetailTab/activeTab non-private for closure mutation
+- `QueryOverlayView.swift` — added almanacSummaryBanner (conditional on contested claims count > 0); onAlmanacTap callback navigates to almanac tab
+
+Phase 4 (deep-research mode in /query) is next, awaiting your review.
