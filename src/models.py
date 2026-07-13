@@ -89,6 +89,7 @@ class QueryResponse(BaseModel):
     history: List[Dict[str, str]] = Field(default_factory=list, description="Previous turns in this conversation")
     claim_confidences: List[ClaimConfidence] = Field(default_factory=list)
     source_tier: str = Field("local", description="local | network_opt_in")
+    task_id: Optional[str] = Field(None, description="Background task ID when status is task_created")
 
 
 class NavigateRequest(BaseModel):

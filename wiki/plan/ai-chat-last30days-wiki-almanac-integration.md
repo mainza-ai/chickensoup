@@ -10,7 +10,7 @@ related: [langgraph-workflows, chat-to-wiki-conversion, living-almanac-engine, s
 # AI Chat ↔ last30days ↔ Wiki ↔ Living Almanac — Integration Plan
 
 **Companion to:** `wiki/plan/internal-wiki-content-audit-report.md`  
-**Status:** In progress — Phases 0–3 complete; Phase 4 awaiting your review.  
+**Status:** In progress — Phases 0–4 implemented. Swift polling support added. Ready for testing.  
 **Scope source:** Deep-pass audit dated 2026-07-13. Four live bugs and four design phases.
 
 ---
@@ -62,6 +62,31 @@ Backend + Swift wiring complete. Uses the **banner-in-chat** approach (simpler t
 - `AlmanacService.swift`: Added `almanacSummary: APIAlmanacSummaryResponse?` state, `isFetchingAlmanacSummary`, and `fetchAlmanacSummary()` (fires on app launch via `ContentView.fetchInitialData()`)
 - `QueryOverlayView.swift`: Added `onAlmanacTap: (() -> Void)?` parameter and `almanacSummaryBanner` — a tappable orange banner shown when `almanacSummary.newlyContested > 0`. Tapping calls `onAlmanacTap` to navigate to the Almanac view.
 - `ContentView.swift`: Passes `onAlmanacTap` closures to both `QueryOverlayView` instances — desktop switches `activeDetailTab = .almanac`, iPhone switches `activeTab = .almanac`.
+
+---
+
+### Phase 4 — Option A: Tight Deep-Research Mode in `/query` (complete)
+
+Uses the **background-task + poll** approach (fast-path sync return + background enrichment via `TaskRegistry`).
+
+**Backend:**
+- `src/agents/query_agent.py`: Added `"enrich"` to `ParsedQuery.intent` enum. Updated LLM prompt to include enrich intent definition (trigger phrases: "research", "deep-research", "pulse", "enrich"). Updated TQL and heuristic fallback parsers.
+- `src/agents/orchestrator.py`: Added `EnrichNode(BaseNode)`. `ClassifyNode.run()` returns `EnrichNode()` when `parsed.intent == "enrich"`. `OrchestratorDeps` imports `TaskRegistry` and `BackgroundTask`. `EnrichNode.run()` creates a task via `task_registry.create_task()`, executes research in a `run_in_executor` worker, writes a simple wiki stub via filesystem, writes pulse snapshot via `PulseWriter`, and sets task success/failure. GraphBuilder registers `EnrichNode`.
+- `src/main.py`: `_build_query_response()` adds optional `task_id`. `post_query()` short-circuits when `output.get("status") == "task_created"` — skips history append and returns immediately.
+- `src/models.py`: `QueryResponse.task_id: Optional[str]` added.
+- `GET /tasks/{task_id}` (already existed in `main.py:211`) is the polling endpoint. No new `/research/status/` route needed.
+
+**Swift:**
+- `APIModels.swift:APIQueryResponse`: Added `public var taskId: String?` with `CodingKeys(taskId = "task_id")`. Updated `init(from:)` and convenience init.
+- `BackendService.swift`: Added `BackendQueryResult` struct (`responseText`, `conversationId`, `taskId`). Changed `submitQuery` return type from `String?` to `BackendQueryResult`. Exposes `taskId` to the caller.
+- `ChatHistoryView.swift`: Updated `ChatMessage` to include `taskId: String?` and `researchStatus: String?`. Added `onApproveResearch` callback. `ChatBubbleView` renders `ProgressView("Researching…")` for messages with active `taskId`, text on completed status, retry affordance on failed. `onApprove` closure passed through for future approval-gated tasks.
+- `ContentView.swift:handleQuerySubmit`: After `submitQuery`, if `taskId` is present, appends a "Researching…" placeholder `ChatMessage` and spawns `pollResearchTask(taskId:placeholderId)` which polls `GET /tasks/{taskId}` every 2s via `backendService.almanac.fetchTaskStatus`. On terminal status, updates the matching message's text and `researchStatus` on `MainActor`. `ChatHistoryView` call sites (desktop `ContentView.swift:186` and iPhone `ContentView.swift:309`) pass `onApproveResearch` closures that call `backendService.approveResearch(threadId:)`.
+- `EntityDetailView.swift`: Added `onPulseCompleted: (() -> Void)?` closure. `pollPulseStatus` calls it on `MainActor` after terminal status. `GraphExplorerView` passes a closure that re-selects the entity via `backendService.selectEntity(name, context: modelContext)` to refresh graph data.
+
+**Backend fixes:**
+- `src/main.py` `GET /almanac/summary`: Relaxed regex to `r"- \*\*contested\*\*.*: (.+)"` (matches plan spec). Fixed empty-case return to `entities_processed: []` instead of `int 0` across all three early-return paths.
+
+Open questions (4, 5, 6) remain unresolved but do not block ship.
 
 ---
 

@@ -302,7 +302,9 @@ struct GraphExplorerView: View {
         #if !os(macOS)
         .sheet(item: $selectedEntityItem) { item in
             NavigationStack {
-                EntityDetailView(entityName: item.name, entity: backendService.graph.focusedEntityName == item.name ? backendService.graph.neighborhood?.entity : nil)
+                EntityDetailView(entityName: item.name, entity: backendService.graph.focusedEntityName == item.name ? backendService.graph.neighborhood?.entity : nil, onPulseCompleted: {
+                    backendService.selectEntity(item.name, context: modelContext)
+                })
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { selectedEntityItem = nil }

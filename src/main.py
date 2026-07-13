@@ -376,6 +376,7 @@ def _build_query_response(query: str, output: Dict[str, Any], conversation_id: O
         history=history or [],
         claim_confidences=claim_confs,
         source_tier=source_tier,
+        task_id=output.get("task_id"),
     )
 
 
@@ -519,6 +520,10 @@ async def post_query(request: QueryRequest):
 
         output = await orchestrator.execute(request.query, history=history)
         response = _build_query_response(request.query, output, conversation_id=conversation_id, history=history)
+
+        # Async enrichment: return immediately with task_id instead of blocking answer
+        if output.get("status") == "task_created":
+            return response
 
         # Store updated conversation
         history.append({"role": "user", "content": request.query})
@@ -2172,15 +2177,15 @@ async def get_almanac_summary():
         from src.wiki.paths import get_almanac_dir as _get_ad
         ad = _get_ad()
         if not ad.exists():
-            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
 
         md_files = sorted(ad.glob("*.md"), reverse=True)
         if not md_files:
-            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
         latest = md_files[0]
         with open(latest, "r", encoding="utf-8") as f:
             content = f.read()
-        contested = re.findall(r"- \*\*contested\*\* \(.*?\) epi=.*?: (.+)", content)
+        contested = re.findall(r"- \*\*contested\*\*.*: (.+)", content)
         entities = re.findall(r"^## (.+)$", content, re.MULTILINE)
         entities_processed = [e for e in entities if not e.startswith("State of the Anomaly")]
         return {
@@ -2191,7 +2196,7 @@ async def get_almanac_summary():
         }
     except Exception as e:
         logger.error(f"Almanac summary failed: {e}")
-        return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+        return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
 
 
 @app.get("/almanac/history")

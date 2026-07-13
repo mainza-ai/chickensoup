@@ -5,7 +5,8 @@ struct EntityDetailView: View {
     let entity: NeighborhoodEntity?
     @Environment(AlmanacService.self) private var almanacService
     @State private var isPulsing = false
-
+    var onPulseCompleted: (() -> Void)? = nil
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DesignConstants.standardPadding) {
@@ -118,7 +119,7 @@ struct EntityDetailView: View {
         guard let taskId = result?.taskId else { return }
         _ = await pollPulseStatus(taskId: taskId)
     }
-
+    
     private func pollPulseStatus(taskId: String) async -> Bool {
         var done = false
         while !done {
@@ -131,6 +132,9 @@ struct EntityDetailView: View {
             } else {
                 done = true
             }
+        }
+        await MainActor.run {
+            onPulseCompleted?()
         }
         return true
     }

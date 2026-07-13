@@ -2,12 +2,28 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-07-12
+updated: 2026-07-13
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-07-13] audit + fix | Phase 4 frontend closure + almanac edge case + entity refresh
+
+Completed deep audit comparing integration plan against codebase. Identified and closed all Phase 4 frontend gaps:
+- **A1**: Added `taskId: String?` to `APIQueryResponse` in `APIModels.swift` with proper `CodingKeys(taskId = "task_id")`
+- **A2**: Added `BackendQueryResult` struct to `BackendService.swift`, changed `submitQuery` return from `String?` to `BackendQueryResult`
+- **A3**: Added `taskId` and `researchStatus` to `ChatMessage`
+- **A4**: Updated `ChatHistoryView` with `onApproveResearch` callback, `ChatBubbleView` with `isResearching` state, approval/retry affordances
+- **A5**: Updated `ContentView.handleQuerySubmit` to spawn `pollResearchTask` when `taskId` is present (2s polling via `fetchTaskStatus`)
+- **A6**: Wired `onApproveResearch` closures through both desktop and iPhone `ChatHistoryView` call sites to `backendService.approveResearch(threadId:)`
+- **B**: Added `onPulseCompleted` closure to `EntityDetailView`, wired through `GraphExplorerView` to `backendService.selectEntity(name, context:)` for graph refresh after pulse
+- **D**: Fixed `GET /almanac/summary` regex from strict `\(.*?\) epi=.*?:` to plan's `.*:` pattern; fixed empty-case return to `entities_processed: []` instead of `int 0`
+
+Verified with affirmative `xcodebuild -project "Project Chicken Soup.xcodeproj"` — **BUILD SUCCEEDED**.
+
+Related: [[ai-chat-last30days-wiki-almanac-integration]]
 
 ## [2026-07-12] audit | Snapshot Feed Ecosystem Audit
 

@@ -17,7 +17,7 @@ WIKI_ENTITY_DIRS = [
 ]
 
 class ParsedQuery(BaseModel):
-    intent: str = Field(..., description="Query intent: query, navigate, or status")
+    intent: str = Field(..., description="Query intent: query, enrich, navigate, or status")
     entities: List[str] = Field(default_factory=list, description="Extracted entity names")
     structured_filters: Dict[str, Any] = Field(default_factory=dict, description="Extracted key-value filters (TQL-like)")
     confidence: float = Field(0.5, description="Confidence score of classification")
@@ -155,6 +155,8 @@ class QueryAgent:
             intent = "navigate"
         elif "status" in query.lower() or "health" in query.lower():
             intent = "status"
+        elif "enrich" in query.lower() or "research" in query.lower() or "pulse" in query.lower() or "deep-research" in query.lower():
+            intent = "enrich"
 
         return ParsedQuery(
             intent=intent,
@@ -225,12 +227,17 @@ class QueryAgent:
 
         Intent definitions:
         - "query": User seeks information, lore, answers, explanations, or wants to visualize/plot data about a topic. Use "query" when the user asks about something specific (people, places, events, concepts) — even if they use words like "plot", "map", or "chart".
+        - "enrich": User explicitly asks to research, deep-research, gather external evidence, or run a pulse/last30days lookup on an entity or topic. This is a request to start an async research task.
         - "navigate": User wants to calculate a spacetime trajectory, travel through time, or plot a course from one specific point to another (e.g., "navigate to 1947", "travel to Roswell"). This typically involves explicit origin/destination or year targets.
         - "status": User wants system health, component status, or operational checks.
 
         Examples:
         - "Plot timelines connected to Element 115" → intent: "query" (info about Element 115)
         - "What happened in Roswell in 1947?" → intent: "query"
+        - "Research Bob Lazar with external evidence" → intent: "enrich"
+        - "Deep-research Project Serpo" → intent: "enrich"
+        - "Run a pulse on the Philadelphia Experiment" → intent: "enrich"
+        - "Get latest evidence for Majestic-12" → intent: "enrich"
         - "Navigate from Earth-2026 to Earth-1947" → intent: "navigate"
         - "Navigate to 1947" → intent: "navigate"
         - "Show system status" → intent: "status"
@@ -239,7 +246,7 @@ class QueryAgent:
 
         Return ONLY a JSON object:
         {{
-            "intent": "query" | "navigate" | "status",
+            "intent": "query" | "enrich" | "navigate" | "status",
             "entities": ["entity1", ...],
             "structured_filters": {{...}},
             "confidence": 0.85
@@ -260,6 +267,8 @@ class QueryAgent:
             intent = "navigate"
         elif "status" in lower_q or "health" in lower_q or "check" in lower_q:
             intent = "status"
+        elif "enrich" in lower_q or "research" in lower_q or "pulse" in lower_q or "deep-research" in lower_q:
+            intent = "enrich"
 
         # Entity extraction: prefer wiki matches, fall back to capitalized words, fall back to query
         entities = []

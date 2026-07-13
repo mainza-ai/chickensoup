@@ -201,7 +201,7 @@ public final class BackendService {
         }
     }
 
-    public func submitQuery(_ text: String, isStructured: Bool, context: ModelContext) async -> String? {
+    public func submitQuery(_ text: String, isStructured: Bool, context: ModelContext) async -> BackendQueryResult {
         isSubmittingQuery = true
         defer { isSubmittingQuery = false }
 
@@ -243,11 +243,19 @@ public final class BackendService {
             }
 
             try? context.save()
-            return response.responseText
+            return BackendQueryResult(
+                responseText: response.responseText,
+                conversationId: response.conversationId,
+                taskId: response.taskId
+            )
         } catch {
             self.lastError = APIError.requestFailed(error)
             logger.error("Failed to submit query: \(error.localizedDescription)")
-            return nil
+            return BackendQueryResult(
+                responseText: "Error processing query: \(error.localizedDescription)",
+                conversationId: conversationId,
+                taskId: nil
+            )
         }
     }
 
@@ -453,6 +461,7 @@ public final class BackendService {
         await config.probeLLMProvider(name)
     }
 
+    @discardableResult
     public func approveResearch(threadId: String) async -> (success: Bool, summary: String)? {
         do {
             struct ApproveResponse: Codable {
@@ -471,5 +480,17 @@ public final class BackendService {
             logger.error("Failed to approve research for thread '\(threadId)': \(error.localizedDescription)")
             return nil
         }
+    }
+}
+
+public struct BackendQueryResult {
+    public let responseText: String
+    public let conversationId: String?
+    public let taskId: String?
+    
+    public init(responseText: String, conversationId: String? = nil, taskId: String? = nil) {
+        self.responseText = responseText
+        self.conversationId = conversationId
+        self.taskId = taskId
     }
 }

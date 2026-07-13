@@ -195,6 +195,9 @@ struct ContentView: View {
                                         withAnimation(.spring(duration: 0.3)) {
                                             backendService.graph.showChatHistory = false
                                         }
+                                    },
+                                    onApproveResearch: { threadId in
+                                        Task { await backendService.approveResearch(threadId: threadId) }
                                     }
                                 )
                                 Spacer()
@@ -318,6 +321,9 @@ struct ContentView: View {
                                             withAnimation(.spring(duration: 0.3)) {
                                                 backendService.graph.showChatHistory = false
                                             }
+                                        },
+                                        onApproveResearch: { threadId in
+                                            Task { await backendService.approveResearch(threadId: threadId) }
                                         }
                                     )
                                     .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -452,10 +458,69 @@ struct ContentView: View {
         }
         
         Task {
-            let response = await backendService.submitQuery(currentQuery, isStructured: isStructuredQuery, context: modelContext)
-            await MainActor.run {
-                withAnimation(.spring(duration: 0.4)) {
-                    messages.append(ChatMessage(isUser: false, text: response ?? "No response generated."))
+            let result = await backendService.submitQuery(currentQuery, isStructured: isStructuredQuery, context: modelContext)
+            
+            if let taskId = result.taskId {
+                let placeholder = ChatMessage(
+                    isUser: false,
+                    text: "Researching in the background…",
+                    taskId: taskId,
+                    researchStatus: "researching"
+                )
+                await MainActor.run {
+                    withAnimation(.spring(duration: 0.4)) {
+                        messages.append(placeholder)
+                    }
+                }
+                await pollResearchTask(taskId: taskId, placeholderId: placeholder.id)
+            } else {
+                await MainActor.run {
+                    withAnimation(.spring(duration: 0.4)) {
+                        messages.append(ChatMessage(isUser: false, text: result.responseText))
+                    }
+                }
+            }
+        }
+    }
+    
+    private func pollResearchTask(taskId: String, placeholderId: UUID) async {
+        var status: APITaskStatus?
+        
+        repeat {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            status = await backendService.almanac.fetchTaskStatus(taskId: taskId)
+        } while status?.status == "running"
+        
+        await MainActor.run {
+            withAnimation(.spring(duration: 0.4)) {
+                if let idx = messages.firstIndex(where: { $0.id == placeholderId }) {
+                    let current = messages[idx]
+                    let finalText: String
+                    let finalStatus: String
+                    
+                    if status?.status == "failed" {
+                        finalText = status?.logs.last ?? "Research failed."
+                        finalStatus = "failed"
+                    } else if let result = status?.result,
+                              let answer = result["answer"]?.value as? String {
+                        finalText = answer
+                        finalStatus = "completed"
+                    } else if let resultText = status?.result.map({ "\($0)" }) {
+                        finalText = resultText
+                        finalStatus = "completed"
+                    } else {
+                        finalText = "Research completed."
+                        finalStatus = "completed"
+                    }
+                    
+                    messages[idx] = ChatMessage(
+                        id: current.id,
+                        isUser: current.isUser,
+                        text: finalText,
+                        timestamp: current.timestamp,
+                        taskId: current.taskId,
+                        researchStatus: finalStatus
+                    )
                 }
             }
         }
