@@ -892,3 +892,19 @@ Swift:
 Phase 1 scope per [[ai-chat-last30days-wiki-almanac-integration]] complete.
 
 Phase 2 ("Research Now" button in entity detail views) and Phase 3 (Almanac summary → chat awareness) are next awaiting your review.
+## [2026-07-13] impl | Phase 2+3 — Research Now + Almanac Chat Awareness
+
+Committed `ed8f46f` on develop.
+
+Phase 2 — Research Now in entity views:
+- `EntityDetailView.swift` — added Research Now toolbar button wired to almanacService.triggerPulseAsync, polls fetchTaskStatus every 2s, refreshes page on completion. Button appears in macOS sidebar detail panel and iOS sheet.
+- `GraphExplorerView.swift` — no changes needed; it routes to EntityDetailView in both macOS detail column and iOS sheet, so the button appears automatically.
+
+Phase 3 — Almanac summary chat awareness:
+- `src/main.py` — added GET /almanac/summary endpoint, reads latest almanac markdown, returns contested claims + entities processed
+- `APIModels.swift` — added APIAlmanacSummaryResponse model
+- `AlmanacService.swift` — added almanacSummary state, isFetchingAlmanacSummary, fetchAlmanacSummary() async method
+- `ContentView.swift` — calls fetchAlmanacSummary() on launch via fetchInitialData(); passes onAlmanacTap closures to both QueryOverlayView instances; made activeDetailTab/activeTab non-private for closure mutation
+- `QueryOverlayView.swift` — added almanacSummaryBanner (conditional on contested claims count > 0); onAlmanacTap callback navigates to almanac tab
+
+Phase 4 (deep-research mode in /query) is next, awaiting your review.

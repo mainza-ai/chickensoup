@@ -10,7 +10,7 @@ related: [langgraph-workflows, chat-to-wiki-conversion, living-almanac-engine, s
 # AI Chat ↔ last30days ↔ Wiki ↔ Living Almanac — Integration Plan
 
 **Companion to:** `wiki/plan/internal-wiki-content-audit-report.md`  
-**Status:** In progress — Phase 0 and Phase 1 complete; Phases 2–4 awaiting your review.  
+**Status:** In progress — Phases 0–3 complete; Phase 4 awaiting your review.  
 **Scope source:** Deep-pass audit dated 2026-07-13. Four live bugs and four design phases.
 
 ---
@@ -36,6 +36,32 @@ related: [langgraph-workflows, chat-to-wiki-conversion, living-almanac-engine, s
 **1b — Wiki page enrichment after pulse**: Implemented. In `idle_ingestion_loop`, after a pulse completes with evidence, if the wiki page was chat-created (sources contain `conversation:`), the top 3 claims by engagement are appended as a `## External Evidence` section to the wiki body via `write_page()`.
 
 **1c — Swift "Pulse Now" button**: Implemented. `WikiPageDetailView` now exposes a toolbar button calling `almanacService.triggerPulseAsync(entityName:)`. A `pollPulseStatus` task polls `fetchTaskStatus(taskId:)` every 2 seconds and refreshes the page when the pulse completes.
+
+---
+
+### Phase 2 — Option B: "Research Now" in Graph Views (complete, committed `ed8f46f`)
+
+Implemented in `EntityDetailView.swift`. `GraphExplorerView` requires no changes — it already embeds `EntityDetailView` in both the macOS `NavigationSplitView` detail column and the iOS sheet, so the new toolbar button appears automatically in all contexts.
+
+- **Toolbar button**: Added `Research Now` toolbar item wired to `almanacService.triggerPulseAsync(entityName:)`
+- **Polling**: `pollPulseStatus(taskId:)` polls `fetchTaskStatus(taskId:)` every 2 seconds
+- **Completion**: On terminal status (`completed`/`failed`/`success`), the view refreshes via `loader?.load()`
+- **State**: `isPulsing` drives a `ProgressView("Researching...")` in the toolbar during the pulse
+
+---
+
+### Phase 3 — Option D: Almanac-Driven Chat Awareness (complete, committed `ed8f46f`)
+
+Backend + Swift wiring complete. Uses the **banner-in-chat** approach (simpler than prompt injection, no LLM prompt changes).
+
+**Backend:**
+- `src/main.py`: Added `GET /almanac/summary`. Reads the most recent almanac `.md` file, returns `date`, `contested_claims` (top 10), `newly_contested` count, and `entities_processed` list.
+
+**Swift:**
+- `APIModels.swift`: Added `APIAlmanacSummaryResponse` with CodingKeys for snake_case JSON
+- `AlmanacService.swift`: Added `almanacSummary: APIAlmanacSummaryResponse?` state, `isFetchingAlmanacSummary`, and `fetchAlmanacSummary()` (fires on app launch via `ContentView.fetchInitialData()`)
+- `QueryOverlayView.swift`: Added `onAlmanacTap: (() -> Void)?` parameter and `almanacSummaryBanner` — a tappable orange banner shown when `almanacSummary.newlyContested > 0`. Tapping calls `onAlmanacTap` to navigate to the Almanac view.
+- `ContentView.swift`: Passes `onAlmanacTap` closures to both `QueryOverlayView` instances — desktop switches `activeDetailTab = .almanac`, iPhone switches `activeTab = .almanac`.
 
 ---
 
