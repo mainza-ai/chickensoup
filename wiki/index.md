@@ -72,6 +72,7 @@ related: []
  - [[mauro-biglino]] — Former Vatican translator, literal Hebrew Bible, Elohim as plural advanced civilization
  - [[kordylewski-clouds]] — Earth-Moon L4/L5 dusty plasma clouds, auroral circuit hypothesis
  - [[robert-temple]] — Author of "A New Science of Heaven," plasma-consciousness thesis
+ - [[ginestra-bianconi]] — Theoretical physicist, entropic action theory of gravity, QMUL
 
 ## Concepts (in wiki/concepts/)
 
@@ -137,6 +138,7 @@ related: []
 - [[temporal-anomaly-detection]] — Detecting unusual patterns
 - [[temporal-quantum-tomography]] — Reconstructing quantum state
 - [[entropic-gravity]] — Gravity as emergent thermodynamic phenomenon (Verlinde)
+- [[entropic-action-gravity]] — Bianconi 2025: derives gravity from quantum relative entropy between metrics, introduces G-field
 - [[quadratic-gravity]] — Renormalizable 4D quantum gravity without extra dimensions (Turok)
 - [[malament-hogarth]] — Spacetimes enabling hypercomputation via causal structure
 - [[simulation-escape]] — Escaping nested simulations (Yampolskiy)

@@ -47,5 +47,7 @@ Verlinde acknowledges the theory needs further development and may be decades fr
 - [[entropy]]
 - [[holographic-principle]]
 - [[black-hole-entropy]]
+- [[arrow-of-time]]
 - [[information-is-physical]]
+- [[entropic-action-gravity]] — Bianconi 2025: derives gravity from quantum relative entropy between spacetime and matter-induced metrics, introduces G-field
 - [[field-manipulation]]
