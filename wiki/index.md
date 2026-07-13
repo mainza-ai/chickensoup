@@ -30,32 +30,6 @@ related: []
 - [[exponential-quantum-speedup]] — Quantum speedup for coupled oscillators
 - [[the-new-science-of-uap]] — Comprehensive UAP review
 - [[implementation-of-quantum-algorithms]] — Concrete quantum implementations
-- [[omlx]] — Optimized LLM inference server for Apple Silicon
-- [[ollama]] — Local LLM runner with OpenAI-compatible API
-- [[lm-studio]] — Desktop app for running LLMs locally
-- [[neo4j]] — Graph database for knowledge graph
-- [[redis]] — In-memory cache for LLM responses and quantum results
-- [[fastapi]] — Modern Python API framework
-- [[fastmcp]] — Model Context Protocol server
-- [[pydantic-ai]] — Python agent framework
-- [[pydantic-graph]] — Graph-based agent orchestration
-- [[langgraph]] — LangGraph for complex sub-workflows
-- [[docker]] — Containerization and orchestration
-- [[celery]] — Distributed task queue
-- [[ray]] — Distributed computing framework
-- [[opentelemetry]] — Observability framework
-- [[pydantic-settings]] — Configuration management
-- [[pytest]] — Testing framework
-- [[pyproject-toml]] — Build configuration
-- [[docker-compose]] — Multi-container orchestration
-- [[apple-reference-guides]] — Apple platform coding references (AppIntents, Liquid Glass, AlarmKit, WebKit, FoundationModels, Swift concurrency, SwiftData, MapKit, StoreKit, visionOS, more)
-- [[swiftui-pro]] — Agent skill: SwiftUI best practices (twostraws)
-- [[swiftdata-pro]] — Agent skill: SwiftData best practices (twostraws)
-- [[swift-concurrency-pro]] — Agent skill: Swift concurrency best practices (twostraws)
-- [[swift-testing-pro]] — Agent skill: Swift Testing best practices (twostraws)
-- [[github-actions]] — CI/CD for automated testing, building, deployment
-- [[core-models]] — Core Pydantic models for the system
-- [[logging]] — Logging and observability setup with OpenTelemetry tracing and metrics
 - [[ezekiel]] — Prophet with chariot vision (593 BC)
 - [[daniel]] — Prophet with throne vision (605-536 BC)
 - [[eric-burles]] — Rep. Eric Burles (R-MO), congressional UAP disclosure advocate
@@ -94,12 +68,8 @@ related: []
 - [[death-ray]] — Tesla's particle beam weapon, a precursor to modern UAP energy weapons
 - [[ralph-larson]] — Former CIA officer and DOE intelligence director who claims time travel to medieval Mount Athos
 - [[neil-turok]] — Physicist working on quadratic gravity and CPT-symmetric universe
-- [[juan-maldacena]] — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior
-- [[mauro-biglino]] — Former Vatican translator, literal Hebrew Bible, Elohim as plural advanced civilization
-- [[knowledge-graph-ingestion]] — Wiki markdown to Neo4j ingestion with schema-constrained LLM edge classification
-- [[wiki-backup-restore]] — Wiki snapshot creation, export/import, and backup management
-- [[wiki-cleanup]] — Bulk content deletion with tag-based preservation rules
- - [[physics-of-time-travel]] — Time travel physics transcript covering paradoxes and entropic closed timelike curves
+ - [[juan-maldacena]] — Discoverer of AdS/CFT correspondence, ER=EPR, black hole interior
+ - [[mauro-biglino]] — Former Vatican translator, literal Hebrew Bible, Elohim as plural advanced civilization
  - [[kordylewski-clouds]] — Earth-Moon L4/L5 dusty plasma clouds, auroral circuit hypothesis
  - [[robert-temple]] — Author of "A New Science of Heaven," plasma-consciousness thesis
 
@@ -138,20 +108,12 @@ related: []
 - [[quantum-machine-learning]] — QML for pattern recognition
 - [[hamiltonian-simulation]] — Simulate spacetime field evolution
 - [[local-first-llm]] — Local-first LLM with auto-discovery
-- [[wiki-file-system]] — Wiki page CRUD, cross-referencing, index/log management
-- [[ingestion-pipeline]] — File/folder upload with AI analysis and wiki commit
-- [[chat-to-wiki-pipeline]] — Periodic background conversion of conversations into wiki pages
 - [[llm-discovery]] — LLM auto-discovery mechanism
 - [[llm-fallback-chain]] — LLM fallback chain (oMLX → Ollama → LM Studio)
 - [[agent-architecture]] — Multi-agent architecture with confidence gating, wiki file fallback, timeout isolation, and routing observability
 - [[knowledge-graph-schema]] — Knowledge graph schema (nodes, relationships, properties)
-- [[api-design]] — 30+ endpoints with FastAPI and Pydantic models (20+ models, ingest, chat-to-wiki, conversation)
-- [[mcp-server]] — MCP server design and tools
-- [[langgraph-features]] — LangGraph features (checkpointing, human-in-the-loop, etc.)
-- [[production-readiness]] — Production readiness checklist
 - [[quantum-state-representation]] — Quantum state representation
 - [[quantum-error-model]] — Quantum error model
-- [[agent-skills]] — Four twostraws agent skills for Swift implementation
 - [[temporal-data-model]] — Temporal data model for time travel
 - [[credibility-scoring]] — Credibility scoring for claims
 - [[evaluation-framework]] — Evaluation framework for the system
@@ -182,10 +144,6 @@ related: []
 - [[cellular-intelligence]] — Every cell as reinforcement learning agent
 - [[weak-measurement]] — Conditional measurements, retrocausality, time symmetry
 - [[multi-llm-consensus]] — Cross-provider LLM consensus with Jaccard agreement scoring
-- [[api-authentication]] — API key header verification with dev mode support
-- [[celery-tasks]] — Async background tasks for wiki ingestion and spacetime navigation
-- [[quantum-job-scheduler]] — Quantum hardware job submission (IBM, D-Wave, IonQ)
-- [[swift-frontend-architecture]] — SwiftUI app structure, models, services, networking, features, conversation support, discovery sync
  - [[post-quantum-cryptographic-governance]] — Assemblage theory analysis of how states govern the quantum cybersecurity threat (Csenkey & Bindel, 2022)
  - [[quantum-coupled-oscillator-simulation]] — WISER/Classiq 2026 implementation of Babbush et al. exponential quantum speedup for coupled oscillator simulation
  - [[non-unitary-coupled-cluster-quantum]] — Mid-circuit measurement extension of coupled cluster for quantum chemistry; 28% CNOT / 57% T-gate reduction (Fleury et al., 2024)
@@ -205,22 +163,16 @@ related: []
 - [[quantum-systems]] (in concepts/) — Quantum platform comparison
 - [[quantum-systems-comparison]] (in projects/)
 - [[langgraph-workflows]] (in projects/)
-- [[master-implementation-plan]] (in projects/) — Master Implementation Plan: Living Almanac hardening, idle-driven scheduling redesign, evidence pipeline fix, XSS fix, 6-stage execution with dependency graph
 
 ## Other Concepts (in wiki/concepts/)
 
 - [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, 7-phase plan, gap analysis, production hardening (fully implemented, 90 tests green, idle scheduler, resource ledger, staleness queue, semantic disambiguation)
 - [[credibility-scoring]] — Claim wavefunction scoring with VQE over 3-basis, decoupled epi/traction, falsifiable inputs, calibration fixtures
-- [[api-design]] — 40+ endpoints including Living Almanac: pulse, divergence, timeline, entanglement, tribunal, budget, almanac
 - [[agent-architecture]] — Multi-agent with wavefunction wiring, tribunal gated cost control, inferred_events fix
-- [[project-structure]] — Full directory tree (48 py files, 19 test files, wiki/raw/pulse + almanac dirs)
 - [[technology-stack]] — Layer-to-technology mapping including quantum credibility + almanac
 - [[key-decisions]] — Now 30+ decisions including wavefunction, budget Lua atomic, network opt-in tier, HOLD approval, shell=False
 - [[ui-ux-design]] — SwiftUI, light mode default, #FF9500 accent, custom layout, timeline-first, floating query overlay, integrated AI Navigator, 2D with depth
-- [[swift-frontend-architecture]] — Now includes pulse/budget/almanac service methods, models, charts, WKWebView for briefs
 
 ## Plans (in wiki/plan/)
 
-- [[frontend-settings-menu]] — SwiftUI Settings menu plan to reach final DOD: budget display, HOLD approval, pulse triggers, almanac dry-run/live, timeline slider, entity divergence rows, DOD checklist
-- [[master-implementation-plan]] — Master implementation plan: 6-stage sequenced execution (XSS → evidence pipeline → cohesion → idle-driven scheduling → query intelligence → verification)
-- [[snapshot-feed-fixes]] — Snapshot feed dedup & grouping fix plan: latest-per-entity write dedup, truthful deduped status, /pulse/history latest=true grouping, SwiftUI expandable re-run rows, per-entity purge, 8 PRs, conflict resolution, dependency graph
+- (internal implementation plans moved to wiki/plan/internal/)

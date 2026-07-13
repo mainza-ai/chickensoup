@@ -4,7 +4,7 @@ tags: [overview]
 created: 2026-06-22
 updated: 2026-07-12
 sources: []
-related: [chat-to-wiki-pipeline, ingestion-pipeline, wiki-file-system, time-travel-machinery-architecture, living-almanac, agent-architecture]
+related: [time-travel-machinery-architecture, living-almanac, agent-architecture]
 ---
 
 # Overview
@@ -41,10 +41,7 @@ This wiki covers:
 
 ## Pipeline Architecture
 
-- [[chat-to-wiki-pipeline]] — Periodic background conversion of conversations into wiki pages (scheduler, ChatIngestAgent, eligibility detection, research threads)
-- [[ingestion-pipeline]] — File/folder upload with AI analysis and wiki commit
-- [[wiki-file-system]] — Markdown CRUD, YAML frontmatter, cross-referencing, index/log management
-- **Living Almanac Pipeline (NEW):** `last30days CLI` → [[pulse-agent]] → [[quantum-credibility-wavefunction]] → [[divergence-engine]] → [[entanglement-correlation]] → [[tribunal-agent]] → `wiki/raw/almanac/{date}.html` (autonomous daily via scheduler)
+- **Living Almanac Pipeline:** autonomous daily brief sourced from live evidence via the pulse agent
 - [[frontend-settings-menu]] — SwiftUI Settings plan for final DOD (budget display, HOLD approval, pulse triggers, almanac dry-run/live, timeline slider)
 
 ## See Also
@@ -56,6 +53,5 @@ This wiki covers:
 - [[local-first-llm]]
 - [[earth-as-space-craft]]
 - [[ui-ux-design]]
- - [[agent-skills]]
- - [[kordylewski-clouds]] — Earth-Moon dusty plasma clouds, plasma intelligence emergence
- - [[credibility-scoring]] — Claim wavefunction scoring (corroborated/contested/unverified with VQE, epistemic vs traction)
+- [[kordylewski-clouds]] — Earth-Moon dusty plasma clouds, plasma intelligence emergence
+- [[credibility-scoring]] — Claim wavefunction scoring (corroborated/contested/unverified with VQE, epistemic vs traction)
