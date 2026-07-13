@@ -35,6 +35,7 @@ Project Chicken Soup is a production-quality, local-first system that simulates 
 - **Chat-to-Wiki Pipeline**: Periodic background conversion of user–AI conversations into wiki pages, research threads, and temporal events.
 - **Living Almanac — Quantum Credibility Engine** (NEW): Every claim gets a quantum wavefunction over {CORROBORATED, CONTESTED, UNVERIFIED} scored through real `FieldGeometryTensor` + Qiskit/PennyLane machinery, with social traction kept as a separate number. Divergence, entanglement correlation, adversarial tribunal, and an autonomous daily HTML digest that writes itself.
 - **Apple SwiftUI Client**: Native macOS & iOS application with a warm, "chicken soup" systemOrange accent theme (`#FF9500`) powered by **SwiftData**.
+- **Async Deep-Research in Chat** (Phase 4): When you ask the AI to "research", "deep-research", or "pulse" an entity, the chat immediately returns what it knows from the wiki while a background task runs `last30days` ingestion, wavefunction scoring, and wiki update. The chat card polls `GET /tasks/{task_id}` every 2 seconds and updates with the enriched answer when complete. Approval-gated budget releases surface an inline "Approve" button.
 
 ---
 
@@ -49,6 +50,7 @@ graph TD
     subgraph AI_Orch ["AI Orchestration Layer (Python)"]
         Orchestrator[Orchestrator Graph: pydantic-graph]
         Query[Query Agent: TQL + LLM + Heuristic]
+        Enrich[EnrichNode: async background research]
         Research[Research Agent: LangGraph + Wiki Fallback + Wavefunction Scoring]
         Navigator[Navigation Agent: Quantum Pipeline]
         Ingest[Ingest Agent: File/Folder → Wiki]
@@ -58,6 +60,7 @@ graph TD
         Scheduler[Scheduler: Chat Ingest + Almanac Loops]
         
         Orchestrator --> Query
+        Orchestrator --> Enrich
         Orchestrator --> Research
         Orchestrator --> Navigator
         Research --> Tribunal
@@ -168,6 +171,9 @@ src/scheduler.py  (periodic_almanac_loop alongside chat ingest loop)
 | `POST` | `/budget/approve` | Clear HOLD |
 | `POST` | `/almanac/generate?dry_run=` | Trigger almanac generation |
 | `GET` | `/almanac/history?limit=` | List published briefs |
+| `POST` | `/query` | Runs an AI query. For "research"/"deep-research"/"pulse"/"enrich" intent, returns `task_id` immediately and continues in background |
+| `GET` | `/tasks/{task_id}` | Poll status, progress, logs, and final result for an async background task |
+| `POST` | `/research/{thread_id}/approve` | Resume a paused research thread after budget/approval gate |
 
 ---
 
