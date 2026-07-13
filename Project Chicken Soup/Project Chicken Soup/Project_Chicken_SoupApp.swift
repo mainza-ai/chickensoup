@@ -34,10 +34,10 @@ struct Project_Chicken_SoupApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(AlmanacService.self, .shared)
-                .environment(BackendService.self, .shared)
-                .environment(LLMDiscoveryService.self, .shared)
-                .environment(DataStoreBackupService.self, .shared)
+                .environment(AlmanacService.shared)
+                .environment(BackendService.shared)
+                .environment(LLMDiscoveryService.shared)
+                .environment(DataStoreBackupService.shared)
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .background {
                         Task { @MainActor in
