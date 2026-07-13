@@ -90,6 +90,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(spacing: DesignConstants.loosePadding) {
                 brandHeader
+                appearanceSection
                 headerBanner
                 backendPickerSection
                 llmConfigSection
@@ -285,6 +286,43 @@ struct SettingsView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+    }
+
+    private var appearanceSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("APPEARANCE")
+                .font(.caption)
+                .bold()
+                .foregroundStyle(DesignConstants.systemOrangeText)
+
+            VStack(spacing: 0) {
+                Toggle(isOn: Binding(
+                    get: { backendService.config.isDarkMode },
+                    set: { _ in backendService.config.toggleTheme() }
+                )) {
+                    HStack {
+                        Image(systemName: backendService.config.isDarkMode ? "sun.max.fill" : "moon.fill")
+                            .foregroundStyle(backendService.config.isDarkMode ? .yellow : .indigo)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(backendService.config.isDarkMode ? "Dark Mode" : "Light Mode")
+                                .font(.body)
+                                .bold()
+                                .foregroundStyle(DesignConstants.primaryText)
+                            Text("Switch the app appearance between light and dark.")
+                                .font(.caption)
+                                .foregroundStyle(DesignConstants.secondaryText)
+                        }
+                        Spacer()
+                    }
+                }
+                .toggleStyle(SwitchToggleStyle(tint: DesignConstants.systemOrange))
+                .padding(.horizontal, DesignConstants.compactPadding)
+                .padding(.vertical, DesignConstants.compactPadding)
+            }
+            .background(DesignConstants.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .padding(.horizontal, DesignConstants.standardPadding)
     }
 
     @ViewBuilder
