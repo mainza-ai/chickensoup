@@ -123,7 +123,7 @@ struct PulsesHistorySection: View {
             NavigationStack {
                 List {
                     ForEach(groupedPulses) { group in
-                        groupRow(for: group, isExpanded: .constant(true))
+                        groupRow(for: group, isExpanded: Binding<Bool>.constant(true))
                     }
                 }
                 .navigationTitle("Ingestion Snapshots History")
