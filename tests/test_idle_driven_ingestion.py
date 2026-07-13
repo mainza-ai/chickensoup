@@ -102,19 +102,32 @@ def test_idle_sentinel_activity_updates():
 # ── Resource Ledger Tests ────────────────────────────────────────────
 
 def test_resource_ledger_paid_and_free():
-    # Test paid ledger checks budget_tracker
-    with patch("src.resource_ledger.budget_tracker") as mock_bt:
-        mock_bt.check_budget.return_value = (True, 15.0, "ok")
-        mock_bt.get_status.return_value = MagicMock(spent_usd=5.0, ceiling_usd=20.0, remaining_usd=15.0)
-        
-        allowed, remaining, reason = ResourceLedger.check_budget(is_paid=True)
-        assert allowed
-        assert remaining == 15.0
-        
-    # Test free ledger checking sliding window
-    allowed, remaining, reason = ResourceLedger.check_budget(is_paid=False)
-    assert allowed
-    assert remaining > 0
+    from src.config import settings
+    orig_enabled = settings.LAST30DAYS_ENABLED
+    settings.LAST30DAYS_ENABLED = True
+
+    try:
+        # Test paid ledger checks budget_tracker
+        with patch("src.resource_ledger.budget_tracker") as mock_bt:
+            mock_bt.check_budget.return_value = (True, 15.0, "ok")
+            mock_bt.get_status.return_value = MagicMock(spent_usd=5.0, ceiling_usd=20.0, remaining_usd=15.0)
+
+            allowed, remaining, reason = ResourceLedger.check_budget(is_paid=True)
+            assert allowed
+            assert remaining == 15.0
+
+        # Test free ledger: mock no Redis so it falls through to ceiling default
+        with patch("src.resource_ledger.cache_store") as mock_cache, \
+             patch("src.resource_ledger.settings") as mock_settings:
+            mock_cache.redis_client = None
+            mock_settings.FREE_TIER_ENABLED = True
+            mock_settings.FREE_TIER_REQUESTS_PER_HOUR = 60
+
+            allowed, remaining, reason = ResourceLedger.check_budget(is_paid=False)
+            assert allowed
+            assert remaining == 60.0
+    finally:
+        settings.LAST30DAYS_ENABLED = orig_enabled
 
 # ── Staleness Priority Queue Tests ───────────────────────────────────
 
