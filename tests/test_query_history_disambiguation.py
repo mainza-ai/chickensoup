@@ -49,26 +49,30 @@ def test_pulse_agent_semantic_disambiguation():
     
     with patch("subprocess.run") as mock_run, \
          patch("src.agents.pulse_agent.ResourceLedger") as mock_ledger, \
-         patch("src.wiki.writer.read_page") as mock_read:
-         
-         # Mock organization page
-         mock_read.return_value = {
-             "frontmatter": {
-                 "tags": ["organization"],
-                 "last30days_handles": {}
-             }
-         }
-         
-         mock_status = MagicMock()
-         mock_status.paid_remaining = 19.5
-         mock_ledger.get_status.return_value = mock_status
-         mock_ledger.check_budget.return_value = (True, 19.5, "ok")
-         mock_run.return_value = MagicMock(returncode=0, stdout=raw_output, stderr="")
-         
-         result = agent.run_pulse("Bob Lazar")
-         
-         # "UFO Roswell sighting in 1947" should be filtered out by semantic disambiguation 
-         # since it doesn't mention "Bob" or "Lazar" anywhere in the candidate
-         assert result.status == "success"
-         assert len(result.evidence) == 1
-         assert result.evidence[0].claim_text == "Bob Lazar's testimonies on reverse engineering"
+         patch("src.wiki.writer.read_page") as mock_read, \
+         patch("src.agents.pulse_agent.write_pulse_snapshot") as mock_write:
+        
+        mock_write.return_value = {"json_path": "/tmp/fake.json", "md_path": "/tmp/fake.md", "base_name": "bob-lazar-2026-07-12", "deduped": False, "matched_path": ""}
+
+        # Mock organization page
+        mock_read.return_value = {
+            "frontmatter": {
+                "tags": ["organization"],
+                "last30days_handles": {}
+            }
+        }
+        
+        mock_status = MagicMock()
+        mock_status.paid_remaining = 19.5
+        mock_ledger.get_status.return_value = mock_status
+        mock_ledger.check_budget.return_value = (True, 19.5, "ok")
+        mock_run.return_value = MagicMock(returncode=0, stdout=raw_output, stderr="")
+        
+        result = agent.run_pulse("Bob Lazar")
+        
+        # "UFO Roswell sighting in 1947" should be filtered out by semantic disambiguation 
+        # since it doesn't mention "Bob" or "Lazar" anywhere in the candidate
+        assert result.status == "success"
+        assert len(result.evidence) == 1
+        # claim_text comes from 'title' (snippet > title > explanation priority)
+        assert result.evidence[0].claim_text == "Bob Lazar S-4 claims"

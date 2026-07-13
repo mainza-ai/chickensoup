@@ -123,7 +123,7 @@ struct PulsesHistorySection: View {
             NavigationStack {
                 List {
                     ForEach(groupedPulses) { group in
-                        groupRow(for: group, isExpanded: .constant(true))
+                        groupRow(for: group, isExpanded: Binding<Bool>.constant(true))
                     }
                 }
                 .navigationTitle("Ingestion Snapshots History")
@@ -142,9 +142,9 @@ struct PulsesHistorySection: View {
     }
 
     @ViewBuilder
-    private func groupRow(for group: PulseGroup, isExpandedBinding: Binding<Bool>? = nil) -> some View {
+    private func groupRow(for group: PulseGroup, isExpanded: Binding<Bool>? = nil) -> some View {
         let latest = group.entries.first!
-        let binding: Binding<Bool> = isExpandedBinding ?? Binding(
+        let binding: Binding<Bool> = isExpanded ?? Binding(
             get: { expandedGroups.contains(group.entityName) },
             set: { isOn in
                 if isOn {
@@ -245,6 +245,20 @@ struct PulsesHistorySection: View {
                         .padding(.vertical, 6)
                         .background(DesignConstants.controlBackground.opacity(0.5))
                     }
+
+                    if group.entries.contains(where: { $0.evidenceCount == 0 }) {
+                        Button(action: {
+                            purgeEmpty(entityName: group.entityName)
+                        }) {
+                            Text("Purge Empty Logs for \(group.entityName)")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Purge empty pulse snapshots for \(group.entityName)")
+                    }
                 }
                 .background(DesignConstants.controlBackground.opacity(0.3))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -253,10 +267,15 @@ struct PulsesHistorySection: View {
         }
     }
 
-    private func purgeEmpty() {
+    private func purgeEmpty(entityName: String? = nil) {
         isPurging = true
         Task {
-            let success = await almanacService.purgeEmptyPulses()
+            let success: Bool
+            if let ename = entityName {
+                success = await almanacService.purgeEmptyPulses(entityName: ename)
+            } else {
+                success = await almanacService.purgeEmptyPulses()
+            }
             if success {
                 await almanacService.fetchPulseHistory()
             }

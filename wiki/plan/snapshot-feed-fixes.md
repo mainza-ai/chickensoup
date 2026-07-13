@@ -129,10 +129,10 @@ Return `{"pulses": [...], "total": N, "unique_entities": M, "empty_count": K}` s
 
 | Test | What it asserts |
 |---|---|
-| `tests/test_pulse_writer_dedup.py` [NEW] | exact-evidence re-run within window → skipped; different evidence → written; after window → written; empty-first-write → written; empty-second-write-within-24h → skipped |
-| `tests/test_pulse_history_grouping.py` [NEW] | `GET /pulse/history?latest=true` returns one entry per entity; `latest=false` (default) returns all entries; counts in response correct |
-| Update `tests/test_adapter_real_schema.py` | adapter tests unaffected (dedup is post-adapter) |
-| All existing tests | must stay green |
+| `tests/test_pulse_writer_dedup.py` [NEW] | exact-evidence re-run within window → skipped; different evidence → written; after window → written; empty-first-write → written; empty-second-write-within-24h → skipped | ✅ 9 tests pass |
+| `tests/test_pulse_history_grouping.py` [NEW] | `GET /pulse/history?latest=true` returns one entry per entity; `latest=false` (default) returns all entries; counts in response correct | ✅ 4 tests pass |
+| Update `tests/test_adapter_real_schema.py` | adapter tests corrected to reflect title-over-explanation priority | ✅ |
+| All existing tests | must stay green | ✅ 105 tests pass |
 
 ## Rollout
 
@@ -142,3 +142,16 @@ Return `{"pulses": [...], "total": N, "unique_entities": M, "empty_count": K}` s
 4. Merge B2 + C2 last — purely additive enrichment.
 
 All changes are additive. No existing call sites break: `deduped` is a new `PulseResult.status` value, `latest` defaults to `False`, and `APIPulseHistoryResponse` new fields default to `0`/`[]`.
+
+---
+
+## Verification (2026-07-13)
+
+| Check | Result |
+|---|---|
+| `project-serpo` re-run after identical evidence | `result.status=deduped`, `matched_snapshot_path` set, no new file written |
+| `GET /pulse/history?latest=true` | Returns 1 entry per entity; `unique_entities` and `empty_count` populated |
+| `test_pulse_writer_dedup.py` | 9/9 pass (exact-ev dedup, different-ev write, window expiry, empty first/dedup, entity isolation, fingerprint order-independent, meta returns) |
+| `test_pulse_history_grouping.py` | 4/4 pass (latest=true grouping, latest=false all, counts, grouped counts) |
+| `test_adapter_real_schema.py` | Updated; asserts `title` over `explanation` per corrected priority |
+| Full suite | 105/105 pass |

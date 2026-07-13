@@ -255,4 +255,22 @@ public final class AlmanacService {
             return false
         }
     }
+
+    public func purgeEmptyPulses(entityName: String) async -> Bool {
+        do {
+            struct PurgeResponse: Codable {
+                var purged_count: Int
+                var status: String
+            }
+            let res: PurgeResponse = try await APIClient.shared.request(
+                path: "/pulse/purge-empty",
+                method: "POST",
+                queryItems: [URLQueryItem(name: "entity_name", value: entityName)]
+            )
+            return res.status == "success"
+        } catch {
+            logger.error("Failed to purge empty pulses for \(entityName): \(error.localizedDescription)")
+            return false
+        }
+    }
 }
