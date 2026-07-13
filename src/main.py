@@ -2165,6 +2165,35 @@ async def post_almanac_generate(background_tasks: BackgroundTasks, dry_run: bool
     )
 
 
+@app.get("/almanac/summary")
+async def get_almanac_summary():
+    """Returns top contested claims and newly moved entities from the latest almanac."""
+    try:
+        from src.wiki.paths import get_almanac_dir as _get_ad
+        ad = _get_ad()
+        if not ad.exists():
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+
+        md_files = sorted(ad.glob("*.md"), reverse=True)
+        if not md_files:
+            return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+        latest = md_files[0]
+        with open(latest, "r", encoding="utf-8") as f:
+            content = f.read()
+        contested = re.findall(r"- \*\*contested\*\* \(.*?\) epi=.*?: (.+)", content)
+        entities = re.findall(r"^## (.+)$", content, re.MULTILINE)
+        entities_processed = [e for e in entities if not e.startswith("State of the Anomaly")]
+        return {
+            "date": latest.stem,
+            "contested_claims": contested[:10],
+            "newly_contested": len(contested),
+            "entities_processed": entities_processed,
+        }
+    except Exception as e:
+        logger.error(f"Almanac summary failed: {e}")
+        return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": 0}
+
+
 @app.get("/almanac/history")
 async def get_almanac_history(limit: int = 20):
     try:

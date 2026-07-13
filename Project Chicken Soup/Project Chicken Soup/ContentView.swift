@@ -32,7 +32,7 @@ struct ContentView: View {
         case almanac = "Living Almanac"
         var id: String { self.rawValue }
     }
-    @State private var activeDetailTab: DetailTab = .graph
+    @State var activeDetailTab: DetailTab = .graph
     
     // Inject services
     var backendService = BackendService.shared
@@ -49,7 +49,7 @@ struct ContentView: View {
         case ingest
         case almanac
     }
-    @State private var activeTab: TabSelection = .graph
+    @State var activeTab: TabSelection = .graph
     
     var body: some View {
         #if os(macOS)
@@ -126,6 +126,7 @@ struct ContentView: View {
         if backendService.chat.isChatWikiConversionEnabled {
             await backendService.chat.fetchChatIngestStatus()
         }
+        await backendService.almanac.fetchAlmanacSummary()
     }
     
     // MARK: - Desktop Layout (macOS & iPad)
@@ -212,7 +213,12 @@ struct ContentView: View {
                                 onSubmit: handleQuerySubmit,
                                 messages: messages,
                                 entities: entities,
-                                events: events
+                                events: events,
+                                onAlmanacTap: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        activeDetailTab = .almanac
+                                    }
+                                }
                             )
                             Spacer()
                         }
@@ -326,7 +332,10 @@ struct ContentView: View {
                                     onSubmit: handleQuerySubmit,
                                     messages: messages,
                                     entities: entities,
-                                    events: events
+                                    events: events,
+                                    onAlmanacTap: {
+                                        activeTab = .almanac
+                                    }
                                 )
                                 Spacer()
                             }

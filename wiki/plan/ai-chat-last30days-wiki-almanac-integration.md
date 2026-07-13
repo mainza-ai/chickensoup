@@ -10,8 +10,32 @@ related: [langgraph-workflows, chat-to-wiki-conversion, living-almanac-engine, s
 # AI Chat ↔ last30days ↔ Wiki ↔ Living Almanac — Integration Plan
 
 **Companion to:** `wiki/plan/internal-wiki-content-audit-report.md`  
-**Status:** Awaiting your review and approval — no implementation has started.  
+**Status:** In progress — Phase 0 and Phase 1 complete; Phases 2–4 awaiting your review.  
 **Scope source:** Deep-pass audit dated 2026-07-13. Four live bugs and four design phases.
+
+---
+
+## Execution Log
+
+### Phase 0 — Live Correctness Bugs (complete, committed `bf34fbe`)
+
+**0a — History pass-through in `/query` + WebSocket**: Fixed. `orchestrator.execute(request.query, history=history)` now passes conversation history in both the REST handler (`main.py:520`) and the WebSocket handler (`main.py:1191`). WebSocket handler now tracks `conversation_id` per connection, fetches history from Redis, stores updated history back after each turn, and returns `conversation_id` in the completed message.
+
+**0b — Staleness queue directory scan**: Fixed. `rebuild_queue()` now scans `entities/`, `concepts/`, and `projects/` directories. Previously only `entities/` was scanned, making chat-created concepts and research-thread projects invisible to the idle pulse system.
+
+**0c — Research approval endpoint**: Fixed. Added `POST /research/{thread_id}/approve` to `main.py`, modeled on the existing `/budget/approve` pattern. Resumes LangGraph execution with `human_approved=True`. Added `BackendService.approveResearch(threadId:)` Swift wrapper.
+
+**0d — Redis `.decode()` calls**: Fixed. Removed four `.decode()` calls in `idle_sentinel.py:71,80` and `staleness_queue.py:36,53`. Redis client is initialized with `decode_responses=True`, so `.get()` already returns `str`. Before fix, `is_idle()` always returned `True` by exception fallback, causing `idle_ingestion_loop` to fire during active periods.
+
+---
+
+### Phase 1 — Option C: Chat-Triggered Auto-Pulse (complete, committed `77e1589`)
+
+**1a — Queue seeding after page creation**: Implemented. After `ChatIngestAgent` creates a wiki page in `process_eligible_conversations()`, if `LAST30DAYS_ENABLED`, calls `staleness_queue.record_pulse_completed(slug)` to seed the Redis sorted set immediately. This eliminates the wait for the next `rebuild_queue()` cycle.
+
+**1b — Wiki page enrichment after pulse**: Implemented. In `idle_ingestion_loop`, after a pulse completes with evidence, if the wiki page was chat-created (sources contain `conversation:`), the top 3 claims by engagement are appended as a `## External Evidence` section to the wiki body via `write_page()`.
+
+**1c — Swift "Pulse Now" button**: Implemented. `WikiPageDetailView` now exposes a toolbar button calling `almanacService.triggerPulseAsync(entityName:)`. A `pollPulseStatus` task polls `fetchTaskStatus(taskId:)` every 2 seconds and refreshes the page when the pulse completes.
 
 ---
 

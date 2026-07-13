@@ -878,3 +878,17 @@ Fixed:
 Effect: Eliminates spurious `WARNING:chickensoup.idle_sentinel:Error checking idle status: 'str' object has no attribute 'decode'` warnings. Before fix, `is_idle()` was falling through to `return True` on every exception, meaning the idle sentinel was effectively blind — always reporting idle even during active periods.
 
 Added to integration plan as Phase 0d in [[ai-chat-last30days-wiki-almanac-integration]].
+## [2026-07-13] impl | Phase 1 — Chat-Triggered Auto-Pulse + Swift Pulse Now button
+
+Committed `77e1589` on develop.
+
+Backend:
+- `src/scheduler.py:process_eligible_conversations()` — after each `write_page()`, if `LAST30DAYS_ENABLED`, calls `staleness_queue.record_pulse_completed(slug)` to seed the Redis sorted set with initial "unverified" status. Eliminates wait for next `rebuild_queue()` cycle.
+- `src/scheduler.py:idle_ingestion_loop()` — after pulse completes with evidence, if page was chat-created (sources contain `conversation:`), appends top 3 claims by engagement as `## External Evidence` section to wiki body via `write_page()`.
+
+Swift:
+- `WikiPageDetailView.swift` — added `Pulse Now` toolbar button wired to `almanacService.triggerPulseAsync(entityName:)`. Polls `fetchTaskStatus(taskId:)` every 2s, refreshes page on completion.
+
+Phase 1 scope per [[ai-chat-last30days-wiki-almanac-integration]] complete.
+
+Phase 2 ("Research Now" button in entity detail views) and Phase 3 (Almanac summary → chat awareness) are next awaiting your review.

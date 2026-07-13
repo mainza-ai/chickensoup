@@ -1435,4 +1435,25 @@ public struct APIAlmanacFileResponse: Codable, Hashable {
     public var content: String
 }
 
+public struct APIAlmanacSummaryResponse: Codable, Hashable {
+    public var date: String?
+    public var contestedClaims: [String]
+    public var newlyContested: Int
+    public var entitiesProcessed: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case contestedClaims = "contested_claims"
+        case newlyContested = "newly_contested"
+        case entitiesProcessed = "entities_processed"
+    }
+
+    public init(date: String?, contestedClaims: [String], newlyContested: Int, entitiesProcessed: [String]) {
+        self.date = date
+        self.contestedClaims = contestedClaims
+        self.newlyContested = newlyContested
+        self.entitiesProcessed = entitiesProcessed
+    }
+}
+
 

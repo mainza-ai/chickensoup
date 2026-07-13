@@ -11,11 +11,13 @@ public final class AlmanacService {
     public var lastPulseResults: [APIPulseResult] = []
     public var pulseHistory: [APIPulseHistoryEntry] = []
     public var almanacHistory: [APIAlmanacHistoryEntry] = []
+    public var almanacSummary: APIAlmanacSummaryResponse? = nil
 
     public var isFetchingBudget = false
     public var isPulsing = false
     public var isGeneratingAlmanac = false
     public var isFetchingHistory = false
+    public var isFetchingAlmanacSummary = false
 
     private init() {}
 
@@ -232,6 +234,17 @@ public final class AlmanacService {
         } catch {
             logger.error("Failed to fetch pulse snapshot for \(filePath): \(error.localizedDescription)")
             return nil
+        }
+    }
+
+    public func fetchAlmanacSummary() async {
+        isFetchingAlmanacSummary = true
+        defer { isFetchingAlmanacSummary = false }
+        do {
+            let res: APIAlmanacSummaryResponse = try await APIClient.shared.request(path: "/almanac/summary")
+            self.almanacSummary = res
+        } catch {
+            logger.error("Failed to fetch almanac summary: \(error.localizedDescription)")
         }
     }
 
