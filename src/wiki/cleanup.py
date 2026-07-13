@@ -33,6 +33,8 @@ ENGINEERING_TAGS: Set[str] = {
     "structure", "swift", "swiftdata", "swiftui", "technology",
     "temporal", "testing", "tools", "tracing", "tql", "twostraws",
     "ui", "upload", "user", "ux", "wiki", "workflows",
+    "dev", "backup", "restore", "reference-guide", "raw-guide",
+    "implementation-plan", "agent-skill",
 }
 
 CONTENT_TAGS: Set[str] = {
