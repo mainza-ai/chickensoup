@@ -2145,7 +2145,7 @@ async def get_almanac_history(limit: int = 20):
 
 
 @app.get("/pulse/history")
-async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50, latest: bool = False):
+async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
     try:
         from src.wiki.paths import get_pulse_dir
         from src.wiki.pulse_writer import list_pulse_snapshots, load_pulse_snapshot
@@ -2155,37 +2155,31 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50, 
             return {"pulses": [], "total": 0}
 
         files = list(reversed(list_pulse_snapshots(entity_name))) if entity_name else sorted(pulse_dir.glob("*.json"), reverse=True)
-        files = files[:limit]
 
-        pulses = []
+        latest: Dict[str, Dict[str, Any]] = {}
         for f in files:
             data = load_pulse_snapshot(f)
-            if data:
+            if not data:
+                continue
+            ename = data.get("entity_name", f.stem)
+            if ename not in latest:
                 evidence_trimmed = data.get("evidence", [])[:10]
-                pulses.append({
-                    "entity_name": data.get("entity_name", f.stem),
+                latest[ename] = {
+                    "entity_name": ename,
                     "date": data.get("date", ""),
                     "timestamp": data.get("timestamp", ""),
                     "evidence_count": data.get("evidence_count", 0),
                     "evidence": evidence_trimmed,
                     "file": str(f),
-                })
+                }
 
+        pulses = list(latest.values())[:limit]
         empty_count = sum(1 for p in pulses if p["evidence_count"] == 0)
-        unique_entities = len({p["entity_name"] for p in pulses})
-
-        if latest:
-            seen: Dict[str, Dict[str, Any]] = {}
-            for p in pulses:
-                ename = p["entity_name"]
-                if ename not in seen:
-                    seen[ename] = p
-            pulses = list(seen.values())
 
         return {
             "pulses": pulses,
             "total": len(pulses),
-            "unique_entities": unique_entities,
+            "unique_entities": len(latest),
             "empty_count": empty_count,
         }
     except Exception as e:
