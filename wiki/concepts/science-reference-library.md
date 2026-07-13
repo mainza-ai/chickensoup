@@ -67,6 +67,7 @@ All papers indexed by theme. Every PDF in `papers/` has at least one wiki concep
 | Paper | Wiki Page |
 |---|---|
 | `2312.05202.pdf` | [[emergent-time-and-time-travel]] — PW formalism, Novikov self-consistency, POVM time observables |
+| `2408.14391v7.pdf` | [[entropic-action-gravity]] — Bianconi 2025: gravity from quantum relative entropy, G-field, dressed Einstein-Hilbert action |
 | `2025.06.17.660168v1.full.pdf` | [[sair-protein-ligand-dataset]] — 5.2M protein-ligand structures (Boltz-1x) |
 | `2603.05479.pdf` | [[quantum-coupled-oscillator-simulation]] — WISER/Classiq exponential speedup |
 
@@ -143,10 +144,10 @@ All papers indexed by theme. Every PDF in `papers/` has at least one wiki concep
 
 ## Provenance
 
-All 61 PDFs copied to `wiki/raw/` for immutable provenance storage, named using sanitized slugs matching the actual filenames.
+All 62 PDFs copied to `wiki/raw/` for immutable provenance storage, named using sanitized slugs matching the actual filenames.
 
 ## Lint Status
 
-- Orphan check: all 61 PDFs have ≥1 wiki page
+- Orphan check: all 62 PDFs have ≥1 wiki page
 - Missing cross-references: none pending; each page links to at least one related concept
 - Data gaps: none — full text extraction performed for all unreferenced papers before page creation

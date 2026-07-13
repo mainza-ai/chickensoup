@@ -9,6 +9,29 @@ related: []
 
 # Log
 
+## [2026-07-13] ingest | Bianconi — "Gravity from entropy" (arXiv:2408.14391v7)
+
+Ingested Ginestra Bianconi's entropic action theory of gravity. Derived gravity from quantum relative entropy between spacetime metric and matter-induced metric; introduces G-field as Lagrangian multipliers yielding dressed Einstein-Hilbert action with emergent cosmological constant.
+
+### New Entity Pages (1)
+- **[[ginestra-bianconi]]** — Theoretical physicist at QMUL; entropic action gravity, topological matter fields (Dirac-Kähler), G-field, dressed Einstein-Hilbert action
+
+### New Concept Pages (1)
+- **[[entropic-action-gravity]]** — Derives modified Einstein equations from quantum relative entropy; metric as quantum operator, matter-induced metric G, G-field as Lagrangian multipliers, second-order equations avoiding Ostrogradsky instability
+
+### Enriched Pages (1)
+- **[[entropic-gravity]]** — Added cross-reference to Bianconi's approach alongside Verlinde/Jacobson
+
+### Sources Used
+- `wiki/raw/2408.14391v7.pdf` — Bianconi, Ginestra. "Gravity from entropy." arXiv:2408.14391v7 [gr-qc] (8 Feb 2025)
+
+### Related
+- [[entropic-gravity]]
+- [[quantum-gravity]]
+- [[entropy]]
+- [[field-manipulation]]
+- [[holographic-principle]]
+
 ## [2026-07-13] audit + fix | Phase 4 frontend closure + almanac edge case + entity refresh
 
 Completed deep audit comparing integration plan against codebase. Identified and closed all Phase 4 frontend gaps:
