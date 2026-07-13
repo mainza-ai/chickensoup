@@ -1,0 +1,14 @@
+{
+  "entity_name": "Bob Lazar; rm -rf /",
+  "slug": "bob-lazar;-rm--rf--",
+  "date": "2026-07-12",
+  "timestamp": "2026-07-13T03:34:41.381230+00:00",
+  "evidence_count": 0,
+  "evidence": [],
+  "raw_output_preview": "{\"claims\": [{\"claim_text\": \"Bob Lazar allegedly worked at S-4 near Area 51 on exotic craft\", \"source_platform\": \"reddit\", \"engagement_count\": 1200, \"url\": \"https://reddit.com/r/ufos/123\", \"timestamp\": \"2026-07-10T12:00:00Z\", \"cluster_id\": \"c1\", \"polymarket_odds\": 0.35}, {\"claim_text\": \"New hearing mentions Bob Lazar testimony from 1989\", \"source_platform\": \"news\", \"engagement_count\": 500, \"url\": \"https://example.com/news\", \"timestamp\": \"2026-07-09T08:00:00Z\", \"cluster_id\": \"c2\"}]}",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 20.0,
+    "status": "no_data"
+  }
+}
