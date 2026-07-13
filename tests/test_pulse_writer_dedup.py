@@ -1,5 +1,5 @@
 import json
-import time
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -7,6 +7,9 @@ from unittest.mock import patch
 
 from src.models import ClaimEvidence
 from src.wiki.pulse_writer import write_pulse_snapshot, list_pulse_snapshots
+
+
+FIXED_TODAY = "2026-07-12"
 
 
 def test_same_entity_same_day_overwrites(tmp_path: Path):
@@ -47,19 +50,21 @@ def test_different_entities_get_separate_files(tmp_path: Path):
 def test_list_snapshots_returns_only_today_for_entity(tmp_path: Path):
     pulse_dir = tmp_path / "pulse"
     pulse_dir.mkdir()
-    today = "2026-07-12"
 
-    snap = pulse_dir / f"project-serpo-{today}.json"
+    snap = pulse_dir / f"project-serpo-{FIXED_TODAY}.json"
     snap.write_text("{}")
 
     old_snap = pulse_dir / "project-serpo-2026-07-01.json"
     old_snap.write_text("{}")
 
     with patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir), \
-         patch("src.wiki.pulse_writer.ensure_pulse_dir", return_value=pulse_dir):
+         patch("src.wiki.pulse_writer.ensure_pulse_dir", return_value=pulse_dir), \
+         patch("src.wiki.pulse_writer.date") as mock_date:
+        mock_date.today.return_value = date.fromisoformat(FIXED_TODAY)
+        mock_date.isoformat = date.isoformat
         results = list_pulse_snapshots("project-serpo")
         assert len(results) == 1
-        assert today in results[0].name
+        assert FIXED_TODAY in results[0].name
 
 
 def test_list_all_snapshots_returns_everything(tmp_path: Path):

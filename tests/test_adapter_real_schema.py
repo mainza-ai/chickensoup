@@ -46,58 +46,65 @@ def test_adapter_parses_real_ranked_candidates():
 def test_pulse_agent_filters_hiring_for_non_org():
     from src.agents.pulse_agent import PulseAgent
     from src.models import PulseResult
+    from src.config import settings
     from unittest.mock import MagicMock, patch
-    
-    agent = PulseAgent()
-    
-    raw_output = json.dumps({
-        "ranked_candidates": [
-            {
-                "candidate_id": "cand-1",
-                "title": "Bob Lazar S-4 Flying Saucer claims",
-                "explanation": "Bob Lazar claimed he worked on reverse engineering alien spacecraft at S-4",
-                "source": "reddit",
-                "url": "https://reddit.com/r/ufos/comments/123",
-                "engagement": 1200
-            },
-            {
-                "candidate_id": "cand-2",
-                "title": "Database Engineer - Element 115",
-                "explanation": "Database Engineer - Element 115 careers at element115.ai",
-                "source": "jobs-web",
-                "url": "https://www.element115.ai/career/database-engineer",
-                "engagement": 0
-            }
-        ]
-    })
-    
-    # Mock subprocess.run to return raw_output
-    with patch("subprocess.run") as mock_run, \
-         patch("src.agents.pulse_agent.ResourceLedger") as mock_ledger, \
-         patch("src.wiki.writer.read_page") as mock_read, \
-         patch("src.agents.pulse_agent.write_pulse_snapshot") as mock_write:
-        
-        mock_write.return_value = {"json_path": "/tmp/fake.json", "md_path": "/tmp/fake.md", "base_name": "bob-lazar-2026-07-12", "deduped": False, "matched_path": ""}
 
-        mock_read.return_value = {
-            "frontmatter": {
-                "tags": ["person", "ufo-witness"],
-                "last30days_handles": {"reddit": "r/ufos"}
+    orig_enabled = settings.LAST30DAYS_ENABLED
+    settings.LAST30DAYS_ENABLED = True
+
+    try:
+        agent = PulseAgent()
+
+        raw_output = json.dumps({
+            "ranked_candidates": [
+                {
+                    "candidate_id": "cand-1",
+                    "title": "Bob Lazar S-4 Flying Saucer claims",
+                    "explanation": "Bob Lazar claimed he worked on reverse engineering alien spacecraft at S-4",
+                    "source": "reddit",
+                    "url": "https://reddit.com/r/ufos/comments/123",
+                    "engagement": 1200
+                },
+                {
+                    "candidate_id": "cand-2",
+                    "title": "Database Engineer - Element 115",
+                    "explanation": "Database Engineer - Element 115 careers at element115.ai",
+                    "source": "jobs-web",
+                    "url": "https://www.element115.ai/career/database-engineer",
+                    "engagement": 0
+                }
+            ]
+        })
+
+        # Mock subprocess.run to return raw_output
+        with patch("subprocess.run") as mock_run, \
+             patch("src.agents.pulse_agent.ResourceLedger") as mock_ledger, \
+             patch("src.wiki.writer.read_page") as mock_read, \
+             patch("src.agents.pulse_agent.write_pulse_snapshot") as mock_write:
+
+            mock_write.return_value = {"json_path": "/tmp/fake.json", "md_path": "/tmp/fake.md", "base_name": "bob-lazar-2026-07-12"}
+
+            mock_read.return_value = {
+                "frontmatter": {
+                    "tags": ["person", "ufo-witness"],
+                    "last30days_handles": {"reddit": "r/ufos"}
+                }
             }
-        }
-        
-        mock_status = MagicMock()
-        mock_status.paid_remaining = 19.5
-        mock_ledger.get_status.return_value = mock_status
-        mock_ledger.check_budget.return_value = (True, 19.5, "ok")
-        mock_run.return_value = MagicMock(returncode=0, stdout=raw_output, stderr="")
-        
-        result = agent.run_pulse("Bob Lazar")
-        
-        assert result.status == "success"
-        # Database Engineer - Element 115 should be filtered out because Bob Lazar is NOT an organization!
-        assert len(result.evidence) == 1
-        assert result.evidence[0].source_platform == "reddit"
+
+            mock_status = MagicMock()
+            mock_status.paid_remaining = 19.5
+            mock_ledger.get_status.return_value = mock_status
+            mock_ledger.check_budget.return_value = (True, 19.5, "ok")
+            mock_run.return_value = MagicMock(returncode=0, stdout=raw_output, stderr="")
+
+            result = agent.run_pulse("Bob Lazar")
+
+            assert result.status == "success"
+            # Database Engineer - Element 115 should be filtered out because Bob Lazar is NOT an organization!
+            assert len(result.evidence) == 1
+            assert result.evidence[0].source_platform == "reddit"
+    finally:
+        settings.LAST30DAYS_ENABLED = orig_enabled
 
 
 def test_adapter_parses_nested_engagement():

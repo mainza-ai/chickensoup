@@ -1,7 +1,10 @@
 import json
-import pytest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
+
+
+FIXED_TODAY = "2026-07-12"
 
 
 def test_history_returns_latest_per_entity(tmp_path: Path):
@@ -57,18 +60,21 @@ def test_history_counts_are_correct(tmp_path: Path):
     pulse_dir.mkdir()
 
     for entity, count in [("alpha", 5), ("beta", 0), ("gamma", 3)]:
-        p = pulse_dir / f"{entity}-2026-07-12.json"
+        p = pulse_dir / f"{entity}-{FIXED_TODAY}.json"
         p.write_text(json.dumps({
             "entity_name": entity,
             "slug": entity,
-            "date": "2026-07-12",
+            "date": FIXED_TODAY,
             "timestamp": "2026-07-12T12:00:00+00:00",
             "evidence_count": count,
             "evidence": [{"claim_text": f"c{count}"}] * count,
         }))
 
     with patch("src.wiki.paths.get_pulse_dir", return_value=pulse_dir), \
-         patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir):
+         patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir), \
+         patch("src.wiki.pulse_writer.date") as mock_date:
+        mock_date.today.return_value = date.fromisoformat(FIXED_TODAY)
+        mock_date.isoformat = date.isoformat
         from src.main import app
         from fastapi.testclient import TestClient
         client = TestClient(app)
@@ -84,25 +90,28 @@ def test_history_filtered_by_entity_name(tmp_path: Path):
     pulse_dir = tmp_path / "pulse"
     pulse_dir.mkdir()
 
-    (pulse_dir / "project-serpo-2026-07-12.json").write_text(json.dumps({
+    (pulse_dir / f"project-serpo-{FIXED_TODAY}.json").write_text(json.dumps({
         "entity_name": "Project Serpo",
         "slug": "project-serpo",
-        "date": "2026-07-12",
+        "date": FIXED_TODAY,
         "timestamp": "2026-07-12T12:00:00+00:00",
         "evidence_count": 5,
         "evidence": [{"claim_text": "c"}] * 5,
     }))
-    (pulse_dir / "roswell-crash-2026-07-12.json").write_text(json.dumps({
+    (pulse_dir / f"roswell-crash-{FIXED_TODAY}.json").write_text(json.dumps({
         "entity_name": "Roswell Crash",
         "slug": "roswell-crash",
-        "date": "2026-07-12",
+        "date": FIXED_TODAY,
         "timestamp": "2026-07-12T12:00:00+00:00",
         "evidence_count": 3,
         "evidence": [{"claim_text": "c"}] * 3,
     }))
 
     with patch("src.wiki.paths.get_pulse_dir", return_value=pulse_dir), \
-         patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir):
+         patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir), \
+         patch("src.wiki.pulse_writer.date") as mock_date:
+        mock_date.today.return_value = date.fromisoformat(FIXED_TODAY)
+        mock_date.isoformat = date.isoformat
         from src.main import app
         from fastapi.testclient import TestClient
         client = TestClient(app)

@@ -832,4 +832,14 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
 ## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
 ## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
 
