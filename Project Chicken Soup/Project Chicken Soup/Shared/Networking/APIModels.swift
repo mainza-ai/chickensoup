@@ -1190,6 +1190,22 @@ public struct APIPulseHistoryEntry: Codable, Identifiable, Hashable {
 public struct APIPulseHistoryResponse: Codable {
     public var pulses: [APIPulseHistoryEntry]
     public var total: Int
+    public var uniqueEntities: Int = 0
+    public var emptyCount: Int = 0
+
+    enum CodingKeys: String, CodingKey {
+        case pulses
+        case total
+        case uniqueEntities = "unique_entities"
+        case emptyCount = "empty_count"
+    }
+
+    public init(pulses: [APIPulseHistoryEntry] = [], total: Int = 0, uniqueEntities: Int = 0, emptyCount: Int = 0) {
+        self.pulses = pulses
+        self.total = total
+        self.uniqueEntities = uniqueEntities
+        self.emptyCount = emptyCount
+    }
 }
 
 public struct APIBudgetStatus: Codable, Hashable {

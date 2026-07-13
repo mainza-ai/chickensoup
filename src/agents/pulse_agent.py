@@ -299,6 +299,16 @@ class PulseAgent:
                     },
                 )
                 json_path = paths["json_path"]
+                if paths.get("deduped"):
+                    logger.info(f"No-data pulse for '{entity_name}' deduped against {paths.get('matched_path')}")
+                    return PulseResult(
+                        entity_name=entity_name,
+                        status="deduped",
+                        evidence=[],
+                        raw_snapshot_path=paths.get("matched_path"),
+                        budget_remaining=ResourceLedger.get_status().paid_remaining,
+                        matched_snapshot_path=paths.get("matched_path"),
+                    )
             except Exception as write_err:
                 logger.warning(f"Failed to write no_data pulse snapshot: {write_err}")
                 json_path = None
@@ -329,6 +339,17 @@ class PulseAgent:
                     "cost_usd": cost,
                 },
             )
+            if paths.get("deduped"):
+                matched = paths.get("matched_path", "")
+                logger.info(f"Pulse for '{entity_name}' deduped against {matched}")
+                return PulseResult(
+                    entity_name=entity_name,
+                    status="deduped",
+                    evidence=evidence,
+                    raw_snapshot_path=matched,
+                    budget_remaining=ResourceLedger.get_status().paid_remaining,
+                    matched_snapshot_path=matched,
+                )
             json_path = paths["json_path"]
             logger.info(f"Pulse snapshot for '{entity_name}': {json_path} with {len(evidence)} evidence")
         except Exception as e:

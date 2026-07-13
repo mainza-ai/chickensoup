@@ -9,6 +9,22 @@ related: []
 
 # Log
 
+## [2026-07-12] audit | Snapshot Feed Ecosystem Audit
+
+Full audit of pulse snapshot feed duplication and 0-evidence propagation. Findings documented in [[living-almanac]] Section 16 and [[living-almanac-troubleshooting]] "Snapshot Feed — Duplicate & 0-Evidence Issues". Implementation plan at [[snapshot-feed-fixes]].
+
+Key findings:
+- **F1**: Every pulse run writes a new file — no non-empty dedup on write (`pulse_writer.py:58-69`)
+- **F2**: Existing `_has_recent_empty_snapshot` dedup only fires for `evidence_count==0` (`pulse_writer.py:49-52`)
+- **F3**: `/pulse/history` returns every file, no "latest per entity" grouping (`main.py:2147`)
+- **F4**: SwiftUI `id: \.file` — same-entity re-runs always appear as new rows (`PulsesHistorySection.swift:73`)
+- **F6**: Dedup'd empty snapshot returns `json_path=""` — indistinguishable from write error in UI (`pulse_agent.py:291-304`)
+- **F9 (FIXED)**: Semantic filter dropped all evidence for slug-form entities like `project-serpo` — tokeniser now uses `re.split(r"[-_ ]+", ...)` and STOP_WORDS filter (`pulse_agent.py:248-262`)
+
+Verified end-to-end: `project-serpo` re-run now returns 2 evidence items (was 0 before F9 fix).
+
+Plan: [[snapshot-feed-fixes]] — workstreams A (write-path dedup + truthful status), B (read-path grouping), C (SwiftUI expandable rows + per-entity purge).
+
 ## [2026-07-12] impl | Living Almanac Hardening & Idle-Driven Ingestion Execution
 
 Successfully completed implementation and verification of all 6 stages of the master implementation plan:
@@ -733,4 +749,7 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
 ## [2026-07-12] ingest | pulse | enoch | 9 evidence | $0.00 | remaining=$1980.50 | enoch
 ## [2026-07-12] ingest | pulse | project-serpo | 2 evidence | $0.00 | remaining=$1980.50 | project-serpo
+## [2026-07-12] ingest | pulse | nikola-tesla | 12 evidence | $0.00 | remaining=$1980.50 | nikola-tesla
+## [2026-07-12] ingest | pulse | project-serpo | 2 evidence | $0.00 | remaining=$1980.50 | project-serpo
+## [2026-07-12] ingest | pulse | enoch | 8 evidence | $0.00 | remaining=$1980.50 | enoch
 

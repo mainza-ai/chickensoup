@@ -2135,7 +2135,7 @@ async def get_almanac_history(limit: int = 20):
 
 
 @app.get("/pulse/history")
-async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
+async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50, latest: bool = False):
     try:
         from src.wiki.paths import get_pulse_dir
         from src.wiki.pulse_writer import list_pulse_snapshots, load_pulse_snapshot
@@ -2161,7 +2161,23 @@ async def get_pulse_history(entity_name: Optional[str] = None, limit: int = 50):
                     "file": str(f),
                 })
 
-        return {"pulses": pulses, "total": len(pulses)}
+        empty_count = sum(1 for p in pulses if p["evidence_count"] == 0)
+        unique_entities = len({p["entity_name"] for p in pulses})
+
+        if latest:
+            seen: Dict[str, Dict[str, Any]] = {}
+            for p in pulses:
+                ename = p["entity_name"]
+                if ename not in seen:
+                    seen[ename] = p
+            pulses = list(seen.values())
+
+        return {
+            "pulses": pulses,
+            "total": len(pulses),
+            "unique_entities": unique_entities,
+            "empty_count": empty_count,
+        }
     except Exception as e:
         logger.error(f"Pulse history failed: {e}")
         return {"pulses": [], "total": 0}
