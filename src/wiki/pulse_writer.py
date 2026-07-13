@@ -4,7 +4,6 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
-from src.config import settings
 from src.models import ClaimEvidence
 from src.wiki.paths import ensure_pulse_dir, get_pulse_dir
 from src.wiki.writer import slugify
@@ -20,104 +19,21 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _evidence_fingerprint(evidence: List[ClaimEvidence]) -> str:
-    claim_texts = sorted(e.claim_text.strip() for e in evidence if e.claim_text)
-    return f"{len(evidence)}|{'|'.join(claim_texts)}"
-
-
-def _get_latest_snapshot_meta(slug: str, max_age_hours: Optional[int] = None) -> Optional[Dict[str, Any]]:
-    pulse_dir = get_pulse_dir()
-    if not pulse_dir.exists():
-        return None
-
-    window = max_age_hours if max_age_hours is not None else settings.LAST30DAYS_DEDUP_WINDOW_HOURS
-    cutoff = datetime.now(timezone.utc).timestamp() - (window * 3600)
-    pattern = f"{slug}-*.json"
-    newest_path: Optional[Path] = None
-    newest_mtime: float = 0.0
-
-    for snap_path in pulse_dir.glob(pattern):
-        try:
-            mtime = snap_path.stat().st_mtime
-            if mtime < cutoff:
-                continue
-            if mtime > newest_mtime:
-                newest_mtime = mtime
-                newest_path = snap_path
-        except Exception:
-            continue
-
-    if newest_path is None:
-        return None
-
-    data = load_pulse_snapshot(newest_path)
-    if not data:
-        return None
-
-    evidence_list = data.get("evidence", [])
-    return {
-        "path": str(newest_path),
-        "evidence_count": data.get("evidence_count", len(evidence_list)),
-        "timestamp": data.get("timestamp", ""),
-        "evidence_fingerprint": _evidence_fingerprint_from_raw(evidence_list),
-    }
-
-
-def _evidence_fingerprint_from_raw(evidence_raw: List[Dict[str, Any]]) -> str:
-    claim_texts = sorted(
-        (str(e.get("claim_text", "")).strip() for e in evidence_raw if e.get("claim_text")),
-        key=str.lower,
-    )
-    return f"{len(evidence_raw)}|{'|'.join(claim_texts)}"
-
-
-def _format_dedup_return(path: str, matched_path: str, base_name: str) -> Dict[str, str]:
-    return {
-        "json_path": path,
-        "md_path": path.replace(".json", ".md"),
-        "base_name": base_name,
-        "deduped": True,
-        "matched_path": matched_path,
-    }
-
-
 def write_pulse_snapshot(
     entity_name: str,
     evidence: List[ClaimEvidence],
     raw_output: str = "",
     extra_meta: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
-    slug = slugify(entity_name)
-
-    latest_meta = _get_latest_snapshot_meta(slug)
-    if latest_meta is not None:
-        current_fingerprint = _evidence_fingerprint(evidence)
-        if current_fingerprint == latest_meta.get("evidence_fingerprint", ""):
-            matched_path = latest_meta["path"]
-            logger.info(
-                f"Skipping duplicate snapshot for '{entity_name}' — evidence matches {matched_path} within dedup window"
-            )
-            base_name = Path(matched_path).stem
-            return _format_dedup_return("", matched_path, base_name)
-
     pulse_dir = ensure_pulse_dir()
+    slug = slugify(entity_name)
     today = _today_str()
     now_iso = _now_iso()
 
     base_name = f"{slug}-{today}"
-
     json_path = pulse_dir / f"{base_name}.json"
     md_path = pulse_dir / f"{base_name}.md"
 
-    # Avoid collision — if file exists today, append counter
-    counter = 1
-    while json_path.exists() or md_path.exists():
-        counter += 1
-        base_name = f"{slug}-{today}-{counter}"
-        json_path = pulse_dir / f"{base_name}.json"
-        md_path = pulse_dir / f"{base_name}.md"
-
-    # JSON snapshot — immutable evidence records
     payload = {
         "entity_name": entity_name,
         "slug": slug,
@@ -137,7 +53,6 @@ def write_pulse_snapshot(
         logger.error(f"Failed to write pulse JSON {json_path}: {e}")
         raise
 
-    # Markdown snapshot — human-readable
     md_lines = [
         f"# Pulse: {entity_name}\n\n",
         f"**Date:** {today}\n",
@@ -183,14 +98,11 @@ def write_pulse_snapshot(
         logger.info(f"Pulse MD snapshot written: {md_path}")
     except Exception as e:
         logger.error(f"Failed to write pulse MD {md_path}: {e}")
-        # JSON already written — don't fail entirely, but log
 
     return {
         "json_path": str(json_path),
         "md_path": str(md_path),
         "base_name": base_name,
-        "deduped": False,
-        "matched_path": "",
     }
 
 
@@ -201,8 +113,9 @@ def list_pulse_snapshots(entity_name: Optional[str] = None) -> List[Path]:
 
     if entity_name:
         slug = slugify(entity_name)
-        pattern = f"{slug}-*.json"
-        return sorted(pulse_dir.glob(pattern))
+        pattern = f"{slug}-{date.today().isoformat()}.json"
+        path = pulse_dir / pattern
+        return [path] if path.exists() else []
 
     return sorted(pulse_dir.glob("*.json"))
 
@@ -241,7 +154,6 @@ def load_recent_pulse_evidence(entity_name: str, max_age_days: int = 7) -> List[
             if ts < cutoff:
                 continue
         except Exception:
-            # If timestamp unparsable, include if file is recent by mtime
             try:
                 mtime = datetime.fromtimestamp(os.path.getmtime(snap_path), tz=timezone.utc)
                 if mtime < cutoff:

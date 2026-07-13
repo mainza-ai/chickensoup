@@ -299,16 +299,6 @@ class PulseAgent:
                     },
                 )
                 json_path = paths["json_path"]
-                if paths.get("deduped"):
-                    logger.info(f"No-data pulse for '{entity_name}' deduped against {paths.get('matched_path')}")
-                    return PulseResult(
-                        entity_name=entity_name,
-                        status="deduped",
-                        evidence=[],
-                        raw_snapshot_path=paths.get("matched_path"),
-                        budget_remaining=ResourceLedger.get_status().paid_remaining,
-                        matched_snapshot_path=paths.get("matched_path"),
-                    )
             except Exception as write_err:
                 logger.warning(f"Failed to write no_data pulse snapshot: {write_err}")
                 json_path = None
@@ -321,12 +311,10 @@ class PulseAgent:
                 budget_remaining=ResourceLedger.get_status().paid_remaining,
             )
 
-        # Cap claims per pulse
         max_claims = settings.LAST30DAYS_MAX_CLAIMS_PER_PULSE
         if len(evidence) > max_claims:
             evidence = evidence[:max_claims]
 
-        # Write immutable snapshot to wiki/raw/pulse — never touches entities/concepts
         try:
             paths = write_pulse_snapshot(
                 entity_name=entity_name,
@@ -339,17 +327,6 @@ class PulseAgent:
                     "cost_usd": cost,
                 },
             )
-            if paths.get("deduped"):
-                matched = paths.get("matched_path", "")
-                logger.info(f"Pulse for '{entity_name}' deduped against {matched}")
-                return PulseResult(
-                    entity_name=entity_name,
-                    status="deduped",
-                    evidence=evidence,
-                    raw_snapshot_path=matched,
-                    budget_remaining=ResourceLedger.get_status().paid_remaining,
-                    matched_snapshot_path=matched,
-                )
             json_path = paths["json_path"]
             logger.info(f"Pulse snapshot for '{entity_name}': {json_path} with {len(evidence)} evidence")
         except Exception as e:

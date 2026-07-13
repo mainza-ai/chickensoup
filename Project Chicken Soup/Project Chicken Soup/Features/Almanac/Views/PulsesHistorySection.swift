@@ -8,7 +8,6 @@ struct PulsesHistorySection: View {
     @State private var showAllSnapshots = false
     @State private var selectedFilter: IngestionFilter = .all
     @State private var isPurging = false
-    @State private var expandedGroups: Set<String> = []
 
     @Environment(AlmanacService.self) private var almanacService
 
@@ -18,31 +17,6 @@ struct PulsesHistorySection: View {
         case empty = "[ Empty ]"
 
         var id: String { rawValue }
-    }
-
-    struct PulseGroup: Identifiable {
-        let entityName: String
-        var entries: [APIPulseHistoryEntry]
-        var id: String { entityName }
-    }
-
-    var groupedPulses: [PulseGroup] {
-        let filtered = filteredPulses
-        var groups: [String: [APIPulseHistoryEntry]] = [:]
-        for entry in filtered {
-            groups[entry.entityName, default: []].append(entry)
-        }
-        return groups.map { key, entries in
-            PulseGroup(entityName: key, entries: entries)
-        }.sorted { a, b in
-            let aLatest = a.entries.first?.timestamp ?? ""
-            let bLatest = b.entries.first?.timestamp ?? ""
-            return aLatest > bLatest
-        }
-    }
-
-    var displayedGroups: [PulseGroup] {
-        Array(groupedPulses.prefix(5))
     }
 
     var filteredPulses: [APIPulseHistoryEntry] {
@@ -89,21 +63,22 @@ struct PulsesHistorySection: View {
             .padding(.bottom, 4)
 
             VStack(spacing: 10) {
-                if displayedGroups.isEmpty {
+                let displayed = filteredPulses
+                if displayed.isEmpty {
                     Text("No snapshots match this filter.")
                         .font(.caption2)
                         .foregroundStyle(DesignConstants.secondaryText)
                         .padding(.vertical, 20)
                 } else {
-                    ForEach(displayedGroups) { group in
-                        groupRow(for: group)
+                    ForEach(displayed.prefix(5)) { entry in
+                        pulseRow(for: entry)
                     }
 
-                    if groupedPulses.count > 5 {
+                    if displayed.count > 5 {
                         Button(action: {
                             showAllSnapshots = true
                         }) {
-                            Text("Show All Ingest Snapshots (\(groupedPulses.count))")
+                            Text("Show All Ingest Snapshots (\(displayed.count))")
                                 .font(.caption)
                                 .bold()
                                 .foregroundStyle(DesignConstants.systemOrangeText)
@@ -122,8 +97,8 @@ struct PulsesHistorySection: View {
         .sheet(isPresented: $showAllSnapshots) {
             NavigationStack {
                 List {
-                    ForEach(groupedPulses) { group in
-                        groupRow(for: group, isExpanded: Binding<Bool>.constant(true))
+                    ForEach(filteredPulses) { entry in
+                        pulseRow(for: entry)
                     }
                 }
                 .navigationTitle("Ingestion Snapshots History")
@@ -142,140 +117,58 @@ struct PulsesHistorySection: View {
     }
 
     @ViewBuilder
-    private func groupRow(for group: PulseGroup, isExpanded: Binding<Bool>? = nil) -> some View {
-        let latest = group.entries.first!
-        let binding: Binding<Bool> = isExpanded ?? Binding(
-            get: { expandedGroups.contains(group.entityName) },
-            set: { isOn in
-                if isOn {
-                    expandedGroups.insert(group.entityName)
-                } else {
-                    expandedGroups.remove(group.entityName)
-                }
-            }
-        )
-
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                Button(action: {
-                    onPulseSelected(latest)
-                    showAllSnapshots = false
-                }) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(latest.entityName)
-                                .font(.subheadline)
-                                .bold()
-                                .foregroundStyle(DesignConstants.primaryText)
-                            Text("Pulsed: \(latest.date)")
-                                .font(.caption2)
-                                .foregroundStyle(DesignConstants.secondaryText)
-                        }
-
-                        Spacer()
-
-                        Text("\(latest.evidenceCount) claims")
-                            .font(.system(.caption2, design: .monospaced))
+    private func pulseRow(for entry: APIPulseHistoryEntry) -> some View {
+        HStack(spacing: 12) {
+            Button(action: {
+                onPulseSelected(entry)
+                showAllSnapshots = false
+            }) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(entry.entityName)
+                            .font(.subheadline)
                             .bold()
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(DesignConstants.systemOrange.opacity(0.15))
-                            .foregroundStyle(DesignConstants.systemOrangeText)
-                            .clipShape(Capsule())
-                    }
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Open pulse details for \(latest.entityName)")
-
-                if group.entries.count > 1 {
-                    Button(action: {
-                        binding.wrappedValue.toggle()
-                    }) {
-                        Image(systemName: binding.wrappedValue ? "chevron.up" : "chevron.down")
-                            .font(.caption.bold())
+                            .foregroundStyle(DesignConstants.primaryText)
+                        Text("Pulsed: \(entry.date)")
+                            .font(.caption2)
                             .foregroundStyle(DesignConstants.secondaryText)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(binding.wrappedValue ? "Collapse history for \(group.entityName)" : "Expand history for \(group.entityName)")
-                }
 
-                Button(action: {
-                    onPulseRerun(latest.entityName)
-                    showAllSnapshots = false
-                }) {
-                    Image(systemName: "arrow.clockwise.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(DesignConstants.systemOrange)
+                    Spacer()
+
+                    Text("\(entry.evidenceCount) claims")
+                        .font(.system(.caption2, design: .monospaced))
+                        .bold()
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(DesignConstants.systemOrange.opacity(0.15))
+                        .foregroundStyle(DesignConstants.systemOrangeText)
+                        .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Re-run ingestion pulse for \(group.entityName)")
             }
-            .padding(10)
-            .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open pulse details for \(entry.entityName)")
 
-            if binding.wrappedValue, group.entries.count > 1 {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(group.entries.dropFirst()) { prior in
-                        HStack(spacing: 12) {
-                            Button(action: {
-                                onPulseSelected(prior)
-                                showAllSnapshots = false
-                            }) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(prior.entityName)
-                                            .font(.caption)
-                                            .foregroundStyle(DesignConstants.secondaryText)
-                                        Text("Pulsed: \(prior.date)")
-                                            .font(.caption2)
-                                            .foregroundStyle(DesignConstants.secondaryText.opacity(0.7))
-                                    }
-                                    Spacer()
-                                    Text("\(prior.evidenceCount) claims")
-                                        .font(.system(.caption2, design: .monospaced))
-                                        .foregroundStyle(DesignConstants.secondaryText)
-                                }
-                            }
-                            .buttonStyle(.plain)
-
-                            Spacer()
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(DesignConstants.controlBackground.opacity(0.5))
-                    }
-
-                    if group.entries.contains(where: { $0.evidenceCount == 0 }) {
-                        Button(action: {
-                            purgeEmpty(entityName: group.entityName)
-                        }) {
-                            Text("Purge Empty Logs for \(group.entityName)")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Purge empty pulse snapshots for \(group.entityName)")
-                    }
-                }
-                .background(DesignConstants.controlBackground.opacity(0.3))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.bottom, 4)
+            Button(action: {
+                onPulseRerun(entry.entityName)
+                showAllSnapshots = false
+            }) {
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(DesignConstants.systemOrange)
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Re-run ingestion pulse for \(entry.entityName)")
         }
+        .padding(10)
+        .background(DesignConstants.controlBackground, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(DesignConstants.dividerColor, lineWidth: 1))
     }
 
-    private func purgeEmpty(entityName: String? = nil) {
+    private func purgeEmpty() {
         isPurging = true
         Task {
-            let success: Bool
-            if let ename = entityName {
-                success = await almanacService.purgeEmptyPulses(entityName: ename)
-            } else {
-                success = await almanacService.purgeEmptyPulses()
-            }
+            let success = await almanacService.purgeEmptyPulses()
             if success {
                 await almanacService.fetchPulseHistory()
             }
