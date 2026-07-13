@@ -142,7 +142,13 @@ public final class DataStoreBackupService {
         let backupURL = backupsURL.appendingPathComponent(backup.id, isDirectory: true)
         guard FileManager.default.fileExists(atPath: backupURL.path) else { return nil }
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        #if os(macOS)
         let exportURL = documentsURL.appendingPathComponent("ChickenSoupBackup_\(backup.id).zip")
+        #else
+        let exportURL = documentsURL.appendingPathComponent("ChickenSoupBackup_\(backup.id)", isDirectory: true)
+        #endif
+
         return await withCheckedContinuation { continuation in
             DispatchQueue.global(qos: .utility).async {
                 do {
@@ -326,6 +332,7 @@ public struct BackupInfo: Codable, Identifiable {
 
 private extension FileManager {
     func zipItem(at sourceURL: URL, to destinationURL: URL) throws {
+        #if os(macOS)
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
         task.arguments = ["-c", "-k", "--keepParent", sourceURL.path, destinationURL.path]
@@ -336,5 +343,13 @@ private extension FileManager {
         if task.terminationStatus != 0 {
             throw NSError(domain: "DataStoreBackup", code: 1, userInfo: [NSLocalizedDescriptionKey: "ditto exited with code \(task.terminationStatus)"])
         }
+        #else
+        try createDirectory(at: destinationURL, withIntermediateDirectories: true)
+        let contents = try contentsOfDirectory(at: sourceURL, includingPropertiesForKeys: nil)
+        for item in contents {
+            let dest = destinationURL.appendingPathComponent(item.lastPathComponent)
+            try copyItem(at: item, to: dest)
+        }
+        #endif
     }
 }
