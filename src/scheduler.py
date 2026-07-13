@@ -226,6 +226,13 @@ async def process_eligible_conversations():
                 except Exception as xref_err:
                     logger.warning(f"Cross-reference failed for '{page['title']}': {xref_err}")
 
+                if settings.LAST30DAYS_ENABLED:
+                    try:
+                        from src.staleness_queue import record_pulse_completed
+                        record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
+                    except Exception as queue_err:
+                        logger.warning(f"Failed to seed staleness queue for '{slug}': {queue_err}")
+
                 try:
                     driver = neo4j_conn.get_driver()
                     full_content = (
@@ -777,6 +784,37 @@ async def idle_ingestion_loop():
                         rc = _get_reinforcement_count(slug)
                         cc = wf.score_claim(claim_text, result.evidence, reinforcement_count=rc)
                         state_label = cc.state_label
+
+                    # Optional: enrich chat-created wiki pages with external evidence
+                    if result.evidence:
+                        sources = page_data.get("frontmatter", {}).get("sources", [])
+                        is_chat_created = any(isinstance(s, str) and s.startswith("conversation:") for s in sources)
+                        if is_chat_created:
+                            try:
+                                from src.wiki.writer import write_page
+                                top_claims = sorted(
+                                    result.evidence,
+                                    key=lambda ev: ev.engagement_count if hasattr(ev, "engagement_count") else 0,
+                                    reverse=True
+                                )[:3]
+                                evidence_section = "\n\n## External Evidence\n\n"
+                                for ev in top_claims:
+                                    claim_text = getattr(ev, "claim_text", "") or ""
+                                    if claim_text:
+                                        evidence_section += f"- {claim_text}\n"
+                                if len(evidence_section) > len("\n\n## External Evidence\n\n"):
+                                    updated_body = page_data.get("body", "") + evidence_section
+                                    write_page(
+                                        title=page_data["frontmatter"].get("title", entity_name),
+                                        body=updated_body,
+                                        tags=page_data["frontmatter"].get("tags", []),
+                                        sources=sources,
+                                        related=page_data["frontmatter"].get("related", []),
+                                        page_type=page_data.get("page_type", "entities"),
+                                    )
+                                    logger.info(f"Enriched wiki page '{slug}' with {len(top_claims)} external evidence items")
+                            except Exception as enrich_err:
+                                logger.warning(f"Wiki page enrichment failed for '{slug}': {enrich_err}")
 
                     record_pulse_completed(slug, divergence_risk=div_risk, state_label=state_label)
                     _IDLE_LAST_RUN = datetime.now(timezone.utc).isoformat()
