@@ -599,3 +599,138 @@ The two enums were never synchronised.
 **Fix**: Changed `activeTab` default from `.timeline` to `.graph`.
 
 **File**: `ContentView.swift:47`
+
+---
+
+## 16. Snapshot Feed Ecosystem Audit (2026-07-12)
+
+Full audit of the pulse snapshot feed: how duplicates are created, how they propagate to the UI, and where dedup logic exists or is missing.
+
+### 16.1 Data Flow Overview
+
+```
+UI: PulsesHistorySection
+  └─ ForEach(history.prefix(5), id: \.file)   ← file path IS the identity
+       ├─ onPulseSelected(entry)  →  openPulseSnapshot sheet
+       │      └─ GET /pulse/snapshot?filepath=<entry.file>
+       │           └─ returns full JSON including evidence array
+       │
+       └─ onPulseRerun(entry.entityName)  →  triggerPulse(for: slug)
+              └─ POST /pulse/{entity_name}  (background task)
+                   └─ PulseAgent.run_pulse(entity_name)
+                        ├─ _resolve_binary() → last30days CLI
+                        ├─ parse_output(raw, entity_name) → [ClaimEvidence]
+                        ├─ semantic filter
+                        └─ write_pulse_snapshot() → disk
+                             └─ {slug}-{date}[-N].{json,md}
+                   └─ task.set_success(result) triggers onFinished()
+                        └─ loadInitialDashboardData()
+                             └─ fetchPulseHistory()  →  reloads feed from disk
+```
+
+### 16.2 How a "duplicate" row is born
+
+Every pulse run creates a new file, unconditionally:
+
+```
+base_name = f"{slug}-{today}"            → project-serpo-2026-07-12.json
+if exists: counter=1  → project-serpo-2026-07-12-1.json
+if exists: counter=2  → project-serpo-2026-07-12-2.json  ← re-run #1
+if exists: counter=3  → project-serpo-2026-07-12-3.json  ← re-run #2
+```
+
+There is **zero dedup on the write path for non-empty evidence**. The same entity re-run N times produces N files. The history endpoint returns all N files. SwiftUI `ForEach(displayed.prefix(5), id: \.file)` renders each as a separate row because `id` is the full file path.
+
+Confirmed on disk:
+```
+project-serpo-2026-07-12.json      ← original
+project-serpo-2026-07-12-2.json    ← 2nd run
+project-serpo-2026-07-12-3.json    ← 3rd run (0 evidence, dedup not yet triggered)
+project-serpo-2026-07-12-4.json    ← 4th run
+roswell-crash-2026-07-11.json
+roswell-crash-2026-07-11-2.json    ← first re-run
+roswell-crash-2026-07-11-3.json    ← second re-run
+```
+
+### 16.3 Write path — naming and collision
+
+**`src/wiki/pulse_writer.py:58-69`**
+
+`write_pulse_snapshot` creates files with pattern `{slug}-{date}[-N].{json,md}`. Collision avoidance increments the counter. No entity-aware dedup. No time-window dedup for non-empty evidence.
+
+### 16.4 Existing dedup: `_has_recent_empty_snapshot` (24h guard)
+
+**`src/wiki/pulse_writer.py:22-38`** — added in the most recent fix set.
+
+```python
+def _has_recent_empty_snapshot(slug, max_age_hours=24):
+    cutoff = now().timestamp() - (24 * 3600)
+    for snap_path in pulse_dir.glob(f"{slug}-*.json"):
+        if snap_path.stat().st_mtime < cutoff: continue
+        data = load_pulse_snapshot(snap_path)
+        if data and data.get("evidence_count", -1) == 0:
+            return True
+    return False
+```
+
+**What it does**: prevents writing a 0-evidence snapshot if one was written in the last 24h.
+
+**Flaws**:
+1. `st_mtime` could diverge from the `timestamp` field inside JSON (restore from backup, `touch`, timezone drift).
+2. Does not dedup non-empty re-runs — 10 re-runs each with 2 evidence items = 10 files.
+3. On dedup, returns `{"json_path": "", "md_path": "", "base_name": ""}`. The caller stores `json_path = ""` in `PulseResult.raw_snapshot_path`, which is indistinguishable from a write error in the UI.
+4. The very first empty snapshot for an entity always writes — the guard only fires on the *second* empty write.
+
+### 16.5 `/pulse/history` — per-file, no grouping
+
+**`src/main.py:2147`** — glob returns all matching files, `reversed()` sorts newest first, no grouping, no "latest per entity" logic.
+
+### 16.6 `/pulse/history` response — now includes evidence array
+
+As of the most recent fix, each entry includes `evidence: [...]` (up to 10 items), so `PulseSnapshotDetailsView` can inline claims without a second round-trip.
+
+### 16.7 Swift model — `APIPulseHistoryEntry`
+
+**`APIModels.swift:1162-1187`** — has `evidence: [APIClaimEvidence]` field with a default-empty array so all call sites remain backward-compatible.
+
+### 16.8 Feed rendering — `id: \.file` means no UI-side dedup
+
+**`PulsesHistorySection.swift:73`**
+
+```swift
+ForEach(displayed.prefix(5), id: \.file) { entry in  pulseRow(for: entry) }
+```
+
+Since each file has a unique path, the feed treats each re-run as a new entry. There is no merge logic.
+
+### 16.9 Purge-empty — global, all-entities
+
+**`src/main.py:1844-1867`** — `POST /pulse/purge-empty` iterates ALL `.json` files in the pulse directory, deleting any with `evidence_count == 0`. No dry-run, no per-entity filter, no time scope. Triggered from the "Purge Empty Logs" button.
+
+### 16.10 Re-run refresh cycle
+
+After a re-run, `TaskConsoleView` polls task status → `onFinished()` → `loadInitialDashboardData()` → `fetchPulseHistory()`. This reloads all files from disk. Old rows persist unless `limit=50` drops them (time-based, not entity-based).
+
+### 16.11 Finding summary
+
+| # | Finding | Location | Severity |
+|---|---|---|---|
+| F1 | Every pulse run writes a new file — no non-empty dedup on write | `pulse_writer.py:58-69` | High |
+| F2 | `_has_recent_empty_snapshot` dedup only fires for `evidence_count==0`, not for non-empty re-runs | `pulse_writer.py:49-52` | High |
+| F3 | `/pulse/history` returns every file matching glob, no "latest per entity" grouping | `main.py:2147` | Medium |
+| F4 | SwiftUI `id: \.file` — same-entity re-runs always appear as new rows | `PulsesHistorySection.swift:73` | Medium |
+| F5 | `st_mtime` used for 24h window — could diverge from JSON `timestamp` | `pulse_writer.py:31` | Low |
+| F6 | Dedup'd empty snapshot returns `json_path=""` — indistinguishable from write error in UI | `pulse_agent.py:291-304` | Medium |
+| F7 | Purge-empty deletes across ALL entities with no per-entity opt-out | `main.py:1856` | Low |
+| F8 | After re-run, `fetchPulseHistory()` reloads all history — old rows persist unless limit=50 excludes them | `AlmanacService.swift:69-81` | Medium |
+| F9 | 4-snapshot spiral (`-2,-3,-4`) for `project-serpo` was caused by the filter bug dropping all evidence + no non-empty dedup | `pulse_writer.py` + `pulse_agent.py` (filter fixed) | Root cause (fixed) |
+
+### 16.12 Implementation plan
+
+See [[snapshot-feed-fixes]] for the targeted fix plan covering:
+- Latest-per-entity dedup on write path (time-window, configurable)
+- Truthful `PulseResult` status when dedup skips write
+- UI grouping: collapse re-runs into "latest" row with expandable history
+- `/pulse/history` grouping or `latest=true` query param
+- Purge-empty per-entity filter + dry-run mode
+

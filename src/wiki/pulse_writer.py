@@ -19,23 +19,64 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _has_recent_empty_snapshot(slug: str, max_age_hours: int = 24) -> bool:
+def _evidence_fingerprint(evidence: List[ClaimEvidence]) -> str:
+    claim_texts = sorted(e.claim_text.strip() for e in evidence if e.claim_text)
+    return f"{len(evidence)}|{'|'.join(claim_texts)}"
+
+
+def _get_latest_snapshot_meta(slug: str, max_age_hours: int = 24) -> Optional[Dict[str, Any]]:
     pulse_dir = get_pulse_dir()
     if not pulse_dir.exists():
-        return False
+        return None
 
     cutoff = datetime.now(timezone.utc).timestamp() - (max_age_hours * 3600)
     pattern = f"{slug}-*.json"
+    newest_path: Optional[Path] = None
+    newest_mtime: float = 0.0
+
     for snap_path in pulse_dir.glob(pattern):
         try:
-            if snap_path.stat().st_mtime < cutoff:
+            mtime = snap_path.stat().st_mtime
+            if mtime < cutoff:
                 continue
-            data = load_pulse_snapshot(snap_path)
-            if data and data.get("evidence_count", -1) == 0:
-                return True
+            if mtime > newest_mtime:
+                newest_mtime = mtime
+                newest_path = snap_path
         except Exception:
             continue
-    return False
+
+    if newest_path is None:
+        return None
+
+    data = load_pulse_snapshot(newest_path)
+    if not data:
+        return None
+
+    evidence_list = data.get("evidence", [])
+    return {
+        "path": str(newest_path),
+        "evidence_count": data.get("evidence_count", len(evidence_list)),
+        "timestamp": data.get("timestamp", ""),
+        "evidence_fingerprint": _evidence_fingerprint_from_raw(evidence_list),
+    }
+
+
+def _evidence_fingerprint_from_raw(evidence_raw: List[Dict[str, Any]]) -> str:
+    claim_texts = sorted(
+        (str(e.get("claim_text", "")).strip() for e in evidence_raw if e.get("claim_text")),
+        key=str.lower,
+    )
+    return f"{len(evidence_raw)}|{'|'.join(claim_texts)}"
+
+
+def _format_dedup_return(path: str, matched_path: str, base_name: str) -> Dict[str, str]:
+    return {
+        "json_path": path,
+        "md_path": path.replace(".json", ".md"),
+        "base_name": base_name,
+        "deduped": True,
+        "matched_path": matched_path,
+    }
 
 
 def write_pulse_snapshot(
@@ -46,10 +87,16 @@ def write_pulse_snapshot(
 ) -> Dict[str, str]:
     slug = slugify(entity_name)
 
-    if not evidence:
-        if _has_recent_empty_snapshot(slug):
-            logger.info(f"Skipping duplicate empty snapshot for '{entity_name}' — empty snapshot written within last 24h")
-            return {"json_path": "", "md_path": "", "base_name": ""}
+    latest_meta = _get_latest_snapshot_meta(slug)
+    if latest_meta is not None:
+        current_fingerprint = _evidence_fingerprint(evidence)
+        if current_fingerprint == latest_meta.get("evidence_fingerprint", ""):
+            matched_path = latest_meta["path"]
+            logger.info(
+                f"Skipping duplicate snapshot for '{entity_name}' — evidence matches {matched_path} within dedup window"
+            )
+            base_name = Path(matched_path).stem
+            return _format_dedup_return("", matched_path, base_name)
 
     pulse_dir = ensure_pulse_dir()
     today = _today_str()
@@ -140,6 +187,8 @@ def write_pulse_snapshot(
         "json_path": str(json_path),
         "md_path": str(md_path),
         "base_name": base_name,
+        "deduped": False,
+        "matched_path": "",
     }
 
 

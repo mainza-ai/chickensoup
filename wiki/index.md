@@ -222,4 +222,5 @@ related: []
 ## Plans (in wiki/plan/)
 
 - [[frontend-settings-menu]] — SwiftUI Settings menu plan to reach final DOD: budget display, HOLD approval, pulse triggers, almanac dry-run/live, timeline slider, entity divergence rows, DOD checklist
-- [[master-implementation-plan]] — Master implementation plan: 6-stage sequenced execution (XSS → evidence pipeline → cohesion → idle-driven scheduling → query intelligence → verification), 8 PRs, conflict resolution, dependency graph
+- [[master-implementation-plan]] — Master implementation plan: 6-stage sequenced execution (XSS → evidence pipeline → cohesion → idle-driven scheduling → query intelligence → verification)
+- [[snapshot-feed-fixes]] — Snapshot feed dedup & grouping fix plan: latest-per-entity write dedup, truthful deduped status, /pulse/history latest=true grouping, SwiftUI expandable re-run rows, per-entity purge, 8 PRs, conflict resolution, dependency graph

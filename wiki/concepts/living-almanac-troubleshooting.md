@@ -4,7 +4,7 @@ tags: [living-almanac, troubleshooting, debug]
 created: 2026-07-12
 updated: 2026-07-12
 sources: [chickensoup-living-almanac-implementation-spec, agent-architecture, integration-architecture]
-related: [living-almanac, api-design, production-readiness]
+related: [living-almanac, api-design, production-readiness, snapshot-feed-fixes]
 ---
 
 # Living Almanac — Troubleshooting
@@ -48,3 +48,75 @@ Ensure at least 2 independent platforms co-mention both entities in recent pulse
 ### Budget hold / spend stuck
 
 Check `GET /budget/status`. If `on_hold=true`, call `POST /budget/approve`. Verify budget ceiling in `.env` (`LAST30DAYS_MONTHLY_BUDGET_USD`). Budget is tracked in Redis hash `budget:YYYY-MM`.
+
+---
+
+## Snapshot Feed — Duplicate & 0-Evidence Issues
+
+### Re-run produces duplicate rows in feed
+
+**Cause (F1–F4)**: Every `POST /pulse/{entity}` invocation writes a new file to `wiki/raw/pulse/` with a unique counter suffix. The `/pulse/history` endpoint returns every matching file. SwiftUI treats each file path as a unique row identity. There is no "latest per entity" grouping on either the write path or the read path.
+
+**Diagnosis**: `ls wiki/raw/pulse/` shows `project-serpo-2026-07-12.json`, `-2.json`, `-3.json`, `-4.json` for the same entity on the same day. `/pulse/history` returns all 4 entries.
+
+---
+
+### Re-run returns 0 evidence after adapter fix
+
+**Cause (F9 — FIXED)**: Pre-existing semantic disambiguation filter in `src/agents/pulse_agent.py` used `entity_name.split()` which, for slug-form names like `project-serpo` or `bob-lazar`, produced a single giant token (`["project-serpo"]`). The filter then required that literal token to appear in every claim text or URL. No last30days claim contains `"project-serpo"` verbatim, so all claims were silently dropped.
+
+**Fix**: Changed tokeniser to `re.split(r"[-_ ]+", entity_name)`, added STOP_WORDS filter, and changed threshold from 50% to **all-words-required** for multi-word entities.
+
+---
+
+### 0-evidence re-run creates empty snapshot spiral
+
+**Cause (F1, F2)**: Before the 24h dedup guard was added, every 0-evidence re-run created a new empty snapshot file. The first empty write was never dedup'd (no prior empty snapshot to match), so a series of re-runs accumulated `-2.json`, `-3.json`, `-4.json`, etc.
+
+**Current behaviour (post-fix)**: `_has_recent_empty_snapshot(slug)` in `pulse_writer.py` skips writing a new empty snapshot if one exists within the last 24h. Returns `{"json_path": "", ...}` silently.
+
+**Residual issue (F6)**: The caller stores `json_path = ""` in `PulseResult.raw_snapshot_path`. The task console shows "Ingested 0 evidence items" — indistinguishable from a write error. Use server logs (`Filtering out`, `Skipping duplicate empty snapshot`) to tell dedup hits apart from genuine failures.
+
+---
+
+### Purge-empty removes all empty snapshots globally
+
+**Cause (F7)**: `POST /pulse/purge-empty` iterates `pulse_dir.glob("*.json")` across all entities with no per-entity opt-out. Use the UI filter in `PulsesHistorySection` to review before purging.
+
+---
+
+### `st_mtime` discrepancy with snapshot `timestamp` field
+
+**Cause (F5)**: `_has_recent_empty_snapshot` uses `snap_path.stat().st_mtime` for the 24h window. If files are restored from backup or `touch`-ed, `st_mtime` can diverge from the `timestamp` field inside the JSON. In normal operation these are near-identical.
+
+---
+
+### UI does not collapse same-entity re-runs
+
+**Cause (F4)**: `ForEach(displayed.prefix(5), id: \.file)` in `PulsesHistorySection.swift:73` uses the full file path as row identity. Same-entity re-runs produce distinct rows with identical `entityName`, `date`, and `evidenceCount`. Users must tap each row and read `timestamp` inside `PulseSnapshotDetailsView` to distinguish them.
+
+---
+
+### Diagnostic commands
+
+```bash
+# List all snapshots for an entity, sorted newest first
+ls -lt wiki/raw/pulse/project-serpo-*.json
+
+# Count total snapshots
+ls wiki/raw/pulse/*.json | wc -l
+
+# Count empty snapshots
+python3 -c "
+import json, pathlib
+d = pathlib.Path('wiki/raw/pulse')
+empty = [f.name for f in d.glob('*.json') if json.load(open(f)).get('evidence_count',-1)==0]
+print(f'Empty snapshots: {len(empty)}')
+"
+
+# Check dedup guard hit in server log
+grep "Skipping duplicate empty snapshot" /tmp/chickensoup-server.log | tail -10
+
+# Check filter drops in server log
+grep "Filtering out cross-contamination" /tmp/chickensoup-server.log | tail -20
+```

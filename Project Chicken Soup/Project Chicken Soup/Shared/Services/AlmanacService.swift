@@ -66,13 +66,17 @@ public final class AlmanacService {
         }
     }
 
-    public func fetchPulseHistory(limit: Int = 50) async {
+    public func fetchPulseHistory(limit: Int = 50, latest: Bool = false) async {
         isFetchingHistory = true
         defer { isFetchingHistory = false }
         do {
+            var queryItems = [URLQueryItem(name: "limit", value: String(limit))]
+            if latest {
+                queryItems.append(URLQueryItem(name: "latest", value: "true"))
+            }
             let res: APIPulseHistoryResponse = try await APIClient.shared.request(
                 path: "/pulse/history",
-                queryItems: [URLQueryItem(name: "limit", value: String(limit))]
+                queryItems: queryItems
             )
             self.pulseHistory = res.pulses
         } catch {
