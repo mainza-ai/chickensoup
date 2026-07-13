@@ -844,4 +844,5 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
 ## [2026-07-13] ingest | pulse | bob-lazar | 23 evidence | $0.00 | remaining=$1980.50 | bob-lazar
 ## [2026-07-13] ingest | pulse | david-grusch | 14 evidence | $0.00 | remaining=$1980.50 | david-grusch
+## [2026-07-13] ingest | pulse | aldo-rebelo | 9 evidence | $0.00 | remaining=$1980.50 | aldo-rebelo
 
