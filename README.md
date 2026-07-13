@@ -6,7 +6,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active_development-orange.svg" alt="Active Development" />
-  <img src="https://img.shields.io/badge/tests-75%20passing-brightgreen.svg" alt="Tests" />
+  <img src="https://img.shields.io/badge/tests-102%20passing-brightgreen.svg" alt="Tests" />
   <img src="https://img.shields.io/badge/python-3.12%2B-blue.svg" alt="Python" />
 </p>
 
@@ -70,7 +70,7 @@ graph TD
         WF[Wavefunction: Qiskit VQE over 3-basis]
         Div[Divergence Engine: FieldGeometryTensor reuse]
         Ent[Entanglement Correlation: Meyer-Wallach]
-        Time[Timeline: pulse/*.json + git log]
+        Time[Timeline: wiki/dev/data/pulse/*.json + git log]
         Almanac[Almanac Generator: Tier-1 → HTML brief]
     end
     
@@ -101,9 +101,9 @@ graph TD
 
 - **Orchestrator**: Managed via `pydantic-graph` for top-level routing with confidence gating.
 - **Research Agent**: Now wires `ClaimWavefunction` when recent pulse evidence exists (14-day window), with graceful heuristic fallback. Populates `inferred_events` and `inferred_entities` from wavefunction-scored claims (previously dead since audit).
-- **Pulse Agent**: Entity-scoped `last30days` ingestion via subprocess (`shell=False` always), budget guard with atomic Lua, writes immutable dated snapshots to `wiki/raw/pulse/`.
+- **Pulse Agent**: Entity-scoped `last30days` ingestion via subprocess (`shell=False` always), budget guard with atomic Lua, writes immutable dated snapshots to `wiki/dev/data/pulse/` (overwrites same-day re-runs, no duplicate counter-suffix files).
 - **Tribunal Agent**: 3-role adversarial synthesis (Skeptic, Empiricist, Believer) + Referee. Only triggers for contested claims or divergence spikes > 0.7. Cost control: uncontested claims never trigger tribunal.
-- **Living Almanac**: Autonomous daily brief — Tier-1 pulse → wavefunction → divergence → tribunal → HTML+md in `wiki/raw/almanac/`, self-contained (inline CSS, no JS, dark mode, print-friendly), idempotency via hash, dry-run mode.
+- **Living Almanac**: Autonomous daily brief — Tier-1 pulse → wavefunction → divergence → tribunal → HTML+md in `wiki/dev/data/almanac/`, self-contained (inline CSS, no JS, dark mode, print-friendly), idempotency via hash, dry-run mode.
 - **Budget Tracker**: Redis-backed atomic monthly ceiling with HOLD threshold (2x cost remaining). Follows MilimoClaw's REVIEW→HOLD approval shape.
 
 ---
@@ -239,7 +239,7 @@ Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
 | **Quantum Tier** | Qiskit (Spacetime — AerEstimatorV2 pattern), CUDA-Q (Field), PennyLane (Pathfinding QML), Quantum Hardware Job Scheduler |
 | **Databases** | Neo4j (Knowledge Graph), Redis (Cache + Budget + Celery broker) |
 | **Ingestion** | `pulse_agent.py` (last30days subprocess, budget-guarded), `last30days_adapter.py` (JSON+markdown normalization) |
-| **Wiki Layer** | `writer.py` (YAML CRUD), `paths.py` (central resolver), `pulse_writer.py` (immutable snapshots), `backup.py`, `cleanup.py`, `budget.py` (Lua atomic) |
+| **Wiki Layer** | `writer.py` (YAML CRUD), `paths.py` (central resolver), `pulse_writer.py` (immutable same-day snapshots, no counter suffix), `backup.py`, `cleanup.py`, `budget.py` (Lua atomic) |
 | **Observability** | OpenTelemetry tracing + 11 custom metrics: `agent_loop_executions`, `quantum_simulation_duration`, `pulse_runs_total`, `pulse_latency_seconds`, `budget_spent_usd`, `wavefunction_state_total{state,collapsed}`, `divergence_risk`, `tribunal_runs_total{trigger}`, `almanac_generated_total`, `almanac_generation_duration_seconds` |
 | **Infrastructure** | Docker, Celery (Asynchronous Ingestion Workers), pytest 75 passing, `uv` package manager |
 
@@ -252,54 +252,59 @@ chickensoup/
 ├── development-docs/       # Project specifications & architecture docs
 │   ├── PROJECT_SPEC.md     # Core technical specification
 │   └── chickensoup-living-almanac-implementation-spec.md  # Living Almanac spec (new)
-├── wiki/                   # Markdown wiki (250+ pages: entities, concepts, projects)
-│   ├── entities/           # 87 pages (people, craft, places, events, programs)
-│   ├── concepts/           # 155 pages (ideas, theories, frameworks + credibility/almanac docs)
-│   ├── projects/           # 7 pages (time travel machinery + living almanac plan)
-│   ├── raw/                # Immutable source documents
-│   │   ├── pulse/          # (NEW) Dated pulse snapshots — entity-scoped evidence
-│   │   └── almanac/        # (NEW) Dated HTML+md State of the Anomaly briefs
-│   └── plan/               # (NEW) Frontend settings menu plan for final DOD
+├── wiki/                   # Markdown wiki (content + internal docs)
+│   ├── entities/           # Public content: people, places, events, technologies
+│   ├── concepts/           # Public content: theories, frameworks, claims
+│   ├── projects/           # Public content: architecture, specs, plans
+│   ├── raw/                # Immutable source documents (PDFs, transcripts, Apple guides)
+│   ├── dev/                # INTERNAL — development docs, agent skills, dependency pages,
+│   │   ├── skills/         #   engineering architecture, API specs, implementation plans
+│   │   ├── dependencies/   #   (excluded from user-facing ingestion and Neo4j graph)
+│   │   ├── reference/      #   (moved from entities/, concepts/, raw/ for production hygiene)
+│   │   ├── data/           #   Runtime artifacts: pulse snapshots, almanac briefs
+│   │   └── ...
+│   ├── plan/               # Frontend settings menu plan for final DOD + internal/
+│   └── log.md              # Append-only ingestion log
 ├── Project Chicken Soup/   # Native SwiftUI client (macOS & iOS, 50+ Swift files)
-├── src/                    # Backend source code (48 Python files, was 22)
+├── src/                    # Backend source code (48 Python files)
 │   ├── main.py             # FastAPI entry point (40+ endpoints + WebSocket + Living Almanac routes)
-│   ├── config.py           # Config — now includes LAST30DAYS_* + WAVEFUNCTION_* + ALMANAC_* flags
-│   ├── models.py           # Pydantic models — now ClaimEvidence, ClaimConfidence, DivergenceResult, PulseResult, etc.
-│   ├── budget.py           # (NEW) BudgetTracker with Lua atomic check+incr, HOLD flag, approve_hold
-│   ├── last30days_adapter.py  # (NEW) Normalizes last30days CLI JSON/md output to ClaimEvidence[]
+│   ├── config.py           # Config — includes LAST30DAYS_* + WAVEFUNCTION_* + ALMANAC_* flags
+│   ├── models.py           # Pydantic models — ClaimEvidence, ClaimConfidence, DivergenceResult, PulseResult, etc.
+│   ├── budget.py           # BudgetTracker with Lua atomic check+incr, HOLD flag, approve_hold
+│   ├── last30days_adapter.py  # Normalizes last30days CLI JSON/md output to ClaimEvidence[]
 │   ├── cache.py            # Redis cache + invalidation
 │   ├── tasks.py            # Celery tasks (fixed metric_tensor bug)
-│   ├── observability.py    # OpenTelemetry — now 11 metrics including pulse/budget/wavefunction/divergence/tribunal/almanac
+│   ├── observability.py    # OpenTelemetry — 11 metrics including pulse/budget/wavefunction/divergence/tribunal/almanac
 │   ├── multi_llm.py        # Multi-LLM consensus via Jaccard
 │   ├── quantum_scheduler.py# Job routing to D-Wave, IonQ, IBM Quantum
 │   ├── scheduler.py        # Chat-to-wiki loop (5min) + Almanac loop (24h interval, idempotency)
 │   ├── api/auth.py         # API key header auth (dev mode bypass)
-│   ├── agents/             # 7 agents (was 4)
+│   ├── agents/             # 7 agents
 │   │   ├── orchestrator.py # pydantic-graph routing with confidence gating + synthesize_answer
 │   │   ├── query_agent.py  # TQL→LLM→heuristic 3-tier intent parsing
-│   │   ├── research_agent.py # LangGraph 6 nodes — now wires wavefunction scoring + inferred_events
+│   │   ├── research_agent.py # LangGraph 6 nodes — wires wavefunction scoring + inferred_events
 │   │   ├── navigation_agent.py # pipelines spacetime→field→path
 │   │   ├── ingest_agent.py # file→wiki analysis
 │   │   ├── chat_ingest_agent.py # conversation→wiki
-│   │   ├── pulse_agent.py  # (NEW) entity-scoped last30days ingestion, budget-guarded, shell=False
-│   │   └── tribunal_agent.py # (NEW) Skeptic/Empiricist/Believer + Referee, gated cost control
-│   ├── quantum_credibility/  # (NEW) Quantum credibility module
+│   │   ├── pulse_agent.py  # entity-scoped last30days ingestion, budget-guarded, shell=False
+│   │   └── tribunal_agent.py # Skeptic/Empiricist/Believer + Referee, gated cost control
+│   ├── quantum_credibility/  # Quantum credibility module
 │   │   ├── wavefunction.py # ClaimWavefunction 3-basis VQE scoring
 │   │   ├── divergence_engine.py # Narrative divergence via tensor+pathfinder reuse
 │   │   ├── entanglement_corr.py # Meyer-Wallach over co-occurrence
 │   │   └── vectorizer.py   # Claims→vector, canon→vector, vector→FieldGeometryTensor
-│   ├── almanac/            # (NEW) Living Almanac artifacts
-│   │   ├── timeline.py     # pulse/*.json + git log → chartable TimelinePoints
+│   ├── almanac/            # Living Almanac artifacts
+│   │   ├── timeline.py     # wiki/dev/data/pulse/*.json + git log → chartable TimelinePoints
 │   │   └── almanac_generator.py # generate_daily_almanac() dry-run + idempotency + HTML
 │   ├── spacetime_engine/   # Qiskit layer + new extractors
 │   │   ├── tensor.py       # FieldGeometryTensor ADM 3+1
 │   │   ├── qiskit_simulation.py # Spacetime metrics (legacy Aer path + numpy)
-│   │   ├── entanglement.py # (NEW) Meyer-Wallach reusable scorer
-│   │   └── vqe_runner.py   # (NEW) AerEstimatorV2 wrapper, claim state circuits
+│   │   ├── entanglement.py # Meyer-Wallach reusable scorer
+│   │   └── vqe_runner.py   # AerEstimatorV2 wrapper, claim state circuits
 │   ├── wiki/               # Wiki vault layer
 │   │   ├── writer.py       # Page CRUD + LOG_IGNORE_PATTERNS for pytest isolation
-│   │   ├── paths.py        # (NEW) Central WIKI_DIR resolver
-│   │   ├── pulse_writer.py # (NEW) Immutable pulse snapshots json+md
+│   │   ├── paths.py        # Central WIKI_DIR resolver
+│   │   ├── pulse_writer.py # Immutable pulse snapshots json+md (same-day overwrite, no counter suffix)
 │   │   ├── backup.py       # Snapshot export/import
 │   │   └── cleanup.py      # Content vs engineering preservation
 │   └── knowledge_graph/    # Neo4j layer
@@ -307,7 +312,7 @@ chickensoup/
 │       ├── connection.py   # Driver lifecycle
 │       ├── queries.py      # Cypher templates
 │       └── schema.py       # Constraints + indexes
-├── tests/                  # Backend tests (19 files, 75 passing — was 9)
+├── tests/                  # Backend tests (19 files, 102 passing)
 │   └── test_pulse_agent.py, test_budget.py, test_wavefunction.py,
 │       test_divergence_engine.py, test_entanglement_corr.py,
 │       test_tribunal_agent.py, test_timeline_endpoint.py, test_almanac_generator.py + original suite
@@ -400,6 +405,7 @@ curl -X POST "http://127.0.0.1:8000/almanac/generate?dry_run=false"
 | `/entities/{name}/divergence` returns 404 or empty | Swift `AlmanacService` must NOT percent-encode entity names before passing to `APIClient.request`. Double-encoding (`%20` → `%2520`) causes FastAPI 404. |
 | Pulse fails with `Permission denied` | `chmod +x last30days-skill/skills/last30days/scripts/last30days.py` |
 | Pulse times out after 60s | Increase `LAST30DAYS_PULSE_TIMEOUT_SECONDS` to 120 (script takes ~58s cold start) |
+| `/pulse/history` shows duplicate snapshots per entity | Same-day re-runs now overwrite `{slug}-{date}.json` in place. If you see `-2.json`, `-3.json` files, those are stale from before the overwrite fix — purge them with `POST /pulse/purge-empty`. |
 
 ### 4. SwiftUI Client Setup
 ```bash
@@ -407,26 +413,31 @@ open "Project Chicken Soup/Project Chicken Soup.xcodeproj"
 ```
 Build and run target `Project Chicken Soup` on **macOS** or **iOS**.
 Optional: Run unit tests using Swift Testing framework (`@Test`).
-See also: `wiki/plan/frontend-settings-menu.md` for Living Almanac settings UI plan.
+See also: `wiki/plan/internal/frontend-settings-menu.md` for Living Almanac settings UI plan (internal).
 
 ---
 
 ## 📚 The Lore Wiki
 
-The knowledge graph is hydrated from structured markdown files in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory (250+ content pages and growing).
+The knowledge graph is hydrated from structured markdown files in the [wiki/](file:///Users/mck/Desktop/chickensoup/wiki) directory.
+
+**Public content** lives in `wiki/entities/`, `wiki/concepts/`, and `wiki/projects/`. These are the only directories ingested into Neo4j, listed by the API, and surfaced in the app's wiki browser.
+
+**Internal/development content** lives in `wiki/dev/`. This directory is excluded from ingestion, graph indexing, and the public wiki browser. A CI lint (`tests/test_wiki_content_hygiene.py`) enforces this boundary.
 
 Pages are automatically created through:
 - **File/Folder Upload**: Upload `.txt`/`.md`/`.json`/`.csv` files → AI analyzes content → wiki pages created with cross-references → synced to Neo4j.
 - **Chat-to-Wiki Pipeline**: Enable in Settings → conversations with 10+ messages are periodically analyzed → entities, concepts, and projects extracted → wiki pages auto-created.
-- **Pulse Agent (NEW)**: Entity-scoped `last30days` ingestion → immutable snapshots in `wiki/raw/pulse/` → quantum-scored confidence via wavefunction → divergence/tribunal → almanac brief in `wiki/raw/almanac/`.
+- **Pulse Agent (NEW)**: Entity-scoped `last30days` ingestion → immutable snapshots in `wiki/dev/data/pulse/` → quantum-scored confidence via wavefunction → divergence/tribunal → almanac brief in `wiki/dev/data/almanac/`.
 
 | Wiki Section | Count | Description |
 |:---|---:|:---|
-| [Entities](file:///Users/mck/Desktop/chickensoup/wiki/entities) | 87 | People, places, objects, events, programs |
-| [Concepts](file:///Users/mck/Desktop/chickensoup/wiki/concepts) | 155 | Theories, frameworks, ideas, claims including credibility engine + almanac docs |
-| [Projects](file:///Users/mck/Desktop/chickensoup/wiki/projects) | 7 | Engineering work, architecture, specifications + Living Almanac plan |
-| [Raw](file:///Users/mck/Desktop/chickensoup/wiki/raw) | 80+ | Immutable source docs + Apple platform guides + pulse snapshots + almanac briefs |
-| [Plan](file:///Users/mck/Desktop/chickensoup/wiki/plan) | 1 | Frontend settings menu plan for final DOD |
+| [Entities](file:///Users/mck/Desktop/chickensoup/wiki/entities) | 65 | People, places, objects, events, programs (infrastructure pages moved to wiki/dev/) |
+| [Concepts](file:///Users/mck/Desktop/chickensoup/wiki/concepts) | ~90 | Theories, frameworks, ideas, claims |
+| [Projects](file:///Users/mck/Desktop/chickensoup/wiki/projects) | 6 | Engineering work, architecture, specifications |
+| [Raw](file:///Users/mck/Desktop/chickensoup/wiki/raw) | 60+ | Immutable source documents (PDFs, transcripts, Apple platform guides) |
+| [Dev](file:///Users/mck/Desktop/chickensoup/wiki/dev) | 70+ | INTERNAL — agent skills, dependency docs, API specs, implementation plans, pulse/almanac artifacts (excluded from user-facing ingestion) |
+| [Plan](file:///Users/mck/Desktop/chickensoup/wiki/plan) | 0 public | Internal implementation plans moved to wiki/plan/internal/ |
 
 ### Advanced Capabilities & Services
 
@@ -438,7 +449,7 @@ Pages are automatically created through:
 * **Budget Guardrails**: Monthly ceiling, atomic Lua check+incr, HOLD threshold, `POST /budget/approve` to clear.
 * **MCP Integration**: FastMCP exposing 6 custom tools.
 * **Observability (OpenTelemetry)**: 11 metrics including `pulse_runs_total`, `budget_spent_usd`, `wavefunction_state_total`, `divergence_risk`, `tribunal_runs_total`, `almanac_generated_total`, plus tracing and latency histograms.
-* **Almanac Artifacts**: Self-contained HTML briefs (inline CSS, no JS, dark mode via `@media (prefers-color-scheme: dark)`, print-friendly) in `wiki/raw/almanac/`.
+* **Almanac Artifacts**: Self-contained HTML briefs (inline CSS, no JS, dark mode via `@media (prefers-color-scheme: dark)`, print-friendly) in `wiki/dev/data/almanac/`.
 
 ---
 
