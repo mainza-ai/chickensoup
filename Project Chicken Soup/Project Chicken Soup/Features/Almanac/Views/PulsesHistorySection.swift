@@ -142,9 +142,9 @@ struct PulsesHistorySection: View {
     }
 
     @ViewBuilder
-    private func groupRow(for group: PulseGroup, isExpandedBinding: Binding<Bool>? = nil) -> some View {
+    private func groupRow(for group: PulseGroup, isExpanded: Binding<Bool>? = nil) -> some View {
         let latest = group.entries.first!
-        let binding: Binding<Bool> = isExpandedBinding ?? Binding(
+        let binding: Binding<Bool> = isExpanded ?? Binding(
             get: { expandedGroups.contains(group.entityName) },
             set: { isOn in
                 if isOn {
