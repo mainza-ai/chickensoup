@@ -4,6 +4,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
+from src.config import settings
 from src.models import ClaimEvidence
 from src.wiki.paths import ensure_pulse_dir, get_pulse_dir
 from src.wiki.writer import slugify
@@ -24,12 +25,13 @@ def _evidence_fingerprint(evidence: List[ClaimEvidence]) -> str:
     return f"{len(evidence)}|{'|'.join(claim_texts)}"
 
 
-def _get_latest_snapshot_meta(slug: str, max_age_hours: int = 24) -> Optional[Dict[str, Any]]:
+def _get_latest_snapshot_meta(slug: str, max_age_hours: Optional[int] = None) -> Optional[Dict[str, Any]]:
     pulse_dir = get_pulse_dir()
     if not pulse_dir.exists():
         return None
 
-    cutoff = datetime.now(timezone.utc).timestamp() - (max_age_hours * 3600)
+    window = max_age_hours if max_age_hours is not None else settings.LAST30DAYS_DEDUP_WINDOW_HOURS
+    cutoff = datetime.now(timezone.utc).timestamp() - (window * 3600)
     pattern = f"{slug}-*.json"
     newest_path: Optional[Path] = None
     newest_mtime: float = 0.0

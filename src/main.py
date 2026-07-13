@@ -1842,18 +1842,28 @@ class PulseRequest(BaseModel):
 
 
 @app.post("/pulse/purge-empty", dependencies=[Depends(verify_api_key)])
-async def purge_empty_pulses():
-    """Deletes all pulse snapshot JSON and MD files with zero evidence items."""
+async def purge_empty_pulses(entity_name: Optional[str] = None):
+    """Deletes pulse snapshot JSON and MD files with zero evidence items.
+    If entity_name is provided, only deletes empty snapshots for that entity.
+    """
     try:
         from src.wiki.paths import get_pulse_dir
-        from src.wiki.pulse_writer import load_pulse_snapshot
-        
+        from src.wiki.pulse_writer import load_pulse_snapshot, list_pulse_snapshots
+        from src.wiki.writer import slugify
+
         pulse_dir = get_pulse_dir()
         if not pulse_dir.exists():
             return {"purged_count": 0, "status": "success"}
 
+        if entity_name:
+            slug = slugify(entity_name)
+            pattern = f"{slug}-*.json"
+            candidates = list(pulse_dir.glob(pattern))
+        else:
+            candidates = list(pulse_dir.glob("*.json"))
+
         purged = 0
-        for json_path in list(pulse_dir.glob("*.json")):
+        for json_path in candidates:
             data = load_pulse_snapshot(json_path)
             if data and data.get("evidence_count", 0) == 0:
                 json_path.unlink(missing_ok=True)

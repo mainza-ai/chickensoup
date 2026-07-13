@@ -752,4 +752,23 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-12] ingest | pulse | nikola-tesla | 12 evidence | $0.00 | remaining=$1980.50 | nikola-tesla
 ## [2026-07-12] ingest | pulse | project-serpo | 2 evidence | $0.00 | remaining=$1980.50 | project-serpo
 ## [2026-07-12] ingest | pulse | enoch | 8 evidence | $0.00 | remaining=$1980.50 | enoch
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-12] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-12] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
 

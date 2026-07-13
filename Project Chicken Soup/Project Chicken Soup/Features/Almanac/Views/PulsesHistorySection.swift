@@ -245,6 +245,20 @@ struct PulsesHistorySection: View {
                         .padding(.vertical, 6)
                         .background(DesignConstants.controlBackground.opacity(0.5))
                     }
+
+                    if group.entries.contains(where: { $0.evidenceCount == 0 }) {
+                        Button(action: {
+                            purgeEmpty(entityName: group.entityName)
+                        }) {
+                            Text("Purge Empty Logs for \(group.entityName)")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Purge empty pulse snapshots for \(group.entityName)")
+                    }
                 }
                 .background(DesignConstants.controlBackground.opacity(0.3))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -253,10 +267,15 @@ struct PulsesHistorySection: View {
         }
     }
 
-    private func purgeEmpty() {
+    private func purgeEmpty(entityName: String? = nil) {
         isPurging = true
         Task {
-            let success = await almanacService.purgeEmptyPulses()
+            let success: Bool
+            if let ename = entityName {
+                success = await almanacService.purgeEmptyPulses(entityName: ename)
+            } else {
+                success = await almanacService.purgeEmptyPulses()
+            }
             if success {
                 await almanacService.fetchPulseHistory()
             }
