@@ -1,0 +1,114 @@
+{
+  "entity_name": "area-51-and-s4",
+  "slug": "area-51-and-s4",
+  "date": "2026-07-13",
+  "timestamp": "2026-07-13T07:27:43.288838+00:00",
+  "evidence_count": 7,
+  "evidence": [
+    {
+      "claim_text": "Inside Area 51’s Most Secret Facility: The S4 Base FINALLY Recreated! #JoeRogan #BobLazar #Area51 #S4Base #AlienTechnology #UFOAliens #Documentary",
+      "source_platform": "youtube",
+      "engagement_count": 63,
+      "url": "https://www.youtube.com/watch?v=u1I14sJPwAM",
+      "timestamp": "2026-07-13T07:27:43.287245+00:00",
+      "cluster_id": "cluster-1",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.9011428993421277,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-1"
+      ]
+    },
+    {
+      "claim_text": "The Bob Lazar Story Nobody Follows: What Happened After S4? 🌙 Build your own UFO sleep playlist: https://dreamsofdisclosure.com 194 UFO & alien stories • custom ambience • sleep timer • sorted by encounter type, location, and year This full documentary follows what happened after Bob Lazar came forward with his claims about S4, Area 51, and recovered non-human craft. Beyond the famous interviews and the debate over whether his story is true, this film focuses on the aftermath: disputed education records, denied employment history, vanished clearance cla",
+      "source_platform": "youtube",
+      "engagement_count": 100,
+      "url": "https://www.youtube.com/watch?v=qTU-JW7dIwA",
+      "timestamp": "2026-07-13T07:27:43.287339+00:00",
+      "cluster_id": "cluster-3",
+      "polymarket_odds": null,
+      "engagement_decayed": 1.0,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-3"
+      ]
+    },
+    {
+      "claim_text": "He stated in the area 52 interview there was only vending machines and when asked what was his favorite thing to get, Lazar quickly responded with a snack item, I forgot which. So the cafeteria consis I agree this a pretty big hole in the story , very odd, I wonder if there’s any more inconsistencies and that may be why he didn’t wanna do many interviews for a long time but those checks started cal so he changed the story Its always been and always will be \"just a story\", of course it changes, and will continue for as long as Bob continues to spin it.",
+      "source_platform": "reddit",
+      "engagement_count": 59,
+      "url": "https://www.reddit.com/r/BobLazarNew/comments/1uuwn5y/is_there_actually_a_cafeterialunch_room_at_s4/",
+      "timestamp": "2026-07-13T07:27:43.287380+00:00",
+      "cluster_id": "cluster-8",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.8871587529039013,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-8"
+      ]
+    },
+    {
+      "claim_text": "Tech billionaires hire Democratic dealmakers in push to build a Bay Area city",
+      "source_platform": "hackernews",
+      "engagement_count": 28,
+      "url": "https://calmatters.org/politics/2026/06/california-forever-solano-shipyard-deal/",
+      "timestamp": "2026-07-13T07:27:43.287422+00:00",
+      "cluster_id": "cluster-14",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.7296225131497026,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-14"
+      ]
+    },
+    {
+      "claim_text": "Are we finally on the verge of Disclosure? In this episode of The Total Disclosure Podcast, we sit down with filmmaker and veteran investigator Luigi Vendittelli to peel back the layers of the most controversial UFO cases in history. From the secret halls of the S4 facility at Area 51 to the chilling warnings delivered during the Ariel School incident, Luigi shares the evidence the government does",
+      "source_platform": "reddit",
+      "engagement_count": 4,
+      "url": "https://www.reddit.com/r/UFOs/comments/1u6wad8/inside_s4_why_the_government_is_hiding_the_truth/",
+      "timestamp": "2026-07-13T07:27:43.287441+00:00",
+      "cluster_id": "cluster-18",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.34873150258179014,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-18"
+      ]
+    },
+    {
+      "claim_text": "Bob Lazar's S4 Story Trailer Review | We Want To Believe... Kinda 👽 👽 Bob Lazar's S4 Story Trailer Review | We Want To Believe... Kinda 👽 The American Craic Podcast reacts to the trailer for Bob Lazar's S4 Story. Area 51, alien spacecraft, Element 115, and one of the most debated UFO stories ever. Is Bob Lazar a whistleblower, a legend, or just the king of \"trust me bro\"? Watch our reaction as we break down the trailer, question everything, and probably leave with more questions than answers. #BobLazar #Area51 #S4 #UFO #TrailerReaction #AmericanCraicPodcast",
+      "source_platform": "youtube",
+      "engagement_count": 43,
+      "url": "https://www.youtube.com/watch?v=EspfAMjpuf8",
+      "timestamp": "2026-07-13T07:27:43.287454+00:00",
+      "cluster_id": "cluster-19",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.8199546729298166,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-19"
+      ]
+    },
+    {
+      "claim_text": "## Summary\n\n**Phase 5 of the core `noExplicitAny` graduation** (S4 ratchet #1579) — the **`ObjectRegistry`** (the hardest, highest-internal-coupling area).\n\n**registry `any` reduced 167 → 9 documented irreducible leaves → core now at 178** (336 → 178). Three parallel isolated-worktree agents + a rec",
+      "source_platform": "github",
+      "engagement_count": 1,
+      "url": "https://github.com/happyvertical/smrt/pull/1676",
+      "timestamp": "2026-07-13T07:27:43.287478+00:00",
+      "cluster_id": "cluster-23",
+      "polymarket_odds": null,
+      "engagement_decayed": 0.15019048322368794,
+      "provenance_chain": [
+        "last30days:area-51-and-s4",
+        "cluster:cluster-23"
+      ]
+    }
+  ],
+  "raw_output_preview": "{\n  \"artifacts\": {\n    \"grounding\": [\n      {\n        \"keyless_backend\": \"ddg\",\n        \"label\": \"keyless\",\n        \"resultCount\": 5,\n        \"webSearchQueries\": [\n          \"area-51-and-s4\"\n        ]\n      }\n    ],\n    \"hiring_signals_mode\": false,\n    \"plan_source\": \"deterministic\",\n    \"pre_research_flags_present\": false,\n    \"resolved\": {\n      \"context\": \"\",\n      \"entity\": \"area-51-and-s4\",\n      \"github_repos\": [],\n      \"github_user\": \"\",\n      \"subreddits\": [],\n      \"trustpilot_domain\": \"\",\n      \"x_handle\": \"\"\n    }\n  },\n  \"clusters\": [\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=u1i14sjpwam\"\n      ],\n      \"cluster_id\": \"cluster-1\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=u1i14sjpwam\"\n      ],\n      \"score\": 12.833060109289619,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"Inside Area 51\\u2019s Most Secret Facility: The S4 Base FINALLY Recreated!\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://tester.army\"\n      ],\n      \"cluster_id\": \"cluster-2\",\n      \"representative_ids\": [\n        \"https://tester.army\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"hackernews\"\n      ],\n      \"title\": \"Launch HN: TesterArmy (YC P26) \\u2013 Agents that test web and mobile apps\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://youtube.com/watch?v=qtu-jw7diwa\"\n      ],\n      \"cluster_id\": \"cluster-3\",\n      \"representative_ids\": [\n        \"https://youtube.com/watch?v=qtu-jw7diwa\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"youtube\"\n      ],\n      \"title\": \"The Bob Lazar Story Nobody Follows: What Happened After S4?\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://github.com/tuvens/phased-development/pull/809\"\n      ],\n      \"cluster_id\": \"cluster-4\",\n      \"representative_ids\": [\n        \"https://github.com/tuvens/phased-development/pull/809\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"github\"\n      ],\n      \"title\": \"P9/E19: consumer-activation-doctor-readiness \\u2014 doctor reliability + TeamCreate probe hardening\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://techcrunch.com/2026/06/16/doj-claims-xais-unpermitted-gas-turbines-are-a-matter-of-national-economic-and-energy-security\"\n      ],\n      \"cluster_id\": \"cluster-5\",\n      \"representative_ids\": [\n        \"https://techcrunch.com/2026/06/16/doj-claims-xais-unpermitted-gas-turbines-are-a-matter-of-national-economic-and-energy-security\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"hackernews\"\n      ],\n      \"title\": \"DOJ claims xAI's gas turbines are a matter of 'national and energy security'\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://github.com/rickylabs/netscript/pull/170\"\n      ],\n      \"cluster_id\": \"cluster-6\",\n      \"representative_ids\": [\n        \"https://github.com/rickylabs/netscript/pull/170\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"github\"\n      ],\n      \"title\": \"chore(plugin): #167 scaffolder hardening \\u2014 schema + plugins:check + version-coherence + dead-code (pre-alpha.13)\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/boblazarnew/comments/1u6m4el/inside_s4_why_the_government_is_hiding_the_truth\"\n      ],\n      \"cluster_id\": \"cluster-7\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/boblazarnew/comments/1u6m4el/inside_s4_why_the_government_is_hiding_the_truth\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"INSIDE S4: Why the Government is hiding The Truth about BOB LAZAR & UFOs| Ft. Luigi Venditelli\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://reddit.com/r/boblazarnew/comments/1uuwn5y/is_there_actually_a_cafeterialunch_room_at_s4\"\n      ],\n      \"cluster_id\": \"cluster-8\",\n      \"representative_ids\": [\n        \"https://reddit.com/r/boblazarnew/comments/1uuwn5y/is_there_actually_a_cafeterialunch_room_at_s4\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"reddit\"\n      ],\n      \"title\": \"Is there actually a cafeteria/lunch room at S4? Bob's Lazar's statements on this question today contradicts with Bob Lazar's statements in the past.\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://github.com/dotnet/maui/pull/36511\"\n      ],\n      \"cluster_id\": \"cluster-9\",\n      \"representative_ids\": [\n        \"https://github.com/dotnet/maui/pull/36511\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"github\"\n      ],\n      \"title\": \"Fix iOS non-Shell large title collapse\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://github.com/zeblithic/harmony-client/pull/454\"\n      ],\n      \"cluster_id\": \"cluster-10\",\n      \"representative_ids\": [\n        \"https://github.com/zeblithic/harmony-client/pull/454\"\n      ],\n      \"score\": 0.0,\n      \"sources\": [\n        \"github\"\n      ],\n      \"title\": \"ZEB-668 S4: per-device last-seen + fleet-synced petnames\"\n    },\n    {\n      \"candidate_ids\": [\n        \"https://github.com/yukoval-dakia/the-learning-project/pull/682\"\n      ],\n      \"clu",
+  "meta": {
+    "handles": {},
+    "budget_remaining_before": 60.0,
+    "binary": "/Users/mck/Desktop/chickensoup/last30days-skill/skills/last30days/scripts/last30days.py",
+    "cost_usd": 0.0
+  }
+}

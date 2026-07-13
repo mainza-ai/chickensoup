@@ -452,4 +452,24 @@ public final class BackendService {
     public func probeLLMProvider(_ name: String) async -> (provider: String, available: Bool, models: [String]) {
         await config.probeLLMProvider(name)
     }
+
+    public func approveResearch(threadId: String) async -> (success: Bool, summary: String)? {
+        do {
+            struct ApproveResponse: Codable {
+                let success: Bool
+                let thread_id: String
+                let summary: String
+            }
+            let bodyData = try JSONSerialization.data(withJSONObject: [:])
+            let response: ApproveResponse = try await APIClient.shared.request(
+                path: "/research/\(threadId)/approve",
+                method: "POST",
+                body: bodyData
+            )
+            return (success: response.success, summary: response.summary)
+        } catch {
+            logger.error("Failed to approve research for thread '\(threadId)': \(error.localizedDescription)")
+            return nil
+        }
+    }
 }

@@ -846,3 +846,35 @@ Imported 20 Apple platform development guides from `development-docs/AppleAdditi
 ## [2026-07-13] ingest | pulse | david-grusch | 14 evidence | $0.00 | remaining=$1980.50 | david-grusch
 ## [2026-07-13] ingest | pulse | aldo-rebelo | 9 evidence | $0.00 | remaining=$1980.50 | aldo-rebelo
 
+
+## [2026-07-13] audit | AI Chat / last30days / Wiki / Almanac Deep Integration Audit
+
+Deep-pass audit of the full AI research pipeline: AI chat query → ResearchAgent → last30days pulse → wiki ingestion → Living Almanac generation. Three live bugs found and documented. Integration plan written to [[ai-chat-last30days-wiki-almanac-integration]].
+
+Key findings:
+- **F10 (live bug)**: `POST /query` does not pass `history=history` to `orchestrator.execute()` (`main.py:520`). WebSocket handler has the same bug plus never fetches history at all (`main.py:1183`). Multi-turn queries have no conversational context.
+- **F11 (live bug)**: `staleness_queue.rebuild_queue()` scans only `wiki/entities/` (`staleness_queue.py:113`). Chat-created concept pages and research-thread project pages are structurally invisible to the idle pulse system.
+- **F12 (live bug)**: Research agent approval gate has no resume endpoint. Queries scoring below 0.4 confidence return `"PENDING APPROVAL"` permanently. No `POST /research/{thread_id}/approve` exists. `/budget/approve` pattern confirmed as template (`main.py:2055-2063`).
+- **F13 (precision correction)**: Almanac tier-1 selection is already dynamic over all three wiki dirs; the hardcoded `bob-lazar`/`element-115`/`roswell-crash` list is only a bootstrap fallback. What's genuinely missing is the promotion path — nothing auto-assigns `tier: 1` to a chat-created page.
+- **F14**: `MultiLLMConsensus` confirmed dead code outside `/consensus/query`. Not called by Orchestrator.
+- **F15**: `EntityDetailView.swift` has zero pulse/research-trigger wiring.
+
+Revised priority order: Phase 0 (3 small bug fixes) → Phase 1 Option C (rescoped, cheaper than original) → Phase 2 Option B → Phase 3 Option D → Phase 4 Option A.
+
+Plan: [[ai-chat-last30days-wiki-almanac-integration]]
+## [2026-07-13] ingest | pulse | area-51-and-s4 | 7 evidence | $0.00 | remaining=$1980.50 | area-51-and-s4
+
+
+## [2026-07-13] impl | Fix Redis `.decode()` calls in idle_sentinel and staleness_queue
+
+Redis client initialized with `decode_responses=True` in `cache.py:18`, meaning all `.get()` responses are already `str`. Two modules were calling `.decode()` on already-decoded strings, causing `AttributeError` on every idle check.
+
+Fixed:
+- `src/idle_sentinel.py:71,80` — removed `.decode()` calls
+- `src/staleness_queue.py:36,53` — removed `.decode()` calls
+
+`src/scheduler.py:59,83` already uses `isinstance(..., bytes)` guards and was not affected.
+
+Effect: Eliminates spurious `WARNING:chickensoup.idle_sentinel:Error checking idle status: 'str' object has no attribute 'decode'` warnings. Before fix, `is_idle()` was falling through to `return True` on every exception, meaning the idle sentinel was effectively blind — always reporting idle even during active periods.
+
+Added to integration plan as Phase 0d in [[ai-chat-last30days-wiki-almanac-integration]].
