@@ -561,9 +561,9 @@ struct ContentView_PreviewHelper: View {
     var body: some View {
         ContentView()
             .modelContainer(container)
-            .environment(AlmanacService.self)
-            .environment(BackendService.self)
-            .environment(DataStoreBackupService.self)
+            .environment(AlmanacService.self, .shared)
+            .environment(BackendService.self, .shared)
+            .environment(DataStoreBackupService.self, .shared)
     }
 }
 
