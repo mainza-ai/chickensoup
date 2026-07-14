@@ -78,8 +78,12 @@ class MultiLLMConsensus:
 
     def _calculate_consensus(self, responses: List[Tuple[str, str]]) -> Dict[str, Any]:
         """
-        Calculates simple agreement/consensus metrics between responses.
-        For production, we evaluate semantic similarity or keyword overlap.
+        Calculates agreement/consensus metrics between responses using
+        Jaccard word-overlap (not semantic similarity) — intentional choice
+        for local-first constraints (no cloud API dependency).
+        
+        The agreement_score is the mean pairwise Jaccard coefficient across
+        all non-empty model responses, rounded to 3 decimal places.
         """
         non_empty = [resp for resp in responses if resp[1].strip()]
         if not non_empty:

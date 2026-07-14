@@ -60,6 +60,8 @@ def _wiki_entity_lookup(query: str) -> List[str]:
     Fuzzy-match query words against wiki filenames.
     Returns display names of matching wiki pages (sorted by relevance).
     """
+    if not query or not query.strip():
+        return []
     index = _get_wiki_index()
     lower_q = query.lower()
     words = set(re.findall(r"[a-zA-Z0-9-]+", lower_q))
@@ -183,7 +185,7 @@ class QueryAgent:
             "response_format": {"type": "json_object"}
         }
         
-        try:
+        def _do_request():
             req = urllib.request.Request(
                 url,
                 data=json.dumps(payload).encode("utf-8"),
@@ -195,6 +197,14 @@ class QueryAgent:
                     res_data = json.loads(response.read().decode("utf-8"))
                     content = res_data["choices"][0]["message"]["content"]
                     return content
+            return None
+        
+        try:
+            from src.llm_circuit_breaker import llm_circuit_breaker
+            return llm_circuit_breaker.call(_do_request)
+        except RuntimeError as cb_error:
+            logger.warning(f"LLM circuit breaker open: {cb_error}")
+            return None
         except Exception as e:
             logger.warning(f"Failed to fetch classification from local LLM: {e}")
         return None
@@ -256,7 +266,19 @@ class QueryAgent:
         if llm_response:
             try:
                 data = json.loads(llm_response)
-                return ParsedQuery(**data)
+                result = ParsedQuery(**data)
+                if result.intent is None:
+                    result.intent = "query"
+                if result.entities is None:
+                    result.entities = []
+                if len(result.entities) == 1 and (" and " in query.lower() or " or " in query.lower()):
+                    separators = r'\s+and\s+|\s+or\s+|\s*&\s*'
+                    parts = re.split(separators, query)
+                    for part in parts:
+                        part = part.strip()
+                        if part and part not in result.entities:
+                            result.entities.append(part)
+                return result
             except Exception as e:
                 logger.warning(f"Error parsing LLM response: {e}. Falling back to default parser.")
 
@@ -270,21 +292,43 @@ class QueryAgent:
         elif "enrich" in lower_q or "research" in lower_q or "pulse" in lower_q or "deep-research" in lower_q:
             intent = "enrich"
 
-        # Entity extraction: prefer wiki matches, fall back to capitalized words, fall back to query
+        # Entity extraction: prefer wiki matches, fall back to grouped capitalized phrases, fall back to query
         entities = []
         if wiki_matches:
             entities = wiki_matches
         else:
-            words = query.split()
-            capitalized = [w.strip("?,.!") for w in words if w and w[0].isupper()]
-            if capitalized:
-                entities = capitalized
-            else:
-                entities = [query]
+            if query:
+                words = query.split()
+                grouped = []
+                current = []
+                for w in words:
+                    clean = w.strip("?,.!:;")
+                    if clean and (clean[0].isupper() or (current and clean.isdigit())):
+                        current.append(clean)
+                    else:
+                        if current:
+                            grouped.append(" ".join(current))
+                            current = []
+                if current:
+                    grouped.append(" ".join(current))
+                question_words = {"What", "Why", "How", "Who", "When", "Where", "Which", "Is", "Are", "Was", "Were", "Do", "Does", "Did"}
+                entities = [g for g in grouped if g not in question_words] if grouped else [query.strip()]
 
-        return ParsedQuery(
+        result = ParsedQuery(
             intent=intent,
             entities=entities,
             structured_filters={},
             confidence=0.5
         )
+        if result.intent is None:
+            result.intent = "query"
+        if result.entities is None:
+            result.entities = []
+        if len(result.entities) == 1 and (" and " in query.lower() or " or " in query.lower()):
+            separators = r'\s+and\s+|\s+or\s+|\s*&\s*'
+            parts = re.split(separators, query)
+            for part in parts:
+                part = part.strip()
+                if part and part not in result.entities:
+                    result.entities.append(part)
+        return result

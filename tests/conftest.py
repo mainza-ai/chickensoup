@@ -12,6 +12,7 @@ def clear_llm_env_overrides(monkeypatch):
     import src.config
     monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_PROVIDER", "")
     monkeypatch.setattr(src.config.settings, "LLM_ACTIVE_MODEL", "")
+    monkeypatch.setattr(src.config.settings, "RATE_LIMITING_ENABLED", False)
     # Reset the discovery module-level cache so tests start clean
     import src.discovery as d
     d._discovered_provider = None

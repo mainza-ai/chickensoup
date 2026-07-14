@@ -216,23 +216,29 @@ class EnrichNode(BaseNode[OrchestratorState, OrchestratorDeps]):
                 task.log("Research complete. Writing wiki page...")
 
                 from src.wiki.pulse_writer import write_pulse_snapshot
-                from pathlib import Path
+                from src.wiki.writer import write_page
 
                 title = entities[0] if entities else ctx.state.query
                 body = res.get("summary", ctx.state.query)
-                wiki_dir = Path(__file__).resolve().parent.parent / "wiki" / "entities"
-                wiki_dir.mkdir(parents=True, exist_ok=True)
-                page_path = wiki_dir / f"{title.lower().replace(' ', '-')}.md"
-                existing = page_path.read_text() if page_path.exists() else ""
-                if title.lower() not in existing.lower():
-                    page_path.write_text(f"# {title}\n\n{body}\n")
+                sources = res.get("sources", ["Local Wiki Knowledge Graph"])
+                write_page(
+                    title=title,
+                    body=body,
+                    tags=["enriched", "auto"],
+                    sources=sources,
+                    related=entities[1:] if len(entities) > 1 else [],
+                    page_type="entities",
+                )
                 write_pulse_snapshot(
                     entity_name=title,
-                    claims=[],
-                    status="success",
-                    source_count=len(res.get("sources", [])),
-                    tool="orchestrator_enrich",
-                    evidence_items=res.get("research_details", {}).get("evidence_items", []),
+                    evidence=[],
+                    raw_output=res.get("summary", ""),
+                    extra_meta={
+                        "tool": "orchestrator_enrich",
+                        "status": "success",
+                        "source_count": len(sources),
+                        "evidence_items": res.get("research_details", {}).get("evidence_items", []),
+                    },
                 )
                 task.update_progress(1.0)
                 task.set_success({

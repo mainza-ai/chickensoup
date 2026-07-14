@@ -58,6 +58,23 @@ class Settings(BaseSettings):
     # Orchestrator graph timeout (seconds)
     ORCHESTRATOR_TIMEOUT_SECONDS: int = 120
 
+    # Concurrency and rate limiting
+    MAX_CONCURRENT_LLM_REQUESTS: int = 10
+    REQUEST_RATE_LIMIT_PER_MINUTE: int = 20
+    REQUEST_RATE_LIMIT_BURST: int = 5
+    REQUEST_MAX_BODY_BYTES: int = 1_048_576  # 1 MB default
+    RATE_LIMITING_ENABLED: bool = True
+
+    # Request ID and observability
+    REQUEST_ID_HEADER: str = "X-Request-ID"
+
+    # Checkpointer backend
+    CHECKPOINT_BACKEND: str = "redis"
+
+    # LLM circuit breaker
+    LLM_CIRCUIT_BREAKER_THRESHOLD: int = 5
+    LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 60
+
     # LLM edge classification (knowledge graph ingest)
     # Number of retries with exponential backoff before falling back to heuristics.
     # Each retry doubles the base timeout. A value of 3 means attempts at
