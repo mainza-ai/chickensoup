@@ -151,28 +151,27 @@ struct ContentView: View {
                 .background(.ultraThinMaterial)
                 
                 // Main Content Viewport ZStack
-                ZStack {
-                    GraphExplorerView()
-                        .opacity(activeDetailTab == .graph ? 1 : 0)
-                        .disabled(activeDetailTab != .graph)
-                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
-                    
-                    TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
-                        .opacity(activeDetailTab == .timeline ? 1 : 0)
-                        .disabled(activeDetailTab != .timeline)
-                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
-                    
-                    LivingAlmanacView()
-                        .opacity(activeDetailTab == .almanac ? 1 : 0)
-                        .disabled(activeDetailTab != .almanac)
-                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
-
+                if activeDetailTab == .status {
                     StatusDashboardView()
-                        .opacity(activeDetailTab == .status ? 1 : 0)
-                        .disabled(activeDetailTab != .status)
-                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ZStack {
+                        GraphExplorerView()
+                            .opacity(activeDetailTab == .graph ? 1 : 0)
+                            .disabled(activeDetailTab != .graph)
+                            .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+
+                        TemporalTimelineView(events: events, selectedEvent: $selectedEvent)
+                            .opacity(activeDetailTab == .timeline ? 1 : 0)
+                            .disabled(activeDetailTab != .timeline)
+                            .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+
+                        LivingAlmanacView()
+                            .opacity(activeDetailTab == .almanac ? 1 : 0)
+                            .disabled(activeDetailTab != .almanac)
+                            .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(alignment: .topTrailing) {
                     if backendService.graph.showNavigator {
                         AINavigatorView()
@@ -235,6 +234,7 @@ struct ContentView: View {
                         .padding(.bottom, 16)
                     }
                     .padding(.trailing, backendService.graph.showNavigator ? 320 : 0)
+                }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
