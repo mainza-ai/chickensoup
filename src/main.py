@@ -99,6 +99,24 @@ def _build_llm_providers() -> Dict[str, LLMProviderStatus]:
         for name, info in raw.items()
     }
 
+_VALID_ENTITY_NAME_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9 _\-\.]{1,100}$')
+
+def _validate_entity_name(name: str, field: str = "entity_name") -> str:
+    """Validate and normalize an entity name from a path parameter.
+    
+    Rejects punctuation-only names, empty strings, and names with
+    suspicious characters. Returns the stripped name if valid.
+    """
+    if not name or not name.strip():
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"{field} must not be empty.")
+    stripped = name.strip()
+    if not _VALID_ENTITY_NAME_RE.match(stripped):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid {field}: '{stripped}'. Must start with alphanumeric, contain only alphanumerics, spaces, hyphens, underscores, and dots, and be 2-100 characters.",
+        )
+    return stripped
+
 def _update_env_file(updates: dict):
     """Persist key-value pairs to .env, preserving existing lines."""
     try:
@@ -170,6 +188,157 @@ class ObservabilityAndRateLimitMiddleware(BaseHTTPMiddleware):
             return response
 
 app.add_middleware(ObservabilityAndRateLimitMiddleware)
+
+
+class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
+    """Reject requests with body larger than settings.REQUEST_MAX_BODY_BYTES."""
+
+    def __init__(self, app, max_size: int = None):
+        super().__init__(app)
+        self.max_size = max_size or settings.REQUEST_MAX_BODY_BYTES
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > self.max_size:
+            return Response(
+                content=json.dumps({"detail": f"Payload too large. Max size is {self.max_size} bytes."}),
+                media_type="application/json",
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            )
+        return await call_next(request)
+
+
+class RequestIdMiddleware(BaseHTTPMiddleware):
+    """Assign a unique X-Request-ID to every request for tracing."""
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        import uuid
+        request_id = request.headers.get(settings.REQUEST_ID_HEADER) or str(uuid.uuid4())
+        response = await call_next(request)
+        response.headers[settings.REQUEST_ID_HEADER] = request_id
+        return response
+
+
+class ConcurrencySemaphoreMiddleware(BaseHTTPMiddleware):
+    """Limit concurrent in-flight LLM requests to prevent saturation."""
+
+    def __init__(self, app, max_concurrent: int = None):
+        super().__init__(app)
+        self.max_concurrent = max_concurrent or settings.MAX_CONCURRENT_LLM_REQUESTS
+        self._semaphore = asyncio.Semaphore(self.max_concurrent)
+        self._active = 0
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        path = request.url.path
+        if path.startswith(("/query", "/consensus/query", "/ingest", "/navigate")):
+            if not hasattr(request.state, "skip_concurrency_limit"):
+                acquired = await self._semaphore.acquire()
+                self._active += 1
+                try:
+                    response = await call_next(request)
+                    return response
+                finally:
+                    self._active -= 1
+                    self._semaphore.release()
+        return await call_next(request)
+
+
+app.add_middleware(RequestSizeLimitMiddleware)
+app.add_middleware(RequestIdMiddleware)
+app.add_middleware(ConcurrencySemaphoreMiddleware)
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """Per-IP and per-API-key rate limiting using sliding window."""
+
+    def __init__(self, app):
+        super().__init__(app)
+        from src.rate_limiter import rate_limiter
+        self._limiter = rate_limiter
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        # Skip rate limiting in test mode or when disabled
+        if not settings.RATE_LIMITING_ENABLED:
+            return await call_next(request)
+        
+        # Skip rate limiting for health checks and static files
+        if request.url.path in ("/health", "/status"):
+            return await call_next(request)
+
+        # Per-IP check
+        client_ip = request.client.host if request.client else "unknown"
+        ip_allowed, ip_remaining = self._limiter.check_ip(client_ip)
+        if not ip_allowed:
+            return Response(
+                content=json.dumps({"detail": "Rate limit exceeded. Try again in 60s.", "retry_after": 60}),
+                media_type="application/json",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                headers={"Retry-After": "60"},
+            )
+
+        # Per-API-key check (if key present)
+        api_key = request.headers.get("X-Api-Key", "")
+        if api_key:
+            key_allowed, key_remaining = self._limiter.check_api_key(api_key)
+            if not key_allowed:
+                return Response(
+                    content=json.dumps({"detail": "API key rate limit exceeded. Try again in 10s.", "retry_after": 10}),
+                    media_type="application/json",
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    headers={"Retry-After": "10"},
+                )
+
+        response = await call_next(request)
+        return response
+
+
+app.add_middleware(RateLimitMiddleware)
+
+
+@app.get("/health")
+async def health_check():
+    """Deep health probe with per-component latency and status."""
+    import time as _time
+    checks = {}
+    
+    # Redis
+    redis_start = _time.time()
+    try:
+        r = redis.from_url(settings.REDIS_URL)
+        r.ping()
+        checks["redis"] = {"ok": True, "latency_ms": round((_time.time() - redis_start) * 1000)}
+    except Exception as e:
+        checks["redis"] = {"ok": False, "latency_ms": None, "error": str(e)}
+    
+    # Neo4j
+    neo4j_start = _time.time()
+    try:
+        neo4j_ok = neo4j_conn.check_health()
+        checks["neo4j"] = {"ok": neo4j_ok, "latency_ms": round((_time.time() - neo4j_start) * 1000)}
+    except Exception as e:
+        checks["neo4j"] = {"ok": False, "latency_ms": None, "error": str(e)}
+    
+    # LLM
+    llm_start = _time.time()
+    try:
+        provider, _, _ = get_discovered(depth="fresh")
+        llm_ok = provider != "simulated"
+        checks["llm"] = {"ok": llm_ok, "latency_ms": round((_time.time() - llm_start) * 1000), "provider": provider}
+    except Exception as e:
+        checks["llm"] = {"ok": False, "latency_ms": None, "error": str(e)}
+    
+    # Disk
+    disk_start = _time.time()
+    try:
+        import shutil
+        free_gb = shutil.disk_usage(".").free / (1024 ** 3)
+        checks["disk"] = {"ok": free_gb > 1.0, "free_gb": round(free_gb, 1), "latency_ms": round((_time.time() - disk_start) * 1000)}
+    except Exception as e:
+        checks["disk"] = {"ok": False, "error": str(e)}
+    
+    all_ok = all(c.get("ok") for c in checks.values())
+    return {"status": "healthy" if all_ok else "degraded", "checks": checks}
+
 
 @app.get("/status", response_model=StatusResponse)
 async def get_status():
@@ -565,6 +734,7 @@ async def post_query(request: QueryRequest):
 
 @app.get("/graph/{entity}")
 async def get_graph_entity(entity: str):
+    entity = _validate_entity_name(entity, "entity")
     """Retrieves an entity and all its directly related nodes/relationships in a simplified form."""
     import uuid
     try:
@@ -1914,6 +2084,7 @@ async def purge_empty_pulses(entity_name: Optional[str] = None):
 
 @app.post("/pulse/{entity_name}", response_model=AsyncTaskResponse, dependencies=[Depends(verify_api_key)])
 async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, request: PulseRequest = None):
+    entity_name = _validate_entity_name(entity_name)
     handles = None
     if request and request.handles:
         handles = request.handles
@@ -1955,6 +2126,7 @@ async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, reques
 
 @app.get("/entities/{name}/divergence", response_model=DivergenceResult)
 async def get_entity_divergence(name: str):
+    name = _validate_entity_name(name, "entity_name")
     slug = slugify(name)
     wiki_page = read_page(slug, "entities") or read_page(slug, "concepts") or read_page(slug, "projects")
     if not wiki_page:
@@ -1978,6 +2150,7 @@ async def get_entity_divergence(name: str):
 
 @app.get("/entities/{name}/timeline")
 async def get_entity_timeline(name: str, days: int = 30):
+    name = _validate_entity_name(name, "entity_name")
     try:
         from src.almanac.timeline import build_timeline
         timeline_result = build_timeline(name, days=days)
@@ -1994,6 +2167,7 @@ async def get_entity_timeline(name: str, days: int = 30):
 
 @app.get("/entities/{name}/entanglement")
 async def get_entity_entanglement(name: str, candidate: Optional[str] = None, limit: int = 10):
+    name = _validate_entity_name(name, "entity_name")
     try:
         from src.wiki.pulse_writer import load_recent_pulse_evidence
         evidence = load_recent_pulse_evidence(name, max_age_days=30)
@@ -2037,6 +2211,7 @@ class TribunalRequest(BaseModel):
 
 @app.post("/entities/{name}/tribunal")
 async def post_entity_tribunal(name: str, request: TribunalRequest):
+    name = _validate_entity_name(name, "entity_name")
     try:
         from src.wiki.pulse_writer import load_recent_pulse_evidence
         evidence = load_recent_pulse_evidence(name, max_age_days=30)

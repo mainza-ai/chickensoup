@@ -947,3 +947,85 @@ Phase 3 — Almanac summary chat awareness:
 - `QueryOverlayView.swift` — added almanacSummaryBanner (conditional on contested claims count > 0); onAlmanacTap callback navigates to almanac tab
 
 Phase 4 (deep-research mode in /query) is next, awaiting your review.
+## [2026-07-13] ingest | pulse | " | 6 evidence | $0.00 | remaining=$1980.50 | "
+## [2026-07-13] ingest | pulse | Bob Lazar | 21 evidence | $0.00 | remaining=$1980.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 3 evidence | $0.00 | remaining=$1980.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Roswell Crash | 8 evidence | $0.00 | remaining=$1980.50 | roswell-crash
+## [2026-07-13] ingest | pulse | Roswell Crash | 8 evidence | $0.00 | remaining=$1980.50 | roswell-crash
+## [2026-07-13] ingest | pulse | Zimbabwe | 10 evidence | $0.00 | remaining=$1980.50 | zimbabwe
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | " | 5 evidence | $0.00 | remaining=$1980.50 | "
+## [2026-07-13] ingest | pulse | " | 5 evidence | $0.00 | remaining=$1980.50 | "
+## [2026-07-13] ingest | pulse | " | 3 evidence | $0.00 | remaining=$1980.50 | "
+## [2026-07-13] ingest | pulse | " | 5 evidence | $0.00 | remaining=$1980.50 | "
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-13] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-13] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-13] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+

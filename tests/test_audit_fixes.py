@@ -9,24 +9,24 @@ from src.wiki.backup import create_snapshot
 from src.wiki.cleanup import _should_preserve
 
 def test_api_ingest_file_size_limit(client):
-    # Simulate a file exceeding the 50MB limit
-    large_payload = b"a" * (50 * 1024 * 1024 + 1)
+    # Simulate a file exceeding the 1MB global request size limit
+    large_payload = b"a" * (1 * 1024 * 1024 + 1)
     response = client.post(
         "/ingest/file",
         files={"file": ("large-file.md", large_payload, "text/markdown")}
     )
-    assert response.status_code == 400
-    assert "size exceeds" in response.json()["detail"]
+    assert response.status_code == 413
+    assert "too large" in response.json()["detail"].lower()
 
 def test_api_ingest_folder_size_limit(client):
-    # Simulate a folder zip file exceeding the 50MB limit
-    large_payload = b"a" * (50 * 1024 * 1024 + 1)
+    # Simulate a folder zip file exceeding the 1MB global request size limit
+    large_payload = b"a" * (1 * 1024 * 1024 + 1)
     response = client.post(
         "/ingest/folder",
         files={"file": ("large-folder.zip", large_payload, "application/zip")}
     )
-    assert response.status_code == 400
-    assert "size exceeds" in response.json()["detail"]
+    assert response.status_code == 413
+    assert "too large" in response.json()["detail"].lower()
 
 def test_clear_content_safeguard(client):
     # Call without confirm query parameter

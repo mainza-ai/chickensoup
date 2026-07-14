@@ -342,8 +342,20 @@ chickensoup/
 cp .env.example .env
 docker-compose up -d
 uv sync
+```
+
+**Development** (with auto-reload):
+```bash
 uv run uvicorn src.main:app --reload
-# or
+```
+
+**Production** (no reload, multiple workers):
+```bash
+uv run uvicorn src.main:app --workers 4 --loop uvloop --http httptools --timeout-keep-alive 30
+```
+
+Run tests:
+```bash
 .venv/bin/python -m pytest tests/ --ignore=tests/test_pdf_ingest.py -q
 ```
 

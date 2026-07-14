@@ -86,7 +86,9 @@ class IdleSentinel:
             
             return True
         except Exception as e:
-            logger.warning(f"Error checking idle status: {e}")
+            import traceback
+            tb = traceback.format_exc()
+            logger.warning(f"Error checking idle status: {e}\n{tb}")
             return True
 
     @staticmethod
