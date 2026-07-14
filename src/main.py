@@ -106,6 +106,11 @@ async def lifespan(app: FastAPI):
     # mock state and causing test hangs.
     if settings.WIKI_RECONCILE_ON_STARTUP and not os.environ.get("PYTEST_VERSION"):
         try:
+            from src.reconciliation_gate import clear_stale_gate
+            clear_stale_gate()
+        except Exception:
+            pass
+        try:
             from src.wiki.watcher import reconcile_existing_pages
             loop = asyncio.get_event_loop()
             loop.run_in_executor(None, reconcile_existing_pages)

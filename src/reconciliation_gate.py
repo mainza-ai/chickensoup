@@ -9,6 +9,9 @@ Prevents concurrent execution of:
 The gate uses a Redis key `reconciliation:busy` with a TTL to signal
 that reconciliation is in progress. Background loops check `is_busy()`
 before starting work and between items.
+
+Stale gates from crashed or killed server instances are cleared at
+server startup via `clear_stale_gate()`.
 """
 import logging
 from src.cache import cache_store
@@ -94,3 +97,15 @@ def stop_signal_flagged() -> bool:
     except Exception as e:
         logger.warning(f"Failed to check reconciliation stop signal: {e}")
         return False
+
+
+def clear_stale_gate():
+    """Remove a stale reconciliation gate from a crashed/killed server instance.
+    Called at server startup to prevent a dead lock from a previous process."""
+    if not cache_store.redis_client:
+        return
+    try:
+        cache_store.redis_client.delete(_RECON_KEY)
+        logger.info("Cleared stale reconciliation gate (if any)")
+    except Exception as e:
+        logger.warning(f"Failed to clear stale reconciliation gate: {e}")
