@@ -7,36 +7,20 @@ from neo4j import Driver
 from src.knowledge_graph.connection import neo4j_conn
 from src.cache import cache_decorator
 from src.config import settings
+from src.wiki.cleanup import ENGINEERING_TAGS, CONTENT_TAGS
 
 logger = logging.getLogger("chickensoup.neo4j.ingest")
 
-# Allowlist of valid Neo4j labels — prevents Cypher injection via user-controlled tags
 VALID_LABELS = frozenset({"Person", "Place", "Concept", "Object", "Project", "Event", "Entity", "Paper", "QuantumPlatform", "Algorithm"})
 
-# Tag-to-label mapping for entity pages
-category_map = {
-    "person": "Person", "people": "Person", "whistleblower": "Person",
-    "scientist": "Person", "researcher": "Person", "witness": "Person",
-    "witnesses": "Person", "military": "Person", "agent": "Person",
-    "place": "Place", "location": "Place", "locations": "Place",
-    "area": "Place", "country": "Place", "city": "Place",
-    "event": "Event", "events": "Event", "crash": "Event",
-    "incident": "Event", "encounter": "Event", "sighting": "Event",
-    "accident": "Event", "recovery": "Event", "landing": "Event",
-    "concept": "Concept", "theory": "Concept", "idea": "Concept",
-    "principle": "Concept", "model": "Concept", "framework": "Concept",
-    "project": "Project", "program": "Project", "experiment": "Project",
-    "mission": "Project", "operation": "Project",
-    "object": "Object", "craft": "Object", "artifact": "Object",
-    "device": "Object", "technology": "Object", "weapon": "Object",
-    "material": "Object", "element": "Object",
+_INFERENCE_WEIGHTS = {
+    "Person": {"strong": ["person", "people", "whistleblower", "witness", "witnesses", "scientist", "researcher", "physicist"], "weak": ["agent", "military"], "name_patterns": [r"\b(?:dr|prof|senator|ambassador|gen|adm)\b"]},
+    "Place": {"strong": ["place", "location", "locations", "country", "city", "area", "base", "facility"], "weak": []},
+    "Event": {"strong": ["event", "events", "incident", "crash", "sighting", "hearing", "encounter", "accident", "landing", "disclosure"], "weak": []},
+    "Project": {"strong": ["project", "program", "experiment", "mission", "operation"], "weak": []},
+    "Object": {"strong": ["object", "craft", "artifact", "device", "material", "element", "weapon", "technology"], "weak": []},
 }
 
-def _sanitize_label(label: str) -> str:
-    """Validate a label against the allowlist. Returns 'Entity' if invalid."""
-    return label if label in VALID_LABELS else "Entity"
-
-# Enforce a strict type-matching schema layout
 SCHEMA_RELATIONSHIPS = {
     ("Person", "Place"): {"valid": ["VISITED", "BORN_IN", "LOCATED_AT", "TESTIFIED_AT"], "default": "LOCATED_AT"},
     ("Person", "Project"): {"valid": ["MEMBER_OF", "LEAD_ON", "CONTRIBUTED_TO", "FOUNDED"], "default": "CONTRIBUTED_TO"},
@@ -48,7 +32,6 @@ SCHEMA_RELATIONSHIPS = {
     ("Concept", "Concept"): {"valid": ["EXTENDS", "CONTRADICTS", "EQUIVALENT_TO", "INFLUENCED"], "default": "INFLUENCED"},
     ("Event", "Place"): {"valid": ["OCCURRED_AT", "INVESTIGATED_IN"], "default": "OCCURRED_AT"},
     ("Event", "Person"): {"valid": ["INVOLVED", "WITNESSED_BY", "CLAIMED_BY"], "default": "INVOLVED"},
-    # Entity pairs (base label, catches everything)
     ("Entity", "Entity"): {"valid": ["RELATED_TO", "REFERENCES", "LINKS_TO"], "default": "RELATED_TO"},
     ("Entity", "Concept"): {"valid": ["REFERENCES", "DISCUSSES", "MENTIONS"], "default": "REFERENCES"},
     ("Concept", "Entity"): {"valid": ["REFERENCES", "DISCUSSES", "MENTIONS"], "default": "REFERENCES"},
@@ -62,7 +45,6 @@ SCHEMA_RELATIONSHIPS = {
     ("Event", "Entity"): {"valid": ["REFERENCES", "DISCUSSES", "MENTIONS"], "default": "REFERENCES"},
     ("Entity", "Place"): {"valid": ["REFERENCES", "LOCATED_IN", "DISCUSSES"], "default": "REFERENCES"},
     ("Place", "Entity"): {"valid": ["REFERENCES", "DISCUSSES", "MENTIONS"], "default": "REFERENCES"},
-    # Additional cross-label pairs
     ("Concept", "Project"): {"valid": ["RELATED_TO", "INFORMS", "PRECEDES"], "default": "RELATED_TO"},
     ("Project", "Project"): {"valid": ["RELATED_TO", "DEPENDS_ON", "PRECEDES", "EXTENDS"], "default": "RELATED_TO"},
     ("Concept", "Object"): {"valid": ["RELATED_TO", "DESCRIBES", "REFERENCES"], "default": "RELATED_TO"},
@@ -88,10 +70,6 @@ SCHEMA_RELATIONSHIPS = {
 }
 
 def parse_markdown_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
-    """
-    Parses YAML frontmatter from a markdown string.
-    Returns a tuple of (metadata_dict, remaining_content_str).
-    """
     yaml_pattern = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
     match = yaml_pattern.match(content)
     if match:
@@ -103,79 +81,88 @@ def parse_markdown_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
                 return metadata, remaining_content
         except Exception as e:
             logger.warning(f"Error parsing frontmatter YAML: {e}")
-    
     return {}, content
 
 def extract_wiki_links(content: str) -> List[str]:
-    """
-    Extracts Obsidian-style links: [[WikiLink]] or [[WikiLink|Custom Text]].
-    """
     link_pattern = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
     return [link.strip() for link in link_pattern.findall(content)]
 
 def _resolve_wiki_root() -> str:
-    """Resolve the wiki root directory from settings."""
     wiki_dir = settings.WIKI_DATA_DIR
     if not os.path.isabs(wiki_dir):
-        # Resolve relative to project root (two levels up from this file)
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         wiki_dir = os.path.join(project_root, wiki_dir)
     return wiki_dir
 
+def _resolve_target_wiki_file(name: str) -> Optional[str]:
+    wiki_root = _resolve_wiki_root()
+    slug = name.lower().replace(" ", "-").replace("'", "").replace("(", "").replace(")", "").replace("=", "-")
+    for subdir in ("entities", "concepts", "projects"):
+        for ext in ("", ".md"):
+            path = os.path.join(wiki_root, subdir, f"{slug}{ext}")
+            if os.path.isfile(path):
+                return path
+    return None
+
+def _read_target_display_name(name: str) -> str:
+    filepath = _resolve_target_wiki_file(name)
+    if filepath:
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                meta, _ = parse_markdown_frontmatter(f.read())
+            if meta.get("title"):
+                return meta["title"]
+        except Exception:
+            pass
+    return name
+
+def _sanitize_label(label: str) -> str:
+    return label if label in VALID_LABELS else "Entity"
+
+def _infer_primary_label(name: str, tags: List[str], body: str = "") -> str:
+    scores = {label: 0.0 for label in ["Concept", "Person", "Place", "Event", "Project", "Object"]}
+    tag_set = set(str(t).lower() for t in tags)
+    name_lower = name.lower()
+    body_lower = (body or "").lower()
+
+    for pat in [r"\b(?:dr|prof|senator|ambassador|gen|adm)\b"]:
+        if re.search(pat, name_lower):
+            scores["Person"] += 3.0
+    name_words = name.split()
+    if len(name_words) >= 2 and all(w[0].isupper() for w in name_words if w[0].isalpha()):
+        scores["Person"] += 2.0
+
+    for label, signals in _INFERENCE_WEIGHTS.items():
+        for tag in signals["strong"]:
+            if tag in tag_set:
+                scores[label] += 2.0
+        for tag in signals["weak"]:
+            if tag in tag_set:
+                scores[label] += 0.3
+
+    if body_lower.count("lived in") + body_lower.count("was born") > 2:
+        scores["Person"] += 1.0
+    if body_lower.count("project") + body_lower.count("program") > 3:
+        scores["Project"] += 1.0
+    if body_lower.count("area 51") > 0 or body_lower.count("located at") > 2:
+        scores["Place"] += 0.5
+
+    best = max(scores, key=scores.get)
+    return best if scores[best] > 0 else "Entity"
+
 def _normalize_node_name(name: str) -> str:
-    """Normalize a node name for deduplication: lowercase, collapse whitespace, strip."""
     if not name:
         return name
     return " ".join(name.lower().split())
 
-
-def _resolve_target_wiki_file(name: str) -> Optional[str]:
-    """Check if a target name corresponds to a wiki page file."""
-    wiki_root = _resolve_wiki_root()
-    slug = name.lower().replace(" ", "-")
-    for subdir in ["entities", "concepts", "projects"]:
-        file_path = os.path.join(wiki_root, subdir, f"{slug}.md")
-        if os.path.exists(file_path):
-            return file_path
-    return None
-
-
-def infer_node_label(name: str) -> str:
-    """
-    Inspects the local wiki folder structure to pre-infer the primary label of a target node.
-    Uses the shared category_map for tag-to-label resolution.
-    """
-    wiki_root = _resolve_wiki_root()
-    clean_name = name.lower().replace(" ", "-")
-    for subdir, label in [("entities", "Entity"), ("concepts", "Concept"), ("projects", "Project")]:
-        file_path = os.path.join(wiki_root, subdir, f"{clean_name}.md")
-        if os.path.exists(file_path):
-            if subdir == "entities":
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        meta, _ = parse_markdown_frontmatter(f.read())
-                        tags = meta.get("tags", [])
-                        tag_strings = set(str(t).lower() for t in tags)
-                        for tag in sorted(tag_strings, key=len, reverse=True):
-                            if tag in category_map:
-                                return category_map[tag]
-                except Exception:
-                    pass
-                return "Entity"
-            return label
-    return "Entity"
+def _is_engineering_only(tags: List[str]) -> bool:
+    tag_set = set(str(t).lower() for t in tags)
+    is_eng = bool(tag_set & ENGINEERING_TAGS)
+    has_content = bool(tag_set & CONTENT_TAGS)
+    return is_eng and not has_content
 
 @cache_decorator(prefix="llm", ttl=3600)
 def _query_llm_for_edge_type(source: str, source_label: str, target: str, target_label: str, body: str) -> Tuple[str, bool]:
-    """
-    Classify relationship type using pure heuristics (no LLM).
-    Returns (relationship_type, should_reverse_direction).
-
-    The LLM path was removed because:
-      - It made N sequential calls per page (up to 35 min per page)
-      - 5+ out-of-schema types were returned, defaulted to REFERENCES anyway
-      - Heuristics already cover 17+ keyword patterns with equivalent accuracy
-    """
     reverse = False
     s_label = source_label
     t_label = target_label
@@ -200,7 +187,6 @@ def _fallback_heuristic_edge_type(
     valid_options: List[str],
     default_option: str
 ) -> Tuple[str, bool]:
-    """Heuristic fallback when LLM is unavailable or all retries are exhausted."""
     body_lower = body.lower()
     for keyword, rel, options_field in [
         ("worked", "EMPLOYED_BY", ["EMPLOYED_BY", "WORKED_AT"]),
@@ -238,6 +224,7 @@ def _fallback_heuristic_edge_type(
             return rel, False
     return default_option, False
 
+
 def ingest_wiki_page(
     driver: Driver,
     title: str,
@@ -245,25 +232,31 @@ def ingest_wiki_page(
     default_tags: List[str] = None,
     default_sources: List[str] = None
 ) -> Tuple[int, int]:
-    """
-    Parses a wiki page (markdown) and ingests it into Neo4j using validation matrices.
-    """
     metadata, body = parse_markdown_frontmatter(content)
-    
+
     tags = [str(t) for t in metadata.get("tags", default_tags or [])]
     sources = [str(s) for s in metadata.get("sources", default_sources or [])]
     related = metadata.get("related", [])
-    
-    # Normalize title for deduplication
-    title = _normalize_node_name(title)
 
-    # Determine primary label (uses module-level category_map)
-    primary_label = "Entity"
-    tag_strings = set(str(t).lower() for t in tags)
-    for tag in sorted(tag_strings, key=len, reverse=True):
-        if tag in category_map:
-            primary_label = _sanitize_label(category_map[tag])
-            break
+    # P3: Engineering-only gate — skip Neo4j ingest
+    if _is_engineering_only(tags):
+        logger.debug(f"Skipping Neo4j ingest for engineering-only page '{title}'")
+        return 0, 0
+
+    # P1: Use frontmatter title as canonical display name
+    display_name = metadata.get("title") or title
+    display_name = display_name.strip()
+    node_name = _normalize_node_name(display_name)
+
+    # P2: Infer label using multi-heuristic scorer
+    primary_label = _infer_primary_label(display_name, tags, body)
+    primary_label = _sanitize_label(primary_label)
+
+    # P7: Detect fallback (pages from _fallback_analysis carry "fallback" tag)
+    is_fallback = "fallback" in [str(t).lower() for t in tags]
+
+    # P4: Read protected flag
+    protected = bool(metadata.get("protected", False))
 
     wiki_links = extract_wiki_links(body)
     all_targets = list(set(related + wiki_links))
@@ -273,53 +266,57 @@ def ingest_wiki_page(
     rels_count = 0
 
     with driver.session() as session:
-        # Create or update primary node
         primary_query = """
         MERGE (n:Entity {name: $name})
-        ON CREATE SET n.tags = $tags, n.sources = $sources, n.content_preview = $preview, n.confidence = 1.0
-        ON MATCH SET n.tags = $tags, n.sources = $sources, n.content_preview = $preview
+        ON CREATE SET
+          n.display_name = $display,
+          n.tags = $tags,
+          n.sources = $sources,
+          n.content_preview = $preview,
+          n.confidence = 1.0,
+          n.fallback = $fallback,
+          n.protected = $protected
+        ON MATCH SET
+          n.display_name = $display,
+          n.tags = $tags,
+          n.sources = $sources,
+          n.content_preview = $preview,
+          n.fallback = $fallback,
+          n.protected = $protected
         RETURN elementId(n)
         """
         preview = body[:300] + "..." if len(body) > 300 else body
-        session.run(primary_query, name=title, tags=tags, sources=sources, preview=preview)
+        session.run(primary_query, name=node_name, display=display_name, tags=tags, sources=sources, preview=preview, fallback=is_fallback, protected=protected)
         nodes_count += 1
 
-        primary_label = _sanitize_label(primary_label)
         if primary_label != "Entity":
-            session.run(f"MATCH (n:Entity {{name: $name}}) SET n:{primary_label}", name=title)
+            session.run(f"MATCH (n:Entity {{name: $name}}) SET n:{primary_label}", name=node_name)
 
-        # Ingest target links
         for target in all_targets:
-            target = _normalize_node_name(target)
-            if not target or target == title:
+            target_display = _read_target_display_name(target)
+            target_name = _normalize_node_name(target_display)
+            if not target_name or target_name == node_name:
                 continue
 
-            # Only create target node if it corresponds to a wiki page
             if not _resolve_target_wiki_file(target):
-                logger.debug(
-                    "Skipping placeholder node for unresolvable target '%s' (source: %s)",
-                    target, title
-                )
+                logger.debug("Skipping placeholder node for unresolvable target '%s' (source: %s)", target, display_name)
                 continue
 
-            target_label = _sanitize_label(infer_node_label(target))
+            target_label = _sanitize_label(_infer_primary_label(target_display, []))
 
-            # Create referenced node
             target_query = """
             MERGE (t:Entity {name: $target_name})
-            ON CREATE SET t.confidence = 0.5
+            ON CREATE SET t.display_name = $target_display, t.confidence = 0.5
             RETURN elementId(t)
             """
-            session.run(target_query, target_name=target)
+            session.run(target_query, target_name=target_name, target_display=target_display)
             nodes_count += 1
 
             if target_label != "Entity":
-                session.run(f"MATCH (t:Entity {{name: $target_name}}) SET t:{target_label}", target_name=target)
+                session.run(f"MATCH (t:Entity {{name: $target_name}}) SET t:{target_label}", target_name=target_name)
 
-            # Classify edge type
-            rel_type, reverse = _query_llm_for_edge_type(title, primary_label, target, target_label, body)
+            rel_type, reverse = _query_llm_for_edge_type(display_name, primary_label, target_display, target_label, body)
 
-            # Draw relationship in the correct semantic direction using :Entity matching
             if reverse:
                 rel_query = f"""
                 MATCH (n:Entity {{name: $name}})
@@ -336,7 +333,7 @@ def ingest_wiki_page(
                 ON CREATE SET r.confidence = 0.8
                 RETURN elementId(r)
                 """
-            session.run(rel_query, name=title, target_name=target)
+            session.run(rel_query, name=node_name, target_name=target_name)
             rels_count += 1
 
     return nodes_count, rels_count
