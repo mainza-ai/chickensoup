@@ -639,6 +639,71 @@ struct ConnectionIndicator: View {
 
 ---
 
+## Troubleshooting
+
+### Status Tab Shows All "Idle"
+
+If every section shows `Status: idle` when you expect activity, check:
+
+```bash
+# 1. Is the server running?
+curl -s http://localhost:8000/status | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['status'])"
+
+# 2. Are progress keys in Redis?
+redis-cli KEYS "progress:*"
+
+# 3. What does the raw progress data look like?
+redis-cli HGETALL "progress:reconciliation"
+redis-cli HGETALL "progress:idle_ingestion"
+redis-cli HGETALL "progress:llm_client"
+```
+
+**Common causes:**
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `progress:*` keys exist but UI shows idle | JSON decoded integers/bools instead of strings (pre-fix behavior) | Update to latest `develop` (commit 074af94 removes `json.loads` in `get_all()`) |
+| No `progress:*` keys in Redis | Background operations haven't started, or Redis connection failed silently | Check server logs: `grep -i "progress\|redis" /tmp/chickensoup-server.log` |
+| Sections flicker between data and idle | Reconciliation thread yields to `IdleSentinel` during user HTTP requests | Wait without making API calls; or reduce `IDLE_THRESHOLD_MINUTES` |
+| Reconciliation shows `stopped` | Stop signal was set via `/wiki/reconcile-stop` | Clear signal: `redis-cli DEL reconciliation:stop` and re-trigger |
+| `progress:reconciliation` present but data is stale | Server was restarted during reconciliation | Wait for next progress update (throttled to 2s polling, update only when values change) |
+
+### Progress Data Persistence
+
+Progress data is stored in Redis hashes with **no TTL**. Keys persist across server restarts. To reset:
+
+```bash
+redis-cli DEL progress:reconciliation progress:idle_ingestion progress:chat_ingest progress:fallback_retry progress:wiki_watcher progress:llm_client progress:neo4j
+```
+
+### Response Format
+
+All values are strings (not integers or booleans). The Swift `APIStatusProgressSection` expects `String?` for every field:
+
+```json
+{
+  "reconciliation": {
+    "status": "running",
+    "current": "45",
+    "total": "495",
+    "current_slug": "bob-lazar",
+    "pages_processed": "44",
+    "errors": "0"
+  }
+}
+```
+
+If any value appears as a non-string (`true`, `42`), the `get_all()` function has a bug — remove `json.loads` from the decode path.
+
+### SwiftUI Specific
+
+| Issue | Cause | Fix |
+|---|---|---|
+| Sections show "No Data" instead of "idle" | Using old `ContentUnavailableView` fallback | Update to latest code: replace with `LabeledContent("Status", value: "idle")` |
+| `foregroundColor()` doesn't compile with ternary | Type inference fails for `foregroundStyle(condition ? .red : .green)` | Extract to a computed `Color` property, use `foregroundStyle(colorProperty)` |
+| Polling task continues after view disappears | Task created with `Task {}` instead of `.task {}` | Use `.task { }` modifier — it auto-cancels on disappear |
+| Tab not visible on macOS | `DetailTab` enum missing `.status` case | Add `case status = "System Status"` to `DetailTab` and corresponding ZStack entry |
+
 ## Rollup Example: What the User Sees
 
 ```
