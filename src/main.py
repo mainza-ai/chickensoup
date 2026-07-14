@@ -56,6 +56,8 @@ async def lifespan(app: FastAPI):
     logger.info("Starting up chickensoup API...")
     scheduler_task = None
     almanac_task = None
+    watcher_task = None
+    daily_rebuild_task = None
     try:
         driver = neo4j_conn.connect()
         initialize_schema(driver)
@@ -76,9 +78,31 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Could not start idle-driven ingestion loop: {e}")
 
+    try:
+        from src.wiki.watcher import wiki_watcher_loop
+        watcher_task = asyncio.create_task(wiki_watcher_loop())
+        logger.info("Wiki filesystem watcher started")
+    except Exception as e:
+        logger.warning(f"Could not start wiki watcher: {e}")
+
+    try:
+        from src.scheduler import rebuild_queue_daily_loop
+        daily_rebuild_task = asyncio.create_task(rebuild_queue_daily_loop())
+        logger.info("Daily queue rebuild loop started")
+    except Exception as e:
+        logger.warning(f"Could not start daily queue rebuild loop: {e}")
+
+    # Sync the staleness queue with the filesystem at startup
+    try:
+        from src.staleness_queue import rebuild_queue
+        rebuild_queue()
+        logger.info("Staleness queue rebuilt at startup")
+    except Exception as e:
+        logger.warning(f"Could not rebuild staleness queue at startup: {e}")
+
     yield
     logger.info("Shutting down chickensoup API...")
-    for task in (scheduler_task, almanac_task):
+    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task):
         if task:
             task.cancel()
             try:
@@ -1032,6 +1056,12 @@ def _process_ingested_content(
             pages_created.append(page.title)
         else:
             pages_updated.append(page.title)
+
+        try:
+            from src.staleness_queue import record_pulse_completed
+            record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
+        except Exception as queue_err:
+            logger.warning(f"Failed to seed staleness queue for '{slug}': {queue_err}")
 
     try:
         index_entries = [(slugify(p.title), p.title, p.page_type) for p in analysis.suggested_pages if p.confidence >= settings.WIKI_MIN_CONFIDENCE]
@@ -2322,6 +2352,33 @@ async def post_research_approve(thread_id: str):
     except Exception as e:
         logger.error(f"Research approve failed: {e}")
         raise HTTPException(status_code=500, detail=f"Research approve failed: {str(e)}")
+
+
+@app.get("/system/ingestion/status")
+async def get_ingestion_status():
+    from src.scheduler import get_almanac_status, _IDLE_LAST_RUN, _IDLE_CHECK_INTERVAL_SECONDS
+    from src.cache import cache_store
+    queue_size = 0
+    next_batch = []
+    try:
+        if cache_store.redis_client:
+            queue_size = cache_store.redis_client.zcard("staleness:queue") or 0
+            next_batch_raw = cache_store.redis_client.zrevrange("staleness:queue", 0, 2)
+            next_batch = [
+                el.decode() if isinstance(el, bytes) else el
+                for el in next_batch_raw
+            ]
+    except Exception:
+        pass
+    almanac = get_almanac_status()
+    return {
+        "almanac_enabled": almanac.get("enabled"),
+        "almanac_last_run": almanac.get("last_run"),
+        "almanac_running": almanac.get("running"),
+        "staleness_queue_size": queue_size,
+        "staleness_next_batch": next_batch,
+        "check_interval_seconds": _IDLE_CHECK_INTERVAL_SECONDS,
+    }
 
 
 @app.post("/almanac/generate", response_model=AsyncTaskResponse)

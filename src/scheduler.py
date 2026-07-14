@@ -723,9 +723,12 @@ def get_recent_notifications(limit: int = 10) -> List[dict]:
 _IDLE_INGESTION_RUNNING = False
 _IDLE_LAST_RUN: Optional[str] = None
 _IDLE_CHECK_INTERVAL_SECONDS = 15  # check every 15s
+_IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
+_IDLE_LAST_BATCH: Optional[List[str]] = None
 
 async def idle_ingestion_loop():
     global _IDLE_INGESTION_RUNNING, _IDLE_LAST_RUN
+    global _IDLE_CONSECUTIVE_IDENTICAL_BATCHES, _IDLE_LAST_BATCH
 
     _IDLE_INGESTION_RUNNING = True
     logger.info("Idle-driven ingestion loop started")
@@ -747,7 +750,21 @@ async def idle_ingestion_loop():
             # Get highest priority entity slugs
             batch = get_next_batch(3)
             if not batch:
+                _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
+                _IDLE_LAST_BATCH = None
                 continue
+
+            # Detect consecutive identical batches (orphan spin)
+            if _IDLE_LAST_BATCH is not None and batch == _IDLE_LAST_BATCH:
+                _IDLE_CONSECUTIVE_IDENTICAL_BATCHES += 1
+                if _IDLE_CONSECUTIVE_IDENTICAL_BATCHES >= 5:
+                    logger.error(
+                        f"Same batch returned {_IDLE_CONSECUTIVE_IDENTICAL_BATCHES}x consecutively — "
+                        f"orphaned slugs detected: {batch}. Run rebuild_queue() or check staleness queue."
+                    )
+            else:
+                _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
+            _IDLE_LAST_BATCH = batch
 
             logger.info(f"Idle ingestion loop processing batch: {batch}")
             pulse_agent = PulseAgent()
@@ -762,10 +779,25 @@ async def idle_ingestion_loop():
                     from src.wiki.writer import read_page
                     page_data = read_page(slug)
                     if not page_data or "frontmatter" not in page_data:
+                        logger.warning(f"Page '{slug}' not found on disk — removing from staleness queue")
+                        if cache_store.redis_client:
+                            cache_store.redis_client.zrem("staleness:queue", slug)
                         continue
                     
                     entity_name = page_data["frontmatter"].get("title", slug)
-                    
+
+                    # Skip pulse for engineering-only pages (no content tags)
+                    tags = page_data["frontmatter"].get("tags", [])
+                    from src.wiki.cleanup import ENGINEERING_TAGS, CONTENT_TAGS
+                    tag_set = set(str(t) for t in tags)
+                    is_engineering = bool(tag_set & ENGINEERING_TAGS)
+                    has_content = bool(tag_set & CONTENT_TAGS)
+                    if is_engineering and not has_content:
+                        logger.info(f"Skipping pulse for engineering page '{slug}'")
+                        record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
+                        _IDLE_LAST_RUN = datetime.now(timezone.utc).isoformat()
+                        continue
+
                     logger.info(f"Running idle pulse for '{entity_name}'")
                     result = pulse_agent.run_pulse(entity_name)
                     
@@ -829,6 +861,22 @@ async def idle_ingestion_loop():
             logger.error(f"Idle-driven ingestion loop error: {e}", exc_info=True)
 
     _IDLE_INGESTION_RUNNING = False
+
+
+async def rebuild_queue_daily_loop():
+    """Calls rebuild_queue() every 24 hours to sync Redis with the filesystem."""
+    logger.info("Daily queue rebuild loop started (24h interval)")
+    while True:
+        try:
+            await asyncio.sleep(86400)
+            from src.staleness_queue import rebuild_queue
+            rebuild_queue()
+            logger.info("Daily staleness queue rebuild complete")
+        except asyncio.CancelledError:
+            logger.info("Daily queue rebuild loop cancelled")
+            break
+        except Exception as e:
+            logger.warning(f"Daily queue rebuild failed: {e}")
 
 
 def get_almanac_status() -> dict:
