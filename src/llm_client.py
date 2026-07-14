@@ -1,5 +1,6 @@
 import json
 import re
+import time
 import logging
 import threading
 import asyncio
@@ -24,6 +25,24 @@ class LLMClient:
     def __init__(self, default_timeout: float = None, default_max_tokens: int = None):
         self.default_timeout = default_timeout or settings.LLM_CLIENT_TIMEOUT
         self.default_max_tokens = default_max_tokens or settings.LLM_CLIENT_MAX_TOKENS
+        self._metrics_enabled = False
+        self._init_metrics()
+
+    def _init_metrics(self):
+        try:
+            from src.observability import (
+                llm_calls_total,
+                llm_parse_failures_total,
+                llm_semaphore_wait_seconds,
+                llm_cache_hits_total,
+            )
+            self._llm_calls_total = llm_calls_total
+            self._llm_parse_failures_total = llm_parse_failures_total
+            self._llm_semaphore_wait_seconds = llm_semaphore_wait_seconds
+            self._llm_cache_hits_total = llm_cache_hits_total
+            self._metrics_enabled = True
+        except Exception:
+            pass
 
     def query_sync(
         self,
@@ -75,14 +94,38 @@ class LLMClient:
                     return res_data["choices"][0]["message"]["content"]
             return None
 
+        wait_start = time.monotonic()
+        stage = response_format or "text"
         with sem:
+            wait_elapsed = time.monotonic() - wait_start
+            if self._metrics_enabled:
+                try:
+                    self._llm_semaphore_wait_seconds.record(wait_elapsed)
+                except Exception:
+                    pass
             try:
-                return llm_circuit_breaker.call(_do_request)
+                result = llm_circuit_breaker.call(_do_request)
+                if self._metrics_enabled:
+                    try:
+                        self._llm_calls_total.add(1, {"stage": stage, "status": "success"})
+                    except Exception:
+                        pass
+                return result
             except RuntimeError as e:
                 logger.warning(f"LLM circuit breaker open: {e}")
+                if self._metrics_enabled:
+                    try:
+                        self._llm_calls_total.add(1, {"stage": stage, "status": "breaker_open"})
+                    except Exception:
+                        pass
                 return None
             except Exception as e:
                 logger.warning(f"LLM query failed: {e}")
+                if self._metrics_enabled:
+                    try:
+                        self._llm_calls_total.add(1, {"stage": stage, "status": "error"})
+                    except Exception:
+                        pass
                 return None
 
     async def query(
@@ -168,4 +211,9 @@ def parse_structured(
         log.debug(f"parse_structured strategy 3 failed: {e}")
 
     log.warning(f"parse_structured: all strategies failed for model {model.__name__}")
+    try:
+        from src.observability import llm_parse_failures_total
+        llm_parse_failures_total.add(1, {"model": model.__name__})
+    except Exception:
+        pass
     return None

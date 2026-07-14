@@ -104,3 +104,28 @@ almanac_generation_duration: Histogram = meter.create_histogram(
     description="Almanac generation duration",
     unit="s"
 )
+
+# LLM client metrics
+llm_calls_total: Counter = meter.create_counter(
+    name="llm_calls_total",
+    description="LLM API calls by stage and status",
+    unit="1"
+)
+
+llm_parse_failures_total: Counter = meter.create_counter(
+    name="llm_parse_failures_total",
+    description="LLM response parse failures by error type",
+    unit="1"
+)
+
+llm_semaphore_wait_seconds: Histogram = meter.create_histogram(
+    name="llm_semaphore_wait_seconds",
+    description="Time spent waiting for LLM semaphore",
+    unit="s"
+)
+
+llm_cache_hits_total: Counter = meter.create_counter(
+    name="llm_cache_hits_total",
+    description="LLM response cache hits",
+    unit="1"
+)
