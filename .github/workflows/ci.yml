@@ -10,6 +10,30 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      neo4j:
+        image: neo4j:5.18.0
+        env:
+          NEO4J_AUTH: neo4j/chickensoup_password
+          NEO4J_PLUGINS: '["apoc"]'
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p chickensoup_password 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.0-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
