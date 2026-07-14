@@ -7,6 +7,14 @@ struct LLMClientSectionView: View {
         section?.breakerOpen == "true"
     }
 
+    var statusColor: Color {
+        isBreakerOpen ? .red : .green
+    }
+
+    var failedColor: Color {
+        section?.failedCalls == "0" ? .secondary : .red
+    }
+
     var successRate: Double? {
         guard let total = section?.totalCalls.flatMap(Double.init),
               let success = section?.successCalls.flatMap(Double.init),
@@ -14,25 +22,31 @@ struct LLMClientSectionView: View {
         return success / total * 100
     }
 
+    var successRateColor: Color {
+        guard let rate = successRate else { return .secondary }
+        return rate > 95 ? .green : .orange
+    }
+
     var body: some View {
         Section {
             if let section {
                 LabeledContent("Status", value: isBreakerOpen ? "Breaker Open" : "Online")
-                    .foregroundColor(isBreakerOpen ? .red : .green)
+                    .foregroundStyle(statusColor)
 
                 LabeledContent("Total calls", value: section.totalCalls ?? "0")
 
                 if let failed = section.failedCalls {
                     LabeledContent("Failed", value: failed)
-                        .foregroundColor(failed == "0" ? .secondary : .red)
+                        .foregroundStyle(failedColor)
                 }
 
                 if let rate = successRate {
                     LabeledContent("Success rate", value: "\(Int(rate))%")
-                        .foregroundStyle(rate > 95 ? .green : .orange)
+                        .foregroundStyle(successRateColor)
                 }
             } else {
-                ContentUnavailableView("No Data", systemImage: "questionmark.circle")
+                LabeledContent("Status", value: "idle")
+                    .foregroundStyle(.secondary)
             }
         } header: {
             HStack {

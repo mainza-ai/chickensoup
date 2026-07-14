@@ -14,11 +14,8 @@ struct Neo4jSnapshotSectionView: View {
                         .font(.caption2)
                 }
             } else {
-                ContentUnavailableView(
-                    "No Data",
-                    systemImage: "point.3.connected.trianglepath.dotted",
-                    description: Text("Knowledge graph has not been synced yet.")
-                )
+                LabeledContent("Status", value: "idle")
+                    .foregroundStyle(.secondary)
             }
         } header: {
             HStack {

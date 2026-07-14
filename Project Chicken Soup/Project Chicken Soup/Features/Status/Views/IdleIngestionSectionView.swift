@@ -19,7 +19,8 @@ struct IdleIngestionSectionView: View {
                         .font(.caption2)
                 }
             } else {
-                ContentUnavailableView("No Data", systemImage: "questionmark.circle")
+                LabeledContent("Status", value: "idle")
+                    .foregroundStyle(.secondary)
             }
         } header: {
             HStack {

@@ -62,11 +62,8 @@ struct ReconciliationSectionView: View {
                         .font(.caption2)
                 }
             } else {
-                ContentUnavailableView(
-                    "No Data",
-                    systemImage: "questionmark.circle",
-                    description: Text("Reconciliation has not reported yet.")
-                )
+                LabeledContent("Status", value: "idle")
+                    .foregroundStyle(.secondary)
             }
         } header: {
             HStack {

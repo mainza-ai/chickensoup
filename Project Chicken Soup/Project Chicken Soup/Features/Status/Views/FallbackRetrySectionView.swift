@@ -29,7 +29,8 @@ struct FallbackRetrySectionView: View {
                     LabeledContent("Last result", value: result)
                 }
             } else {
-                ContentUnavailableView("No Data", systemImage: "questionmark.circle")
+                LabeledContent("Status", value: "idle")
+                    .foregroundStyle(.secondary)
             }
         } header: {
             HStack {
