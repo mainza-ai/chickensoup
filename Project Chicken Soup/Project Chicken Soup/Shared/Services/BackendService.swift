@@ -481,6 +481,16 @@ public final class BackendService {
             return nil
         }
     }
+
+    public func fetchStatusProgress() async -> APIStatusProgress? {
+        do {
+            let response: APIStatusProgress = try await APIClient.shared.request(path: "/status/progress")
+            return response
+        } catch {
+            logger.error("Failed to fetch status progress: \(error.localizedDescription)")
+            return nil
+        }
+    }
 }
 
 public struct BackendQueryResult {

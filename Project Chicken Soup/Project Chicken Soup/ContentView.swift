@@ -46,6 +46,7 @@ struct ContentView: View {
         case timeline
         case graph
         case navigator
+        case status
         case ingest
         case almanac
     }
@@ -401,8 +402,15 @@ struct ContentView: View {
                 Label("AI Navigator", systemImage: "brain.fill")
             }
             .tag(TabSelection.navigator)
-            
-            // Tab 4: Data Ingest
+
+            // Tab 4: System Status
+            StatusDashboardView()
+                .tabItem {
+                    Label("Status", systemImage: "gear")
+                }
+                .tag(TabSelection.status)
+
+            // Tab 5: Data Ingest
             NavigationStack {
                 DataIngestionView()
                     #if !os(macOS)
@@ -419,8 +427,8 @@ struct ContentView: View {
             }
             .badge(backendService.chat.unreadWikiPagesFromChat)
             .tag(TabSelection.ingest)
-            
-            // Tab 5: Living Almanac
+
+            // Tab 6: Living Almanac
             NavigationStack {
                 LivingAlmanacView()
                     #if !os(macOS)

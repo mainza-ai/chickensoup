@@ -1460,4 +1460,69 @@ public struct APIAlmanacSummaryResponse: Codable, Hashable {
     }
 }
 
+// MARK: - System Status Progress
 
+public struct APIStatusProgressSection: Codable {
+    public var status: String?
+    public var current: String?
+    public var total: String?
+    public var currentSlug: String?
+    public var pagesProcessed: String?
+    public var errors: String?
+    public var pulsesSuccess: String?
+    public var pulsesError: String?
+    public var lastResult: String?
+    public var lastRun: String?
+    public var queueSize: String?
+    public var succeeded: String?
+    public var failed: String?
+    public var eventsProcessed: String?
+    public var totalCalls: String?
+    public var successCalls: String?
+    public var failedCalls: String?
+    public var breakerOpen: String?
+    public var nodes: String?
+    public var relationships: String?
+    public var startedAt: String?
+    public var completedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case status, current, total, errors
+        case currentSlug = "current_slug"
+        case pagesProcessed = "pages_processed"
+        case pulsesSuccess = "pulses_success"
+        case pulsesError = "pulses_error"
+        case lastResult = "last_result"
+        case lastRun = "last_run"
+        case queueSize = "queue_size"
+        case succeeded, failed
+        case eventsProcessed = "events_processed"
+        case totalCalls = "total_calls"
+        case successCalls = "success_calls"
+        case failedCalls = "failed_calls"
+        case breakerOpen = "breaker_open"
+        case nodes, relationships
+        case startedAt = "started_at"
+        case completedAt = "completed_at"
+    }
+}
+
+public struct APIStatusProgress: Codable {
+    public var reconciliation: APIStatusProgressSection?
+    public var idleIngestion: APIStatusProgressSection?
+    public var chatIngest: APIStatusProgressSection?
+    public var fallbackRetry: APIStatusProgressSection?
+    public var wikiWatcher: APIStatusProgressSection?
+    public var llmClient: APIStatusProgressSection?
+    public var neo4j: APIStatusProgressSection?
+
+    enum CodingKeys: String, CodingKey {
+        case reconciliation
+        case idleIngestion = "idle_ingestion"
+        case chatIngest = "chat_ingest"
+        case fallbackRetry = "fallback_retry"
+        case wikiWatcher = "wiki_watcher"
+        case llmClient = "llm_client"
+        case neo4j
+    }
+}
