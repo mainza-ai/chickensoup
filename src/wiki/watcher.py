@@ -1,12 +1,16 @@
 import asyncio
 import logging
 import os
-from datetime import datetime, timezone
-from typing import Dict, Set
+from typing import Set
 
 from src.config import settings
 
 logger = logging.getLogger("chickensoup.wiki.watcher")
+
+# Slugs created by the watcher's own entity extraction, used to prevent
+# recursive processing loops when the watcher creates sub-pages that
+# then trigger additional filesystem events.
+_WATCHER_CREATED: Set[str] = set()
 
 
 def _wiki_dirs() -> Set[str]:
@@ -20,7 +24,201 @@ def _wiki_dirs() -> Set[str]:
     }
 
 
+def _run_llm_entity_extraction(slug: str, title: str, subdir: str, body: str) -> None:
+    """Run LLM-powered entity extraction on page body to discover sub-entities.
+
+    Passes the page body through IngestAgent.analyze_content so the LLM can
+    identify entities, concepts, or projects mentioned in the text that don't
+    yet have their own wiki page. New sub-pages are created, cross-referenced,
+    and ingested to Neo4j through the full pipeline (including LLM edge
+    classification).
+
+    Skips entity extraction for pages that were themselves created by this
+    function to prevent recursive processing loops.
+    """
+    if slug in _WATCHER_CREATED:
+        logger.debug(f"Skipping LLM entity extraction for watcher-created page '{slug}'")
+        return
+
+    from src.agents.ingest_agent import IngestAgent
+    from src.wiki.writer import write_page, cross_reference_new_page, invalidate_index_cache
+    from src.knowledge_graph.connection import neo4j_conn
+    from src.knowledge_graph.ingest import ingest_wiki_page
+    from src.staleness_queue import record_pulse_completed
+
+    try:
+        agent = IngestAgent()
+    except Exception as e:
+        logger.warning(f"LLM extraction: could not create IngestAgent for '{slug}': {e}")
+        return
+
+    try:
+        analysis = agent.analyze_content(body, filename=f"{slug}.md")
+    except Exception as e:
+        logger.warning(f"LLM extraction: analyze_content failed for '{slug}': {e}")
+        return
+
+    if not analysis.suggested_pages:
+        return
+
+    driver = neo4j_conn.get_driver()
+
+    created_any = False
+    for page in analysis.suggested_pages:
+        if page.confidence < settings.WIKI_MIN_CONFIDENCE:
+            continue
+        if not settings.WIKI_AUTO_CREATE:
+            break
+
+        page_type = page.page_type
+        if page_type not in ("entities", "concepts", "projects"):
+            page_type = agent.classify_page_type(page.title, page.summary, page.tags)
+
+        sub_slug, is_new = write_page(
+            title=page.title,
+            body=page.body,
+            tags=page.tags,
+            sources=page.sources,
+            related=page.related,
+            page_type=page_type,
+        )
+
+        _WATCHER_CREATED.add(sub_slug)
+
+        try:
+            cross_reference_new_page(sub_slug, page.title, page_type)
+        except Exception as xref_err:
+            logger.warning(f"LLM extraction: cross-ref failed for '{page.title}': {xref_err}")
+
+        if driver:
+            full = (
+                f"---\ntitle: {page.title}\ntags: {page.tags}\n"
+                f"sources: {page.sources}\nrelated: {page.related}\n---\n\n{page.body}"
+            )
+            try:
+                ingest_wiki_page(driver, title=page.title, content=full)
+            except Exception as neo4j_err:
+                logger.warning(f"LLM extraction: Neo4j ingest failed for '{page.title}': {neo4j_err}")
+
+        try:
+            record_pulse_completed(sub_slug, divergence_risk=0.0, state_label="unverified")
+        except Exception as queue_err:
+            logger.warning(f"LLM extraction: queue seed failed for '{sub_slug}': {queue_err}")
+
+        created_any = True
+
+    if created_any:
+        invalidate_index_cache()
+        logger.info(f"LLM extraction: created {len(analysis.suggested_pages)} sub-entities from '{slug}'")
+
+
+def _ingest_page(slug: str, subdir: str) -> None:
+    """Run full ingestion pipeline for a single wiki page.
+
+    Includes LLM-powered entity extraction (discovers sub-entities from body),
+    cross-referencing, Neo4j ingest with LLM edge classification, index/log
+    updates, and staleness queue seeding.
+
+    Neo4j MERGE operations make this safe to call for already-ingested pages.
+    Idempotent by design.
+    """
+    from src.wiki.writer import (
+        read_page, cross_reference_new_page, append_to_index, append_to_log,
+        invalidate_index_cache,
+    )
+    from src.knowledge_graph.ingest import ingest_wiki_page
+    from src.staleness_queue import record_pulse_completed
+    from src.knowledge_graph.connection import neo4j_conn
+
+    page_data = read_page(slug, page_type=subdir)
+    if not page_data or "frontmatter" not in page_data:
+        logger.warning(f"Ingest: cannot read page '{slug}' in '{subdir}'")
+        return
+
+    title = page_data["frontmatter"].get("title", slug)
+    tags = page_data["frontmatter"].get("tags", [])
+    sources = page_data["frontmatter"].get("sources", [])
+    related = page_data["frontmatter"].get("related", [])
+    body = page_data.get("body", "")
+    full_content = f"---\ntitle: {title}\ntags: {tags}\nsources: {sources}\nrelated: {related}\n---\n\n{body}"
+
+    _run_llm_entity_extraction(slug, title, subdir, body)
+
+    try:
+        cross_reference_new_page(slug, title, subdir)
+    except Exception as xref_err:
+        logger.warning(f"Ingest: cross-reference failed for '{slug}': {xref_err}")
+
+    driver = neo4j_conn.get_driver()
+    if driver:
+        try:
+            ingest_wiki_page(driver, title=title, content=full_content, default_tags=tags, default_sources=sources)
+        except Exception as neo4j_err:
+            logger.warning(f"Ingest: Neo4j ingest failed for '{slug}': {neo4j_err}")
+
+    try:
+        append_to_index([(slug, title, subdir)])
+    except Exception as idx_err:
+        logger.warning(f"Ingest: index update failed for '{slug}': {idx_err}")
+
+    try:
+        append_to_log(f"Watcher ingest: {slug} ({subdir})")
+    except Exception as log_err:
+        logger.warning(f"Ingest: log update failed for '{slug}': {log_err}")
+
+    invalidate_index_cache()
+    record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
+    logger.info(f"Ingest: processed page '{slug}' ({subdir})")
+
+
+async def _on_file_event(change_type: str, path_str: str) -> None:
+    """Handle a single filesystem event from the watcher.
+
+    Dispatches the ingestion work to a thread executor to avoid blocking
+    the event loop during LLM calls and Neo4j operations.
+    """
+    if not path_str.endswith(".md"):
+        return
+    slug = os.path.splitext(os.path.basename(path_str))[0]
+    subdir = os.path.basename(os.path.dirname(path_str))
+    logger.info(f"Watcher: {change_type} page '{slug}' ({subdir})")
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, _ingest_page, slug, subdir)
+
+
+def reconcile_existing_pages():
+    """Reconciliation: run full ingestion for all existing wiki pages.
+
+    Handles pages that were added or restored while the server was
+    down (e.g. git checkout, rsync). Runs in a thread executor to avoid
+    blocking the event loop during the O(n) cross-reference scan and LLM calls.
+    """
+    watched_dirs = _wiki_dirs()
+    existing_dirs = [d for d in watched_dirs if os.path.isdir(d)]
+    logger.info("Reconciliation: scanning existing wiki pages...")
+    count = 0
+    for dir_path in existing_dirs:
+        subdir = os.path.basename(dir_path)
+        for fname in sorted(os.listdir(dir_path)):
+            if not fname.endswith(".md"):
+                continue
+            slug = os.path.splitext(fname)[0]
+            try:
+                _ingest_page(slug, subdir)
+                count += 1
+            except Exception as e:
+                logger.error(f"Reconciliation: failed to process '{slug}': {e}")
+    logger.info(f"Reconciliation complete: {count} pages processed")
+
+
 async def wiki_watcher_loop():
+    """Async filesystem watcher for wiki page changes.
+
+    Watches wiki/{entities,concepts,projects}/ for new/modified .md files
+    and runs the full ingestion pipeline including LLM entity extraction
+    and edge classification. All I/O-bound work is offloaded to a thread
+    executor to keep the event loop responsive.
+    """
     try:
         from watchfiles import awatch
     except ImportError:
@@ -34,67 +232,7 @@ async def wiki_watcher_loop():
         return
 
     logger.info(f"Wiki watcher started, watching: {existing_dirs}")
+
     async for changes in awatch(*existing_dirs):
         for change_type, path_str in changes:
-            if not path_str.endswith(".md"):
-                continue
-            slug = os.path.splitext(os.path.basename(path_str))[0]
-            subdir = os.path.basename(os.path.dirname(path_str))
-            try:
-                from src.wiki.writer import (
-                    read_page, write_page, slugify,
-                    cross_reference_new_page, invalidate_index_cache,
-                )
-                from src.knowledge_graph.ingest import ingest_wiki_page
-                from src.staleness_queue import record_pulse_completed
-                from src.knowledge_graph.connection import neo4j_conn
-                from src.wiki.writer import append_to_index, append_to_log
-
-                page_data = read_page(slug)
-                if not page_data or "frontmatter" not in page_data:
-                    logger.warning(f"Watcher: cannot read page '{slug}' after change")
-                    continue
-
-                title = page_data["frontmatter"].get("title", slug)
-                tags = page_data["frontmatter"].get("tags", [])
-                sources = page_data["frontmatter"].get("sources", [])
-                related = page_data["frontmatter"].get("related", [])
-                body = page_data.get("body", "")
-                full_content = f"---\ntitle: {title}\ntags: {tags}\nsources: {sources}\nrelated: {related}\n---\n\n{body}"
-
-                if change_type == "added":
-                    logger.info(f"Watcher: new page detected '{slug}' ({subdir})")
-                    try:
-                        cross_reference_new_page(slug, title, subdir)
-                    except Exception as xref_err:
-                        logger.warning(f"Watcher: cross-reference failed for '{slug}': {xref_err}")
-                    try:
-                        driver = neo4j_conn.get_driver()
-                        if driver:
-                            ingest_wiki_page(driver, title=title, content=full_content, default_tags=tags, default_sources=sources)
-                    except Exception as neo4j_err:
-                        logger.warning(f"Watcher: Neo4j ingest failed for '{slug}': {neo4j_err}")
-                    try:
-                        append_to_index([(slug, title, subdir)])
-                    except Exception as idx_err:
-                        logger.warning(f"Watcher: index update failed for '{slug}': {idx_err}")
-                    try:
-                        append_to_log(f"Watcher auto-ingest: created {slug} ({subdir})")
-                    except Exception as log_err:
-                        logger.warning(f"Watcher: log update failed for '{slug}': {log_err}")
-                    invalidate_index_cache()
-                    record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
-                    logger.info(f"Watcher: fully ingested new page '{slug}'")
-                elif change_type == "modified":
-                    logger.info(f"Watcher: modified page detected '{slug}'")
-                    try:
-                        driver = neo4j_conn.get_driver()
-                        if driver:
-                            ingest_wiki_page(driver, title=title, content=full_content, default_tags=tags, default_sources=sources)
-                    except Exception as neo4j_err:
-                        logger.warning(f"Watcher: Neo4j re-ingest failed for '{slug}': {neo4j_err}")
-                    invalidate_index_cache()
-                    record_pulse_completed(slug, divergence_risk=0.0, state_label="unverified")
-                    logger.info(f"Watcher: re-ingested modified page '{slug}'")
-            except Exception as e:
-                logger.error(f"Watcher: failed to process change for '{path_str}': {e}", exc_info=True)
+            await _on_file_event(change_type, path_str)

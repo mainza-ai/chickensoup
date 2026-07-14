@@ -92,6 +92,20 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Could not start daily queue rebuild loop: {e}")
 
+    # Deferred reconciliation: process any pages that exist on disk but haven't
+    # been ingested (e.g. restored from git while server was down). Runs in a
+    # thread executor to avoid blocking the event loop during O(n) cross-ref scan.
+    # Skipped in test environments to avoid background threads interfering with
+    # mock state and causing test hangs.
+    if settings.WIKI_RECONCILE_ON_STARTUP and not os.environ.get("PYTEST_VERSION"):
+        try:
+            from src.wiki.watcher import reconcile_existing_pages
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, reconcile_existing_pages)
+            logger.info("Wiki reconciliation dispatched to thread executor")
+        except Exception as e:
+            logger.warning(f"Could not start wiki reconciliation: {e}")
+
     # Sync the staleness queue with the filesystem at startup
     try:
         from src.staleness_queue import rebuild_queue

@@ -91,6 +91,10 @@ class Settings(BaseSettings):
     FREE_TIER_ENABLED: bool = True
     IDLE_THRESHOLD_MINUTES: int = 5
     LAST30DAYS_PULSE_TIMEOUT_SECONDS: int = 60
+
+    # Wiki reconciliation at startup: ingests existing pages into Neo4j/queue.
+    # Disable in tests to avoid background threads interfering with mock state.
+    WIKI_RECONCILE_ON_STARTUP: bool = True
     LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
     LAST30DAYS_PULSE_ENABLED: bool = False
 

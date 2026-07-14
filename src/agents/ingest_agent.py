@@ -105,6 +105,8 @@ Rules:
         if llm_response:
             try:
                 data = json.loads(llm_response)
+                if isinstance(data, list):
+                    data = {"suggested_pages": data, "confidence": 0.5}
                 pages = []
                 for p in data.get("suggested_pages", []):
                     pages.append(SuggestedPage(
@@ -154,12 +156,29 @@ Rules:
         )
 
     def classify_page_type(self, title: str, summary: str, tags: List[str]) -> str:
+        lower_tags = [t.lower() for t in tags]
         lower_title = title.lower()
         lower_summary = summary.lower()
-        all_text = " ".join(t.lower() for t in tags) + " " + lower_title + " " + lower_summary
-        if any(w in all_text for w in ["person", "people", "place", "location", "object", "craft", "event"]):
+
+        # Tag-based classification (most reliable)
+        entity_tags = {"person", "people", "place", "location", "object", "craft",
+                       "event", "whistleblower", "witness", "incident", "crash",
+                       "sighting", "artifact", "device", "material"}
+        if any(t in entity_tags for t in lower_tags):
             return "entities"
-        if any(w in all_text for w in ["project", "engineering", "architecture", "implementation"]):
+
+        project_tags = {"project", "program", "experiment", "mission", "operation"}
+        if any(t in project_tags for t in lower_tags):
+            return "projects"
+
+        # Fallback to summary + title keyword matching (less reliable)
+        # Only match whole words to avoid substring false positives
+        all_text = " " + " ".join(lower_tags) + " " + lower_title + " " + lower_summary + " "
+        entity_keywords = ["person", "people", "place", "location", "object", "craft", "event"]
+        if any(f" {w} " in all_text for w in entity_keywords):
+            return "entities"
+        project_keywords = ["project", "engineering", "architecture", "implementation"]
+        if any(f" {w} " in all_text for w in project_keywords):
             return "projects"
         return "concepts"
 
