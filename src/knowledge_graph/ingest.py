@@ -8,6 +8,7 @@ from src.knowledge_graph.connection import neo4j_conn
 from src.cache import cache_store, cache_decorator
 from src.config import settings
 from src.wiki.cleanup import ENGINEERING_TAGS, CONTENT_TAGS
+from src.progress_tracker import increment as progress_inc
 
 logger = logging.getLogger("chickensoup.neo4j.ingest")
 
@@ -367,4 +368,6 @@ def ingest_wiki_page(
             session.run(rel_query, name=node_name, target_name=target_name)
             rels_count += 1
 
+    progress_inc("neo4j", "nodes", nodes_count)
+    progress_inc("neo4j", "relationships", rels_count)
     return nodes_count, rels_count

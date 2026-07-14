@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import time
+from datetime import datetime, timezone
 from typing import Set
 
 from src.config import settings
@@ -11,6 +12,7 @@ from src.reconciliation_gate import (
     clear_reconciliation_stop,
 )
 from src.idle_sentinel import IdleSentinel
+from src.progress_tracker import update as progress_update, increment as progress_inc
 
 logger = logging.getLogger("chickensoup.wiki.watcher")
 
@@ -223,31 +225,53 @@ def reconcile_existing_pages():
     try:
         watched_dirs = _wiki_dirs()
         existing_dirs = [d for d in watched_dirs if os.path.isdir(d)]
-        logger.info("Reconciliation: scanning existing wiki pages...")
-        count = 0
+        all_pages = []
         for dir_path in existing_dirs:
             subdir = os.path.basename(dir_path)
             for fname in sorted(os.listdir(dir_path)):
-                if not fname.endswith(".md"):
-                    continue
-                slug = os.path.splitext(fname)[0]
+                if fname.endswith(".md"):
+                    all_pages.append((os.path.splitext(fname)[0], subdir))
 
+        total = len(all_pages)
+        logger.info(f"Reconciliation: scanning {total} existing wiki pages...")
+
+        now = datetime.now(timezone.utc).isoformat()
+        progress_update("reconciliation",
+            status="running", current=0, total=str(total),
+            current_slug="", pages_processed="0", errors="0",
+            started_at=now)
+
+        count = 0
+        errors = 0
+        for idx, (slug, subdir) in enumerate(all_pages):
+            if stop_signal_flagged():
+                logger.info("Reconciliation preempted by stop signal")
+                progress_update("reconciliation", status="stopped")
+                return
+
+            while not IdleSentinel.is_idle():
+                time.sleep(1)
                 if stop_signal_flagged():
-                    logger.info("Reconciliation preempted by stop signal")
+                    progress_update("reconciliation", status="stopped")
                     return
 
-                while not IdleSentinel.is_idle():
-                    time.sleep(1)
-                    if stop_signal_flagged():
-                        return
+            try:
+                progress_update("reconciliation", current=str(idx + 1), current_slug=slug)
+                _ingest_page(slug, subdir)
+                count += 1
+                reconciliation_gate.refresh_ttl()
+            except Exception as e:
+                logger.error(f"Reconciliation: failed to process '{slug}': {e}")
+                errors += 1
+                progress_update("reconciliation", errors=str(errors))
 
-                try:
-                    _ingest_page(slug, subdir)
-                    count += 1
-                    reconciliation_gate.refresh_ttl()
-                except Exception as e:
-                    logger.error(f"Reconciliation: failed to process '{slug}': {e}")
-        logger.info(f"Reconciliation complete: {count} pages processed")
+        progress_update("reconciliation",
+            status="complete", current=str(total), total=str(total),
+            pages_processed=str(count), errors=str(errors),
+            completed_at=datetime.now(timezone.utc).isoformat())
+        logger.info(f"Reconciliation complete: {count} pages processed, {errors} errors")
+    finally:
+        reconciliation_gate.release()
     finally:
         reconciliation_gate.release()
 
@@ -273,7 +297,9 @@ async def wiki_watcher_loop():
         return
 
     logger.info(f"Wiki watcher started, watching: {existing_dirs}")
+    progress_update("wiki_watcher", status="watching", events_processed="0")
 
     async for changes in awatch(*existing_dirs):
         for change_type, path_str in changes:
             await _on_file_event(change_type, path_str)
+            progress_inc("wiki_watcher", "events_processed")

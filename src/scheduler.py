@@ -139,11 +139,14 @@ async def periodic_chat_ingest_loop():
                 continue
 
             from src.idle_sentinel import IdleSentinel
+            from src.progress_tracker import update as progress_update
             IdleSentinel.update_activity("chat_ingest", True)
             try:
+                progress_update("chat_ingest", status="running")
                 await process_eligible_conversations()
             finally:
                 IdleSentinel.update_activity("chat_ingest", False)
+                progress_update("chat_ingest", status="idle")
 
             _LAST_RUN = datetime.now(timezone.utc).isoformat()
 
@@ -757,6 +760,7 @@ async def idle_ingestion_loop():
             from src.idle_sentinel import IdleSentinel
             from src.staleness_queue import get_next_batch, record_pulse_completed
             from src.agents.pulse_agent import PulseAgent
+            from src.progress_tracker import update as progress_update, increment as progress_inc
 
             if not IdleSentinel.is_idle():
                 continue
@@ -786,6 +790,7 @@ async def idle_ingestion_loop():
 
             logger.info(f"Idle ingestion loop processing batch: {batch}")
             pulse_agent = PulseAgent()
+            progress_update("idle_ingestion", status="pulsing")
 
             for slug in batch:
                 # Cooperative yielding: check idle state before processing each entity
@@ -817,6 +822,7 @@ async def idle_ingestion_loop():
                         continue
 
                     logger.info(f"Running idle pulse for '{entity_name}'")
+                    progress_update("idle_ingestion", status="pulsing", current_slug=slug)
                     result = pulse_agent.run_pulse(entity_name)
                     
                     # Compute divergence risk & state label if we got evidence
@@ -868,9 +874,16 @@ async def idle_ingestion_loop():
 
                     record_pulse_completed(slug, divergence_risk=div_risk, state_label=state_label)
                     _IDLE_LAST_RUN = datetime.now(timezone.utc).isoformat()
+                    status_label = getattr(result, "status", "unknown") if result else "error"
+                    if status_label == "success":
+                        progress_inc("idle_ingestion", "pulses_success")
+                    else:
+                        progress_inc("idle_ingestion", "pulses_error")
+                    progress_update("idle_ingestion", last_result=status_label, last_run=_IDLE_LAST_RUN)
 
                 except Exception as ent_err:
                     logger.error(f"Error processing entity '{slug}' in idle loop: {ent_err}", exc_info=True)
+                    progress_inc("idle_ingestion", "pulses_error")
 
         except asyncio.CancelledError:
             logger.info("Idle-driven ingestion loop cancelled")
@@ -923,6 +936,7 @@ async def fallback_retry_loop():
 
             from src.idle_sentinel import IdleSentinel
             from src.reconciliation_gate import reconciliation_gate
+            from src.progress_tracker import update as progress_update, increment as progress_inc
 
             if not IdleSentinel.is_idle() or reconciliation_gate.is_busy():
                 continue
@@ -930,9 +944,12 @@ async def fallback_retry_loop():
             if not cache_store.redis_client:
                 continue
 
+            queue_size = cache_store.redis_client.scard("retry:fallback")
             slug = cache_store.redis_client.spop("retry:fallback")
             if not slug:
                 continue
+
+            progress_update("fallback_retry", status="retrying", current_slug=slug, queue_size=str(queue_size))
 
             from src.wiki.writer import read_page
             page_data = read_page(slug)
@@ -969,16 +986,23 @@ async def fallback_retry_loop():
                 _seed_fallback_retry(slug)
 
                 logger.info(f"Fallback retry succeeded for '{slug}'")
+                progress_inc("fallback_retry", "succeeded")
+                progress_update("fallback_retry", status="idle", last_result="success",
+                    last_run=datetime.now(timezone.utc).isoformat())
             else:
                 cache_store.redis_client.sadd("retry:fallback", slug)
                 cache_store.redis_client.expire("retry:fallback", 2592000)
                 logger.debug(f"Fallback retry failed for '{slug}', re-queued")
+                progress_inc("fallback_retry", "failed")
+                progress_update("fallback_retry", status="idle", last_result="failed",
+                    last_run=datetime.now(timezone.utc).isoformat())
 
         except asyncio.CancelledError:
             logger.info("Fallback retry loop cancelled")
             break
         except Exception as e:
             logger.warning(f"Fallback retry loop error: {e}", exc_info=True)
+            progress_update("fallback_retry", status="error", last_error=str(e)[:200])
 
     _FALLBACK_RETRY_RUNNING = False
 

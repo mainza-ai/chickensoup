@@ -12,6 +12,7 @@ from pydantic import BaseModel, ValidationError
 from src.config import settings
 from src.discovery import get_active_model, get_active_base_url, get_active_provider
 from src.llm_circuit_breaker import llm_circuit_breaker
+from src.progress_tracker import increment as progress_inc, update as progress_update
 
 logger = logging.getLogger("chickensoup.llm_client")
 
@@ -110,6 +111,8 @@ class LLMClient:
                         self._llm_calls_total.add(1, {"stage": stage, "status": "success"})
                     except Exception:
                         pass
+                progress_inc("llm_client", "total_calls")
+                progress_inc("llm_client", "success_calls")
                 return result
             except RuntimeError as e:
                 logger.warning(f"LLM circuit breaker open: {e}")
@@ -118,6 +121,9 @@ class LLMClient:
                         self._llm_calls_total.add(1, {"stage": stage, "status": "breaker_open"})
                     except Exception:
                         pass
+                progress_inc("llm_client", "total_calls")
+                progress_inc("llm_client", "failed_calls")
+                progress_update("llm_client", breaker_open="true")
                 return None
             except Exception as e:
                 logger.warning(f"LLM query failed: {e}")
@@ -126,6 +132,8 @@ class LLMClient:
                         self._llm_calls_total.add(1, {"stage": stage, "status": "error"})
                     except Exception:
                         pass
+                progress_inc("llm_client", "total_calls")
+                progress_inc("llm_client", "failed_calls")
                 return None
 
     async def query(

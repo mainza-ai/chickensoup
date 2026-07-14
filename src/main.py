@@ -1544,6 +1544,15 @@ async def get_entities(exclude_fallback: bool = True):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/status/progress")
+async def get_progress():
+    """Returns real-time progress of all background operations
+    (reconciliation, idle ingestion, chat ingest, fallback retry,
+    wiki watcher, LLM engine, knowledge graph counters)."""
+    from src.progress_tracker import get_all
+    return get_all()
+
+
 @app.delete("/entities/{name}", dependencies=[Depends(verify_api_key)])
 async def delete_entity(name: str, hard: bool = True, force: bool = False):
     """Deletes a lore entity. Coordinates with filesystem to delete the matching wiki page if it exists."""
