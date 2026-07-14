@@ -1,9 +1,16 @@
 import asyncio
 import logging
 import os
+import time
 from typing import Set
 
 from src.config import settings
+from src.reconciliation_gate import (
+    reconciliation_gate,
+    stop_signal_flagged,
+    clear_reconciliation_stop,
+)
+from src.idle_sentinel import IdleSentinel
 
 logger = logging.getLogger("chickensoup.wiki.watcher")
 
@@ -182,6 +189,11 @@ async def _on_file_event(change_type: str, path_str: str) -> None:
     slug = os.path.splitext(os.path.basename(path_str))[0]
     subdir = os.path.basename(os.path.dirname(path_str))
     logger.info(f"Watcher: {change_type} page '{slug}' ({subdir})")
+
+    if reconciliation_gate.is_busy():
+        logger.debug(f"Watcher: skipping '{slug}' — reconciliation in progress")
+        return
+
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, _ingest_page, slug, subdir)
 
@@ -192,23 +204,45 @@ def reconcile_existing_pages():
     Handles pages that were added or restored while the server was
     down (e.g. git checkout, rsync). Runs in a thread executor to avoid
     blocking the event loop during the O(n) cross-reference scan and LLM calls.
+
+    Phase 4/9: Acquires ReconciliationGate, yields to user activity via
+    IdleSentinel, and checks a Redis stop signal between pages.
     """
-    watched_dirs = _wiki_dirs()
-    existing_dirs = [d for d in watched_dirs if os.path.isdir(d)]
-    logger.info("Reconciliation: scanning existing wiki pages...")
-    count = 0
-    for dir_path in existing_dirs:
-        subdir = os.path.basename(dir_path)
-        for fname in sorted(os.listdir(dir_path)):
-            if not fname.endswith(".md"):
-                continue
-            slug = os.path.splitext(fname)[0]
-            try:
-                _ingest_page(slug, subdir)
-                count += 1
-            except Exception as e:
-                logger.error(f"Reconciliation: failed to process '{slug}': {e}")
-    logger.info(f"Reconciliation complete: {count} pages processed")
+    if not reconciliation_gate.acquire():
+        logger.info("Reconciliation skipped — already in progress")
+        return
+
+    clear_reconciliation_stop()
+    try:
+        watched_dirs = _wiki_dirs()
+        existing_dirs = [d for d in watched_dirs if os.path.isdir(d)]
+        logger.info("Reconciliation: scanning existing wiki pages...")
+        count = 0
+        for dir_path in existing_dirs:
+            subdir = os.path.basename(dir_path)
+            for fname in sorted(os.listdir(dir_path)):
+                if not fname.endswith(".md"):
+                    continue
+                slug = os.path.splitext(fname)[0]
+
+                if stop_signal_flagged():
+                    logger.info("Reconciliation preempted by stop signal")
+                    return
+
+                while not IdleSentinel.is_idle():
+                    time.sleep(1)
+                    if stop_signal_flagged():
+                        return
+
+                try:
+                    _ingest_page(slug, subdir)
+                    count += 1
+                    reconciliation_gate.refresh_ttl()
+                except Exception as e:
+                    logger.error(f"Reconciliation: failed to process '{slug}': {e}")
+        logger.info(f"Reconciliation complete: {count} pages processed")
+    finally:
+        reconciliation_gate.release()
 
 
 async def wiki_watcher_loop():

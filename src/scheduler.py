@@ -8,6 +8,7 @@ from typing import List, Optional
 
 from src.config import settings
 from src.cache import cache_store
+from src.reconciliation_gate import reconciliation_gate
 
 logger = logging.getLogger("chickensoup.scheduler")
 
@@ -131,6 +132,10 @@ async def periodic_chat_ingest_loop():
             await asyncio.sleep(settings.CHAT_WIKI_CHECK_INTERVAL_SECONDS)
 
             if not settings.CHAT_WIKI_CONVERSION_ENABLED:
+                continue
+
+            if reconciliation_gate.is_busy():
+                logger.debug("Chat ingest skipped — reconciliation in progress")
                 continue
 
             from src.idle_sentinel import IdleSentinel
@@ -731,7 +736,7 @@ def get_recent_notifications(limit: int = 10) -> List[dict]:
 
 _IDLE_INGESTION_RUNNING = False
 _IDLE_LAST_RUN: Optional[str] = None
-_IDLE_CHECK_INTERVAL_SECONDS = 15  # check every 15s
+_IDLE_CHECK_INTERVAL_SECONDS = 30  # check every 30s (Phase 7: reduced polling)
 _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
 _IDLE_LAST_BATCH: Optional[List[str]] = None
 
@@ -756,8 +761,12 @@ async def idle_ingestion_loop():
             if not IdleSentinel.is_idle():
                 continue
 
+            if reconciliation_gate.is_busy():
+                logger.debug("Idle ingestion skipped — reconciliation in progress")
+                continue
+
             # Get highest priority entity slugs
-            batch = get_next_batch(3)
+            batch = get_next_batch(1)  # Phase 7: one pulse at a time when idle
             if not batch:
                 _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
                 _IDLE_LAST_BATCH = None

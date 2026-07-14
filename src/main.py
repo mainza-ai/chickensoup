@@ -1856,6 +1856,25 @@ async def create_wiki_backup_now():
     return {"success": path is not None, "filepath": path}
 
 
+@app.post("/wiki/reconcile-stop", dependencies=[Depends(verify_api_key)])
+async def set_reconciliation_stop():
+    """Sets a stop signal for long-running reconciliation. Reconciliation checks
+    this signal between pages and exits early."""
+    from src.reconciliation_gate import set_reconciliation_stop as _set_stop
+    _set_stop()
+    return {"success": True, "message": "Reconciliation stop signal set"}
+
+
+@app.post("/wiki/reconcile")
+async def trigger_reconciliation():
+    """Triggers reconciliation of all wiki pages. Safe to call even if
+    reconciliation is already running — returns immediately if busy."""
+    loop = asyncio.get_event_loop()
+    from src.wiki.watcher import reconcile_existing_pages
+    loop.run_in_executor(None, reconcile_existing_pages)
+    return {"success": True, "message": "Reconciliation dispatched to background thread"}
+
+
 @app.get("/wiki/pages", response_model=WikiPageListResponse)
 async def get_wiki_pages(page_type: Optional[str] = None):
     """Lists all wiki pages with frontmatter metadata. Optionally filter by page_type."""
