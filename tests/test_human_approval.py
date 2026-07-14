@@ -6,6 +6,7 @@ and the POST /research/{thread_id}/approve endpoint.
 Tests use TestClient so MemorySaver state is shared between test and handler.
 """
 import time
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -98,7 +99,8 @@ class TestApproveEndpoint:
         )
         return result
 
-    def test_approve_completes_paused_research(self, client):
+    @patch.object(ResearchAgent, '_generate_summary', return_value="Mocked summary for Area 51 evidence.")
+    def test_approve_completes_paused_research(self, mock_summary, client):
         thread_id = _gen_thread_id()
         paused = self._seed_paused_state(thread_id)
         assert paused.get("human_approval_required") is True
@@ -123,7 +125,6 @@ class TestApproveEndpoint:
 
     def test_approve_endpoint_rejects_non_paused_thread(self, client):
         thread_id = _gen_thread_id()
-        # Create a completed research run (no force approval)
         agent = ResearchAgent()
         agent.run_research(
             query="Area 51",
@@ -136,10 +137,10 @@ class TestApproveEndpoint:
             f"/research/{thread_id}/approve",
             headers={"X-Api-Key": "dev"},
         )
-        # A completed (non-paused) thread should return 400
         assert response.status_code == 400
 
-    def test_approve_resume_generates_summary(self, client):
+    @patch.object(ResearchAgent, '_generate_summary', return_value="Mocked summary with evidence for Area 51 research.")
+    def test_approve_resume_generates_summary(self, mock_summary, client):
         thread_id = _gen_thread_id()
         paused = self._seed_paused_state(thread_id)
         assert paused.get("human_approval_required") is True
@@ -154,7 +155,8 @@ class TestApproveEndpoint:
         summary = data.get("summary", "")
         assert len(summary) > 10
 
-    def test_approve_returns_entities(self, client):
+    @patch.object(ResearchAgent, '_generate_summary', return_value="Mocked summary with entities.")
+    def test_approve_returns_entities(self, mock_summary, client):
         thread_id = _gen_thread_id()
         self._seed_paused_state(thread_id)
 
