@@ -31,20 +31,27 @@ def _wiki_dirs() -> Set[str]:
     }
 
 
-def _run_llm_entity_extraction(slug: str, title: str, subdir: str, body: str) -> None:
+def _run_llm_entity_extraction(slug: str, title: str, subdir: str, body: str, tags: list = None) -> None:
     """Run LLM-powered entity extraction on page body to discover sub-entities.
 
     Passes the page body through IngestAgent.analyze_content so the LLM can
     identify entities, concepts, or projects mentioned in the text that don't
     yet have their own wiki page. New sub-pages are created, cross-referenced,
-    and ingested to Neo4j through the full pipeline (including LLM edge
-    classification).
+    and ingested to Neo4j through the full pipeline.
 
-    Skips entity extraction for pages that were themselves created by this
-    function to prevent recursive processing loops.
+    Skips entity extraction for:
+      - Pages that were themselves created by this function (recursion guard)
+      - Engineering-only pages (no content tags)
     """
     if slug in _WATCHER_CREATED:
         logger.debug(f"Skipping LLM entity extraction for watcher-created page '{slug}'")
+        return
+
+    # P3: Skip LLM extraction for engineering-only pages
+    from src.wiki.cleanup import ENGINEERING_TAGS, CONTENT_TAGS
+    tag_set = set(str(t).lower() for t in (tags or []))
+    if bool(tag_set & ENGINEERING_TAGS) and not bool(tag_set & CONTENT_TAGS):
+        logger.debug(f"Skipping LLM extraction for engineering-only page '{slug}'")
         return
 
     from src.agents.ingest_agent import IngestAgent
@@ -149,7 +156,7 @@ def _ingest_page(slug: str, subdir: str) -> None:
     body = page_data.get("body", "")
     full_content = f"---\ntitle: {title}\ntags: {tags}\nsources: {sources}\nrelated: {related}\n---\n\n{body}"
 
-    _run_llm_entity_extraction(slug, title, subdir, body)
+    _run_llm_entity_extraction(slug, title, subdir, body, tags=tags)
 
     try:
         cross_reference_new_page(slug, title, subdir)

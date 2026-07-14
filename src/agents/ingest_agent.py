@@ -111,7 +111,7 @@ Rules:
                 SuggestedPage(
                     title=page_title,
                     page_type="entities",
-                    tags=["uploaded", "document"],
+                    tags=["uploaded", "document", "fallback"],
                     sources=[filename or "uploaded-document"],
                     summary=f"Auto-extracted from uploaded file: {filename or 'unknown'}",
                     related=lookup_entity(page_title),
