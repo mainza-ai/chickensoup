@@ -153,7 +153,7 @@ def test_pulse_budget_exceeded_refused_and_logged():
     try:
         with patch("src.agents.pulse_agent.ResourceLedger", mock_tracker), \
              patch("src.wiki.writer.append_to_log") as mock_log, \
-             patch("src.agents.pulse_agent.subprocess.run") as mock_run:
+             patch("src.agents.pulse_agent.subprocess.Popen") as mock_popen:
 
             agent = PulseAgent()
             result = agent.run_pulse("Bob Lazar")
@@ -162,8 +162,8 @@ def test_pulse_budget_exceeded_refused_and_logged():
             assert result.evidence == []
             assert "budget" in result.error.lower() or "ceiling" in result.error.lower()
 
-            # Subprocess must NOT have been called
-            assert not mock_run.called
+            # Popen must NOT have been called
+            assert not mock_popen.called
 
             # Log was attempted
             assert mock_log.called

@@ -54,7 +54,7 @@ def test_pulse_agent_semantic_disambiguation():
             ]
         })
 
-        with patch("subprocess.run") as mock_run, \
+        with patch("src.agents.pulse_agent.subprocess.Popen") as mock_popen, \
              patch("src.agents.pulse_agent.ResourceLedger") as mock_ledger, \
              patch("src.wiki.writer.read_page") as mock_read, \
              patch("src.agents.pulse_agent.write_pulse_snapshot") as mock_write:
@@ -73,7 +73,9 @@ def test_pulse_agent_semantic_disambiguation():
             mock_status.paid_remaining = 19.5
             mock_ledger.get_status.return_value = mock_status
             mock_ledger.check_budget.return_value = (True, 19.5, "ok")
-            mock_run.return_value = MagicMock(returncode=0, stdout=raw_output, stderr="")
+            mock_proc = MagicMock(returncode=0)
+            mock_proc.communicate.return_value = (raw_output, "")
+            mock_popen.return_value = mock_proc
 
             result = agent.run_pulse("Bob Lazar")
 
