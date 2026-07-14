@@ -90,6 +90,10 @@ class TestMultiEntityExtraction:
 # P0-2: Malformed path parameter validation
 # ---------------------------------------------------------------------------
 
+@pytest.mark.skipif(
+    not _is_live_server_available(),
+    reason="Live server not available",
+)
 class TestPathParameterValidation:
     """Malformed entity names in path parameters must return 422, not 200."""
 

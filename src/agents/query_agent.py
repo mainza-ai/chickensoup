@@ -297,7 +297,7 @@ class QueryAgent:
         if wiki_matches:
             entities = wiki_matches
         else:
-            if query:
+            if query and query.strip():
                 words = query.split()
                 grouped = []
                 current = []
