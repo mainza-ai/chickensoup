@@ -7,10 +7,10 @@ from langgraph.graph import StateGraph, END
 
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.queries import search_entities, get_entity_neighborhood
-from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
+from src.discovery import get_discovered, get_active_provider
+from src.llm_client import llm_client
 from src.config import settings
 from src.cache import cache_decorator
-import urllib.request
 import json
 import yaml
 
@@ -503,10 +503,7 @@ class ResearchAgent:
     def _generate_summary(self, query: str, context: str, history: List[Dict[str, str]] = None) -> str:
         if get_active_provider() == "simulated":
             return f"Lore Summary: Detailed report matches query '{query}'."
-            
-        url = f"{get_active_base_url()}/chat/completions"
-        model_name = get_active_model()
-        
+
         prompt = f"""
         Analyze the following research context and answer the user query: "{query}"
 
@@ -515,7 +512,7 @@ class ResearchAgent:
 
         Synthesize a clean summary including references to specific entities, credibility values, and connections.
         """
-        
+
         messages = [
             {"role": "system", "content": "You are a helpful researcher summarizing UFO/anomalous lore."}
         ]
@@ -527,24 +524,12 @@ class ResearchAgent:
                     messages.append({"role": role, "content": content})
         messages.append({"role": "user", "content": prompt})
 
-        payload = {
-            "model": model_name,
-            "messages": messages,
-            "temperature": 0.3
-        }
-        
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
-            )
-            with urllib.request.urlopen(req, timeout=30.0) as response:
-                if response.status == 200:
-                    res_data = json.loads(response.read().decode("utf-8"))
-                    content = res_data["choices"][0]["message"]["content"]
-                    return content
-        except Exception as e:
-            logger.warning(f"Failed to generate summary via LLM: {e}")
+        result = llm_client.query_sync(
+            prompt="",
+            messages=messages,
+            priority="high",
+            temperature=0.3,
+        )
+        if result:
+            return result
         return f"Lore Summary: Found relevant context matches. {query}"

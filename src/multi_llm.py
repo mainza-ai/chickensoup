@@ -1,11 +1,8 @@
 import logging
 import asyncio
-import json
-import urllib.request
-import urllib.error
 from typing import List, Dict, Any, Tuple
 from src.discovery import get_discovered, get_active_model, get_active_provider
-from src.cache import cache_decorator
+from src.llm_client import llm_client
 
 logger = logging.getLogger("chickensoup.multi_llm")
 
@@ -51,29 +48,15 @@ class MultiLLMConsensus:
         return await loop.run_in_executor(None, self._query_model_sync, model, prompt, system_instruction)
 
     def _query_model_sync(self, model: str, prompt: str, system_instruction: str) -> Tuple[str, str]:
-        url = f"{self.base_url}/chat/completions"
-        payload = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_instruction},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.5
-        }
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
-            )
-            with urllib.request.urlopen(req, timeout=90.0) as response:
-                if response.status == 200:
-                    data = json.loads(response.read().decode("utf-8"))
-                    content = data["choices"][0]["message"]["content"]
-                    return model, content
-        except Exception as e:
-            logger.warning(f"Error querying model {model} on {self.provider}: {e}")
+        content = llm_client.query_sync(
+            prompt=prompt,
+            system=system_instruction,
+            priority="high",
+            temperature=0.5,
+            model=model,
+        )
+        if content:
+            return model, content
         return model, ""
 
     def _calculate_consensus(self, responses: List[Tuple[str, str]]) -> Dict[str, Any]:

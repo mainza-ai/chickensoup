@@ -1,6 +1,6 @@
 import json
 import logging
-import urllib.request
+import re
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
@@ -8,7 +8,8 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from typing_extensions import TypedDict
 
-from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
+from src.llm_client import llm_client
+from src.discovery import get_discovered, get_active_provider
 from src.models import ClaimEvidence
 from src.config import settings
 from src.observability import tribunal_runs_total
@@ -86,35 +87,15 @@ class TribunalAgent:
         if get_active_provider() == "simulated":
             return f"{role_label} position (simulated): Analysed claim with {len(user_prompt)} chars of context.", []
 
-        url = f"{get_active_base_url()}/chat/completions"
-        model_name = get_active_model()
-
-        payload = {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": 0.4,
-        }
-
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=45.0) as response:
-                if response.status == 200:
-                    res_data = json.loads(response.read().decode("utf-8"))
-                    content = res_data["choices"][0]["message"]["content"]
-                    # Extract citations via URL patterns
-                    import re
-                    urls = re.findall(r"https?://[^\s\)\]]+", content)
-                    return content, urls
-        except Exception as e:
-            logger.warning(f"Tribunal {role_label} LLM query failed: {e}")
+        content = llm_client.query_sync(
+            prompt=user_prompt,
+            system=system_prompt,
+            priority="high",
+            temperature=0.4,
+        )
+        if content:
+            urls = re.findall(r"https?://[^\s\)\]]+", content)
+            return content, urls
 
         return f"{role_label} position fallback: insufficient evidence evaluated.", []
 

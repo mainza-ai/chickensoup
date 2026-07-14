@@ -3,9 +3,8 @@ import re
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from pydantic import BaseModel, Field
-from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
-import urllib.request
-import urllib.parse
+from src.discovery import get_discovered
+from src.llm_client import llm_client
 import json
 
 logger = logging.getLogger("chickensoup.agents.query_agent")
@@ -169,45 +168,14 @@ class QueryAgent:
 
     @cache_decorator(prefix="llm", ttl=300)
     def _query_local_llm(self, prompt: str) -> Optional[str]:
-        if get_active_provider() == "simulated":
-            return None
-        
-        url = f"{get_active_base_url()}/chat/completions"
-        model_name = get_active_model()
-        
-        payload = {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": "You are a precise classifier. Return ONLY valid JSON and nothing else."},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"}
-        }
-        
-        def _do_request():
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
-            )
-            with urllib.request.urlopen(req, timeout=15.0) as response:
-                if response.status == 200:
-                    res_data = json.loads(response.read().decode("utf-8"))
-                    content = res_data["choices"][0]["message"]["content"]
-                    return content
-            return None
-        
-        try:
-            from src.llm_circuit_breaker import llm_circuit_breaker
-            return llm_circuit_breaker.call(_do_request)
-        except RuntimeError as cb_error:
-            logger.warning(f"LLM circuit breaker open: {cb_error}")
-            return None
-        except Exception as e:
-            logger.warning(f"Failed to fetch classification from local LLM: {e}")
-        return None
+        return llm_client.query_sync(
+            prompt=prompt,
+            system="You are a precise classifier. Return ONLY valid JSON and nothing else.",
+            priority="high",
+            response_format="json_object",
+            temperature=0.1,
+            timeout=30.0,
+        )
 
     def classify_and_parse(self, query: str, history: List[Dict[str, str]] = None) -> ParsedQuery:
         """

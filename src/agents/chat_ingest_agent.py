@@ -1,10 +1,9 @@
 import json
 import logging
-import urllib.request
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 
-from src.discovery import get_active_model, get_active_base_url, get_active_provider
+from src.llm_client import llm_client
 from src.config import settings
 from src.wiki.writer import build_index, lookup_entity, slugify
 
@@ -14,33 +13,13 @@ logger = logging.getLogger("chickensoup.agents.chat_ingest_agent")
 class ChatIngestAgent:
 
     def _query_llm(self, prompt: str, system: str = "You are a precise conversation analyst.") -> Optional[str]:
-        if get_active_provider() == "simulated":
-            return None
-        url = f"{get_active_base_url()}/chat/completions"
-        model_name = get_active_model()
-        payload = {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"},
-        }
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=30.0) as response:
-                if response.status == 200:
-                    res_data = json.loads(response.read().decode("utf-8"))
-                    return res_data["choices"][0]["message"]["content"]
-        except Exception as e:
-            logger.warning(f"Chat ingest LLM query failed: {e}")
-        return None
+        return llm_client.query_sync(
+            prompt=prompt,
+            system=system,
+            priority="low",
+            response_format="json_object",
+            temperature=0.1,
+        )
 
     async def analyze_conversation(
         self,

@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     ORCHESTRATOR_TIMEOUT_SECONDS: int = 120
 
     # Concurrency and rate limiting
-    MAX_CONCURRENT_LLM_REQUESTS: int = 10
+    MAX_CONCURRENT_LLM_REQUESTS: int = 4  # 2 high priority + 2 low priority
     REQUEST_RATE_LIMIT_PER_MINUTE: int = 20
     REQUEST_RATE_LIMIT_BURST: int = 5
     REQUEST_MAX_BODY_BYTES: int = 1_048_576  # 1 MB default
@@ -73,14 +73,20 @@ class Settings(BaseSettings):
 
     # LLM circuit breaker
     LLM_CIRCUIT_BREAKER_THRESHOLD: int = 5
-    LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 60
+    LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 120  # local LLM restart takes time
 
-    # LLM edge classification (knowledge graph ingest)
-    # Number of retries with exponential backoff before falling back to heuristics.
-    # Each retry doubles the base timeout. A value of 3 means attempts at
-    # 30s, 60s, 120s (total max wait ~210s per classification).
-    LLM_EDGE_CLASSIFICATION_TIMEOUT: int = 30
-    LLM_EDGE_CLASSIFICATION_MAX_RETRIES: int = 3
+    # LLM client (shared across all call sites)
+    LLM_CLIENT_TIMEOUT: float = 120.0  # local LLMs (e.g. Qwen3.6-35B) are slow
+    LLM_CLIENT_MAX_TOKENS: int = 2048
+    LLM_CLIENT_HIGH_PRIORITY_CONCURRENCY: int = 2
+    LLM_CLIENT_LOW_PRIORITY_CONCURRENCY: int = 2
+
+    # LLM edge classification (knowledge graph ingest) — DEPRECATED
+    # The LLM path has been removed (Phase 3). Edge classification is now
+    # handled exclusively by heuristics. These settings remain for backward
+    # compatibility but are no longer used by any code path.
+    LLM_EDGE_CLASSIFICATION_TIMEOUT: int = 0
+    LLM_EDGE_CLASSIFICATION_MAX_RETRIES: int = 0
 
     # Living Almanac / last30days integration
     LAST30DAYS_ENABLED: bool = False

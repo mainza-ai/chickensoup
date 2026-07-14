@@ -1,14 +1,10 @@
 import os
 import re
 import logging
-import time
 import yaml
-import json
-import urllib.request
 from typing import Dict, List, Any, Tuple, Optional
 from neo4j import Driver
 from src.knowledge_graph.connection import neo4j_conn
-from src.discovery import discover_active_provider
 from src.cache import cache_decorator
 from src.config import settings
 
@@ -172,19 +168,18 @@ def infer_node_label(name: str) -> str:
 @cache_decorator(prefix="llm", ttl=3600)
 def _query_llm_for_edge_type(source: str, source_label: str, target: str, target_label: str, body: str) -> Tuple[str, bool]:
     """
-    Probes the active LLM (or heuristics) to determine the best relationship type.
+    Classify relationship type using pure heuristics (no LLM).
     Returns (relationship_type, should_reverse_direction).
 
-    Retries with exponential backoff on timeout/network errors before falling
-    back to heuristics. The timeout and retry count are controlled by:
-      settings.LLM_EDGE_CLASSIFICATION_TIMEOUT
-      settings.LLM_EDGE_CLASSIFICATION_MAX_RETRIES
+    The LLM path was removed because:
+      - It made N sequential calls per page (up to 35 min per page)
+      - 5+ out-of-schema types were returned, defaulted to REFERENCES anyway
+      - Heuristics already cover 17+ keyword patterns with equivalent accuracy
     """
     reverse = False
     s_label = source_label
     t_label = target_label
 
-    # If the target-to-source fits a schema matrix entry, swap for semantic analysis and reverse later
     if (t_label, s_label) in SCHEMA_RELATIONSHIPS and (s_label, t_label) not in SCHEMA_RELATIONSHIPS:
         s_label, t_label = t_label, s_label
         source, target = target, source
@@ -195,83 +190,6 @@ def _query_llm_for_edge_type(source: str, source_label: str, target: str, target
     valid_options = options["valid"]
     default_option = options["default"]
 
-    provider, base_url, models = discover_active_provider()
-    use_llm = provider != "simulated" and bool(models)
-    if not use_llm:
-        return _fallback_heuristic_edge_type(source, source_label, target, target_label, body, valid_options, default_option)
-
-    url = f"{base_url}/chat/completions"
-    options_str = "\n".join([f"- {opt}" for opt in valid_options])
-    prompt = f"""
-You are an expert knowledge graph schema engineer. Given the source node, its label, the target node, its label, and the context, determine the single most appropriate relationship type between them.
-
-Permitted Options for a connection from {s_label} to {t_label}:
-{options_str}
-
-Source Name: "{source}" (Label: {s_label})
-Target Name: "{target}" (Label: {t_label})
-Context:
-{body[:500]}
-
-Return ONLY a JSON object:
-{{
-    "relationship": "<One of the permitted options listed above>"
-}}
-"""
-    payload = {
-        "model": models[0],
-        "messages": [
-            {"role": "system", "content": "You are a precise JSON classifier."},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.1,
-        "response_format": {"type": "json_object"}
-    }
-
-    last_exc = None
-    timeout = settings.LLM_EDGE_CLASSIFICATION_TIMEOUT
-    max_retries = settings.LLM_EDGE_CLASSIFICATION_MAX_RETRIES
-
-    for attempt in range(1, max_retries + 1):
-        try:
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
-            )
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                if response.status == 200:
-                    res_data = json.loads(response.read().decode("utf-8"))
-                    content = res_data["choices"][0]["message"]["content"]
-                    result = json.loads(content)
-                    rel = result.get("relationship", default_option)
-                    if rel in valid_options:
-                        return rel, reverse
-                    logger.warning(
-                        "LLM returned out-of-schema relationship '%s' for %s -> %s; using default '%s'",
-                        rel, source, target, default_option
-                    )
-                    return default_option, reverse
-        except Exception as e:
-            last_exc = e
-            logger.warning(
-                "LLM edge classification attempt %d/%d failed for %s -> %s: %s",
-                attempt, max_retries, source, target, e
-            )
-
-        if attempt < max_retries:
-            backoff = timeout * (2 ** (attempt - 1))
-            logger.info(
-                "Retrying LLM edge classification for %s -> %s in %ds (attempt %d/%d)",
-                source, target, backoff, attempt + 1, max_retries
-            )
-            time.sleep(backoff)
-
-    logger.error(
-        "LLM edge classification exhausted %d retries for %s -> %s; falling back to heuristics. Last error: %s",
-        max_retries, source, target, last_exc
-    )
     return _fallback_heuristic_edge_type(source, source_label, target, target_label, body, valid_options, default_option)
 
 

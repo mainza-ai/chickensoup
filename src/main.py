@@ -259,37 +259,16 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
 
 
 class ConcurrencySemaphoreMiddleware(BaseHTTPMiddleware):
-    """Limit concurrent in-flight LLM requests to prevent saturation.
-    Returns 503 when at capacity instead of queuing."""
-
-    def __init__(self, app, max_concurrent: int = None):
-        super().__init__(app)
-        self.max_concurrent = max_concurrent or settings.MAX_CONCURRENT_LLM_REQUESTS
-        self._semaphore = asyncio.Semaphore(self.max_concurrent)
+    """Deprecated: LLM concurrency is now managed by LLMClient's priority
+    semaphore system (2 high + 2 low). This middleware is kept as a passthrough
+    for backward compatibility but does no gating."""
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        path = request.url.path
-        if path.startswith(("/query", "/consensus/query", "/ingest", "/navigate")):
-            if not hasattr(request.state, "skip_concurrency_limit"):
-                if not self._semaphore.locked():
-                    async with self._semaphore:
-                        response = await call_next(request)
-                        return response
-                return Response(
-                    content=json.dumps({
-                        "detail": "Server at capacity. Try again later.",
-                        "retry_after": 30,
-                    }),
-                    media_type="application/json",
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    headers={"Retry-After": "30"},
-                )
         return await call_next(request)
 
 
 app.add_middleware(RequestSizeLimitMiddleware)
 app.add_middleware(RequestIdMiddleware)
-app.add_middleware(ConcurrencySemaphoreMiddleware)
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
