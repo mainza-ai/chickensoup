@@ -291,8 +291,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if not settings.RATE_LIMITING_ENABLED:
             return await call_next(request)
         
-        # Skip rate limiting for health checks and static files
-        if request.url.path in ("/health", "/status"):
+        # Skip rate limiting for health checks, status, and static files
+        if request.url.path in ("/health", "/status", "/status/progress"):
             return await call_next(request)
 
         # Per-IP check
