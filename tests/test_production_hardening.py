@@ -91,7 +91,7 @@ class TestMultiEntityExtraction:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(
-    not _is_live_server_available(),
+    "not _is_live_server_available()",
     reason="Live server not available",
 )
 class TestPathParameterValidation:
