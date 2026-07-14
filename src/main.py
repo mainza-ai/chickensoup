@@ -92,6 +92,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Could not start daily queue rebuild loop: {e}")
 
+    try:
+        from src.scheduler import fallback_retry_loop
+        asyncio.create_task(fallback_retry_loop())
+        logger.info("Fallback retry loop started")
+    except Exception as e:
+        logger.warning(f"Could not start fallback retry loop: {e}")
+
     # Deferred reconciliation: process any pages that exist on disk but haven't
     # been ingested (e.g. restored from git while server was down). Runs in a
     # thread executor to avoid blocking the event loop during O(n) cross-ref scan.
@@ -1489,14 +1496,17 @@ def reconcile_neo4j_with_wiki(driver):
 
 
 @app.get("/entities")
-async def get_entities():
-    """Retrieves all Lore Entities from the Neo4j database."""
+async def get_entities(exclude_fallback: bool = True):
+    """Retrieves all Lore Entities from the Neo4j database.
+    When exclude_fallback=True (default), low-quality fallback pages are hidden."""
     import uuid
     driver = neo4j_conn.get_driver()
     if driver:
         reconcile_neo4j_with_wiki(driver)
-    query = """
+    fallback_filter = "WHERE (n.fallback IS NULL OR n.fallback <> true)" if exclude_fallback else ""
+    query = f"""
     MATCH (n:Entity)
+    {fallback_filter}
     RETURN n
     """
     entities = []

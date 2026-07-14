@@ -6,11 +6,16 @@ from src.cache import cache_decorator
 logger = logging.getLogger("chickensoup.neo4j.queries")
 
 @cache_decorator(prefix="neo4j", ttl=300)
-def get_entity_neighborhood(driver: Driver, entity_name: str) -> Dict[str, Any]:
+def get_entity_neighborhood(driver: Driver, entity_name: str, exclude_fallback: bool = True) -> Dict[str, Any]:
     """
     Retrieves an entity and all its directly connected neighbors and relationships.
+    When exclude_fallback=True, fallback-tagged neighbors are excluded from results.
     """
-    query = """
+    match_clause = "OPTIONAL MATCH (n)-[r]-(m:Entity)"
+    if exclude_fallback:
+        match_clause += "\nWHERE (m.fallback IS NULL OR m.fallback <> true)"
+
+    query = f"""
     MATCH (n:Entity)
     WHERE toLower(n.name) = toLower($name)
        OR replace(toLower(n.name), ' ', '-') = replace(toLower($name), ' ', '-')
@@ -18,7 +23,7 @@ def get_entity_neighborhood(driver: Driver, entity_name: str) -> Dict[str, Any]:
        OR replace(toLower(n.name), ' ', '-') CONTAINS replace(toLower($name), ' ', '-')
        OR replace(toLower($name), ' ', '-') CONTAINS replace(toLower(n.name), ' ', '-')
     WITH n LIMIT 1
-    OPTIONAL MATCH (n)-[r]-(m:Entity)
+    {match_clause}
     RETURN n, collect(r) as relationships, collect(m) as neighbors
     """
     
@@ -52,13 +57,15 @@ def get_entity_neighborhood(driver: Driver, entity_name: str) -> Dict[str, Any]:
         }
 
 @cache_decorator(prefix="neo4j", ttl=300)
-def search_entities(driver: Driver, search_term: str) -> List[Dict[str, Any]]:
+def search_entities(driver: Driver, search_term: str, exclude_fallback: bool = True) -> List[Dict[str, Any]]:
     """
-    Performs a fuzzy search on entity names.
+    Performs a fuzzy search on entity names, optionally excluding fallback-tagged nodes.
     """
-    query = """
+    where_clause = "(n.fallback IS NULL OR n.fallback <> true)" if exclude_fallback else "true"
+    query = f"""
     MATCH (n:Entity)
-    WHERE n.name CONTAINS $term OR n.content_preview CONTAINS $term
+    WHERE (n.name CONTAINS $term OR n.content_preview CONTAINS $term)
+      AND {where_clause}
     RETURN n LIMIT 15
     """
     results = []

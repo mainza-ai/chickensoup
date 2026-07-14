@@ -905,7 +905,86 @@ def get_almanac_status() -> dict:
     }
 
 
+_FALLBACK_RETRY_RUNNING = False
+
+
+async def fallback_retry_loop():
+    """Periodically retry LLM extraction for fallback-tagged pages.
+    Pops one slug per cycle from the Redis retry queue, re-runs entity
+    extraction via the LLM. On success, updates the Neo4j node to clear
+    the fallback flag. Runs only when the system is idle."""
+    global _FALLBACK_RETRY_RUNNING
+    _FALLBACK_RETRY_RUNNING = True
+    logger.info("Fallback retry loop started (1h interval)")
+
+    while _FALLBACK_RETRY_RUNNING:
+        try:
+            await asyncio.sleep(3600)
+
+            from src.idle_sentinel import IdleSentinel
+            from src.reconciliation_gate import reconciliation_gate
+
+            if not IdleSentinel.is_idle() or reconciliation_gate.is_busy():
+                continue
+
+            if not cache_store.redis_client:
+                continue
+
+            slug = cache_store.redis_client.spop("retry:fallback")
+            if not slug:
+                continue
+
+            from src.wiki.writer import read_page
+            page_data = read_page(slug)
+            if not page_data or "frontmatter" not in page_data:
+                continue
+
+            title = page_data["frontmatter"].get("title", slug)
+            body = page_data.get("body", "")
+
+            from src.agents.ingest_agent import IngestAgent
+            from src.knowledge_graph.connection import neo4j_conn
+            from src.knowledge_graph.ingest import ingest_wiki_page
+
+            agent = IngestAgent()
+            analysis = agent.analyze_content(body, filename=f"{slug}.md")
+
+            if analysis and analysis.confidence >= 0.5:
+                sources = page_data["frontmatter"].get("sources", [])
+                tags = page_data["frontmatter"].get("tags", [])
+                tags = [t for t in tags if t != "fallback"]
+                related = page_data["frontmatter"].get("related", [])
+
+                from src.wiki.writer import write_page
+                from src.knowledge_graph.ingest import _seed_fallback_retry
+                analysis_result = analysis.model_dump() if hasattr(analysis, "model_dump") else analysis
+                body = analysis_result.get("body", body)
+                write_page(title=title, body=body, tags=tags, sources=sources, related=related, page_type=page_data.get("page_type", "entities"))
+
+                content = f"---\ntitle: {title}\ntags: {tags}\nsources: {sources}\nrelated: {related}\n---\n\n{body}"
+                driver = neo4j_conn.get_driver()
+                if driver:
+                    ingest_wiki_page(driver, title=title, content=content, default_tags=tags, default_sources=sources)
+
+                _seed_fallback_retry(slug)
+
+                logger.info(f"Fallback retry succeeded for '{slug}'")
+            else:
+                cache_store.redis_client.sadd("retry:fallback", slug)
+                cache_store.redis_client.expire("retry:fallback", 2592000)
+                logger.debug(f"Fallback retry failed for '{slug}', re-queued")
+
+        except asyncio.CancelledError:
+            logger.info("Fallback retry loop cancelled")
+            break
+        except Exception as e:
+            logger.warning(f"Fallback retry loop error: {e}", exc_info=True)
+
+    _FALLBACK_RETRY_RUNNING = False
+
+
 def stop():
-    global _RUNNING, _IDLE_INGESTION_RUNNING
+    global _RUNNING, _IDLE_INGESTION_RUNNING, _FALLBACK_RETRY_RUNNING
     _RUNNING = False
     _IDLE_INGESTION_RUNNING = False
+    _FALLBACK_RETRY_RUNNING = False

@@ -5,7 +5,7 @@ import yaml
 from typing import Dict, List, Any, Tuple, Optional
 from neo4j import Driver
 from src.knowledge_graph.connection import neo4j_conn
-from src.cache import cache_decorator
+from src.cache import cache_store, cache_decorator
 from src.config import settings
 from src.wiki.cleanup import ENGINEERING_TAGS, CONTENT_TAGS
 
@@ -178,6 +178,16 @@ def _is_engineering_only(tags: List[str]) -> bool:
     has_content = bool(tag_set & CONTENT_TAGS)
     return is_eng and not has_content
 
+
+def _seed_fallback_retry(slug: str):
+    try:
+        if cache_store.redis_client:
+            cache_store.redis_client.sadd("retry:fallback", slug)
+            cache_store.redis_client.expire("retry:fallback", 2592000)
+    except Exception:
+        pass
+
+
 @cache_decorator(prefix="llm", ttl=3600)
 def _query_llm_for_edge_type(source: str, source_label: str, target: str, target_label: str, body: str) -> Tuple[str, bool]:
     reverse = False
@@ -308,6 +318,10 @@ def ingest_wiki_page(
 
         if primary_label != "Entity":
             session.run(f"MATCH (n:Entity {{name: $name}}) SET n:{primary_label}", name=node_name)
+
+        if is_fallback:
+            slug = display_name.lower().replace(" ", "-")
+            _seed_fallback_retry(slug)
 
         for target in all_targets:
             target_display = _read_target_display_name(target)
