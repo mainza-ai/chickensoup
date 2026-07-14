@@ -30,6 +30,7 @@ struct ContentView: View {
         case graph = "Lore Graph"
         case timeline = "Spacetime Timeline"
         case almanac = "Living Almanac"
+        case status = "System Status"
         var id: String { self.rawValue }
     }
     @State var activeDetailTab: DetailTab = .graph
@@ -164,6 +165,11 @@ struct ContentView: View {
                     LivingAlmanacView()
                         .opacity(activeDetailTab == .almanac ? 1 : 0)
                         .disabled(activeDetailTab != .almanac)
+                        .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
+
+                    StatusDashboardView()
+                        .opacity(activeDetailTab == .status ? 1 : 0)
+                        .disabled(activeDetailTab != .status)
                         .animation(.easeInOut(duration: 0.25), value: activeDetailTab)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
