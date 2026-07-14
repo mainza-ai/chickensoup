@@ -179,28 +179,49 @@ class PulseAgent:
         logger.info(f"Running last30days pulse for '{entity_name}': {' '.join(shlex.quote(c) for c in cmd[:5])} ...")
 
         raw_output = ""
+        timeout = settings.LAST30DAYS_PULSE_TIMEOUT_SECONDS
         try:
-            result = subprocess.run(
+            proc = subprocess.Popen(
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=settings.LAST30DAYS_PULSE_TIMEOUT_SECONDS,
-                shell=False,
                 env={**os.environ, "NO_COLOR": "1"},
             )
-            raw_output = result.stdout or ""
-
-            if result.returncode != 0:
-                logger.warning(f"last30days CLI exited {result.returncode} for '{entity_name}': stderr={result.stderr[:500]}")
-                if not raw_output.strip():
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                from src.idle_sentinel import IdleSentinel
+                if not IdleSentinel.is_idle():
+                    proc.kill()
+                    logger.info(f"Pulse preempted by user activity for '{entity_name}'")
                     return PulseResult(
                         entity_name=entity_name,
-                        status="error",
+                        status="preempted",
                         evidence=[],
                         raw_snapshot_path=None,
                         budget_remaining=remaining,
-                        error=f"CLI exit {result.returncode}: {result.stderr[:500]}",
+                        error="Preempted by user activity",
                     )
+                try:
+                    stdout, stderr = proc.communicate(timeout=1)
+                    raw_output = stdout or ""
+                    if proc.returncode != 0:
+                        logger.warning(f"last30days CLI exited {proc.returncode} for '{entity_name}': stderr={stderr[:500] if stderr else ''}")
+                        if not raw_output.strip():
+                            return PulseResult(
+                                entity_name=entity_name,
+                                status="error",
+                                evidence=[],
+                                raw_snapshot_path=None,
+                                budget_remaining=remaining,
+                                error=f"CLI exit {proc.returncode}: {stderr[:500] if stderr else ''}",
+                            )
+                    break
+                except subprocess.TimeoutExpired:
+                    continue
+            else:
+                proc.kill()
+                raise subprocess.TimeoutExpired(cmd, timeout)
 
         except subprocess.TimeoutExpired:
             msg = f"last30days pulse timed out after {settings.LAST30DAYS_PULSE_TIMEOUT_SECONDS}s for '{entity_name}'"

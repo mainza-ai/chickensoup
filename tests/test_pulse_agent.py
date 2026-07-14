@@ -101,14 +101,12 @@ def test_pulse_enabled_writes_one_immutable_file():
                      patch.object(pw_mod, "ensure_pulse_dir", return_value=pulse_dir2), \
                      patch.object(pw_mod, "get_pulse_dir", return_value=pulse_dir2), \
                      patch("src.wiki.writer.append_to_log"), \
-                     patch("src.agents.pulse_agent.subprocess.run") as mock_run, \
+                     patch("src.agents.pulse_agent.subprocess.Popen") as mock_popen, \
                      patch.object(paths_mod, "ensure_pulse_dir", return_value=pulse_dir2):
 
-                    mock_run.return_value = MagicMock(
-                        returncode=0,
-                        stdout=_mock_evidence_json("Bob Lazar"),
-                        stderr=""
-                    )
+                    mock_proc = MagicMock(returncode=0)
+                    mock_proc.communicate.return_value = (_mock_evidence_json("Bob Lazar"), "")
+                    mock_popen.return_value = mock_proc
 
                     with patch("src.agents.pulse_agent.PulseAgent._resolve_binary", return_value=["last30days"]):
                         agent = PulseAgent()
@@ -188,8 +186,11 @@ def test_pulse_never_shell_true():
         mock_tracker.check_budget.return_value = (True, 20.0, "ok")
         mock_tracker.record_spend.return_value = (20.0, "recorded")
 
-        mock_subp.run.return_value = MagicMock(returncode=0, stdout=_mock_evidence_json(), stderr="")
+        mock_proc = MagicMock(returncode=0)
+        mock_proc.communicate.return_value = (_mock_evidence_json(), "")
+        mock_subp.Popen.return_value = mock_proc
         mock_subp.TimeoutExpired = __import__("subprocess").TimeoutExpired
+        mock_subp.PIPE = -1  # subprocess.PIPE sentinel
 
         from src.config import settings
         orig_enabled = settings.LAST30DAYS_ENABLED
@@ -200,11 +201,11 @@ def test_pulse_never_shell_true():
                 agent = PulseAgent()
                 agent.run_pulse("Bob Lazar; rm -rf /")
 
-                # Check subprocess.run called with shell=False
-                call_kwargs = mock_subp.run.call_args[1] if mock_subp.run.call_args else {}
-                assert call_kwargs.get("shell") is False
+                # Check Popen called, not shell
+                call_kwargs = mock_subp.Popen.call_args[1] if mock_subp.Popen.call_args else {}
+                assert call_kwargs.get("shell") is not True
                 # Entity passed as separate arg, not interpolated into shell string
-                called_args = mock_subp.run.call_args[0][0]
+                called_args = mock_subp.Popen.call_args[0][0]
                 assert isinstance(called_args, list)
                 assert "Bob Lazar; rm -rf /" in called_args or any("Bob Lazar" in str(a) for a in called_args)
 
