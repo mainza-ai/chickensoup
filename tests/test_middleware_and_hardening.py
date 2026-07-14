@@ -119,8 +119,14 @@ class TestCircuitBreaker:
 # Middleware integration tests (live server)
 # ---------------------------------------------------------------------------
 
+def _live_server_ok() -> bool:
+    try:
+        return requests.get(f"{BASE}/status", timeout=3).ok
+    except (requests.ConnectionError, requests.Timeout):
+        return False
+
 @pytest.mark.skipif(
-    not requests.get(f"{BASE}/status", timeout=3).ok,
+    not _live_server_ok(),
     reason="Live server not available",
 )
 class TestMiddlewareLive:
