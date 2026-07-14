@@ -418,37 +418,46 @@ async def _handle_user_name_detected(detected_name: str, conversation_id: str):
 
 def _create_temporal_events(temporal_refs: list, conversation_id: str):
     from src.knowledge_graph.connection import neo4j_conn
+    from src.knowledge_graph.ingest import ingest_wiki_page
+    from src.wiki.writer import write_page, cross_reference_new_page
+
     driver = neo4j_conn.get_driver()
     if not driver:
         return
 
     for ref in temporal_refs:
         title = ref.get("event", "Unknown Event")
-        date_str = ref.get("date", "")
         description = ref.get("description", f"Extracted from conversation {conversation_id}")
+        date_str = ref.get("date", "")
+        tags = ["event", "temporal-reference"]
+        sources = [f"conversation:{conversation_id}"]
 
-        with driver.session() as session:
-            session.run(
-                """
-                MERGE (e:Entity {name: $name})
-                ON CREATE SET e.type = 'Event', e.confidence = 0.6,
-                              e.tags = ['event', 'chat-extracted'],
-                              e.sources = [$source],
-                              e.content_preview = $preview
-                ON MATCH SET e.sources = CASE
-                    WHEN NOT $source IN e.sources THEN e.sources + $source
-                    ELSE e.sources
-                END
-                """,
-                name=title,
-                source=f"conversation:{conversation_id}",
-                preview=description[:300],
-            )
-            if date_str:
-                session.run(
-                    "MATCH (e:Entity {name: $name}) SET e.date = $date",
-                    name=title, date=date_str
-                )
+        body = description.strip()
+        if date_str:
+            body += f"\n\n**Date:** {date_str}"
+
+        # Write a wiki page so the event becomes a first-class entity with full LLM pipeline
+        slug, is_new = write_page(
+            title=title,
+            body=body,
+            tags=tags,
+            sources=sources,
+            related=[],
+            page_type="entities",
+        )
+        try:
+            cross_reference_new_page(slug, title, "entities")
+        except Exception as xref_err:
+            logger.warning(f"Cross-reference failed for temporal event '{title}': {xref_err}")
+
+        # Ingest to Neo4j through the full pipeline (LLM edge classification)
+        full_content = (
+            f"---\ntitle: {title}\ntags: {tags}\nsources: {sources}\nrelated: []\n---\n\n{body}"
+        )
+        try:
+            ingest_wiki_page(driver, title=title, content=full_content)
+        except Exception as neo4j_err:
+            logger.warning(f"Neo4j ingest failed for temporal event '{title}': {neo4j_err}")
 
 
 def _update_user_entity_interests(entities_discussed: list):
