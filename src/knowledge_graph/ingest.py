@@ -96,12 +96,22 @@ def _resolve_wiki_root() -> str:
 
 def _resolve_target_wiki_file(name: str) -> Optional[str]:
     wiki_root = _resolve_wiki_root()
-    slug = name.lower().replace(" ", "-").replace("'", "").replace("(", "").replace(")", "").replace("=", "-")
-    for subdir in ("entities", "concepts", "projects"):
-        for ext in ("", ".md"):
-            path = os.path.join(wiki_root, subdir, f"{slug}{ext}")
-            if os.path.isfile(path):
-                return path
+    candidates = set()
+    base = name.lower().strip()
+    candidates.add(base)
+    candidates.add(base.replace(" ", "-"))
+    candidates.add(base.replace("-", " "))
+    candidates.add(base.replace("-", "").replace(" ", ""))
+    for subdir in ("entities", "concepts", "projects", "raw", "raw/drafts"):
+        dirpath = os.path.join(wiki_root, subdir)
+        if not os.path.isdir(dirpath):
+            continue
+        for fname in os.listdir(dirpath):
+            if not fname.endswith(".md"):
+                continue
+            fstem = fname[:-3].lower()
+            if fstem in candidates or fstem.replace("-", "") == base.replace("-", "").replace(" ", ""):
+                return os.path.join(dirpath, fname)
     return None
 
 def _read_target_display_name(name: str) -> str:
@@ -128,8 +138,15 @@ def _infer_primary_label(name: str, tags: List[str], body: str = "") -> str:
     for pat in [r"\b(?:dr|prof|senator|ambassador|gen|adm)\b"]:
         if re.search(pat, name_lower):
             scores["Person"] += 3.0
+    # Name looks like a person: 2+ words where first is title or name-like
     name_words = name.split()
-    if len(name_words) >= 2 and all(w[0].isupper() for w in name_words if w[0].isalpha()):
+    person_name_patterns = [
+        r"^[A-Z][a-z]+ [A-Z][a-z]+$",     # "Bob Lazar", "David Grusch"
+        r"^[A-Z][a-z]+ [A-Z]\. [A-Z][a-z]+$",  # "John A. Smith"
+        r"^[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+$",  # "Thomas Townsend Brown"
+    ]
+    display_name = " ".join(name_words)
+    if any(re.match(p, display_name) for p in person_name_patterns):
         scores["Person"] += 2.0
 
     for label, signals in _INFERENCE_WEIGHTS.items():
