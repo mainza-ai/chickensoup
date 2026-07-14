@@ -81,7 +81,7 @@ Return ONLY JSON:
 
 class TribunalAgent:
     def __init__(self):
-        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
+        self.provider, self.base_url, self.models = get_discovered(depth="cached")
 
     def _query_llm(self, system_prompt: str, user_prompt: str, role_label: str) -> tuple[str, List[str]]:
         if get_active_provider() == "simulated":

@@ -392,7 +392,7 @@ class ResearchAgent:
     """
     
     def __init__(self):
-        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
+        self.provider, self.base_url, self.models = get_discovered(depth="cached")
         self.graph = research_graph
 
     def run_research(

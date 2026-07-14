@@ -11,17 +11,14 @@ class MultiLLMConsensus:
     Orchestrates consensus matching and result collation across multiple active LLM provider models.
     """
     def __init__(self):
-        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
+        self.provider, self.base_url, self.models = get_discovered(depth="cached")
 
     async def generate_consensus(self, prompt: str, system_instruction: str = "You are an expert consensus analyzer.") -> Dict[str, Any]:
         """
         Queries all discovered models for the prompt, computes agreement consensus scores,
         and collates the final consensus response.
         """
-        # Refresh discovery on each call so config changes take effect immediately
-        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
-
-        # If simulated, return standard mocked consensus output
+        self.provider, self.base_url, self.models = get_discovered(depth="cached")
         if self.provider == "simulated" or not self.models:
             return self._generate_mocked_consensus(prompt)
 

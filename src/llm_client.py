@@ -1,15 +1,20 @@
 import json
+import re
 import logging
 import threading
 import asyncio
 import urllib.request
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Type, TypeVar
+
+from pydantic import BaseModel, ValidationError
 
 from src.config import settings
 from src.discovery import get_active_model, get_active_base_url, get_active_provider
 from src.llm_circuit_breaker import llm_circuit_breaker
 
 logger = logging.getLogger("chickensoup.llm_client")
+
+T = TypeVar("T", bound=BaseModel)
 
 
 class LLMClient:
@@ -109,3 +114,58 @@ class LLMClient:
 
 
 llm_client = LLMClient()
+
+
+def parse_structured(
+    response: Optional[str],
+    model: Type[T],
+    field: str = None,
+    logger: logging.Logger = None,
+) -> Optional[T]:
+    """Parse LLM response into a Pydantic model with multiple recovery strategies.
+
+    Strategies:
+      1. Direct json.loads + model validation
+      2. Find JSON block in free text (```json or { } or [ ])
+      3. Extract a specific top-level field from a JSON object (if field is set)
+      4. Fallback — return None
+
+    Returns the parsed model, or None if all strategies fail.
+    """
+    log = logger or logging.getLogger(__name__)
+
+    if not response:
+        return None
+
+    # Strategy 1: Direct
+    try:
+        data = json.loads(response)
+        if field:
+            data = data[field]
+        return model(**data)
+    except (json.JSONDecodeError, ValidationError, KeyError) as e:
+        log.debug(f"parse_structured strategy 1 failed: {e}")
+
+    # Strategy 2: Extract JSON from markdown or free text
+    for pattern in [r"```json\n(.*?)\n```", r"```\n(.*?)\n```", r"\{.*\}"]:
+        try:
+            match = re.search(pattern, response, re.DOTALL)
+            if match:
+                data = json.loads(match.group(1) if pattern != r"\{.*\}" else match.group(0))
+                if field:
+                    data = data[field]
+                return model(**data)
+        except (json.JSONDecodeError, ValidationError, KeyError) as e:
+            log.debug(f"parse_structured strategy 2 ({pattern}) failed: {e}")
+
+    # Strategy 3: If the response is a JSON array at top level
+    try:
+        data = json.loads(f'{{"{field}": {response}}}') if field else json.loads(response)
+        if field:
+            data = data[field]
+        return model(**data)
+    except (json.JSONDecodeError, ValidationError, KeyError) as e:
+        log.debug(f"parse_structured strategy 3 failed: {e}")
+
+    log.warning(f"parse_structured: all strategies failed for model {model.__name__}")
+    return None

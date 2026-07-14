@@ -1,13 +1,37 @@
-import json
 import logging
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 
-from src.llm_client import llm_client
+from pydantic import BaseModel, Field
+from src.llm_client import llm_client, parse_structured
 from src.config import settings
 from src.wiki.writer import build_index, lookup_entity, slugify
 
 logger = logging.getLogger("chickensoup.agents.chat_ingest_agent")
+
+
+class SuggestedPage(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    page_type: str = Field(default="entities", pattern=r"^(entities|concepts|projects)$")
+    tags: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+    summary: str = ""
+    related: List[str] = Field(default_factory=list)
+    body: str = ""
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+
+
+class TemporalReference(BaseModel):
+    date: str = ""
+    event: str = ""
+    description: str = ""
+
+
+class ChatIngestResult(BaseModel):
+    suggested_pages: List[SuggestedPage] = Field(default_factory=list)
+    user_name_detected: Optional[str] = None
+    entities_discussed: List[str] = Field(default_factory=list)
+    temporal_references: List[TemporalReference] = Field(default_factory=list)
 
 
 class ChatIngestAgent:
@@ -93,11 +117,9 @@ Return ONLY a JSON object with this exact structure:
 
         llm_response = self._query_llm(prompt)
         if llm_response:
-            try:
-                data = json.loads(llm_response)
-                return self._normalize_result(data, conversation_id)
-            except Exception as e:
-                logger.warning(f"Failed to parse chat ingest LLM response: {e}")
+            result = parse_structured(llm_response, ChatIngestResult)
+            if result:
+                return self._normalize_result(result, conversation_id)
 
         return self._fallback_analysis(messages, conversation_id)
 
@@ -110,34 +132,31 @@ Return ONLY a JSON object with this exact structure:
         return "\n\n".join(lines)
 
     def _normalize_result(
-        self, data: dict, conversation_id: str
+        self, data: ChatIngestResult, conversation_id: str
     ) -> Dict[str, Any]:
         pages = []
-        for p in data.get("suggested_pages", []):
-            page_type = p.get("page_type", "entities")
-            if page_type not in ("entities", "concepts", "projects"):
-                page_type = "entities"
-
-            sources = p.get("sources", [f"conversation:{conversation_id}"])
+        for p in data.suggested_pages:
+            page_type = p.page_type if p.page_type in ("entities", "concepts", "projects") else "entities"
+            sources = list(p.sources)
             if f"conversation:{conversation_id}" not in sources:
                 sources.append(f"conversation:{conversation_id}")
 
             pages.append({
-                "title": p["title"],
+                "title": p.title,
                 "page_type": page_type,
-                "tags": p.get("tags", []),
+                "tags": p.tags,
                 "sources": sources,
-                "summary": p.get("summary", ""),
-                "related": p.get("related", []),
-                "body": p.get("body", ""),
-                "confidence": max(0.0, min(1.0, p.get("confidence", 0.5))),
+                "summary": p.summary,
+                "related": p.related,
+                "body": p.body,
+                "confidence": max(0.0, min(1.0, p.confidence)),
             })
 
         return {
             "suggested_pages": pages,
-            "user_name_detected": data.get("user_name_detected") or None,
-            "entities_discussed": data.get("entities_discussed", []),
-            "temporal_references": data.get("temporal_references", []),
+            "user_name_detected": data.user_name_detected or None,
+            "entities_discussed": data.entities_discussed,
+            "temporal_references": [t.model_dump() for t in data.temporal_references],
         }
 
     def _fallback_analysis(

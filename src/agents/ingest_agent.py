@@ -1,30 +1,35 @@
-import json
 import logging
 from typing import List, Optional, Dict, Any
-from dataclasses import dataclass
 
-from src.llm_client import llm_client
+from pydantic import BaseModel, Field
+from src.llm_client import llm_client, parse_structured
 from src.wiki.writer import build_index, lookup_entity, slugify
 from src.cache import cache_decorator
 
 logger = logging.getLogger("chickensoup.agents.ingest_agent")
 
-@dataclass
-class SuggestedPage:
-    title: str
-    page_type: str
-    tags: List[str]
-    sources: List[str]
-    summary: str
-    related: List[str]
-    body: str
-    confidence: float
 
-@dataclass
-class IngestAnalysis:
-    suggested_pages: List[SuggestedPage]
-    confidence: float
-    raw_text_preview: str
+class SuggestedPage(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    page_type: str = Field(default="entities", pattern=r"^(entities|concepts|projects)$")
+    tags: List[str] = Field(default_factory=list)
+    sources: List[str] = Field(default_factory=list)
+    summary: str = ""
+    related: List[str] = Field(default_factory=list)
+    body: str = ""
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+
+
+class IngestResponse(BaseModel):
+    """Shape of the LLM response for entity extraction."""
+    suggested_pages: List[SuggestedPage] = Field(default_factory=list)
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+
+
+class IngestAnalysis(BaseModel):
+    suggested_pages: List[SuggestedPage] = Field(default_factory=list)
+    confidence: float = 0.5
+    raw_text_preview: str = ""
 
 class IngestAgent:
     def __init__(self):
@@ -82,29 +87,13 @@ Rules:
 """
         llm_response = self._query_llm(prompt)
         if llm_response:
-            try:
-                data = json.loads(llm_response)
-                if isinstance(data, list):
-                    data = {"suggested_pages": data, "confidence": 0.5}
-                pages = []
-                for p in data.get("suggested_pages", []):
-                    pages.append(SuggestedPage(
-                        title=p["title"],
-                        page_type=p.get("page_type", "entities"),
-                        tags=p.get("tags", []),
-                        sources=p.get("sources", [filename or "uploaded-document"]),
-                        summary=p.get("summary", ""),
-                        related=p.get("related", []),
-                        body=p.get("body", ""),
-                        confidence=p.get("confidence", 0.5),
-                    ))
+            result = parse_structured(llm_response, IngestResponse)
+            if result:
                 return IngestAnalysis(
-                    suggested_pages=pages,
-                    confidence=data.get("confidence", 0.5),
+                    suggested_pages=result.suggested_pages,
+                    confidence=result.confidence,
                     raw_text_preview=text[:500],
                 )
-            except Exception as e:
-                logger.warning(f"Failed to parse LLM analysis: {e}")
 
         return self._fallback_analysis(text, filename)
 

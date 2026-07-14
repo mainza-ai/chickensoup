@@ -123,7 +123,7 @@ class QueryAgent:
     """
     
     def __init__(self):
-        self.provider, self.base_url, self.models = get_discovered(depth="fresh")
+        self.provider, self.base_url, self.models = get_discovered(depth="cached")
         logger.info(f"QueryAgent initialized with provider: {self.provider} ({self.base_url})")
 
     def parse_tql(self, query: str) -> Optional[ParsedQuery]:
