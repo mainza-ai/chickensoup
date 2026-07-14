@@ -2276,17 +2276,39 @@ async def post_budget_approve():
 @app.post("/research/{thread_id}/approve", dependencies=[Depends(verify_api_key)])
 async def post_research_approve(thread_id: str):
     try:
-        from src.agents.research_agent import research_graph
+        from src.agents.research_agent import ResearchAgent, research_graph
         config = {"configurable": {"thread_id": thread_id}}
         current_state = research_graph.get_state(config)
         if not current_state or not current_state.values:
             raise HTTPException(status_code=404, detail=f"No paused research found for thread '{thread_id}'")
+        if not current_state.next:
+            raise HTTPException(status_code=400, detail=f"Research thread '{thread_id}' is not paused")
+
+        query = current_state.values.get("query", "")
+        entities = current_state.values.get("entities", [])
+        history = current_state.values.get("history", [])
+
         updated_values = dict(current_state.values)
         updated_values["human_approved"] = True
         research_graph.update_state(config, updated_values)
-        final_state = research_graph.invoke({}, config=config)
-        summary = final_state.get("summary", "Approval processed.")
-        return {"success": True, "thread_id": thread_id, "summary": summary}
+
+        # Resume graph execution — runs human_approval_gate → context_assembly
+        final_state = research_graph.invoke(None, config=config)
+
+        # Generate summary from the assembled context
+        agent = ResearchAgent()
+        summary = agent._generate_summary(
+            query=query,
+            context=final_state.get("assembled_context", ""),
+            history=history,
+        )
+
+        return {
+            "success": True,
+            "thread_id": thread_id,
+            "summary": summary,
+            "entities": [e for e in entities if e],
+        }
     except HTTPException:
         raise
     except Exception as e:

@@ -101,6 +101,7 @@ class ResearchState(TypedDict):
     assembled_context: str
     human_approval_required: bool
     human_approved: bool
+    force_human_approval: bool
     summary: str
 
 def extraction_node(state: ResearchState) -> Dict[str, Any]:
@@ -266,11 +267,12 @@ def credibility_scoring_node(state: ResearchState) -> Dict[str, Any]:
                 score += 0.15
             scores[name] = min(1.0, max(0.0, score))
 
-    human_approval_required = False
-    for name, val in scores.items():
-        if val < 0.4:
-            human_approval_required = True
-            break
+    human_approval_required = state.get("force_human_approval", False)
+    if not human_approval_required:
+        for name, val in scores.items():
+            if val < 0.4:
+                human_approval_required = True
+                break
 
     result: Dict[str, Any] = {
         "credibility_scores": scores,
@@ -362,8 +364,13 @@ workflow.add_edge("human_approval_gate", "context_assembly")
 workflow.add_edge("context_assembly", END)
 
 # Checkpointer for state saving & resuming
+# interrupt_before human_approval_gate so the graph truly pauses
+# when human approval is required, enabling resume via POST /research/{thread_id}/approve
 memory = MemorySaver()
-research_graph = workflow.compile(checkpointer=memory)
+research_graph = workflow.compile(
+    checkpointer=memory,
+    interrupt_before=["human_approval_gate"],
+)
 
 class ResearchAgent:
     """
@@ -382,6 +389,7 @@ class ResearchAgent:
         structured_filters: Dict[str, Any] = None,
         thread_id: str = "default_thread",
         human_approved: bool = False,
+        force_human_approval: bool = False,
         history: List[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         
@@ -396,22 +404,36 @@ class ResearchAgent:
             assembled_context="",
             human_approval_required=False,
             human_approved=human_approved,
+            force_human_approval=force_human_approval,
             summary=""
         )
         
         config = {"configurable": {"thread_id": thread_id}}
         
-        # If it's a resume after human approval
+        # If it's a resume after human approval, update persisted state
         if human_approved:
-            # We update the state in the checkpointer to set human_approved = True
             current_state = self.graph.get_state(config)
             if current_state and current_state.values:
                 updated_values = dict(current_state.values)
                 updated_values["human_approved"] = True
                 self.graph.update_state(config, updated_values)
-                
-        # Run/resume graph
+
+        # Run graph — may be interrupted at human_approval_gate
         final_state = self.graph.invoke(initial_state, config=config)
+        # If interrupt_before paused the graph, final_state is partial.
+        # Check if there are pending nodes to run.
+        paused_check = self.graph.get_state(config)
+        if paused_check and paused_check.next:
+            # Graph is paused waiting for human approval
+            return {
+                "human_approval_required": True,
+                "credibility_scores": final_state.get("credibility_scores", {}),
+                "summary": "Human approval required for credibility evaluation.",
+                "thread_id": thread_id,
+                "inferred_events": [],
+                "inferred_entities": [],
+                "assembled_context": "",
+            }
         
         # Generate summary using local LLM if possible
         summary = ""
