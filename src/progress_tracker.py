@@ -85,10 +85,7 @@ def get_all() -> dict:
             for k, v in raw.items():
                 dk = k.decode() if isinstance(k, bytes) else k
                 dv = v.decode() if isinstance(v, bytes) else v
-                try:
-                    data[dk] = json.loads(dv)
-                except (json.JSONDecodeError, TypeError):
-                    data[dk] = dv
+                data[dk] = dv
             result[section] = data
         return result
     except Exception as e:
