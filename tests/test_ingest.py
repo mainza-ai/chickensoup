@@ -57,7 +57,7 @@ class TestIngestFileEndpoint:
         response = client.post("/ingest/file", files=files, headers={"X-Api-Key": "dev"})
         assert response.status_code == 200
         data = response.json()
-        assert data.get("total_pages") >= 1
+        assert data.get("total_pages", 0) >= 1
 
     @patch("src.main.ingest_agent")
     def test_ingest_file_empty_content(self, mock_agent, client):
@@ -128,8 +128,10 @@ class TestIngestFolderEndpoint:
         )
         assert response.status_code == 200
         data = response.json()
-        # total_files counts only files with supported extensions (.md, .txt, etc.)
-        assert data.get("total_files") >= 1
+        # Only supported extensions (.md, .txt, .json, .csv, .html) are counted
+        assert data.get("total_files") == 1
+        # Unsupported extensions are silently skipped, not recorded as failures
+        assert len(data.get("failed_files", [])) == 0
 
     def test_ingest_folder_too_large(self, client):
         # The 50MB limit is on the uploaded zip file itself, not its contents.

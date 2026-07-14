@@ -68,6 +68,9 @@ class Settings(BaseSettings):
     # Request ID and observability
     REQUEST_ID_HEADER: str = "X-Request-ID"
 
+    # Checkpointer backend
+    CHECKPOINT_BACKEND: str = "redis"
+
     # LLM circuit breaker
     LLM_CIRCUIT_BREAKER_THRESHOLD: int = 5
     LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 60

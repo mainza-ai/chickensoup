@@ -214,32 +214,38 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         import uuid
         request_id = request.headers.get(settings.REQUEST_ID_HEADER) or str(uuid.uuid4())
+        logger.info(f"Request {request_id}: {request.method} {request.url.path}")
         response = await call_next(request)
         response.headers[settings.REQUEST_ID_HEADER] = request_id
         return response
 
 
 class ConcurrencySemaphoreMiddleware(BaseHTTPMiddleware):
-    """Limit concurrent in-flight LLM requests to prevent saturation."""
+    """Limit concurrent in-flight LLM requests to prevent saturation.
+    Returns 503 when at capacity instead of queuing."""
 
     def __init__(self, app, max_concurrent: int = None):
         super().__init__(app)
         self.max_concurrent = max_concurrent or settings.MAX_CONCURRENT_LLM_REQUESTS
         self._semaphore = asyncio.Semaphore(self.max_concurrent)
-        self._active = 0
 
     async def dispatch(self, request: Request, call_next) -> Response:
         path = request.url.path
         if path.startswith(("/query", "/consensus/query", "/ingest", "/navigate")):
             if not hasattr(request.state, "skip_concurrency_limit"):
-                acquired = await self._semaphore.acquire()
-                self._active += 1
-                try:
-                    response = await call_next(request)
-                    return response
-                finally:
-                    self._active -= 1
-                    self._semaphore.release()
+                if not self._semaphore.locked():
+                    async with self._semaphore:
+                        response = await call_next(request)
+                        return response
+                return Response(
+                    content=json.dumps({
+                        "detail": "Server at capacity. Try again later.",
+                        "retry_after": 30,
+                    }),
+                    media_type="application/json",
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    headers={"Retry-After": "30"},
+                )
         return await call_next(request)
 
 
@@ -671,6 +677,8 @@ async def set_user_name(request: SetUserNameRequest):
 async def post_query(request: QueryRequest):
     """Submits a query to search the knowledge graph and generate an answer summary using Orchestrator."""
     try:
+        if len(request.query.encode("utf-8")) > 102_400:
+            raise HTTPException(status_code=413, detail="Query exceeds 100KB limit")
         import uuid
         from src.idle_sentinel import IdleSentinel
         IdleSentinel.update_activity("query")
@@ -871,7 +879,7 @@ class QuantumJobRequest(BaseModel):
     target_year: int
     energy_level: float = 1.0
 
-@app.post("/consensus/query")
+@app.post("/consensus/query", dependencies=[Depends(verify_api_key)])
 async def post_consensus_query(request: ConsensusQueryRequest):
     """
     Evaluates queries against multiple active provider models, returning consensus scores.

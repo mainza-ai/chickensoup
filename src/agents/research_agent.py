@@ -4,11 +4,11 @@ import logging
 from typing import Dict, Any, List, Optional
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.memory import MemorySaver
 
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.queries import search_entities, get_entity_neighborhood
 from src.discovery import get_discovered, get_active_model, get_active_base_url, get_active_provider
+from src.config import settings
 from src.cache import cache_decorator
 import urllib.request
 import json
@@ -363,12 +363,25 @@ workflow.add_conditional_edges(
 workflow.add_edge("human_approval_gate", "context_assembly")
 workflow.add_edge("context_assembly", END)
 
-# Checkpointer for state saving & resuming
+# Checkpointer for persistent state saving & resuming.
+# Uses RedisSaver when Redis is available; falls back to MemorySaver.
 # interrupt_before human_approval_gate so the graph truly pauses
 # when human approval is required, enabling resume via POST /research/{thread_id}/approve
-memory = MemorySaver()
+
+def _create_checkpointer():
+    try:
+        from langgraph.checkpoint.redis import RedisSaver
+        cp = RedisSaver(redis_url=settings.REDIS_URL)
+        cp.setup()
+        logger.info("Using RedisSaver for persistent checkpointing")
+        return cp
+    except Exception as e:
+        logger.warning(f"Redis checkpointer unavailable, using MemorySaver: {e}")
+        from langgraph.checkpoint.memory import MemorySaver
+        return MemorySaver()
+
 research_graph = workflow.compile(
-    checkpointer=memory,
+    checkpointer=_create_checkpointer(),
     interrupt_before=["human_approval_gate"],
 )
 

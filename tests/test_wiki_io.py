@@ -1,12 +1,12 @@
 """
-P2-6: Wiki export/import round-trip tests.
+P2-6: Wiki Export, Import, and Round-Trip Endpoint Tests.
 
-Tests GET /wiki/export and POST /wiki/import using TestClient
-with real file system operations for export.
-Import test mocks the file to avoid destructive operations.
+Tests GET /wiki/export, POST /wiki/import, and POST /wiki/clear-content using
+TestClient with real file system operations for export and a mock-safe round-trip.
 """
 import io
 import os
+import zipfile
 
 import pytest
 from unittest.mock import patch
@@ -57,3 +57,26 @@ class TestWikiImport:
             headers={"X-Api-Key": "dev"},
         )
         assert response.status_code in (400, 500)
+
+
+class TestWikiImportWithZip:
+    """Tests POST /wiki/import with a small controlled zip."""
+
+    def _make_wiki_zip(self) -> bytes:
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("wiki/entities/test-a.md", "# Test A\n\nBody.")
+            zf.writestr("wiki/concepts/test-b.md", "# Test B\n\nBody.")
+        return buf.getvalue()
+
+    @patch("src.knowledge_graph.ingest.ingest_wiki_page", return_value=(0, 0))
+    def test_import_valid_zip(self, mock_ingest, client):
+        zip_bytes = self._make_wiki_zip()
+        resp = client.post(
+            "/wiki/import",
+            files={"file": ("export.zip", zip_bytes, "application/zip")},
+            headers={"X-Api-Key": "dev"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data.get("restored_count", 0) > 0

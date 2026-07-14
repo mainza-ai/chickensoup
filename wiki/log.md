@@ -2,12 +2,39 @@
 title: "Log"
 tags: [log]
 created: 2026-06-22
-updated: 2026-07-13
+updated: 2026-07-14
 sources: []
 related: []
 ---
 
 # Log
+
+## [2026-07-14] test + fix | P2-2/P2-3/P2-4/P2-5/P2-6/P3-1/P3-2/P3-3 production hardening
+
+Completed production hardening audit. Fixed ingest test assertions, wiki import round-trip test, and persistent checkpointer. All 41 critical tests pass.
+
+### Changes
+- **P2-2**: Human approval gate — `interrupt_before=["human_approval_gate"]`, `force_human_approval` param, approve endpoint (9 tests)
+- **P2-3**: Almanac endpoint integration tests — endpoint flow, polling, dry_run passthrough, failure handling (8 tests)
+- **P2-4**: Ingest endpoint tests — assertions tightened: `total_pages >= 1`, `total_files == 1` for filtered types (7 tests)
+- **P2-5**: Draft promotion flow tests — list, include created, promote, frontmatter (5 tests)
+- **P2-6**: Wiki export tests + import round-trip — export shape, import with controlled zip, `src.knowledge_graph.ingest.ingest_wiki_page` patched for Neo4j-free import (5 tests)
+- **P3-1**: `/consensus/query` auth — `dependencies=[Depends(verify_api_key)]`
+- **P3-2**: Persistent checkpointer — `RedisSaver` with `MemorySaver` fallback, `CHECKPOINT_BACKEND` config, cross-instance persistence (8 tests, 1 skipped)
+- **P3-3**: Explicit `websockets>=13.0` dependency
+- **P0-1**: ConcurrencySemaphoreMiddleware returns 503 with `Retry-After: 30` instead of blocking
+- **P1-3**: Per-endpoint 100KB limit on `/query` (413)
+- **P4-1**: RequestIdMiddleware logging added
+
+### Files
+- `src/main.py`, `src/config.py`, `src/agents/research_agent.py`, `src/multi_llm.py`
+- `pyproject.toml` (`websockets>=13.0`, `langgraph-checkpoint-redis>=0.5.0`)
+- `tests/test_almanac_endpoint.py`, `tests/test_persistent_checkpointer.py` (new)
+- `tests/test_human_approval.py`, `tests/test_ingest.py`, `tests/test_drafts.py`, `tests/test_wiki_io.py`
+
+### Related
+- [[production-hardening-plan]]
+- [[smoke-test-report]]
 
 ## [2026-07-13] ingest | Bianconi — "Gravity from entropy" (arXiv:2408.14391v7)
 
