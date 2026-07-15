@@ -1008,7 +1008,46 @@ async def fallback_retry_loop():
 
 
 def stop():
-    global _RUNNING, _IDLE_INGESTION_RUNNING, _FALLBACK_RETRY_RUNNING
+    global _RUNNING, _IDLE_INGESTION_RUNNING, _FALLBACK_RETRY_RUNNING, _NEO4J_BACKUP_RUNNING
     _RUNNING = False
     _IDLE_INGESTION_RUNNING = False
     _FALLBACK_RETRY_RUNNING = False
+    _NEO4J_BACKUP_RUNNING = False
+
+
+_NEO4J_BACKUP_RUNNING = True
+
+async def neo4j_backup_loop():
+    """Periodically create Neo4j database dumps. Runs on configurable interval."""
+    global _NEO4J_BACKUP_RUNNING
+    _NEO4J_BACKUP_RUNNING = True
+    interval = settings.NEO4J_BACKUP_INTERVAL_HOURS * 3600
+    logger.info(f"Neo4j backup loop started ({settings.NEO4J_BACKUP_INTERVAL_HOURS}h interval)")
+
+    while _NEO4J_BACKUP_RUNNING:
+        try:
+            await asyncio.sleep(interval)
+
+            from src.neo4j_backup import create_backup, cleanup_old_backups, list_backups
+            from src.progress_tracker import update as progress_update
+
+            path = create_backup()
+            if path:
+                logger.info(f"Neo4j backup created: {path}")
+                deleted = cleanup_old_backups()
+                if deleted:
+                    logger.info(f"Cleaned up {deleted} old Neo4j backups")
+
+                backups = list_backups()
+                latest = backups[0] if backups else {}
+                progress_update("neo4j_backup", status="ok", last_backup=latest.get("filename", ""),
+                                total_backups=str(len(backups)))
+            else:
+                logger.warning("Neo4j backup failed")
+                progress_update("neo4j_backup", status="error")
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Neo4j backup error: {e}")
+
+    _NEO4J_BACKUP_RUNNING = False

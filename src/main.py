@@ -155,9 +155,19 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Could not build temporal causality chains: {e}")
 
+    # Start Neo4j backup scheduler if enabled
+    neo4j_backup_task = None
+    if settings.NEO4J_BACKUP_ENABLED:
+        try:
+            from src.scheduler import neo4j_backup_loop
+            neo4j_backup_task = asyncio.create_task(neo4j_backup_loop())
+            logger.info("Neo4j backup scheduler started")
+        except Exception as e:
+            logger.warning(f"Could not start Neo4j backup scheduler: {e}")
+
     yield
     logger.info("Shutting down chickensoup API...")
-    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task):
+    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task, neo4j_backup_task):
         if task:
             task.cancel()
             try:
@@ -2091,6 +2101,29 @@ async def create_wiki_backup_now():
     from src.wiki.backup import create_snapshot
     path = create_snapshot(name=f"manual-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
     return {"success": path is not None, "filepath": path}
+
+
+@app.post("/neo4j/backup", dependencies=[Depends(verify_api_key)])
+async def create_neo4j_backup():
+    """Triggers a Neo4j database dump. Stops container, dumps, restarts."""
+    from src.neo4j_backup import create_backup
+    path = create_backup()
+    return {"success": path is not None, "filepath": str(path) if path else None}
+
+
+@app.get("/neo4j/backups")
+async def list_neo4j_backups():
+    """Lists available Neo4j dump files."""
+    from src.neo4j_backup import list_backups
+    return {"backups": list_backups()}
+
+
+@app.post("/neo4j/restore/{dump_name}", dependencies=[Depends(verify_api_key)])
+async def restore_neo4j_backup(dump_name: str):
+    """Restores Neo4j from a dump file. Stops container, loads, restarts."""
+    from src.neo4j_backup import restore_backup
+    success = restore_backup(dump_name)
+    return {"success": success, "message": "Restored from dump" if success else "Restore failed"}
 
 
 @app.post("/wiki/reconcile-stop", dependencies=[Depends(verify_api_key)])

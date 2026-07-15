@@ -1585,3 +1585,33 @@ public struct APISearchResponse: Codable {
     public let query: String
     public let total: Int
 }
+
+
+public struct APIDBBackup: Codable, Identifiable {
+    public var id: String { filename }
+    public let filename: String
+    public let sizeBytes: Int
+    public let sizeHuman: String
+    public let createdAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case filename, sizeBytes = "size_bytes", sizeHuman = "size_human", createdAt = "created_at"
+    }
+}
+
+
+public struct APIDBBackupListResponse: Codable {
+    public let backups: [APIDBBackup]
+}
+
+
+public struct APIDBBackupCreateResponse: Codable {
+    public let success: Bool
+    public let filepath: String?
+}
+
+
+public struct APIDBBackupRestoreResponse: Codable {
+    public let success: Bool
+    public let message: String
+}

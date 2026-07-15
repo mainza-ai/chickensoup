@@ -520,6 +520,45 @@ public final class BackendService {
             return nil
         }
     }
+
+    // MARK: - Neo4j Backup
+
+    public func fetchNeo4jBackups() async -> [APIDBBackup] {
+        do {
+            let response: APIDBBackupListResponse = try await APIClient.shared.request(path: "/neo4j/backups")
+            return response.backups
+        } catch {
+            logger.error("Failed to fetch Neo4j backups: \(error.localizedDescription)")
+            return []
+        }
+    }
+
+    @discardableResult
+    public func createNeo4jBackup() async -> Bool {
+        do {
+            let response: APIDBBackupCreateResponse = try await APIClient.shared.request(
+                path: "/neo4j/backup", method: "POST"
+            )
+            return response.success
+        } catch {
+            logger.error("Failed to create Neo4j backup: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    @discardableResult
+    public func restoreNeo4jBackup(_ filename: String) async -> Bool {
+        do {
+            let encoded = filename.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? filename
+            let response: APIDBBackupRestoreResponse = try await APIClient.shared.request(
+                path: "/neo4j/restore/\(encoded)", method: "POST"
+            )
+            return response.success
+        } catch {
+            logger.error("Failed to restore Neo4j backup: \(error.localizedDescription)")
+            return false
+        }
+    }
 }
 
 public struct BackendQueryResult {

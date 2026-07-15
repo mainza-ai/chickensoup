@@ -29,6 +29,7 @@ PREFIX = "progress"
 SECTIONS = frozenset({
     "reconciliation", "idle_ingestion", "chat_ingest",
     "fallback_retry", "wiki_watcher", "llm_client", "neo4j",
+    "neo4j_backup",
 })
 
 

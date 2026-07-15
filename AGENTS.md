@@ -31,6 +31,7 @@ Pages in `wiki/dev/` and `wiki/plan/` have `ENGINEERING_TAGS` (architecture, des
 | `dev/api-design.md` | All endpoints in `main.py` | Adding/removing routes |
 | `dev/agent-architecture.md` | Agent files in `src/agents/` | Adding agents, changing architecture |
 | `dev/pydantic-settings.md` | Settings in `src/config.py` | Adding/removing env vars |
+| `dev/neo4j-backup.md` | Backup in `src/neo4j_backup.py` | Changing backup strategy
 
 Check `src/wiki/cleanup.py` for the authoritative `ENGINEERING_TAGS` set.
 

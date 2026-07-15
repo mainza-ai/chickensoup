@@ -56,6 +56,13 @@ class Settings(BaseSettings):
     WIKI_BACKUP_RETENTION_DAYS: int = 30
     WIKI_AUTO_COMMIT: bool = False
 
+    # Neo4j database backup settings
+    NEO4J_BACKUP_ENABLED: bool = True
+    NEO4J_BACKUP_DIR: str = "backups/neo4j"
+    NEO4J_BACKUP_RETENTION_DAYS: int = 30
+    NEO4J_BACKUP_INTERVAL_HOURS: int = 24
+    NEO4J_URI_HOST_DATA: str = "/var/lib/docker/volumes/chickensoup_neo4j_data/_data"
+
     # Chat-to-wiki periodic conversion
     CHAT_WIKI_CONVERSION_ENABLED: bool = False
     CHAT_WIKI_MIN_CONVERSATION_LENGTH: int = 10
@@ -117,6 +124,7 @@ class Settings(BaseSettings):
     # Wiki reconciliation at startup: ingests existing pages into Neo4j/queue.
     # Disable in tests to avoid background threads interfering with mock state.
     WIKI_RECONCILE_ON_STARTUP: bool = True
+    LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
     LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
     LAST30DAYS_PULSE_ENABLED: bool = False
 

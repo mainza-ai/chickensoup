@@ -95,6 +95,8 @@ struct SettingsView: View {
                 backendPickerSection
                 llmConfigSection
                 chatToWikiSection
+                // Data store backup section (inline, ~lines 735-906)
+                neo4jBackupSection
                 livingAlmanacSection
                 apiTokenSection
             }
@@ -903,6 +905,12 @@ struct SettingsView: View {
                 Text("Export failed. Check that the backup folder is accessible.")
             }
         }
+    }
+
+    private var neo4jBackupSection: some View {
+        Neo4jBackupSettingsView()
+            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+            .listRowSeparator(.hidden)
     }
 
     @ViewBuilder
