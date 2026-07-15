@@ -164,8 +164,8 @@ def test_api_get_events_filtering(client, mock_neo4j):
         response = client.get("/events")
         assert response.status_code == 200
         data = response.json()
-        
-        titles = [event["title"] for event in data]
+
+        titles = [event["title"] for event in data.get("events", [])]
         assert "Roswell Crash" in titles
         assert "Project Serpo" in titles
         assert "Technology Stack" not in titles

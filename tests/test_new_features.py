@@ -342,13 +342,13 @@ def test_ingest_wiki_page_writes_dates():
     mock_driver.session.return_value.__enter__.return_value = mock_session
 
     content = """---
-title: Test Event
+title: Varginha UFO Crash
 tags: [crash, ufo]
 sources: [test]
 ---
 In 1996, the Varginha UFO crash occurred in Brazil."""
 
-    nodes, rels = ingest_wiki_page(mock_driver, "Test Event", content,
+    nodes, rels = ingest_wiki_page(mock_driver, "Varginha UFO Crash", content,
                                     default_tags=["crash", "ufo"],
                                     default_sources=["test"])
 
@@ -360,7 +360,7 @@ In 1996, the Varginha UFO crash occurred in Brazil."""
     # Find the primary node MERGE call and check date param
     for call in merge_calls:
         kwargs = call[1] if len(call.args) <= 1 else {}
-        if kwargs.get("name") == "test event":
+        if kwargs.get("name") == "varginha ufo crash":
             assert kwargs.get("date") is not None, "date should be extracted from body"
             break
 
