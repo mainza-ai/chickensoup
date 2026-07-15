@@ -842,7 +842,7 @@ async def idle_ingestion_loop():
                         
                         from src.quantum_credibility.wavefunction import ClaimWavefunction
                         wf = ClaimWavefunction()
-                        claim_text = page_data["body"][:500] if page_data.get("body") else entity_name
+                        claim_text = page_data["body"][:5000] if page_data.get("body") else entity_name
                         
                         rc = _get_reinforcement_count(slug)
                         cc = wf.score_claim(claim_text, result.evidence, reinforcement_count=rc)

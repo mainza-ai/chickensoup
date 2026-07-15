@@ -399,9 +399,11 @@ async def generate_daily_almanac(dry_run: bool = False) -> AlmanacResult:
 
         # 1. Pulse
         try:
+            import asyncio
             from src.agents.pulse_agent import PulseAgent
             pulse_agent = PulseAgent()
-            pulse_result = pulse_agent.run_pulse(entity_name, handles=handles)
+            loop = asyncio.get_event_loop()
+            pulse_result = await loop.run_in_executor(None, pulse_agent.run_pulse, entity_name, handles)
             result_entry["pulse_status"] = pulse_result.status
             result_entry["evidence_count"] = len(pulse_result.evidence)
             all_evidence.extend(pulse_result.evidence)
