@@ -86,10 +86,10 @@ class PulseAgent:
                 if val and isinstance(val, str):
                     cmd.append(val)
 
-        # Prefer JSON output
+        # Prefer JSON output with quick mode
         is_python_script = any("last30days.py" in p for p in binary_parts)
         if is_python_script:
-            cmd.extend(["--emit", "json"])
+            cmd.extend(["--emit", "json", "--quick"])
         else:
             if "--json" not in cmd:
                 cmd.append("--json")
@@ -189,6 +189,7 @@ class PulseAgent:
                 env={**os.environ, "NO_COLOR": "1"},
             )
             deadline = time.monotonic() + timeout
+            # Poll with 1s intervals to check for preemption while subprocess runs
             while time.monotonic() < deadline:
                 from src.idle_sentinel import IdleSentinel
                 if not IdleSentinel.is_idle():
@@ -218,7 +219,15 @@ class PulseAgent:
                             )
                     break
                 except subprocess.TimeoutExpired:
-                    continue
+                    # After the first communicate() call, subsequent calls may raise on concurrent reads.
+                    # Fall back to waiting for process completion.
+                    try:
+                        proc.wait(timeout=1)
+                        stdout, stderr = proc.communicate()
+                        raw_output = stdout or ""
+                        break
+                    except subprocess.TimeoutExpired:
+                        continue
             else:
                 proc.kill()
                 raise subprocess.TimeoutExpired(cmd, timeout)
