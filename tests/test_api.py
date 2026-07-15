@@ -141,29 +141,24 @@ def test_api_get_events_filtering(client, mock_neo4j):
     mock_session = MagicMock()
     mock_driver.session.return_value.__enter__.return_value = mock_session
 
-    class FakeNode:
-        def __init__(self, name, labels, tags):
-            self.labels = set(labels)
-            self._properties = {
-                "name": name,
-                "tags": tags,
-                "sources": ["Grusch-2023"],
-                "content_preview": "Test description"
-            }
-        def get(self, key, default=None):
-            return self._properties.get(key, default)
+    def make_record(name, display_name, date, tags, sources, preview, confidence, labels):
+        return {
+            "name": name,
+            "display_name": display_name,
+            "date": date,
+            "tags": tags,
+            "sources": sources,
+            "preview": preview,
+            "confidence": confidence,
+            "labels": labels,
+        }
 
-    node1 = FakeNode("Roswell Crash", ["Entity"], ["ufo", "crash"])
-    node2 = FakeNode("Technology Stack", ["Concept"], ["project", "technology", "stack"])
-    node3 = FakeNode("Project Serpo", ["Entity"], ["project-serpo", "uap"])
-    node4 = FakeNode("Project Structure", ["Project"], ["build"])
-
-    mock_record1 = {"e": node1}
-    mock_record2 = {"e": node2}
-    mock_record3 = {"e": node3}
-    mock_record4 = {"e": node4}
-
-    mock_session.run.return_value = [mock_record1, mock_record2, mock_record3, mock_record4]
+    mock_session.run.return_value = [
+        make_record("roswell-crash", "Roswell Crash", "1947-07-01", ["ufo", "crash"], ["Grusch-2023"], "Test", 1.0, ["Entity"]),
+        make_record("technology-stack", "Technology Stack", None, ["project", "technology", "stack"], ["Grusch-2023"], "Test", 1.0, ["Concept"]),
+        make_record("project-serpo", "Project Serpo", "1989-01-01", ["project-serpo", "uap"], ["Grusch-2023"], "Test", 1.0, ["Entity"]),
+        make_record("project-structure", "Project Structure", None, ["build"], ["Grusch-2023"], "Test", 1.0, ["Project"]),
+    ]
 
     with patch("src.main.reconcile_neo4j_with_wiki"):
         response = client.get("/events")

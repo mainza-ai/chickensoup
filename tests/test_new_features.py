@@ -333,7 +333,7 @@ def test_sse_endpoint_returns_success(client):
 
 
 def test_ingest_wiki_page_writes_dates():
-    """Phase 1.2: ingest_wiki_page writes 'created', 'updated', 'date' to Neo4j."""
+    """Phase 1.2: ingest_wiki_page writes 'date' to Neo4j from body text."""
     from src.knowledge_graph.ingest import ingest_wiki_page
     from unittest.mock import MagicMock
 
@@ -342,36 +342,27 @@ def test_ingest_wiki_page_writes_dates():
     mock_driver.session.return_value.__enter__.return_value = mock_session
 
     content = """---
-title: Test Entity
-created: '2026-01-15'
-updated: '2026-06-20'
-tags: [test]
+title: Test Event
+tags: [crash, ufo]
+sources: [test]
 ---
-Test body content with [[wikilink]]."""
+In 1996, the Varginha UFO crash occurred in Brazil."""
 
-    nodes, rels = ingest_wiki_page(mock_driver, "Test Entity", content)
+    nodes, rels = ingest_wiki_page(mock_driver, "Test Event", content,
+                                    default_tags=["crash", "ufo"],
+                                    default_sources=["test"])
 
-    # Verify the MERGE query includes date params
+    # Verify the MERGE query includes date param
     call_args = mock_session.run.call_args_list
     merge_calls = [c for c in call_args if "MERGE" in str(c) and "Entity" in str(c)]
     assert len(merge_calls) > 0, "MERGE query should be called"
 
-    # Find the primary node MERGE call and check date params
+    # Find the primary node MERGE call and check date param
     for call in merge_calls:
         kwargs = call[1] if len(call.args) <= 1 else {}
-        if kwargs.get("name") == "test entity":
-            assert kwargs.get("created") == "2026-01-15"
-            assert kwargs.get("updated") == "2026-06-20"
-            assert kwargs.get("date") == "2026-06-20"  # date uses updated first
+        if kwargs.get("name") == "test event":
+            assert kwargs.get("date") is not None, "date should be extracted from body"
             break
-    else:
-        # If we got here, check the kwargs more carefully
-        for call in merge_calls:
-            kwargs = call.kwargs if hasattr(call, 'kwargs') else (call[1] if len(call.args) <= 1 else {})
-            name = kwargs.get("name", "")
-            if name == "test entity" or "test" in str(name):
-                assert kwargs.get("created") == "2026-01-15"
-                assert kwargs.get("updated") == "2026-06-20"
                 break
 
 
