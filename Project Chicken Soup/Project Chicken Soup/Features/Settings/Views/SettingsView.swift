@@ -778,6 +778,7 @@ struct SettingsView: View {
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
+                }
             }
             .padding(DesignConstants.standardPadding)
             .background(DesignConstants.cardBackground)
