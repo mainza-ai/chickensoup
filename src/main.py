@@ -2800,13 +2800,13 @@ async def get_almanac_history(limit: int = 20):
         for f in html_files[:limit]:
             try:
                 stat = f.stat()
-                from datetime import timezone as _tz
+                from datetime import datetime as _dt, timezone as _tz
                 results.append({
                     "date": f.stem,
                     "filename": f.name,
                     "path": str(f),
                     "size_kb": round(stat.st_size / 1024, 1),
-                    "created": datetime.fromtimestamp(stat.st_mtime, tz=_tz.utc).isoformat(),
+                    "created": _dt.fromtimestamp(stat.st_mtime, tz=_tz.utc).isoformat(),
                 })
             except Exception:
                 continue
