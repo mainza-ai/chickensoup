@@ -757,6 +757,13 @@ async def idle_ingestion_loop():
             if not settings.LAST30DAYS_ENABLED:
                 continue
 
+            if not settings.LAST30DAYS_PULSE_ENABLED:
+                progress_update("idle_ingestion", status="pulsing_disabled")
+                if _IDLE_CONSECUTIVE_IDENTICAL_BATCHES > 0:
+                    _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
+                await asyncio.sleep(60)
+                continue
+
             from src.idle_sentinel import IdleSentinel
             from src.staleness_queue import get_next_batch, record_pulse_completed
             from src.agents.pulse_agent import PulseAgent

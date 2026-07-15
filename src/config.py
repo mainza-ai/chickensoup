@@ -127,7 +127,7 @@ class Settings(BaseSettings):
     # Disable in tests to avoid background threads interfering with mock state.
     WIKI_RECONCILE_ON_STARTUP: bool = True
     LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
-    LAST30DAYS_MAX_CLAIMS_PER_PULSE: int = 50
+
     LAST30DAYS_PULSE_ENABLED: bool = False
 
     CLAIM_WAVEFUNCTION_SOCIAL_TRACTION_WEIGHT: float = 0.15

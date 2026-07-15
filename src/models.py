@@ -45,7 +45,7 @@ class DivergenceResult(BaseModel):
 
 class PulseResult(BaseModel):
     entity_name: str
-    status: Literal["success", "disabled", "budget_exceeded", "error", "no_data"] = "success"
+    status: Literal["success", "disabled", "budget_exceeded", "error", "no_data", "preempted"] = "success"
     evidence: List[ClaimEvidence] = Field(default_factory=list)
     raw_snapshot_path: Optional[str] = None
     budget_remaining: float = 0.0

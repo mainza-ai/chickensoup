@@ -29,8 +29,9 @@ def write_pulse_snapshot(
     slug = slugify(entity_name)
     today = _today_str()
     now_iso = _now_iso()
+    timestamp_suffix = datetime.now(timezone.utc).strftime("%H%M%S")
 
-    base_name = f"{slug}-{today}"
+    base_name = f"{slug}-{today}-{timestamp_suffix}"
     json_path = pulse_dir / f"{base_name}.json"
     md_path = pulse_dir / f"{base_name}.md"
 
@@ -113,9 +114,7 @@ def list_pulse_snapshots(entity_name: Optional[str] = None) -> List[Path]:
 
     if entity_name:
         slug = slugify(entity_name)
-        pattern = f"{slug}-{date.today().isoformat()}.json"
-        path = pulse_dir / pattern
-        return [path] if path.exists() else []
+        return sorted(pulse_dir.glob(f"{slug}-*.json"))
 
     return sorted(pulse_dir.glob("*.json"))
 

@@ -2430,7 +2430,7 @@ async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, reques
 
     task = task_registry.create_task(f"Pulse: {entity_name}")
 
-    def execute_pulse():
+    async def execute_pulse_async():
         try:
             task.log(f"Starting pulse for '{entity_name}'...")
             task.update_progress(0.1)
@@ -2441,7 +2441,8 @@ async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, reques
             task.log("Contacting last30days evidence collector...")
             task.update_progress(0.3)
 
-            result = agent.run_pulse(entity_name, handles=handles)
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, agent.run_pulse, entity_name, handles)
 
             if result.status == "error":
                 task.log(f"Pulse execution reported error: {result.error or 'Unknown CLI error'}")
@@ -2455,7 +2456,7 @@ async def post_pulse(entity_name: str, background_tasks: BackgroundTasks, reques
             logger.error(f"Async pulse failed for '{entity_name}': {e}", exc_info=True)
             task.set_failed(str(e))
 
-    background_tasks.add_task(execute_pulse)
+    asyncio.ensure_future(execute_pulse_async())
     return AsyncTaskResponse(
         task_id=task.id,
         status=task.status,
@@ -2716,46 +2717,40 @@ async def get_ingestion_status():
 async def post_almanac_generate(background_tasks: BackgroundTasks, dry_run: bool = True):
     task = task_registry.create_task("Almanac Generation")
 
-    def execute_almanac():
+    async def execute_almanac_async():
         try:
             task.log(f"Initializing Daily Almanac Generation (dry_run={dry_run})...")
             task.update_progress(0.1)
 
-            import asyncio
             from src.almanac.almanac_generator import generate_daily_almanac
 
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                task.log("Analyzing active wiki entities...")
-                task.update_progress(0.2)
+            task.log("Analyzing active wiki entities...")
+            task.update_progress(0.2)
 
-                task.log("Running scheduled pulses & narrative analysis (this may take a few seconds)...")
-                task.update_progress(0.5)
+            task.log("Running scheduled pulses & narrative analysis (this may take a few seconds)...")
+            task.update_progress(0.5)
 
-                result = loop.run_until_complete(generate_daily_almanac(dry_run=dry_run))
+            result = await generate_daily_almanac(dry_run=dry_run)
 
-                task.log(f"Almanac generation completed. Status: {result.status}")
-                if result.error:
-                    task.log(f"Generator warnings: {result.error}")
+            task.log(f"Almanac generation completed. Status: {result.status}")
+            if result.error:
+                task.log(f"Generator warnings: {result.error}")
 
-                task.log(f"Processed {result.entities_processed} entities.")
-                task.log(f"Wavefunctions: {result.claims_collapsed} collapsed, {result.newly_contested} newly contested.")
+            task.log(f"Processed {result.entities_processed} entities.")
+            task.log(f"Wavefunctions: {result.claims_collapsed} collapsed, {result.newly_contested} newly contested.")
 
-                if result.html_path:
-                    task.log(f"HTML brief compiled: {result.html_path}")
-                if result.md_path:
-                    task.log(f"Markdown brief compiled: {result.md_path}")
+            if result.html_path:
+                task.log(f"HTML brief compiled: {result.html_path}")
+            if result.md_path:
+                task.log(f"Markdown brief compiled: {result.md_path}")
 
-                task.update_progress(1.0)
-                task.set_success(result)
-            finally:
-                loop.close()
+            task.update_progress(1.0)
+            task.set_success(result)
         except Exception as e:
             logger.error(f"Async almanac generation failed: {e}", exc_info=True)
             task.set_failed(str(e))
 
-    background_tasks.add_task(execute_almanac)
+    asyncio.ensure_future(execute_almanac_async())
     return AsyncTaskResponse(
         task_id=task.id,
         status=task.status,
