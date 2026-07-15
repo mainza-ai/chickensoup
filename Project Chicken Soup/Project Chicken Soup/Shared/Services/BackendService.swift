@@ -89,19 +89,15 @@ public final class BackendService {
         }
     }
 
-    /// Merges server values into a local TemporalEvent using Phase 3 rules.
-    private func mergeTemporalEvent(_ local: TemporalEvent, with server: APITemporalEvent) {
-        local.title = server.title
-        local.eventDescription = server.eventDescription
-        local.timestamp = server.timestamp
-        local.confidence = server.confidence
+    /// Merges server values into a local LoreEntity using Phase 3 rules.
+    private func mergeEntity(_ local: LoreEntity, with server: APILoreEntity) {
+        local.name = server.name
         local.type = server.type
+        local.summary = server.summary
+        local.confidence = server.confidence
         let localSources = Set(local.sources)
         let serverSources = Set(server.sources ?? [server.source])
         local.sources = Array(localSources.union(serverSources)).sorted()
-        if local.userNotes.isEmpty {
-            local.userNotes = server.userNotes ?? ""
-        }
     }
 
     // MARK: - Fetch Temporal Events
@@ -110,33 +106,60 @@ public final class BackendService {
         defer { isFetchingEvents = false }
 
         do {
-            let apiEvents: [APITemporalEvent] = try await APIClient.shared.request(path: "/events")
+            struct EventsResponse: Codable {
+                let events: [APIRawEvent]
+            }
+            struct APIRawEvent: Codable {
+                let id: String
+                let title: String
+                let description: String?
+                let date: String?
+                let confidence: Double?
+                let source: String?
+                let type: String?
+                let sources: [String]?
+            }
 
-            for apiEvent in apiEvents {
-                let id = apiEvent.id
-                let fetchDescriptor = FetchDescriptor<TemporalEvent>(predicate: #Predicate { $0.id == id })
-                if let existing = try? context.fetch(fetchDescriptor).first {
-                    mergeTemporalEvent(existing, with: apiEvent)
+            let response: EventsResponse = try await APIClient.shared.request(path: "/events")
+            let dateParser = DateFormatter()
+            dateParser.dateFormat = "yyyy-MM-dd"
+            dateParser.timeZone = TimeZone(abbreviation: "UTC")
+
+            let allLocal = try? context.fetch(FetchDescriptor<TemporalEvent>())
+            var seenTitles = Set<String>()
+
+            for apiEvent in response.events {
+                seenTitles.insert(apiEvent.title)
+
+                let existing = allLocal?.first(where: { $0.title == apiEvent.title })
+                if let existing {
+                    existing.eventDescription = apiEvent.description ?? ""
+                    if let dateStr = apiEvent.date, let d = dateParser.date(from: dateStr) {
+                        existing.timestamp = d
+                    }
+                    existing.confidence = apiEvent.confidence ?? 1.0
+                    existing.source = apiEvent.source ?? "Unknown"
+                    existing.type = apiEvent.type ?? "anomaly"
+                    existing.sources = apiEvent.sources ?? []
                 } else {
+                    var timestamp = Date()
+                    if let dateStr = apiEvent.date, let d = dateParser.date(from: dateStr) {
+                        timestamp = d
+                    }
                     let newEvent = TemporalEvent(
-                        id: apiEvent.id,
                         title: apiEvent.title,
-                        eventDescription: apiEvent.eventDescription,
-                        timestamp: apiEvent.timestamp,
-                        confidence: apiEvent.confidence,
-                        source: apiEvent.source,
-                        type: apiEvent.type,
-                        userNotes: apiEvent.userNotes ?? "",
-                        sources: apiEvent.sources ?? [apiEvent.source]
+                        eventDescription: apiEvent.description ?? "",
+                        timestamp: timestamp,
+                        confidence: apiEvent.confidence ?? 1.0,
+                        source: apiEvent.source ?? "Unknown",
+                        type: apiEvent.type ?? "anomaly",
+                        sources: apiEvent.sources ?? []
                     )
                     context.insert(newEvent)
                 }
             }
-            try? context.save()
 
-            let serverEventIDs = Set(apiEvents.map(\.id))
-            let allLocalEvents = try? context.fetch(FetchDescriptor<TemporalEvent>())
-            for local in allLocalEvents ?? [] where !serverEventIDs.contains(local.id) {
+            for local in allLocal ?? [] where !seenTitles.contains(local.title) {
                 context.delete(local)
             }
             try? context.save()
