@@ -242,11 +242,13 @@ public final class BackendService {
                 context.insert(newEntity)
             }
 
-            try? context.save()
+                try? context.save()
             return BackendQueryResult(
                 responseText: response.responseText,
                 conversationId: response.conversationId,
-                taskId: response.taskId
+                taskId: response.taskId,
+                threadId: response.threadId,
+                status: response.status
             )
         } catch {
             self.lastError = APIError.requestFailed(error)
@@ -491,16 +493,47 @@ public final class BackendService {
             return nil
         }
     }
+
+    public func fetchServerTime() async -> Date? {
+        do {
+            let response: APIServerTime = try await APIClient.shared.request(path: "/status/time")
+            return ISO8601DateFormatter().date(from: response.iso8601)
+        } catch {
+            logger.error("Failed to fetch server time: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    public func performSearch(query: String, limit: Int = 20) async -> APISearchResponse? {
+        do {
+            let response: APISearchResponse = try await APIClient.shared.request(
+                path: "/search",
+                method: "GET",
+                queryItems: [
+                    URLQueryItem(name: "q", value: query),
+                    URLQueryItem(name: "limit", value: String(limit)),
+                ]
+            )
+            return response
+        } catch {
+            logger.error("Search failed: \(error.localizedDescription)")
+            return nil
+        }
+    }
 }
 
 public struct BackendQueryResult {
     public let responseText: String
     public let conversationId: String?
     public let taskId: String?
-    
-    public init(responseText: String, conversationId: String? = nil, taskId: String? = nil) {
+    public let threadId: String?
+    public let status: String?
+
+    public init(responseText: String, conversationId: String? = nil, taskId: String? = nil, threadId: String? = nil, status: String? = nil) {
         self.responseText = responseText
         self.conversationId = conversationId
         self.taskId = taskId
+        self.threadId = threadId
+        self.status = status
     }
 }

@@ -9,7 +9,7 @@ related: [docker, fastapi]
 
 # GitHub Actions
 
-GitHub Actions is the chosen CI/CD platform for Project Chicken Soup, providing automated testing, building, and deployment.
+> **⚠️ NOT IMPLEMENTED.** No `.github/workflows/` directory exists. CI/CD is not configured. This page is aspirational documentation for future setup.
 
 ## Overview
 

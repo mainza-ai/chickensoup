@@ -9,6 +9,7 @@ from typing import List, Optional, Dict, Any
 from src.models import TimelinePoint, ClaimEvidence
 from src.wiki.paths import get_pulse_dir, get_entities_dir, get_wiki_dir, get_project_root
 from src.wiki.writer import slugify
+from src.cache import cache_store
 
 logger = logging.getLogger("chickensoup.almanac.timeline")
 
@@ -207,9 +208,28 @@ def _compute_confidences_for_snapshot(snapshot: Dict[str, Any]) -> tuple[float, 
     return epistemic, traction, divergence
 
 
-def build_timeline(entity_name: str, days: int = 30) -> TimelineBuilderResult:
-    snapshots = _parse_pulse_snapshots(entity_name, days=days)
-    git_commits = _parse_git_history(entity_name, days=days)
+def build_timeline(entity_name: str, days: int = 365, include_all: bool = False) -> TimelineBuilderResult:
+    """Build timeline from pulse snapshots, git history, and Neo4j event nodes.
+    
+    Returns points sorted chronologically. Results are cached for 5 minutes.
+    """
+    # Check cache
+    cache_key = f"timeline:{entity_name}:{days}:{include_all}"
+    try:
+        cached = cache_store.get(cache_key)
+        if cached:
+            points = [TimelinePoint(**p) for p in cached["points"]]
+            logger.debug(f"Timeline cache hit for {entity_name}")
+            return TimelineBuilderResult(points=points, entity_name=entity_name)
+    except Exception:
+        pass
+
+    pulse_days = None if include_all else days
+    snapshots = _parse_pulse_snapshots(entity_name, days=pulse_days)
+    git_commits = _parse_git_history(entity_name, days=pulse_days)
+
+    # Phase 3: Also query Neo4j for event nodes connected to this entity
+    neo4j_events = _query_neo4j_events(entity_name)
 
     # Build points from pulse snapshots
     points: List[TimelinePoint] = []
@@ -242,14 +262,30 @@ def build_timeline(entity_name: str, days: int = 30) -> TimelineBuilderResult:
         if existing is None or snap.get("timestamp", "") > points_by_date[date_part].date:
             points_by_date[date_part] = point
 
+    # Merge Neo4j events as additional points where no pulse exists for that date
+    for event in neo4j_events:
+        event_date = event.get("date")
+        if not event_date:
+            continue
+        date_part = event_date[:10] if len(event_date) >= 10 else event_date
+        if date_part not in points_by_date:
+            points_by_date[date_part] = TimelinePoint(
+                date=date_part,
+                epistemic_confidence=event.get("confidence", 0.5),
+                social_traction=0.0,
+                divergence_risk=0.0,
+                active_claims=[event.get("display_name") or event.get("name", "")],
+                pulse_file=None,
+                wiki_commit=None,
+            )
+
     # Merge git commits as additional points where no pulse exists for that date
-    commit_map: Dict[str, str] = {}  # date -> sha
+    commit_map: Dict[str, str] = {}
     for commit in git_commits:
         date_str = commit["date"]
         date_part = date_str[:10] if len(date_str) >= 10 else "unknown"
         commit_map[date_part] = commit["sha"]
         if date_part not in points_by_date:
-            # Create a wiki-only point
             points_by_date[date_part] = TimelinePoint(
                 date=date_part,
                 epistemic_confidence=0.5,
@@ -265,7 +301,49 @@ def build_timeline(entity_name: str, days: int = 30) -> TimelineBuilderResult:
         if date_part in commit_map and point.wiki_commit is None:
             point.wiki_commit = commit_map[date_part]
 
-    # Sort chronologically
     sorted_points = sorted(points_by_date.values(), key=lambda p: p.date)
 
+    # Cache result
+    try:
+        cache_store.set(
+            cache_key,
+            {"points": [p.model_dump() for p in sorted_points]},
+            ttl=300,
+        )
+    except Exception:
+        pass
+
     return TimelineBuilderResult(points=sorted_points, entity_name=entity_name)
+
+
+def _query_neo4j_events(entity_name: str) -> list[dict]:
+    """Query Neo4j for Event nodes connected to this entity, or general events with dates."""
+    try:
+        from src.knowledge_graph.connection import neo4j_conn
+        driver = neo4j_conn.get_driver()
+        if not driver:
+            return []
+        with driver.session() as session:
+            # First try direct relationship
+            result = session.run("""
+                MATCH (e:Entity {name: $name})-[r]-(ev:Event)
+                WHERE ev.date IS NOT NULL
+                RETURN ev.name AS name, ev.display_name AS display_name, ev.date AS date, ev.confidence AS confidence
+                ORDER BY ev.date ASC
+                LIMIT 50
+            """, name=entity_name)
+            events = [dict(r) for r in result]
+            if events:
+                return events
+            # Fall back to general events with dates (no direct relationship)
+            result = session.run("""
+                MATCH (ev:Event)
+                WHERE ev.date IS NOT NULL
+                RETURN ev.name AS name, ev.display_name AS display_name, ev.date AS date, ev.confidence AS confidence
+                ORDER BY ev.date ASC
+                LIMIT 20
+            """)
+            return [dict(r) for r in result]
+    except Exception as e:
+        logger.debug(f"Neo4j event query failed for '{entity_name}': {e}")
+        return []

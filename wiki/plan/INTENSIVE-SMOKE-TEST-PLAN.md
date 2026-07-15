@@ -643,6 +643,92 @@ duration: Xs
 
 ---
 
+
+## 15. New Feature Smoke Tests (added 2026-07-14)
+
+### 15.1 Fulltext Search (Phase 1)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `search-01` | `GET /search?q=bob+lazar&limit=3` | 200, `total > 0`, results sorted by `score` descending |
+| `search-02` | `GET /search?q=a` | 422 (min length 2) |
+| `search-03` | `GET /search?q=xyznonexistent` | 200, `total == 0`, `results == []` |
+| `search-04` | `GET /search` (no q param) | 422 |
+
+### 15.2 Events (Phase 1)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `events-01` | `GET /events` | 200, each event has `id`, `title`, `description`, `date`, `confidence`, `source`, `type`, `sources` |
+| `events-02` | `GET /events` | No hardcoded fabricated timestamps in response |
+
+### 15.3 Timeline (Phase 3)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `timeline-01` | `GET /timeline` | 200, `events` array sorted by `date` ascending |
+| `timeline-02` | `GET /timeline?start_date=2020-01-01&end_date=2025-01-01` | 200, respects date range |
+| `timeline-03` | `GET /timeline/range` | 200, has `earliest`, `latest`, `total` |
+| `timeline-04` | `GET /entities/{name}/temporal-context` | 200, events connected to entity |
+
+### 15.4 Rate Limiting (Phase 5)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `ratelimit-01` | 61x `GET /search?q=test` | Requests 61+ return 429 with `search` in message |
+| `ratelimit-02` | 11x `POST /ingest/bulk` | Requests 11+ return 429 with `write` in message |
+
+### 15.5 Approval Flow (Phase 6)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `approve-01` | `POST /query` (low credibility) | `status == "paused_for_human_approval"`, `thread_id` present |
+| `approve-02` | Response from approve-01 | Has `status` and `thread_id` fields |
+| `approve-03` | `POST /research/nonexistent/approve` | 404 |
+| `approve-04` | `POST /research/default_thread/approve` | 400 (not paused) |
+
+### 15.6 Streaming WebSocket (Phase 6)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `ws-01` | `ws://host:8000/ws/agent` | Accepts connection, returns processing status |
+| `ws-02` | Send query via ws-01 | Receives `processing`, `streaming` chunks, `completed` |
+| `ws-03` | Send invalid data to ws-01 | Returns `error` status |
+
+### 15.7 Space-Time Simulator (Phase 7)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `sim-01` | `POST /simulate` with all params | 200, `success == true`, `logs` non-empty |
+| `sim-02` | `POST /simulate` with empty body | 200, uses defaults |
+| `sim-03` | `POST /simulate` with `gravity: 99` | 422 |
+| `sim-04` | `POST /simulate` | Response has all 10 expected fields |
+
+### 15.8 Server Time (Phase 0)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `time-01` | `GET /status/time` | Has `iso8601`, `unix`, `datetime`, `timezone`, `utc_offset`, `utc_iso8601` |
+| `time-02` | `GET /status/time` | `unix > 1700000000` |
+| `time-03` | `GET /status/time` | `timezone` non-empty |
+
+### 15.9 SSE Notifications (Phase 4)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `sse-01` | `GET /events/stream` | 200, `content-type: text/event-stream` |
+| `sse-02` | Trigger ingest while connected to sse-01 | Receives `entity_updated` event |
+| `sse-03` | Wait 30s on sse-01 stream | Receives `heartbeat` event |
+
+### 15.10 Neo4j Resilience (Phase 10)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `neo4j-01` | `GET /health` | `checks.neo4j.ok == true` |
+| `neo4j-02` | Kill Neo4j, make 3 failing requests | Health shows Neo4j degraded |
+| `neo4j-03` | Restart Neo4j, wait 30s | Health recovers |
+
+### 15.11 Cloud LLM Provider (Cloud)
+| Test | Endpoint | Expected |
+|---|---|---|
+| `cloud-01` | `GET /config` | Has `llm_provider_type`, `nvidia_api_key_set`, `openrouter_api_key_set`, `custom_llm_api_url_set` |
+| `cloud-02` | `POST /config/llm/probe` with `{"provider_name": "nvidia"}` | `available: true`, models non-empty |
+
+---
+
+## 16. Observability and Logging
+
+### 16.1 OpenTelemetry Spans
 ## 15. Observability and Logging
 
 ### 15.1 OpenTelemetry Spans

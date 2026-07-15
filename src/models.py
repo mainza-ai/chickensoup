@@ -90,6 +90,8 @@ class QueryResponse(BaseModel):
     claim_confidences: List[ClaimConfidence] = Field(default_factory=list)
     source_tier: str = Field("local", description="local | network_opt_in")
     task_id: Optional[str] = Field(None, description="Background task ID when status is task_created")
+    thread_id: Optional[str] = Field(None, description="Research thread ID for human approval flow")
+    status: str = Field("completed", description="completed | paused_for_human_approval | researching | task_created")
 
 
 class NavigateRequest(BaseModel):
@@ -140,6 +142,8 @@ class ModelsResponse(BaseModel):
 class LLMProviderStatus(BaseModel):
     available: bool = False
     models: List[str] = []
+    type: str = "local"  # "local" or "cloud"
+    api_key_configured: bool = False
 
 
 class ConfigRequest(BaseModel):
@@ -150,6 +154,12 @@ class ConfigRequest(BaseModel):
     quantum_hardware_enabled: bool = False
     llm_active_provider: Optional[str] = None
     llm_active_model: Optional[str] = None
+    llm_provider_type: Optional[str] = None  # "local" or "cloud"
+    nvidia_api_key: Optional[str] = None
+    openrouter_api_key: Optional[str] = None
+    custom_llm_api_key: Optional[str] = None
+    custom_llm_api_url: Optional[str] = None
+    custom_llm_models: Optional[str] = None
 
 
 class ConfigResponse(BaseModel):
@@ -163,6 +173,10 @@ class ConfigResponse(BaseModel):
     llm_active_model: str
     llm_available_models: List[str]
     llm_providers: Dict[str, LLMProviderStatus] = {}
+    llm_provider_type: str = "local"
+    nvidia_api_key_set: bool = False
+    openrouter_api_key_set: bool = False
+    custom_llm_api_url_set: bool = False
     last30days_enabled: bool = False
 
 
@@ -180,7 +194,7 @@ class LLMConfigResponse(BaseModel):
 
 
 class LLMProbeRequest(BaseModel):
-    provider_name: str = Field(..., description="Provider to probe: omlx, ollama, lmstudio")
+    provider_name: str = Field(..., description="Provider to probe: omlx, ollama, lmstudio, nvidia, openrouter, custom")
 
 
 class LLMProbeResponse(BaseModel):
@@ -345,4 +359,25 @@ class AsyncTaskResponse(BaseModel):
     task_id: str
     status: str
     message: str
+
+
+class SimulateRequest(BaseModel):
+    origin: Optional[str] = None
+    destination: Optional[str] = None
+    gravity: float = Field(0.5, ge=0, le=1)
+    velocity: float = Field(0.5, ge=0, le=1)
+    intensity: float = Field(0.5, ge=0, le=1)
+
+
+class SimulateResponse(BaseModel):
+    success: bool
+    gravity_metric: float
+    velocity_metric: float
+    field_intensity: float
+    resolved_path_confidence: float
+    logs: List[str] = Field(default_factory=list)
+    warp_factor: Optional[float] = None
+    lapse: Optional[float] = None
+    entropy_density: Optional[float] = None
+    target_year: Optional[int] = None
 

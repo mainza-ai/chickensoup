@@ -4,26 +4,23 @@ from opentelemetry import trace, metrics
 from opentelemetry.trace import Tracer
 from opentelemetry.metrics import Meter, Counter, Histogram
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
 from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import ConsoleMetricExporter, PeriodicExportingMetricReader
 
 logger = logging.getLogger("chickensoup.observability")
 
-# Set up tracing
+# Set up tracing — no console exporter to avoid log noise
 try:
     provider = TracerProvider()
-    processor = SimpleSpanProcessor(ConsoleSpanExporter())
-    provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 except Exception as e:
     logger.debug(f"TracerProvider already initialized or failed: {e}")
 
 tracer: Tracer = trace.get_tracer("chickensoup.tracer")
 
-# Set up metrics
+# Set up metrics — no console exporter to avoid log noise
 try:
-    metric_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+    meter_provider = MeterProvider()
+    metrics.set_meter_provider(meter_provider)
     meter_provider = MeterProvider(metric_readers=[metric_reader])
     metrics.set_meter_provider(meter_provider)
 except Exception as e:

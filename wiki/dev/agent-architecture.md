@@ -2,40 +2,46 @@
 title: "Agent Architecture"
 tags: [agent, architecture, multi-agent, pydantic-graph, langgraph]
 created: 2026-06-22
-updated: 2026-06-24
+updated: 2026-07-15
 sources: []
 related: [pydantic-ai, pydantic-graph, langgraph, local-first-llm, multi-llm-consensus, langgraph-workflows]
 ---
 
 # Agent Architecture
 
-Hybrid: pydantic-graph for top-level orchestration, LangGraph for complex sub-workflows with checkpointing and human-in-the-loop.
-
-> **2026-06-24 update:** Major production hardening across all agents — see sections below for confidence gating, wiki file fallback, timeout isolation, and routing observability.
+Hybrid: pydantic-graph for top-level orchestration, LangGraph for complex sub-workflows with checkpointing and human-in-the-loop. 8 agent files in `src/agents/`.
 
 ## Components
 
 ```
-                  ┌──────────────────────────────┐
-                  │   Orchestrator (pydantic-graph) │
-                  │   4 nodes: Classify, Research,  │
-                  │   Navigate, Status              │
-                  └──────────┬───────────────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-       ┌──────▼──────┐ ┌────▼────┐  ┌──────▼──────┐
-       │ Query Agent  │ │Research │  │ Navigation   │
-       │ 3-tier parse │ │ Agent   │  │ Agent        │
-       │ TQL→LLM→     │ │LangGraph│  │ pipe: sim→   │
-       │ heuristic     │ │5 nodes │  │ field→path   │
-       └──────┬──────┘ └────┬────┘  └──────┬──────┘
-              │             │              │
-              │        ┌────▼────┐         │
-              │        │ Neo4j   │         │
-              └────────┤ KG     ├─────────┘
+                   ┌──────────────────────────────┐
+                   │   Orchestrator (pydantic-graph) │
+                   │   6 nodes: Classify, Research,  │
+                   │   Navigate, Status, Enrich      │
+                   └──────────┬───────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+       ┌──────▼──────┐  ┌────▼────┐   ┌──────▼──────┐
+       │ Query Agent  │  │Research │   │ Navigation   │
+       │ 3-tier parse │  │ Agent   │   │ Agent        │
+       │ TQL→LLM→     │  │LangGraph│   │ pipe: sim→   │
+       │ heuristic     │  │6 nodes  │   │ field→path   │
+       └──────┬──────┘  └────┬────┘   └──────┬──────┘
+              │              │               │
+              │         ┌────▼────┐          │
+              │         │ Neo4j   │          │
+              └─────────┤ KG     ├──────────┘
                        │ queries │
                        └─────────┘
+
+  Supporting agents (background / non-orchestrator):
+
+  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐
+  │  Pulse Agent │  │   Tribunal   │  │ Ingest Agent │  │ Chat Ingest      │
+  │  last30days  │  │ Skeptic/Emp │  │ content→wiki │  │ Agent            │
+  │  evidence    │  │ Referee      │  │ page creation │  │ conversation→wiki│
+  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────────┘
 ```
 
 ## Query Agent (`src/agents/query_agent.py`)
@@ -116,6 +122,22 @@ Each timeout is independently configurable in the source file. A timeout at any 
 The `_build_query_response()` helper in `main.py` consolidates the previously duplicated `output.get("answer", "No response generated.")` pattern across the HTTP POST `/query` handler and the WebSocket `/ws/agent` handler. It handles paused states, error states, and conversation history consistently.
 
 Dependency injection via `OrchestratorDeps`, thread-based execution per query.
+
+## Pulse Agent (`src/agents/pulse_agent.py`)
+
+Runs the `last30days` external CLI to collect social-platform evidence for a given entity. Budget-guarded via Lua atomic check, respects disabled/no-op gate. Writes immutable dated snapshots to `wiki/raw/pulse/{slug}-{date}.json` and parallel `.md` files. Returns structured `ClaimEvidence[]` with platform inference and URL extraction.
+
+## Tribunal Agent (`src/agents/tribunal_agent.py`)
+
+Adversarial claim evaluation via 3 LLM roles (Skeptic, Empiricist, Believer) + Referee synthesizer. Only triggers when `state_label == contested` or `divergence_risk >= 0.7`. Uncontested claims never trigger (0 LLM calls — cost control). Returns 3 positions with citations + referee synthesis + preserved disagreements.
+
+## Ingest Agent (`src/agents/ingest_agent.py`)
+
+LLM-based content analysis for wiki page extraction. `analyze_content()` passes document body through LLM to identify entities, concepts, and projects. Returns `IngestResponse` with `suggested_pages[]`. Falls back to heuristic analysis when LLM is unavailable.
+
+## Chat Ingest Agent (`src/agents/chat_ingest_agent.py`)
+
+Conversation-aware LLM extraction for the chat-to-wiki pipeline. Scans conversation history for mention-worthy topics, entities, and claims. Creates new wiki pages from chat content. Falls back to heuristic topic extraction when LLM is unavailable.
 
 ## See Also
 

@@ -364,16 +364,59 @@ workflow.add_edge("human_approval_gate", "context_assembly")
 workflow.add_edge("context_assembly", END)
 
 # Checkpointer for persistent state saving & resuming.
-# Uses RedisSaver when Redis is available; falls back to MemorySaver.
-# interrupt_before human_approval_gate so the graph truly pauses
-# when human approval is required, enabling resume via POST /research/{thread_id}/approve
+# Uses a simple Redis key-value checkpointer when Redis is available;
+# falls back to MemorySaver. Avoids RedisSearch (FT._LIST) dependency.
 
 def _create_checkpointer():
     try:
-        from langgraph.checkpoint.redis import RedisSaver
-        cp = RedisSaver(redis_url=settings.REDIS_URL)
+        import redis
+        from langgraph.checkpoint.base import BaseCheckpointSaver
+        from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+
+        r = redis.from_url(settings.REDIS_URL)
+        r.ping()
+
+        class RedisKVCheckpointer(BaseCheckpointSaver):
+            def __init__(self, redis_client):
+                super().__init__(serde=JsonPlusSerializer())
+                self.redis = redis_client
+                self.key_prefix = "checkpoint:"
+
+            def get(self, config):
+                thread_id = config["configurable"]["thread_id"]
+                data = self.redis.get(f"{self.key_prefix}{thread_id}")
+                if data:
+                    return self.serde.loads(data)
+                return None
+
+            def put(self, config, checkpoint, metadata):
+                thread_id = config["configurable"]["thread_id"]
+                self.redis.set(
+                    f"{self.key_prefix}{thread_id}",
+                    self.serde.dumps({"checkpoint": checkpoint, "metadata": metadata}),
+                    ex=86400,
+                )
+                return self.get_tuple(config)
+
+            def get_tuple(self, config):
+                thread_id = config["configurable"]["thread_id"]
+                data = self.redis.get(f"{self.key_prefix}{thread_id}")
+                if data:
+                    payload = self.serde.loads(data)
+                    from langgraph.checkpoint.base import CheckpointTuple
+                    return CheckpointTuple(
+                        config=config,
+                        checkpoint=payload["checkpoint"],
+                        metadata=payload["metadata"],
+                    )
+                return None
+
+            def list(self, config, filter=None, before=None, limit=None):
+                return []
+
+        cp = RedisKVCheckpointer(r)
         cp.setup()
-        logger.info("Using RedisSaver for persistent checkpointing")
+        logger.info("Using RedisKVCheckpointer for persistent checkpointing")
         return cp
     except Exception as e:
         logger.warning(f"Redis checkpointer unavailable, using MemorySaver: {e}")
@@ -493,16 +536,16 @@ class ResearchAgent:
             "credibility_scores": final_state.get("credibility_scores", {}),
             "wavefunction_scores": final_state.get("wavefunction_scores", {}),
             "human_approval_required": final_state.get("human_approval_required", False) and not final_state.get("human_approved", False),
-            "summary": summary or "Summary generation fallback.",
+            "summary": summary or "",
             "thread_id": thread_id,
             "inferred_events": inferred_events,
             "inferred_entities": inferred_entities,
         }
 
     @cache_decorator(prefix="mcp", ttl=300)
-    def _generate_summary(self, query: str, context: str, history: List[Dict[str, str]] = None) -> str:
+    def _generate_summary(self, query: str, context: str, history: List[Dict[str, str]] = None) -> Optional[str]:
         if get_active_provider() == "simulated":
-            return f"Lore Summary: Detailed report matches query '{query}'."
+            return None
 
         prompt = f"""
         Analyze the following research context and answer the user query: "{query}"
@@ -532,4 +575,4 @@ class ResearchAgent:
         )
         if result:
             return result
-        return f"Lore Summary: Found relevant context matches. {query}"
+        return None

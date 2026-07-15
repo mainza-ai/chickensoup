@@ -77,6 +77,8 @@ public struct APITimeTravelSimulationResponse: Codable {
     public var velocityMetric: Double
     public var fieldIntensity: Double
     public var resolvedPathConfidence: Double
+    public var warpFactor: Double?
+    public var targetYear: Int?
 
     enum CodingKeys: String, CodingKey {
         case success, logs
@@ -84,15 +86,19 @@ public struct APITimeTravelSimulationResponse: Codable {
         case velocityMetric = "velocity_metric"
         case fieldIntensity = "field_intensity"
         case resolvedPathConfidence = "resolved_path_confidence"
+        case warpFactor = "warp_factor"
+        case targetYear = "target_year"
     }
 
-    public init(success: Bool, logs: [String], gravityMetric: Double, velocityMetric: Double, fieldIntensity: Double, resolvedPathConfidence: Double) {
+    public init(success: Bool, logs: [String], gravityMetric: Double, velocityMetric: Double, fieldIntensity: Double, resolvedPathConfidence: Double, warpFactor: Double? = nil, targetYear: Int? = nil) {
         self.success = success
         self.logs = logs
         self.gravityMetric = gravityMetric
         self.velocityMetric = velocityMetric
         self.fieldIntensity = fieldIntensity
         self.resolvedPathConfidence = resolvedPathConfidence
+        self.warpFactor = warpFactor
+        self.targetYear = targetYear
     }
 }
 
@@ -102,15 +108,19 @@ public struct APIQueryResponse: Codable {
     public var inferredEntities: [APILoreEntity]
     public var conversationId: String?
     public var taskId: String?
-    
+    public var threadId: String?
+    public var status: String?
+
     enum CodingKeys: String, CodingKey {
         case responseText = "answer"
         case inferredEvents = "inferred_events"
         case inferredEntities = "inferred_entities"
         case conversationId = "conversation_id"
         case taskId = "task_id"
+        case threadId = "thread_id"
+        case status
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.responseText = try container.decode(String.self, forKey: .responseText)
@@ -118,14 +128,18 @@ public struct APIQueryResponse: Codable {
         self.inferredEntities = try container.decodeIfPresent([APILoreEntity].self, forKey: .inferredEntities) ?? []
         self.conversationId = try container.decodeIfPresent(String.self, forKey: .conversationId)
         self.taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
+        self.threadId = try container.decodeIfPresent(String.self, forKey: .threadId)
+        self.status = try container.decodeIfPresent(String.self, forKey: .status)
     }
-    
-    public init(responseText: String, inferredEvents: [APITemporalEvent] = [], inferredEntities: [APILoreEntity] = [], conversationId: String? = nil, taskId: String? = nil) {
+
+    public init(responseText: String, inferredEvents: [APITemporalEvent] = [], inferredEntities: [APILoreEntity] = [], conversationId: String? = nil, taskId: String? = nil, threadId: String? = nil, status: String? = nil) {
         self.responseText = responseText
         self.inferredEvents = inferredEvents
         self.inferredEntities = inferredEntities
         self.conversationId = conversationId
         self.taskId = taskId
+        self.threadId = threadId
+        self.status = status
     }
 }
 
@@ -1507,6 +1521,22 @@ public struct APIStatusProgressSection: Codable {
     }
 }
 
+public struct APIServerTime: Codable {
+    public var iso8601: String
+    public var unix: Double
+    public var datetime: String
+    public var timezone: String
+    public var utcOffset: String
+    public var utcIso8601: String
+
+    enum CodingKeys: String, CodingKey {
+        case iso8601, unix, datetime, timezone
+        case utcOffset = "utc_offset"
+        case utcIso8601 = "utc_iso8601"
+    }
+}
+
+
 public struct APIStatusProgress: Codable {
     public var reconciliation: APIStatusProgressSection?
     public var idleIngestion: APIStatusProgressSection?
@@ -1525,4 +1555,33 @@ public struct APIStatusProgress: Codable {
         case llmClient = "llm_client"
         case neo4j
     }
+}
+
+
+public struct APISearchResult: Codable, Identifiable {
+    public var id: String { name }
+    public let name: String
+    public let displayName: String
+    public let labels: [String]
+    public let preview: String?
+    public let confidence: Double
+    public let tags: [String]?
+    public let score: Double
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case displayName = "display_name"
+        case labels
+        case preview
+        case confidence
+        case tags
+        case score
+    }
+}
+
+
+public struct APISearchResponse: Codable {
+    public let results: [APISearchResult]
+    public let query: String
+    public let total: Int
 }

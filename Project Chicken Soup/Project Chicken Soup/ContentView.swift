@@ -21,6 +21,8 @@ struct ContentView: View {
     @State private var showIngestion = false
     @State private var showSettings = false
     @State private var messages: [ChatMessage] = []
+    @State private var conversationService = ConversationService.shared
+    @State private var showConversations = false
 
     // Migration guard prompt
     @State private var showMigrationAlert = false
@@ -59,6 +61,13 @@ struct ContentView: View {
             .task {
                 await fetchInitialData()
                 showMigrationAlertIfNeeded()
+                messages = conversationService.loadMessages()
+            }
+            .onChange(of: messages) { _, _ in
+                conversationService.saveMessages(messages)
+            }
+            .onChange(of: conversationService.activeConversationId) { _, _ in
+                messages = conversationService.loadMessages()
             }
             .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
             .alert("Restore from Backup?", isPresented: $showMigrationAlert) {
@@ -83,6 +92,13 @@ struct ContentView: View {
         .task {
             await fetchInitialData()
             showMigrationAlertIfNeeded()
+            messages = conversationService.loadMessages()
+        }
+        .onChange(of: messages) { _, _ in
+            conversationService.saveMessages(messages)
+        }
+        .onChange(of: conversationService.activeConversationId) { _, _ in
+            messages = conversationService.loadMessages()
         }
         .preferredColorScheme(backendService.config.isDarkMode ? .dark : .light)
         .alert("Restore from Backup?", isPresented: $showMigrationAlert) {
@@ -193,8 +209,9 @@ struct ContentView: View {
                                     messages: $messages,
                                     onClear: {
                                         withAnimation(.spring(duration: 0.3)) {
-                                            messages.removeAll()
-                                            backendService.graph.showChatHistory = false
+                                        messages.removeAll()
+                                        backendService.graph.showChatHistory = false
+                                        conversationService.clearActiveMessages()
                                         }
                                     },
                                     onClose: {
@@ -203,7 +220,7 @@ struct ContentView: View {
                                         }
                                     },
                                     onApproveResearch: { threadId in
-                                        Task { await backendService.approveResearch(threadId: threadId) }
+                                        approveResearchThread(threadId: threadId)
                                     }
                                 )
                                 Spacer()
@@ -330,7 +347,7 @@ struct ContentView: View {
                                             }
                                         },
                                         onApproveResearch: { threadId in
-                                            Task { await backendService.approveResearch(threadId: threadId) }
+                                            approveResearchThread(threadId: threadId)
                                         }
                                     )
                                     .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -464,17 +481,105 @@ struct ContentView: View {
     private func handleQuerySubmit() {
         guard !queryText.isEmpty else { return }
         let currentQuery = queryText
-        
+
         withAnimation(.spring(duration: 0.3)) {
             messages.append(ChatMessage(isUser: true, text: currentQuery))
             backendService.graph.showChatHistory = true
             queryText = ""
+            conversationService.updateActiveTitle(from: messages)
         }
-        
+
         Task {
-            let result = await backendService.submitQuery(currentQuery, isStructured: isStructuredQuery, context: modelContext)
-            
-            if let taskId = result.taskId {
+            // Try streaming via WebSocket first
+            let streamed = await submitQueryStreaming(currentQuery)
+            if !streamed {
+                // Fall back to HTTP polling
+                await submitQueryHTTP(currentQuery)
+            }
+        }
+    }
+
+    private func submitQueryStreaming(_ query: String) async -> Bool {
+        let stream = ChatStreamManager.shared
+        guard !stream.isStreaming else { return false }
+
+        let placeholder = ChatMessage(
+            isUser: false,
+            text: "",
+            researchStatus: "researching"
+        )
+        await MainActor.run {
+            withAnimation(.spring(duration: 0.4)) {
+                messages.append(placeholder)
+            }
+        }
+
+        return await withCheckedContinuation { continuation in
+            var timedOut = false
+            let timeoutTask = Task {
+                try? await Task.sleep(for: .seconds(5))
+                timedOut = true
+                if !Task.isCancelled {
+                    continuation.resume(returning: false)
+                }
+            }
+
+            stream.onToken = { accumulated in
+                Task { @MainActor in
+                    if let idx = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                        self.messages[idx].text = accumulated
+                        self.messages[idx].researchStatus = "streaming"
+                    }
+                }
+                timeoutTask.cancel()
+            }
+
+            stream.onComplete = { finalText in
+                Task { @MainActor in
+                    if let idx = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                        self.messages[idx].text = finalText
+                        self.messages[idx].researchStatus = "completed"
+                    }
+                }
+                if !timedOut {
+                    continuation.resume(returning: true)
+                }
+            }
+
+            stream.onError = { errorText in
+                Task { @MainActor in
+                    if let idx = self.messages.firstIndex(where: { $0.id == placeholder.id }) {
+                        self.messages[idx].researchStatus = "failed"
+                        if self.messages[idx].text.isEmpty {
+                            self.messages[idx].text = "Stream failed: \(errorText)"
+                        }
+                    }
+                }
+                if !timedOut {
+                    continuation.resume(returning: false)
+                }
+            }
+
+            stream.sendQuery(query)
+        }
+    }
+
+    private func submitQueryHTTP(_ query: String) async {
+        let result = await backendService.submitQuery(query, isStructured: isStructuredQuery, context: modelContext)
+
+            if result.status == "paused_for_human_approval", let threadId = result.threadId {
+                let approvalMsg = ChatMessage(
+                    isUser: false,
+                    text: result.responseText,
+                    threadId: threadId,
+                    researchStatus: "pending_approval"
+                )
+                await MainActor.run {
+                    withAnimation(.spring(duration: 0.4)) {
+                        messages.append(approvalMsg)
+                    }
+                }
+            } else if let taskId = result.taskId {
                 let placeholder = ChatMessage(
                     isUser: false,
                     text: "Researching in the background…",
@@ -494,17 +599,42 @@ struct ContentView: View {
                     }
                 }
             }
+    }
+
+    private func approveResearchThread(threadId: String) {
+        Task { [self] in
+            let result = await self.backendService.approveResearch(threadId: threadId)
+            await MainActor.run {
+                withAnimation(.spring(duration: 0.4)) {
+                    if let idx = self.messages.firstIndex(where: { $0.threadId == threadId }) {
+                        if let (success, summary) = result {
+                            self.messages[idx].text = summary
+                            self.messages[idx].researchStatus = success ? "completed" : "failed"
+                        } else {
+                            self.messages[idx].text = "Failed to approve research."
+                            self.messages[idx].researchStatus = "failed"
+                        }
+                    }
+                }
+            }
         }
     }
-    
+
     private func pollResearchTask(taskId: String, placeholderId: UUID) async {
         var status: APITaskStatus?
-        
-        repeat {
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
+        var delay: UInt64 = 1_000_000_000
+
+        for attempt in 1...30 {
+            try? await Task.sleep(nanoseconds: delay)
             status = await backendService.almanac.fetchTaskStatus(taskId: taskId)
-        } while status?.status == "running"
-        
+
+            if status?.status != "running" {
+                break
+            }
+
+            delay = min(delay * 2, 10_000_000_000)
+        }
+
         await MainActor.run {
             withAnimation(.spring(duration: 0.4)) {
                 if let idx = messages.firstIndex(where: { $0.id == placeholderId }) {
@@ -558,10 +688,40 @@ extension View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Settings", systemImage: "gearshape") {
-                    showSettings.wrappedValue = true
+                HStack(spacing: 8) {
+                    Button("Conversations", systemImage: "list.bullet") {
+                        showConversations.toggle()
+                    }
+                    .buttonStyle(.plain)
+                    .labelStyle(.iconOnly)
+                    .help("Conversations")
+
+                    Button("Settings", systemImage: "gearshape") {
+                        showSettings.wrappedValue = true
+                    }
                 }
             }
+        }
+        .sheet(isPresented: $showConversations) {
+            NavigationStack {
+                ConversationListView(
+                    onSelectConversation: { id in
+                        conversationService.switchTo(id)
+                        showConversations = false
+                    },
+                    onNewConversation: {
+                        conversationService.createNew()
+                        messages = []
+                        showConversations = false
+                    }
+                )
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { showConversations = false }
+                    }
+                }
+            }
+            .frame(minWidth: 300, idealWidth: 350, maxWidth: 400)
         }
     }
     #endif

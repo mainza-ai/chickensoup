@@ -11,6 +11,35 @@ from typing import Optional
 
 logger = logging.getLogger("chickensoup.circuit_breaker")
 
+# Late import to avoid circular dependency
+_settings = None
+
+def _get_threshold():
+    global _settings
+    if _settings is None:
+        try:
+            from src.config import Settings
+            _settings = Settings()
+        except Exception:
+            return 5
+    try:
+        return _settings.LLM_CIRCUIT_BREAKER_THRESHOLD
+    except Exception:
+        return 5
+
+def _get_recovery():
+    global _settings
+    if _settings is None:
+        try:
+            from src.config import Settings
+            _settings = Settings()
+        except Exception:
+            return 60.0
+    try:
+        return _settings.LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT
+    except Exception:
+        return 60.0
+
 
 class CircuitBreaker:
     def __init__(
@@ -71,9 +100,9 @@ class CircuitBreaker:
             raise
 
 
-# Global circuit breaker instance for LLM calls
+# Global circuit breaker instance for LLM calls — values loaded from config.py
 llm_circuit_breaker = CircuitBreaker(
     name="llm_provider",
-    failure_threshold=5,
-    recovery_timeout=60.0,
+    failure_threshold=_get_threshold(),
+    recovery_timeout=_get_recovery(),
 )

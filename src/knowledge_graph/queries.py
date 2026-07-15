@@ -1,9 +1,44 @@
 import logging
 from typing import Dict, List, Any
 from neo4j import Driver
-from src.cache import cache_decorator
+from src.cache import cache_decorator, cache_store
 
 logger = logging.getLogger("chickensoup.neo4j.queries")
+
+
+@cache_decorator(prefix="neo4j", ttl=60)
+def fulltext_search(driver: Driver, query_term: str, limit: int = 20) -> list[dict]:
+    """
+    Performs a fulltext search using the Neo4j fulltext index.
+    Returns scored results sorted by relevance.
+    """
+    cypher = """
+    CALL db.index.fulltext.queryNodes('fulltext_entity', $query)
+    YIELD node, score
+    RETURN node.name AS name,
+           node.display_name AS display_name,
+           labels(node) AS labels,
+           node.content_preview AS preview,
+           node.confidence AS confidence,
+           node.tags AS tags,
+           score
+    ORDER BY score DESC
+    LIMIT $limit
+    """
+    results = []
+    with driver.session() as session:
+        res = session.run(cypher, {"query": query_term, "limit": limit})
+        for record in res:
+            results.append({
+                "name": record["name"],
+                "display_name": record["display_name"],
+                "labels": list(record["labels"]),
+                "preview": record["preview"],
+                "confidence": record["confidence"],
+                "tags": record["tags"],
+                "score": record["score"],
+            })
+    return results
 
 @cache_decorator(prefix="neo4j", ttl=300)
 def get_entity_neighborhood(driver: Driver, entity_name: str, exclude_fallback: bool = True) -> Dict[str, Any]:

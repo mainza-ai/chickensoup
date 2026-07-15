@@ -9,9 +9,7 @@ related: [celery, local-first-llm, ai-alien-connection]
 
 # Ray
 
-Ray is a distributed computing framework for scaling Python applications. It is used for distributed batch processing in Project Chicken Soup.
-
-## Key Features
+> **⚠️ NOT IN USE.** Ray is not listed in `pyproject.toml` and is never imported anywhere in the codebase. This page is aspirational documentation for future distributed computing needs.
 
 - **Distributed** — Scale across multiple machines
 - **Python-native** — First-class Python support

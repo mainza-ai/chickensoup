@@ -203,6 +203,30 @@ async def _on_file_event(change_type: str, path_str: str) -> None:
         logger.debug(f"Watcher: skipping '{slug}' — reconciliation in progress")
         return
 
+    # Phase 1.7: Handle deleted pages — remove from Neo4j and staleness queue
+    if change_type == "deleted":
+        node_name = slug.replace("-", " ")
+        try:
+            from src.knowledge_graph.connection import neo4j_conn
+            driver = neo4j_conn.get_driver()
+            if driver:
+                with driver.session() as session:
+                    session.run("MATCH (n:Entity {name: $name}) DETACH DELETE n", name=node_name)
+                logger.info(f"Watcher: deleted Neo4j node for '{slug}'")
+            from src.cache import cache_store
+            cache_store.invalidate_entity(node_name)
+            if cache_store.redis_client:
+                cache_store.redis_client.zrem("staleness:queue", slug)
+            try:
+                from src.main import _sse_broadcast
+                import asyncio
+                asyncio.ensure_future(_sse_broadcast("entity_deleted", node_name, source="watcher"))
+            except Exception:
+                pass
+        except Exception as e:
+            logger.warning(f"Watcher: failed to clean up deleted page '{slug}': {e}")
+        return
+
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, _ingest_page, slug, subdir)
 
@@ -239,7 +263,7 @@ def reconcile_existing_pages():
         progress_update("reconciliation",
             status="running", current=0, total=str(total),
             current_slug="", pages_processed="0", errors="0",
-            started_at=now)
+            started_at=now, completed_at="")
 
         count = 0
         errors = 0
@@ -270,8 +294,6 @@ def reconcile_existing_pages():
             pages_processed=str(count), errors=str(errors),
             completed_at=datetime.now(timezone.utc).isoformat())
         logger.info(f"Reconciliation complete: {count} pages processed, {errors} errors")
-    finally:
-        reconciliation_gate.release()
     finally:
         reconciliation_gate.release()
 

@@ -13,6 +13,19 @@ class IdleSentinel:
     System-wide activity tracker using Redis to ensure multi-process safety.
     """
     @staticmethod
+    def clear_stale_keys():
+        """Clear all idle tracking keys from Redis. Call on startup to reset state."""
+        if not cache_store.redis_client:
+            return
+        try:
+            keys = cache_store.redis_client.keys("idle:*")
+            if keys:
+                cache_store.redis_client.delete(*keys)
+                logger.info(f"Cleared {len(keys)} stale idle tracking keys")
+        except Exception as e:
+            logger.warning(f"Failed to clear stale idle keys: {e}")
+
+    @staticmethod
     def _redis_key(activity_type: str) -> str:
         return f"idle:{activity_type}"
 

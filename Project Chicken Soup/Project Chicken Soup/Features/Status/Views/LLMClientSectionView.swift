@@ -12,7 +12,8 @@ struct LLMClientSectionView: View {
     }
 
     var failedColor: Color {
-        section?.failedCalls == "0" ? .secondary : .red
+        guard let failed = section?.failedCalls, failed != "0" else { return .secondary }
+        return isBreakerOpen ? .red : .orange
     }
 
     var successRate: Double? {

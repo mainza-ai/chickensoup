@@ -7,6 +7,10 @@ struct StatusDashboardView: View {
     var body: some View {
         NavigationStack {
             List {
+                ServerClockView()
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+
                 ReconciliationSectionView(section: progress?.reconciliation)
                 IdleIngestionSectionView(section: progress?.idleIngestion)
                 FallbackRetrySectionView(section: progress?.fallbackRetry)

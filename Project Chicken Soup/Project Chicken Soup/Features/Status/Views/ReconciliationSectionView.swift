@@ -53,12 +53,12 @@ struct ReconciliationSectionView: View {
                 }
 
                 if let elapsed = section.startedAt {
-                    LabeledContent("Started", value: formatTimestamp(elapsed))
+                    LabeledContent("Started", value: StatusDateFormatter.format(elapsed))
                         .font(.caption2)
                 }
 
                 if let completed = section.completedAt {
-                    LabeledContent("Completed", value: formatTimestamp(completed))
+                    LabeledContent("Completed", value: StatusDateFormatter.format(completed))
                         .font(.caption2)
                 }
             } else {
@@ -72,11 +72,6 @@ struct ReconciliationSectionView: View {
                 Text("Reconciliation")
             }
         }
-    }
-
-    private func formatTimestamp(_ iso: String) -> String {
-        guard let date = ISO8601DateFormatter().date(from: iso) else { return iso }
-        return date.formatted(date: .omitted, time: .standard)
     }
 }
 

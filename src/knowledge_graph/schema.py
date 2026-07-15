@@ -34,6 +34,34 @@ def initialize_schema(driver: Driver) -> None:
         try:
             session.run("CREATE INDEX IF NOT EXISTS FOR (n:Event) ON (n.date)")
             session.run("CREATE INDEX IF NOT EXISTS FOR (n:Entity) ON (n.type)")
+            # Fulltext index for search across name, display_name, and content_preview
+            session.run("""
+            CREATE FULLTEXT INDEX fulltext_entity IF NOT EXISTS
+            FOR (n:Entity)
+            ON EACH [n.name, n.display_name, n.content_preview]
+            OPTIONS {indexConfig: {
+                `fulltext.analyzer`: 'standard',
+                `fulltext.eventually_consistent`: false
+            }}
+            """)
             logger.info("Neo4j schema constraints and indices initialized successfully.")
         except Exception as e:
             logger.warning(f"Error creating secondary indexes: {e}")
+
+    logger.info(f"Fulltext index probe: {verify_fulltext_index(driver)}")
+
+
+def verify_fulltext_index(driver: Driver) -> str:
+    """Probe the fulltext index to confirm it exists and is queryable."""
+    try:
+        with driver.session() as session:
+            result = session.run(
+                "CALL db.index.fulltext.queryNodes('fulltext_entity', 'test') YIELD node, score RETURN count(node) AS c"
+            )
+            record = result.single()
+            count = record["c"] if record else 0
+            logger.info(f"Fulltext index 'fulltext_entity' is healthy — returned {count} results for probe query")
+            return f"healthy ({count} results)"
+    except Exception as e:
+        logger.warning(f"Fulltext index 'fulltext_entity' probe failed: {e}")
+        return f"unhealthy: {e}"

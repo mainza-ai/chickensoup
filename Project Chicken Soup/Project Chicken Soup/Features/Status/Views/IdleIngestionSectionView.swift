@@ -15,7 +15,7 @@ struct IdleIngestionSectionView: View {
                 }
 
                 if let run = section.lastRun {
-                    LabeledContent("Last run", value: formatTimestamp(run))
+                    LabeledContent("Last run", value: StatusDateFormatter.format(run))
                         .font(.caption2)
                 }
             } else {
@@ -28,12 +28,7 @@ struct IdleIngestionSectionView: View {
                     .foregroundStyle(section?.status == "pulsing" ? .blue : .secondary)
                 Text("Idle Ingestion")
             }
-        }
     }
-
-    private func formatTimestamp(_ iso: String) -> String {
-        guard let date = ISO8601DateFormatter().date(from: iso) else { return iso }
-        return date.formatted(date: .omitted, time: .standard)
     }
 }
 

@@ -9,7 +9,7 @@ related: [redis, api-design, technology-stack, knowledge-graph-ingestion]
 
 # Celery Tasks
 
-Async task definitions for background processing of wiki ingestion and spacetime navigation. Implementation in `src/tasks.py` (83 lines).
+> **⚠️ NOT IN USE.** Celery is listed in `pyproject.toml` as a dependency but is never imported in `main.py` or any route handler. All async work uses FastAPI `BackgroundTasks` and `asyncio.create_task()`. There is no `src/tasks.py`. This page is aspirational documentation for future setup.
 
 ## Overview
 

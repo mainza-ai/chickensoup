@@ -24,6 +24,18 @@ class Settings(BaseSettings):
     OLLAMA_API_URL: str = "http://localhost:11434/v1"
     LMSTUDIO_API_URL: str = "http://localhost:1234/v1"
 
+    # Cloud LLM providers
+    NVIDIA_API_KEY: str = ""
+    NVIDIA_API_URL: str = "https://integrate.api.nvidia.com/v1"
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_API_URL: str = "https://openrouter.ai/api/v1"
+    CUSTOM_LLM_API_KEY: str = ""
+    CUSTOM_LLM_API_URL: str = ""
+    CUSTOM_LLM_MODELS: str = ""
+
+    # LLM provider type: "local" (auto-discover fallback chain) or "cloud" (use specified provider)
+    LLM_PROVIDER_TYPE: str = "local"
+
     # Override auto-discovered provider/model (empty = auto-select)
     LLM_ACTIVE_PROVIDER: str = ""
     LLM_ACTIVE_MODEL: str = ""
@@ -76,7 +88,11 @@ class Settings(BaseSettings):
     LLM_CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 120  # local LLM restart takes time
 
     # LLM client (shared across all call sites)
-    LLM_CLIENT_TIMEOUT: float = 120.0  # local LLMs (e.g. Qwen3.6-35B) are slow
+    # Timeout is adjusted dynamically in llm_client.py based on provider type:
+    # cloud providers (NVIDIA, OpenRouter) → 30s, local (omlx/ollama/lmstudio) → 120s
+    LLM_CLIENT_TIMEOUT: float = 30.0
+    LLM_CLIENT_CLOUD_TIMEOUT: float = 30.0
+    LLM_CLIENT_LOCAL_TIMEOUT: float = 120.0
     LLM_CLIENT_MAX_TOKENS: int = 2048
     LLM_CLIENT_HIGH_PRIORITY_CONCURRENCY: int = 2
     LLM_CLIENT_LOW_PRIORITY_CONCURRENCY: int = 2

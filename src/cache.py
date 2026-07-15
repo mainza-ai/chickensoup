@@ -67,7 +67,6 @@ class RedisCache:
         if not self.redis_client:
             return False
         try:
-            # We invalidate keys with our prefixes
             self.invalidate_by_pattern("cache:neo4j:*")
             self.invalidate_by_pattern("cache:llm:*")
             self.invalidate_by_pattern("cache:mcp:*")
@@ -75,6 +74,23 @@ class RedisCache:
             return True
         except Exception as e:
             logger.error(f"Redis invalidate_all error: {e}")
+        return False
+
+    def invalidate_entity(self, entity_name: str) -> bool:
+        """Invalidate cache keys related to a specific entity + all search results.
+        Called after a single entity is created or updated."""
+        if not self.redis_client:
+            return False
+        try:
+            # Invalidate this entity's neighborhood and evidence caches
+            self.invalidate_by_pattern(f"cache:neo4j:*{entity_name}*")
+            # Invalidate all search caches (any entity update could affect any search)
+            self.invalidate_by_pattern("cache:search:*")
+            # Invalidate temporal queries
+            self.invalidate_by_pattern("cache:temporal:*")
+            return True
+        except Exception as e:
+            logger.error(f"Redis invalidate_entity error: {e}")
         return False
 
 # Single global cache instance

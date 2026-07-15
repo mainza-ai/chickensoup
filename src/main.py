@@ -5,7 +5,10 @@ import os
 import io
 import zipfile
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, status, UploadFile, File, Depends, BackgroundTasks
+from fastapi import FastAPI, HTTPException, status, UploadFile, File, Depends, BackgroundTasks, Query
+from fastapi.responses import StreamingResponse
+import json
+import time
 import redis
 
 from src.tasks import task_registry, TaskStatusModel
@@ -17,6 +20,7 @@ from src.discovery import discover_active_provider, get_discovered, get_active_m
 from typing import Any, Dict, List, Optional
 from src.models import (
     QueryRequest, QueryResponse, NavigateRequest, NavigateResponse,
+    SimulateRequest, SimulateResponse,
     IngestRequest, IngestResponse, StatusResponse, ModelsResponse,
     ConfigRequest, ConfigResponse, LLMConfigRequest, LLMConfigResponse,
     LLMProbeRequest, LLMProbeResponse, LLMProviderStatus,
@@ -33,7 +37,8 @@ from src.models import (
 from src.knowledge_graph.connection import neo4j_conn
 from src.knowledge_graph.schema import initialize_schema
 from src.knowledge_graph.ingest import ingest_wiki_page
-from src.knowledge_graph.queries import get_entity_neighborhood, search_entities
+from src.knowledge_graph.queries import get_entity_neighborhood, search_entities, fulltext_search
+from src.knowledge_graph.temporal import get_temporal_events, get_entity_temporal_context, get_timeline_range
 from src.spacetime_engine.qiskit_simulation import simulate_spacetime_metrics
 from src.field_manipulator.cuda_simulation import manipulate_spacetime_field
 from src.ai_navigator.pennylane_qml import find_optimal_path
@@ -111,6 +116,11 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
         try:
+            from src.idle_sentinel import IdleSentinel
+            IdleSentinel.clear_stale_keys()
+        except Exception:
+            pass
+        try:
             from src.wiki.watcher import reconcile_existing_pages
             loop = asyncio.get_event_loop()
             loop.run_in_executor(None, reconcile_existing_pages)
@@ -125,6 +135,25 @@ async def lifespan(app: FastAPI):
         logger.info("Staleness queue rebuilt at startup")
     except Exception as e:
         logger.warning(f"Could not rebuild staleness queue at startup: {e}")
+
+    # Reset LLM client metrics at startup so stale failure counts don't persist
+    try:
+        from src.progress_tracker import update as progress_update
+        progress_update("llm_client", total_calls="0", success_calls="0", failed_calls="0", breaker_open="false")
+        logger.info("LLM client progress counters reset at startup")
+    except Exception as e:
+        logger.warning(f"Could not reset LLM client progress counters: {e}")
+
+    # Build temporal causality chains between dated Event nodes
+    try:
+        from src.knowledge_graph.temporal_causality import build_temporal_causality_chains
+        driver = neo4j_conn.get_driver()
+        if driver:
+            result = build_temporal_causality_chains(driver)
+            if result["events_processed"] > 0:
+                logger.info(f"Temporal causality chains built: {result['preceded_by']} preceded_by, {result['caused']} caused")
+    except Exception as e:
+        logger.warning(f"Could not build temporal causality chains: {e}")
 
     yield
     logger.info("Shutting down chickensoup API...")
@@ -158,11 +187,11 @@ def _validate_entity_name(name: str, field: str = "entity_name") -> str:
     suspicious characters. Returns the stripped name if valid.
     """
     if not name or not name.strip():
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"{field} must not be empty.")
+        raise HTTPException(status_code=422, detail=f"{field} must not be empty.")
     stripped = name.strip()
     if not _VALID_ENTITY_NAME_RE.match(stripped):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=422,
             detail=f"Invalid {field}: '{stripped}'. Must start with alphanumeric, contain only alphanumerics, spaces, hyphens, underscores, and dots, and be 2-100 characters.",
         )
     return stripped
@@ -206,7 +235,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 import time
 from src.observability import tracer, agent_loop_counter, quantum_simulation_duration
-from src.cache import cache_store
+from src.cache import cache_store, cache_decorator
 
 # CORS origins — configurable via CORS_ORIGINS env var
 origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
@@ -284,40 +313,65 @@ app.add_middleware(RequestIdMiddleware)
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Per-IP and per-API-key rate limiting using sliding window."""
+    """Per-IP and per-API-key rate limiting using sliding window with differentiated categories."""
+
+    ROUTE_CATEGORIES: dict[str, str] = {
+        "search": "search",
+        "graph": "search",
+        "entities": "read",
+        "events": "read",
+        "timeline": "read",
+        "wiki/pages": "read",
+        "wiki/page": "read",
+        "status": "read",
+        "health": "read",
+        "config": "read",
+        "models": "read",
+        "conversation": "read",
+        "ingest": "write",
+        "wiki/clear": "write",
+        "wiki/export": "write",
+        "wiki/import": "write",
+        "research": "write",
+        "simulate": "search",
+    }
 
     def __init__(self, app):
         super().__init__(app)
         from src.rate_limiter import rate_limiter
         self._limiter = rate_limiter
 
+    def _get_category(self, path: str) -> str:
+        for prefix, category in self.ROUTE_CATEGORIES.items():
+            if path.startswith(f"/{prefix}"):
+                return category
+        return "general"
+
     async def dispatch(self, request: Request, call_next) -> Response:
-        # Skip rate limiting in test mode or when disabled
         if not settings.RATE_LIMITING_ENABLED:
             return await call_next(request)
-        
-        # Skip rate limiting for health checks, status, and static files
-        if request.url.path in ("/health", "/status", "/status/progress"):
+
+        if request.url.path in ("/health", "/status", "/status/progress", "/status/time"):
             return await call_next(request)
 
-        # Per-IP check
+        category = self._get_category(request.url.path)
+
         client_ip = request.client.host if request.client else "unknown"
-        ip_allowed, ip_remaining = self._limiter.check_ip(client_ip)
+        ip_allowed, ip_remaining = self._limiter.check_ip(client_ip, category)
         if not ip_allowed:
             return Response(
-                content=json.dumps({"detail": "Rate limit exceeded. Try again in 60s.", "retry_after": 60}),
+                content=json.dumps({"detail": f"Rate limit exceeded for {category}. Try again in 60s.", "retry_after": 60}),
                 media_type="application/json",
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 headers={"Retry-After": "60"},
             )
 
-        # Per-API-key check (if key present)
         api_key = request.headers.get("X-Api-Key", "")
         if api_key:
-            key_allowed, key_remaining = self._limiter.check_api_key(api_key)
+            key_allowed, key_remaining = self._limiter.check_api_key(api_key, category)
             if not key_allowed:
                 return Response(
-                    content=json.dumps({"detail": "API key rate limit exceeded. Try again in 10s.", "retry_after": 10}),
+                    content=json.dumps({"detail": f"API key rate limit exceeded for {category}. Try again in 10s.", "retry_after": 10}),
                     media_type="application/json",
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     headers={"Retry-After": "10"},
@@ -430,6 +484,8 @@ async def get_config():
         llm_providers[name] = LLMProviderStatus(
             available=info.get("available", False),
             models=info.get("models", []),
+            type=info.get("type", "local"),
+            api_key_configured=bool(info.get("api_key")),
         )
     return ConfigResponse(
         success=True,
@@ -442,6 +498,10 @@ async def get_config():
         llm_active_model=get_active_model(),
         llm_available_models=models,
         llm_providers=llm_providers,
+        llm_provider_type=settings.LLM_PROVIDER_TYPE,
+        nvidia_api_key_set=bool(settings.NVIDIA_API_KEY),
+        openrouter_api_key_set=bool(settings.OPENROUTER_API_KEY),
+        custom_llm_api_url_set=bool(settings.CUSTOM_LLM_API_URL),
         last30days_enabled=settings.LAST30DAYS_ENABLED,
     )
 
@@ -461,6 +521,18 @@ async def post_config(request: ConfigRequest):
         settings.LLM_ACTIVE_PROVIDER = request.llm_active_provider
     if request.llm_active_model is not None:
         settings.LLM_ACTIVE_MODEL = request.llm_active_model
+    if request.llm_provider_type is not None:
+        settings.LLM_PROVIDER_TYPE = request.llm_provider_type
+    if request.nvidia_api_key is not None:
+        settings.NVIDIA_API_KEY = request.nvidia_api_key
+    if request.openrouter_api_key is not None:
+        settings.OPENROUTER_API_KEY = request.openrouter_api_key
+    if request.custom_llm_api_key is not None:
+        settings.CUSTOM_LLM_API_KEY = request.custom_llm_api_key
+    if request.custom_llm_api_url is not None:
+        settings.CUSTOM_LLM_API_URL = request.custom_llm_api_url
+    if request.custom_llm_models is not None:
+        settings.CUSTOM_LLM_MODELS = request.custom_llm_models
 
     # Refresh discovery with new config
     provider, _, models = refresh_discovery()
@@ -470,6 +542,7 @@ async def post_config(request: ConfigRequest):
         "QUANTUM_HARDWARE_ENABLED": str(settings.QUANTUM_HARDWARE_ENABLED).lower(),
         "LLM_ACTIVE_PROVIDER": settings.LLM_ACTIVE_PROVIDER,
         "LLM_ACTIVE_MODEL": settings.LLM_ACTIVE_MODEL,
+        "LLM_PROVIDER_TYPE": settings.LLM_PROVIDER_TYPE,
     }
     if request.ibm_api_token is not None:
         updates["IBM_API_TOKEN"] = settings.IBM_API_TOKEN
@@ -477,9 +550,28 @@ async def post_config(request: ConfigRequest):
         updates["DWAVE_API_TOKEN"] = settings.DWAVE_API_TOKEN
     if request.ionq_api_token is not None:
         updates["IONQ_API_TOKEN"] = settings.IONQ_API_TOKEN
+    if request.nvidia_api_key is not None:
+        updates["NVIDIA_API_KEY"] = settings.NVIDIA_API_KEY
+    if request.openrouter_api_key is not None:
+        updates["OPENROUTER_API_KEY"] = settings.OPENROUTER_API_KEY
+    if request.custom_llm_api_key is not None:
+        updates["CUSTOM_LLM_API_KEY"] = settings.CUSTOM_LLM_API_KEY
+    if request.custom_llm_api_url is not None:
+        updates["CUSTOM_LLM_API_URL"] = settings.CUSTOM_LLM_API_URL
+    if request.custom_llm_models is not None:
+        updates["CUSTOM_LLM_MODELS"] = settings.CUSTOM_LLM_MODELS
 
     _update_env_file(updates)
 
+    all_providers_raw = get_all_providers()
+    llm_providers = {}
+    for name, info in all_providers_raw.items():
+        llm_providers[name] = LLMProviderStatus(
+            available=info.get("available", False),
+            models=info.get("models", []),
+            type=info.get("type", "local"),
+            api_key_configured=bool(info.get("api_key")),
+        )
     return ConfigResponse(
         success=True,
         quantum_backend=settings.QUANTUM_SIMULATION_BACKEND,
@@ -490,7 +582,11 @@ async def post_config(request: ConfigRequest):
         llm_active_provider=get_active_provider(),
         llm_active_model=get_active_model(),
         llm_available_models=models,
-        llm_providers=_build_llm_providers(),
+        llm_providers=llm_providers,
+        llm_provider_type=settings.LLM_PROVIDER_TYPE,
+        nvidia_api_key_set=bool(settings.NVIDIA_API_KEY),
+        openrouter_api_key_set=bool(settings.OPENROUTER_API_KEY),
+        custom_llm_api_url_set=bool(settings.CUSTOM_LLM_API_URL),
         last30days_enabled=settings.LAST30DAYS_ENABLED,
     )
 
@@ -568,12 +664,14 @@ def _build_query_response(query: str, output: Dict[str, Any], conversation_id: O
 
     source_tier = "network_opt_in" if claim_confs else "local"
 
+    query_status = output.get("status", "completed")
+
     return QueryResponse(
         query=query,
         answer=answer,
         confidence=output.get("confidence", 0.5),
         entities=output.get("entities", []),
-        sources=output.get("sources", ["Orchestrated Search"]) if not output.get("status") == "paused_for_human_approval" else [],
+        sources=output.get("sources", ["Orchestrated Search"]) if not query_status == "paused_for_human_approval" else [],
         inferred_events=inferred_events,
         inferred_entities=inferred_entities,
         conversation_id=conversation_id,
@@ -581,6 +679,8 @@ def _build_query_response(query: str, output: Dict[str, Any], conversation_id: O
         claim_confidences=claim_confs,
         source_tier=source_tier,
         task_id=output.get("task_id"),
+        thread_id=output.get("thread_id"),
+        status=query_status,
     )
 
 
@@ -592,7 +692,7 @@ def _conversation_redis_key(conversation_id: str) -> str:
 async def get_conversation(conversation_id: str):
     """Retrieve conversation history by ID."""
     try:
-        from src.cache import cache_store
+        from src.cache import cache_store, cache_decorator
         raw = cache_store.get(_conversation_redis_key(conversation_id))
         if raw:
             return {"conversation_id": conversation_id, "history": json.loads(raw)}
@@ -717,7 +817,7 @@ async def post_query(request: QueryRequest):
 
         # Retrieve prior conversation turns from Redis
         try:
-            from src.cache import cache_store
+            from src.cache import cache_store, cache_decorator
             raw = cache_store.get(_conversation_redis_key(conversation_id))
             if raw:
                 history = json.loads(raw)
@@ -735,7 +835,7 @@ async def post_query(request: QueryRequest):
         history.append({"role": "user", "content": request.query})
         history.append({"role": "assistant", "content": response.answer})
         try:
-            from src.cache import cache_store
+            from src.cache import cache_store, cache_decorator
             cache_store.set(_conversation_redis_key(conversation_id), json.dumps(history[-20:]), ttl=604800)
 
             # Update conversation meta for chat-to-wiki scheduler
@@ -892,6 +992,71 @@ async def post_navigate(request: NavigateRequest):
             detail=f"Pathfinding navigation failure: {str(e)}"
         )
 
+
+@app.post("/simulate", response_model=SimulateResponse)
+async def simulate_spacetime(req: SimulateRequest):
+    """Simulates spacetime warping for the Space-Time Navigator UI.
+    Maps slider values (gravity, velocity, intensity) to Qiskit/NumPy simulation parameters."""
+    logs = []
+    try:
+        now_year = 2026
+        velocity_range = 1000
+        target_year = now_year + max(1, int(req.velocity * velocity_range))
+        logs.append(f"Target year: {target_year} (velocity {req.velocity:.2f}c → {abs(target_year - now_year)}yr delta)")
+
+        logs.append(f"Gravity distortion: {req.gravity:.3f}, Field density: {req.intensity:.3f}")
+        logs.append("Initializing Qiskit Spacetime Engine...")
+
+        weighted_energy = req.intensity * (0.5 + 0.5 * req.gravity)
+        logs.append(f"Computed weighted energy: {weighted_energy:.3f}")
+
+        tensor = simulate_spacetime_metrics(target_year, weighted_energy)
+        logs.append("Simulation complete.")
+
+        warp_factor = tensor.warp_factor
+        confidence = min(1.0, max(0.0, (warp_factor - 0.5) / 5.0 + 0.5 * req.intensity))
+        logs.append(f"Warp factor: {warp_factor:.4f}, Path confidence: {confidence:.3f}")
+
+        if req.origin or req.destination:
+            origin_str = req.origin or "current spacetime"
+            dest_str = req.destination or "target coordinate"
+            logs.append(f"Path computed: {origin_str} → {dest_str}")
+
+        return SimulateResponse(
+            success=True,
+            gravity_metric=req.gravity,
+            velocity_metric=req.velocity,
+            field_intensity=req.intensity,
+            resolved_path_confidence=confidence,
+            logs=logs,
+            warp_factor=warp_factor,
+            lapse=tensor.lapse,
+            entropy_density=tensor.entropy_density,
+            target_year=target_year,
+        )
+    except Exception as e:
+        logger.error(f"Spacetime simulation failed: {e}")
+        return SimulateResponse(
+            success=False,
+            gravity_metric=req.gravity,
+            velocity_metric=req.velocity,
+            field_intensity=req.intensity,
+            resolved_path_confidence=0.0,
+            logs=[f"Simulation failed: {str(e)}"],
+        )
+
+
+@app.post("/temporal/causality", dependencies=[Depends(verify_api_key)])
+async def build_temporal_causality():
+    """Build temporal causality chains (PRECEDED_BY, CAUSED) between Event nodes."""
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        raise HTTPException(status_code=503, detail="Neo4j unavailable")
+    from src.knowledge_graph.temporal_causality import build_temporal_causality_chains
+    result = build_temporal_causality_chains(driver)
+    return result
+
+
 from src.multi_llm import MultiLLMConsensus
 from src.quantum_scheduler import QuantumJobScheduler
 from pydantic import BaseModel, Field
@@ -964,7 +1129,7 @@ async def post_ingest(request: IngestRequest):
             )
             res = task.get(timeout=5.0)
             if res.get("success"):
-                from src.cache import cache_store
+                from src.cache import cache_store, cache_decorator
                 cache_store.invalidate_all()
                 return IngestResponse(
                     success=True,
@@ -984,7 +1149,7 @@ async def post_ingest(request: IngestRequest):
             default_tags=request.tags,
             default_sources=request.sources
         )
-        from src.cache import cache_store
+        from src.cache import cache_store, cache_decorator
         cache_store.invalidate_all()
         return IngestResponse(
             success=True,
@@ -1084,7 +1249,7 @@ def _process_ingested_content(
         logger.warning(f"Log update failed: {log_err}")
 
     invalidate_index_cache()
-    from src.cache import cache_store
+    from src.cache import cache_store, cache_decorator
     cache_store.invalidate_all()
 
     return FileIngestResponse(
@@ -1236,7 +1401,7 @@ def _run_neo4j_bulk_ingest(wiki_root: str) -> Dict[str, int]:
             except Exception as page_err:
                 logger.error(f"Failed to ingest page {filename}: {page_err}")
 
-    from src.cache import cache_store
+    from src.cache import cache_store, cache_decorator
     cache_store.invalidate_all()
     logger.info(f"Bulk ingestion completed. Ingested {pages_ingested} pages. Created {total_nodes} nodes, {total_rels} relationships.")
     return {
@@ -1355,7 +1520,7 @@ def post_ingest_pdf_folder(req: PdfFolderIngestRequest):
             logger.warning(f"Log update failed: {log_err}")
 
         invalidate_index_cache()
-        from src.cache import cache_store
+        from src.cache import cache_store, cache_decorator
         cache_store.invalidate_all()
 
     return PdfFolderIngestResponse(
@@ -1408,7 +1573,7 @@ async def websocket_agent_endpoint(websocket: WebSocket):
                 # Retrieve prior conversation turns from Redis
                 history: List[Dict[str, str]] = []
                 try:
-                    from src.cache import cache_store
+                    from src.cache import cache_store, cache_decorator
                     raw = cache_store.get(_conversation_redis_key(conversation_id))
                     if raw:
                         history = json.loads(raw)
@@ -1494,10 +1659,20 @@ def reconcile_neo4j_with_wiki(driver):
             if orphans:
                 logger.info(f"Reconciliation: Found {len(orphans)} orphaned Neo4j nodes. Pruning: {orphans}")
                 session.run("MATCH (n:Entity) WHERE n.name IN $names DETACH DELETE n", names=orphans)
-                from src.cache import cache_store
+                from src.cache import cache_store, cache_decorator
                 cache_store.invalidate_all()
     except Exception as e:
         logger.warning(f"Failed to reconcile Neo4j with wiki: {e}")
+
+
+@app.get("/search")
+async def search_endpoint(q: str = Query(..., min_length=2), limit: int = Query(20, le=100)):
+    """Full-text search across all entities using Neo4j fulltext index. Returns scored results."""
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        return {"results": [], "query": q, "total": 0}
+    results = fulltext_search(driver, q, limit)
+    return {"results": results, "query": q, "total": len(results)}
 
 
 @app.get("/entities")
@@ -1549,6 +1724,69 @@ async def get_entities(exclude_fallback: bool = True):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/status/time")
+async def get_server_time():
+    """Returns the server's current date, time, and timezone."""
+    from datetime import datetime, timezone
+    now = datetime.now()
+    utc_now = datetime.now(timezone.utc)
+    return {
+        "iso8601": now.isoformat(),
+        "unix": now.timestamp(),
+        "datetime": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "timezone": str(now.astimezone().tzinfo),
+        "utc_offset": now.astimezone().strftime("%z"),
+        "utc_iso8601": utc_now.isoformat(),
+    }
+
+
+# SSE event broadcasting for real-time index notifications
+_sse_clients: set[asyncio.Queue] = set()
+_sse_lock = asyncio.Lock()
+
+
+async def _sse_broadcast(event_type: str, entity_name: str, source: str = ""):
+    """Broadcast an index change event to all connected SSE clients."""
+    message = {
+        "type": event_type,
+        "entity": entity_name,
+        "source": source,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    async with _sse_lock:
+        stale = set()
+        for q in _sse_clients:
+            try:
+                q.put_nowait(message)
+            except asyncio.QueueFull:
+                stale.add(q)
+        _sse_clients -= stale
+
+
+@app.get("/events/stream")
+async def sse_event_stream(request: Request):
+    """SSE endpoint for real-time index change notifications.
+    Clients connect via EventSource or similar and receive JSON events
+    whenever an entity is created, updated, or deleted."""
+    queue: asyncio.Queue = asyncio.Queue(maxsize=100)
+    async with _sse_lock:
+        _sse_clients.add(queue)
+    try:
+        async def generate():
+            try:
+                while True:
+                    data = await asyncio.wait_for(queue.get(), timeout=30)
+                    yield f"data: {json.dumps(data)}\n\n"
+            except asyncio.TimeoutError:
+                yield f"data: {json.dumps({'type': 'heartbeat', 'timestamp': datetime.now(timezone.utc).isoformat()})}\n\n"
+            except asyncio.CancelledError:
+                pass
+        return StreamingResponse(generate(), media_type="text/event-stream")
+    finally:
+        async with _sse_lock:
+            _sse_clients.discard(queue)
+
+
 @app.get("/status/progress")
 async def get_progress():
     """Returns real-time progress of all background operations
@@ -1594,91 +1832,66 @@ async def delete_entity(name: str, hard: bool = True, force: bool = False):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/events")
-async def get_events():
-    """Retrieves all Temporal Events (Event nodes) from the Neo4j database."""
-    import uuid
-    from datetime import datetime
-    driver = neo4j_conn.get_driver()
-    if driver:
-        reconcile_neo4j_with_wiki(driver)
+@cache_decorator(prefix="neo4j", ttl=60)
+def query_events(driver):
     query = """
-    MATCH (e:Entity)
-    RETURN e
+    MATCH (e:Event)
+    RETURN e.name AS name,
+           e.display_name AS display_name,
+           e.date AS date,
+           e.tags AS tags,
+           e.sources AS sources,
+           e.content_preview AS preview,
+           e.confidence AS confidence,
+           labels(e) AS labels
+    ORDER BY e.date ASC
     """
     events = []
+    with driver.session() as session:
+        res = session.run(query)
+        for record in res:
+            node_labels = [l.lower() for l in record["labels"]]
+            tags = [t.lower() for t in record["tags"] or []]
+            name = record["name"]
+            name_lower = name.lower() if name else ""
+            title = record["display_name"] or name
+
+            event_type = "anomaly"
+            if "crash" in name_lower or "recovery" in name_lower:
+                event_type = "crash"
+            elif "testimony" in name_lower or "whistleblower" in name_lower:
+                event_type = "testimony"
+            elif "theory" in name_lower or "propulsion" in name_lower:
+                event_type = "theory"
+
+            node_sources = record["sources"] or []
+            if not isinstance(node_sources, list):
+                node_sources = [str(node_sources)] if node_sources else []
+
+            events.append({
+                "id": name,
+                "title": title,
+                "description": record["preview"] or "",
+                "date": record["date"],
+                "confidence": record["confidence"] or 1.0,
+                "source": str(node_sources[0]) if node_sources else "Unknown",
+                "type": event_type,
+                "sources": [str(s) for s in node_sources],
+            })
+    return events
+
+
+@app.get("/events")
+async def get_events():
+    """Retrieves all Event-labeled nodes from Neo4j with their stored dates."""
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        return {"events": []}
+    if driver:
+        reconcile_neo4j_with_wiki(driver)
     try:
-        with driver.session() as session:
-            res = session.run(query)
-            for record in res:
-                node = record["e"]
-                title = node.get("name", "Unnamed Event")
-                tags = [t.lower() for t in node.get("tags", [])]
-                labels = [l.lower() for l in node.labels]
-                
-                title_lower = title.lower()
-                is_event = "event" in labels or "event" in tags or any(
-                    k in title_lower or any(k in t for t in tags)
-                    for k in ["incident", "crash", "encounter", "recovery", "transfer", "testimony", "explosion", "sighting", "whistleblower", "project"]
-                )
-                
-                if not is_event:
-                    continue
-                
-                from src.wiki.cleanup import ENGINEERING_TAGS
-                has_engineering_tags = any(t in ENGINEERING_TAGS for t in tags)
-                is_engineering_project = "project" in labels
-                
-                if is_engineering_project or has_engineering_tags:
-                    if not any(hp in title_lower for hp in ["serpo", "rainbow", "looking glass", "pegasus", "paperclip"]):
-                        continue
-                
-                node_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, title))
-                
-                node_sources = node.get("sources", [])
-                if not isinstance(node_sources, list):
-                    node_sources = [str(node_sources)] if node_sources else []
-                node_sources = [str(s) for s in node_sources]
-                
-                timestamp = datetime.utcnow().isoformat() + "Z"
-                year = None
-                for t in tags:
-                    if t.isdigit() and len(t) == 4:
-                        year = int(t)
-                        break
-                
-                if "1933" in title_lower or "1933" in tags:
-                    timestamp = "1933-06-13T00:00:00Z"
-                elif "1944" in title_lower or "1944" in tags:
-                    timestamp = "1944-10-24T00:00:00Z"
-                elif "1989" in title_lower or "1989" in tags:
-                    timestamp = "1989-12-01T00:00:00Z"
-                elif "1994" in title_lower or "1994" in tags:
-                    timestamp = "1994-09-16T00:00:00Z"
-                elif "1996" in title_lower or "1996" in tags:
-                    timestamp = "1996-01-20T00:00:00Z"
-                elif year:
-                    timestamp = f"{year}-06-01T00:00:00Z"
-                
-                event_type = "anomaly"
-                if "crash" in title_lower or "recovery" in title_lower:
-                    event_type = "crash"
-                elif "testimony" in title_lower or "whistleblower" in title_lower:
-                    event_type = "testimony"
-                elif "theory" in title_lower or "propulsion" in title_lower:
-                    event_type = "theory"
-                
-                events.append({
-                    "id": node_uuid,
-                    "title": title.replace("-", " ").title(),
-                    "description": node.get("content_preview", node.get("summary", "")),
-                    "timestamp": timestamp,
-                    "confidence": node.get("confidence", 1.0),
-                    "source": node_sources[0] if node_sources else "Unknown",
-                    "type": event_type,
-                    "sources": node_sources
-                })
-        return events
+        events = query_events(driver)
+        return {"events": events}
     except Exception as e:
         logger.error(f"Failed to fetch events: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -1725,7 +1938,7 @@ def post_ingest_bulk():
                         logger.error(f"Failed to ingest page {filename}: {page_err}")
                         
         # Invalidate Redis/memory cache
-        from src.cache import cache_store
+        from src.cache import cache_store, cache_decorator
         cache_store.invalidate_all()
         
         logger.info(f"Bulk ingestion completed. Ingested {pages_ingested} pages. Created {total_nodes} nodes, {total_rels} relationships.")
@@ -1853,7 +2066,7 @@ async def post_wiki_import(file: UploadFile = File(...)):
 
         from src.wiki.writer import invalidate_index_cache
         invalidate_index_cache()
-        from src.cache import cache_store
+        from src.cache import cache_store, cache_decorator
         cache_store.invalidate_all()
 
         return WikiImportResponse(success=True, restored_count=restored)
@@ -2222,6 +2435,36 @@ async def get_entity_divergence(name: str):
         raise HTTPException(status_code=500, detail=f"Divergence computation failed: {str(e)}")
 
 
+@app.get("/timeline")
+async def get_global_timeline(start_date: str = None, end_date: str = None, limit: int = 100):
+    """Get all dated Event nodes from the graph for timeline visualization."""
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        return {"events": [], "total": 0}
+    events = get_temporal_events(driver, start_date, end_date, limit)
+    return {"events": events, "total": len(events)}
+
+
+@app.get("/timeline/range")
+async def get_timeline_range_endpoint():
+    """Get the earliest and latest dates across all Event nodes."""
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        return {"earliest": None, "latest": None, "total": 0}
+    return get_timeline_range(driver)
+
+
+@app.get("/entities/{name}/temporal-context")
+async def get_entity_temporal(name: str):
+    """Get the temporal neighborhood of an entity — events connected to it."""
+    name = _validate_entity_name(name, "entity_name")
+    driver = neo4j_conn.get_driver()
+    if not driver:
+        return {"events": []}
+    events = get_entity_temporal_context(driver, name)
+    return {"entity": name, "events": events, "total": len(events)}
+
+
 @app.get("/entities/{name}/timeline")
 async def get_entity_timeline(name: str, days: int = 30):
     name = _validate_entity_name(name, "entity_name")
@@ -2393,7 +2636,7 @@ async def post_research_approve(thread_id: str):
 @app.get("/system/ingestion/status")
 async def get_ingestion_status():
     from src.scheduler import get_almanac_status, _IDLE_LAST_RUN, _IDLE_CHECK_INTERVAL_SECONDS
-    from src.cache import cache_store
+    from src.cache import cache_store, cache_decorator
     queue_size = 0
     next_batch = []
     try:

@@ -2,7 +2,7 @@
 title: "Overview"
 tags: [overview]
 created: 2026-06-22
-updated: 2026-07-12
+updated: 2026-07-15
 sources: []
 related: [time-travel-machinery-architecture, living-almanac, agent-architecture]
 ---
@@ -28,7 +28,7 @@ This wiki covers:
 - AI may be using the same field-based principles as UAP propulsion
 - Aliens may be time travelers from our own future
 - Time travel is theoretically possible and may be happening via field manipulation
-- **Every claim now carries a quantum wavefunction** over {CORROBORATED, CONTESTED, UNVERIFIED} scored through real FieldGeometryTensor math — not hardcoded constants
+- **Claims carry quantum wavefunction scores** over {CORROBORATED, CONTESTED, UNVERIFIED} using PennyLane-based divergence math and heuristic feature extraction
 - **Social traction and epistemic credibility are separate numbers**, never merged into one
 
 ## Projects
@@ -37,7 +37,7 @@ This wiki covers:
 - [[chicken-soup-project]] — Project Chicken Soup: overview of the project
 - [[chicken-soup-spec]] — Project Chicken Soup: full specification
 - [[quantum-systems]] — Comparing quantum platforms (Qiskit, CUDA-Q, D-Wave, IonQ)
-- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, autonomous HTML brief — phases 0–6 implemented, 75 tests green
+- [[living-almanac]] — Living Almanac: last30days integration, quantum credibility, autonomous HTML brief — 8 agents, 59 endpoints, 102 tests
 
 ## Pipeline Architecture
 

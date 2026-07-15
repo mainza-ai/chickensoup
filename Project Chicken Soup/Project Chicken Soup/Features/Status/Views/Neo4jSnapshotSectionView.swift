@@ -10,7 +10,7 @@ struct Neo4jSnapshotSectionView: View {
                 LabeledContent("Relationships", value: section.relationships ?? "—")
 
                 if let updated = section.lastRun {
-                    LabeledContent("Last updated", value: formatTimestamp(updated))
+                    LabeledContent("Last updated", value: StatusDateFormatter.format(updated))
                         .font(.caption2)
                 }
             } else {
@@ -24,11 +24,6 @@ struct Neo4jSnapshotSectionView: View {
                 Text("Knowledge Graph")
             }
         }
-    }
-
-    private func formatTimestamp(_ iso: String) -> String {
-        guard let date = ISO8601DateFormatter().date(from: iso) else { return iso }
-        return date.formatted(date: .omitted, time: .standard)
     }
 }
 

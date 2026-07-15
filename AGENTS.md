@@ -15,7 +15,24 @@ wiki/
   concepts/            # Ideas, theories, frameworks
   projects/            # Time travel machinery project-specific
   raw/                 # Immutable source documents
+  dev/                 # Engineering documentation — NOT ingested to Neo4j (engineering-only tags)
+  plan/                # Implementation plans and audits — NOT ingested to Neo4j
 ```
+
+### Dev Pages Rule
+
+Pages in `wiki/dev/` and `wiki/plan/` have `ENGINEERING_TAGS` (architecture, design, api, config, etc.) and NO `CONTENT_TAGS` — they are **engineering-only**, protected from Neo4j ingest. They are documentation for the LLM, not user-facing content.
+
+**When you modify code, update the relevant dev wiki page to match.** The key dev pages are:
+
+| Wiki Page | Code it documents | Keep updated when |
+|-----------|------------------|-------------------|
+| `dev/project-structure.md` | Full source tree layout | Adding/removing files, changing sizes |
+| `dev/api-design.md` | All endpoints in `main.py` | Adding/removing routes |
+| `dev/agent-architecture.md` | Agent files in `src/agents/` | Adding agents, changing architecture |
+| `dev/pydantic-settings.md` | Settings in `src/config.py` | Adding/removing env vars |
+
+Check `src/wiki/cleanup.py` for the authoritative `ENGINEERING_TAGS` set.
 
 ### Page Format
 
@@ -76,6 +93,45 @@ When the LLM needs to write Apple platform code, it should:
 1. Check [[apple-reference-guides]] for the relevant guide
 2. Read the raw file from `wiki/raw/` for implementation details and code examples
 3. Also consult relevant agent skills ([[swiftui-pro]], [[swiftdata-pro]], [[swift-concurrency-pro]], [[swift-testing-pro]])
+
+## SwiftUI Pro Skill Rules
+
+When writing or reviewing SwiftUI code, ALWAYS load the `swiftui-pro` skill and follow these rules strictly. This is a production app — no shortcuts, no simplifications that would require rework.
+
+### File Organization
+- Each type (struct, class, enum, actor) gets its own Swift file. Do not place multiple types in a single file.
+- Computed `some View` properties must be extracted into separate `View` structs, each in its own file. Exceptions only for tiny, trivial helpers that would be 3-5 lines inlined.
+- Use `#Preview` for previews, never `PreviewProvider`.
+
+### Views
+- Button actions must be extracted into separate methods, not inline closures in `body`.
+- Prefer `Button("Label", systemImage: "plus", action: myAction)` syntax over `Button { action() }`.
+- Never use `onTapGesture()` — use `Button` or `.accessibilityAction()` instead.
+- `body` properties must be kept short. Extract sub-views aggressively.
+
+### Data Flow
+- `@Observable` classes must be marked `@MainActor`.
+- `@State` must be `private` and owned by the creating view only.
+- Never use `ObservableObject`, `@Published`, `@StateObject`, `@ObservedObject`, or `@EnvironmentObject` unless unavoidable.
+- Avoid `Binding(get:set:)` in `body` — use `@State` with `onChange()` instead.
+- Structs should conform to `Identifiable` rather than using `id: \.property`.
+
+### Performance
+- Avoid `AnyView`. Use `@ViewBuilder`, `Group`, or generics.
+- Use `LazyVStack`/`LazyHStack` for large scrolling data sets.
+- Prefer `task()` over `onAppear()` for async work (auto-cancels on disappear).
+- Never use `animation(_:)` without a `value` parameter.
+- Use ternary expressions for toggling modifiers instead of `if`/`else` branches.
+
+### Accessibility
+- Buttons with images must always include text labels for VoiceOver, even if visually icon-only (use `.labelStyle(.iconOnly)` to hide the text visually).
+- Use `.accessibilityLabel()` on ambiguous icons.
+- Respect Dynamic Type — use `.font(.body)`, `.headline`, etc. Avoid fixed font sizes.
+- If color is a differentiator, add icons/patterns for `accessibilityDifferentiateWithoutColor`.
+
+### Modifiers Order & Style (from hygiene.md)
+- `.font()` then `.foregroundStyle()` then `.padding()` then `.background()` then `.clipShape()` then `.overlay()`
+- All modifiers on separate lines, indented to match
 
 ## Lint Checklist
 

@@ -20,6 +20,9 @@ _INFERENCE_WEIGHTS = {
     "Event": {"strong": ["event", "events", "incident", "crash", "sighting", "hearing", "encounter", "accident", "landing", "disclosure"], "weak": []},
     "Project": {"strong": ["project", "program", "experiment", "mission", "operation"], "weak": []},
     "Object": {"strong": ["object", "craft", "artifact", "device", "material", "element", "weapon", "technology"], "weak": []},
+    "Algorithm": {"strong": ["algorithm", "quantum algorithm", "qaoa", "vqe", "qft", "qpe", "grover", "shor", "hhl", "quantum walk", "quantum fourier"], "weak": ["complexity", "runtime", "circuit", "complexity class"]},
+    "Paper": {"strong": ["paper", "preprint", "arxiv", "publication", "published", "manuscript"], "weak": ["authors", "et al", "doi", "journal"]},
+    "QuantumPlatform": {"strong": ["platform", "qiskit", "pennylane", "cuda-q", "cirq", "braket", "quantum sdk", "quantum framework"], "weak": ["simulator", "backend", "hardware"]},
 }
 
 SCHEMA_RELATIONSHIPS = {
@@ -115,6 +118,19 @@ def _resolve_target_wiki_file(name: str) -> Optional[str]:
                 return os.path.join(dirpath, fname)
     return None
 
+
+def _resolve_target_wiki_tags(name: str) -> List[str]:
+    """Read tags from the target wiki page's frontmatter if it exists."""
+    filepath = _resolve_target_wiki_file(name)
+    if filepath:
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                meta, _ = parse_markdown_frontmatter(f.read())
+            return [str(t) for t in meta.get("tags", [])]
+        except Exception:
+            pass
+    return []
+
 def _read_target_display_name(name: str) -> str:
     filepath = _resolve_target_wiki_file(name)
     if filepath:
@@ -131,7 +147,7 @@ def _sanitize_label(label: str) -> str:
     return label if label in VALID_LABELS else "Entity"
 
 def _infer_primary_label(name: str, tags: List[str], body: str = "") -> str:
-    scores = {label: 0.0 for label in ["Concept", "Person", "Place", "Event", "Project", "Object"]}
+    scores = {label: 0.0 for label in ["Concept", "Person", "Place", "Event", "Project", "Object", "Algorithm", "Paper", "QuantumPlatform"]}
     tag_set = set(str(t).lower() for t in tags)
     name_lower = name.lower()
     body_lower = (body or "").lower()
@@ -164,9 +180,27 @@ def _infer_primary_label(name: str, tags: List[str], body: str = "") -> str:
         scores["Project"] += 1.0
     if body_lower.count("area 51") > 0 or body_lower.count("located at") > 2:
         scores["Place"] += 0.5
+    if body_lower.count("algorithm") + body_lower.count("complexity") > 3:
+        scores["Algorithm"] += 1.0
+    if body_lower.count("qiskit") + body_lower.count("pennylane") + body_lower.count("cuda-q") > 0:
+        scores["QuantumPlatform"] += 1.5
+    if body_lower.count("arxiv") + body_lower.count("paper") + body_lower.count("preprint") > 2:
+        scores["Paper"] += 1.0
+    if body_lower.count("quantum circuit") + body_lower.count("quantum gate") > 2:
+        scores["Algorithm"] += 0.5
 
     best = max(scores, key=scores.get)
     return best if scores[best] > 0 else "Entity"
+
+def _extract_historical_date(body: str) -> Optional[str]:
+    """Extract the first plausible historical year from page body content."""
+    matches = re.findall(r'\b(1[89]\d\d|20[0-3]\d)\b', body)
+    for m in matches:
+        year = int(m)
+        if 1850 <= year <= 2030:
+            return f"{year}-01-01"
+    return None
+
 
 def _normalize_node_name(name: str) -> str:
     if not name:
@@ -247,6 +281,71 @@ def _fallback_heuristic_edge_type(
         ("discussed", "REFERENCES", ["REFERENCES"]),
         ("cite", "REFERENCES", ["REFERENCES"]),
         ("citation", "REFERENCES", ["REFERENCES"]),
+        # Extended mappings for types that never fire
+        ("invented", "CREATED", ["CREATED"]),
+        ("created", "CREATED", ["CREATED"]),
+        ("founded", "FOUNDED", ["FOUNDED"]),
+        ("established", "FOUNDED", ["FOUNDED"]),
+        ("disclosed", "DISCLOSED", ["DISCLOSED"]),
+        ("revealed", "DISCLOSED", ["DISCLOSED"]),
+        ("refutes", "CONTRADICTS", ["CONTRADICTS"]),
+        ("disagrees with", "CONTRADICTS", ["CONTRADICTS"]),
+        ("same as", "EQUIVALENT_TO", ["EQUIVALENT_TO"]),
+        ("identical to", "EQUIVALENT_TO", ["EQUIVALENT_TO"]),
+        ("demonstrates", "DEMONSTRATES", ["DEMONSTRATES"]),
+        ("shows that", "DEMONSTRATES", ["DEMONSTRATES"]),
+        ("proves", "DEMONSTRATES", ["DEMONSTRATES"]),
+        ("caused", "CAUSED", ["CAUSED"]),
+        ("led to", "CAUSED", ["CAUSED"]),
+        ("resulted in", "CAUSED", ["CAUSED"]),
+        ("hosted", "HOSTS", ["HOSTS"]),
+        ("hosts", "HOSTS", ["HOSTS"]),
+        ("stored at", "STORED_IN", ["STORED_IN"]),
+        ("kept at", "STORED_IN", ["STORED_IN"]),
+        ("housed at", "STORED_IN", ["STORED_IN"]),
+        ("part of", "PART_OF", ["PART_OF"]),
+        ("component of", "PART_OF", ["PART_OF"]),
+        ("member of", "MEMBER_OF", ["MEMBER_OF"]),
+        ("collaborated with", "COLLABORATED_WITH", ["COLLABORATED_WITH"]),
+        ("worked with", "COLLABORATED_WITH", ["COLLABORATED_WITH"]),
+        ("mentored", "MENTORED_BY", ["MENTORED_BY"]),
+        ("trained by", "MENTORED_BY", ["MENTORED_BY"]),
+        ("witnessed", "WITNESSED", ["WITNESSED"]),
+        ("observed", "WITNESSED", ["WITNESSED"]),
+        ("participated in", "PARTICIPATED_IN", ["PARTICIPATED_IN"]),
+        ("involved in", "PARTICIPATED_IN", ["PARTICIPATED_IN"]),
+        ("located in", "LOCATED_IN", ["LOCATED_IN"]),
+        ("based in", "LOCATED_IN", ["LOCATED_IN"]),
+        ("testified at", "TESTIFIED_AT", ["TESTIFIED_AT"]),
+        ("visited", "VISITED", ["VISITED"]),
+        ("traveled to", "VISITED", ["VISITED"]),
+        ("born in", "BORN_IN", ["BORN_IN"]),
+        ("born at", "BORN_IN", ["BORN_IN"]),
+        ("contributed to", "CONTRIBUTED_TO", ["CONTRIBUTED_TO"]),
+        ("led", "LEAD_ON", ["LEAD_ON"]),
+        ("heading", "LEAD_ON", ["LEAD_ON"]),
+        ("commissioned", "COMMISSIONED", ["COMMISSIONED"]),
+        ("manufactures", "MANUFACTURES", ["MANUFACTURES"]),
+        ("manufactured", "MANUFACTURES", ["MANUFACTURES"]),
+        ("reverse engineered", "REVERSE_ENGINEERS", ["REVERSE_ENGINEERS"]),
+        ("reverse-engineer", "REVERSE_ENGINEERS", ["REVERSE_ENGINEERS"]),
+        ("informed by", "INFORMS", ["INFORMS"]),
+        ("informs", "INFORMS", ["INFORMS"]),
+        ("preceded by", "PRECEDED_BY", ["PRECEDED_BY"]),
+        ("precedes", "PRECEDES", ["PRECEDES"]),
+        ("followed by", "FOLLOWED_BY", ["FOLLOWED_BY"]),
+        ("depends on", "DEPENDS_ON", ["DEPENDS_ON"]),
+        ("dependent on", "DEPENDS_ON", ["DEPENDS_ON"]),
+        ("describes", "DESCRIBES", ["DESCRIBES"]),
+        ("described as", "DESCRIBES", ["DESCRIBES"]),
+        ("used by", "USED_BY", ["USED_BY"]),
+        ("researched by", "RESEARCHED_BY", ["RESEARCHED_BY"]),
+        ("researched", "RESEARCHED", ["RESEARCHED"]),
+        ("evidence for", "EVIDENCE_FOR", ["EVIDENCE_FOR"]),
+        ("consulted for", "CONSULTED_FOR", ["CONSULTED_FOR"]),
+        ("location of", "LOCATION_OF", ["LOCATION_OF"]),
+        ("near", "NEAR", ["NEAR"]),
+        ("context for", "CONTEXT_FOR", ["CONTEXT_FOR"]),
     ]:
         if keyword in body_lower and rel in valid_options:
             return rel, False
@@ -261,6 +360,10 @@ def ingest_wiki_page(
     default_sources: List[str] = None
 ) -> Tuple[int, int]:
     metadata, body = parse_markdown_frontmatter(content)
+
+    if not isinstance(metadata, dict):
+        logger.warning(f"Invalid frontmatter for '{title}', using defaults")
+        metadata = {}
 
     tags = [str(t) for t in metadata.get("tags", default_tags or [])]
     sources = [str(s) for s in metadata.get("sources", default_sources or [])]
@@ -280,8 +383,32 @@ def ingest_wiki_page(
     primary_label = _infer_primary_label(display_name, tags, body)
     primary_label = _sanitize_label(primary_label)
 
+    # Phase 1.2: Parse dates — only set for Event-labeled nodes
+    explicit_date = metadata.get("date")
+    date_value = explicit_date or _extract_historical_date(body)
+    if date_value and primary_label != "Event":
+        date_value = None
+
     # P7: Detect fallback (pages from _fallback_analysis carry "fallback" tag)
     is_fallback = "fallback" in [str(t).lower() for t in tags]
+
+    # P8: Infer event type from tags or body for Event-labeled nodes
+    event_type = None
+    if primary_label == "Event":
+        event_type_keywords = {
+            "crash": ["crash", "accident", "downed", "wreckage"],
+            "sighting": ["sighting", "observation", "encounter", "spotting"],
+            "disclosure": ["disclosure", "testimony", "hearing", "whistleblower"],
+            "theory": ["theory", "hypothesis", "framework"],
+            "program": ["program", "project", "initiative"],
+            "anomaly": ["anomaly", "phenomenon", "unexplained"],
+        }
+        tag_set = set(str(t).lower() for t in tags)
+        body_lower = body.lower()
+        for etype, keywords in event_type_keywords.items():
+            if any(kw in tag_set or kw in body_lower for kw in keywords):
+                event_type = etype
+                break
 
     # P4: Read protected flag
     protected = bool(metadata.get("protected", False))
@@ -303,18 +430,22 @@ def ingest_wiki_page(
           n.content_preview = $preview,
           n.confidence = 1.0,
           n.fallback = $fallback,
-          n.protected = $protected
+          n.protected = $protected,
+          n.date = $date,
+          n.type = $event_type
         ON MATCH SET
           n.display_name = $display,
           n.tags = $tags,
           n.sources = $sources,
           n.content_preview = $preview,
           n.fallback = $fallback,
-          n.protected = $protected
+          n.protected = $protected,
+          n.date = $date,
+          n.type = $event_type
         RETURN elementId(n)
         """
         preview = body[:300] + "..." if len(body) > 300 else body
-        session.run(primary_query, name=node_name, display=display_name, tags=tags, sources=sources, preview=preview, fallback=is_fallback, protected=protected)
+        session.run(primary_query, name=node_name, display=display_name, tags=tags, sources=sources, preview=preview, fallback=is_fallback, protected=protected, date=date_value, event_type=event_type)
         nodes_count += 1
 
         if primary_label != "Entity":
@@ -330,18 +461,28 @@ def ingest_wiki_page(
             if not target_name or target_name == node_name:
                 continue
 
-            if not _resolve_target_wiki_file(target):
+            target_file = _resolve_target_wiki_file(target)
+            if not target_file:
                 logger.debug("Skipping placeholder node for unresolvable target '%s' (source: %s)", target, display_name)
                 continue
 
-            target_label = _sanitize_label(_infer_primary_label(target_display, []))
+            # Phase 2.2: Infer target label with tags from target page
+            target_tags = _resolve_target_wiki_tags(target)
+            target_label = _sanitize_label(_infer_primary_label(target_display, target_tags, body))
+
+            # Phase 1.3: Resolved targets get confidence = 1.0
+            target_exists = target_file is not None
+            target_confidence = 1.0 if target_exists else 0.5
 
             target_query = """
             MERGE (t:Entity {name: $target_name})
-            ON CREATE SET t.display_name = $target_display, t.confidence = 0.5
+            ON CREATE SET
+              t.display_name = $target_display,
+              t.confidence = $confidence,
+              t.date = null
             RETURN elementId(t)
             """
-            session.run(target_query, target_name=target_name, target_display=target_display)
+            session.run(target_query, target_name=target_name, target_display=target_display, confidence=target_confidence)
             nodes_count += 1
 
             if target_label != "Entity":
@@ -370,4 +511,11 @@ def ingest_wiki_page(
 
     progress_inc("neo4j", "nodes", nodes_count)
     progress_inc("neo4j", "relationships", rels_count)
+    cache_store.invalidate_entity(node_name)
+    try:
+        from src.main import _sse_broadcast
+        import asyncio
+        asyncio.ensure_future(_sse_broadcast("entity_updated", node_name, source="ingest"))
+    except Exception:
+        pass
     return nodes_count, rels_count
