@@ -338,7 +338,7 @@ chickensoup/
 - **Xcode**: 16.0+ (for SwiftUI client)
 - **Services**: Docker (for Neo4j & Redis)
 - **Git LFS**: `git lfs install` (for Neo4j seed dump download)
-- **Optional (Living Almanac)**: `last30days-skill/` cloned repo (not an npm package). `npx last30days` returns E404. Script auto-resolved from repo. API keys for X, Reddit, YouTube, Brave optional (only if `LAST30DAYS_ENABLED=true`)
+- **Optional (Living Almanac)**: `last30days-skill/` cloned repo. Most sources work with zero config — Reddit, Hacker News, Polymarket, GitHub, StockTwits are free. X needs a browser login cookie (free). YouTube needs `brew install yt-dlp` (free). Web search needs a Brave Search key (2K free queries/month). Social platforms (TikTok, Instagram, Threads, Pinterest, LinkedIn) need a ScrapeCreators key (10K free calls). See [last30days-skill](https://github.com/mvanhorn/last30days-skill) for the full source matrix.
 
 ### 2. Backend Setup
 ```bash
@@ -423,7 +423,7 @@ curl -X POST "http://127.0.0.1:8000/almanac/generate?dry_run=false"
 
 | Symptom | Fix |
 |---------|-----|
-| All entities show `(error, 0 evidence)` | Ensure `LAST30DAYS_ENABLED=true`, `LAST30DAYS_BINARY_PATH` set or workspace root resolves to 3 dirname hops in `pulse_agent.py`, script has execute permission, timeout ≥ 120s |
+| All entities show `(error, 0 evidence)` | Ensure `LAST30DAYS_ENABLED=true`, `LAST30DAYS_BINARY_PATH` set or workspace root resolves to 3 dirname hops in `pulse_agent.py`, script has execute permission, timeout ≥ 120s. Most sources work with zero API keys — see [last30days-skill](https://github.com/mvanhorn/last30days-skill) for details. |
 | `npm error 404 GET https://registry.npmjs.org/last30days` | `last30days` is not an npm package — it's a cloned repo at `last30days-skill/`. Set `LAST30DAYS_BINARY_PATH` so the server uses the Python script instead of `npx`. |
 | `/entities/{name}/divergence` returns 404 or empty | Swift `AlmanacService` must NOT percent-encode entity names before passing to `APIClient.request`. Double-encoding (`%20` → `%2520`) causes FastAPI 404. |
 | Pulse fails with `Permission denied` | `chmod +x last30days-skill/skills/last30days/scripts/last30days.py` |
