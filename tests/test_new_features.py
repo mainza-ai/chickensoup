@@ -363,7 +363,6 @@ In 1996, the Varginha UFO crash occurred in Brazil."""
         if kwargs.get("name") == "test event":
             assert kwargs.get("date") is not None, "date should be extracted from body"
             break
-                break
 
 
 def test_ingest_malformed_frontmatter_does_not_crash():
