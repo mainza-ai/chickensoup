@@ -154,9 +154,9 @@ def test_api_get_events_filtering(client, mock_neo4j):
         }
 
     mock_session.run.return_value = [
-        make_record("roswell-crash", "Roswell Crash", "1947-07-01", ["ufo", "crash"], ["Grusch-2023"], "Test", 1.0, ["Entity"]),
+        make_record("roswell-crash", "Roswell Crash", "1947-07-01", ["ufo", "crash"], ["Grusch-2023"], "Test", 1.0, ["Event", "Entity"]),
         make_record("technology-stack", "Technology Stack", None, ["project", "technology", "stack"], ["Grusch-2023"], "Test", 1.0, ["Concept"]),
-        make_record("project-serpo", "Project Serpo", "1989-01-01", ["project-serpo", "uap"], ["Grusch-2023"], "Test", 1.0, ["Entity"]),
+        make_record("project-serpo", "Project Serpo", "1989-01-01", ["project-serpo", "uap"], ["Grusch-2023"], "Test", 1.0, ["Event", "Entity"]),
         make_record("project-structure", "Project Structure", None, ["build"], ["Grusch-2023"], "Test", 1.0, ["Project"]),
     ]
 
