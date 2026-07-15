@@ -1490,7 +1490,6 @@ struct SettingsView: View {
         }
     }
 }
-}
 
 // MARK: - Preview
 
