@@ -48,6 +48,11 @@ struct SettingsView: View {
     @State private var exportedURLs: [URL] = []
     @State private var restoreAlertMessage: String? = nil
 
+    // Wiki export/import states
+    @State private var wikiExportSuccess: String?
+    @State private var wikiImportError: String?
+    @State private var showWikiImporter = false
+
     private var hasUnsavedChanges: Bool {
         selectedBackend != backendService.config.quantumBackend ||
         hardwareEnabled != backendService.config.quantumHardwareEnabled ||
@@ -701,7 +706,9 @@ struct SettingsView: View {
                             let result = await backendService.wiki.exportWiki()
                             await MainActor.run {
                                 if let r = result, r.success {
-                                    print("Wiki exported: \(r.filepath) (\(r.pageCount) pages, \(r.sizeKb) KB)")
+                                    wikiExportSuccess = "\(r.filepath)\n(\(r.pageCount) pages, \(r.sizeKb) KB)"
+                                } else {
+                                    wikiExportSuccess = "Export failed"
                                 }
                             }
                         }
@@ -722,7 +729,54 @@ struct SettingsView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                }
+
+                    if let result = wikiExportSuccess {
+                        Text(result)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(3)
+                    }
+
+                    Button(action: { showWikiImporter = true }) {
+                        HStack {
+                            Image(systemName: "square.and.arrow.up")
+                            Text("Import Wiki")
+                                .bold()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(DesignConstants.systemBlue.opacity(0.15))
+                        .foregroundStyle(DesignConstants.systemBlue)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: DesignConstants.buttonCornerRadius)
+                                .stroke(DesignConstants.systemBlue.opacity(0.3), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .fileImporter(isPresented: $showWikiImporter, allowedContentTypes: [.zip]) { result in
+                        switch result {
+                        case .success(let url):
+                            Task {
+                                let resp = await backendService.wiki.importWiki(fileURL: url)
+                                await MainActor.run {
+                                    if let r = resp, r.success {
+                                        wikiExportSuccess = "Import complete: \(r.restoredCount) pages"
+                                    } else {
+                                        wikiImportError = "Import failed"
+                                    }
+                                }
+                            }
+                        case .failure:
+                            wikiImportError = "Could not open file"
+                        }
+                    }
+
+                    if let error = wikiImportError {
+                        Text(error)
+                            .font(.caption2)
+                            .foregroundStyle(.red)
+                    }
             }
             .padding(DesignConstants.standardPadding)
             .background(DesignConstants.cardBackground)
