@@ -21,8 +21,24 @@ logger = logging.getLogger("chickensoup.neo4j_backup")
 
 BACKUP_DIR = Path(settings.NEO4J_BACKUP_DIR)
 RETENTION_DAYS = settings.NEO4J_BACKUP_RETENTION_DAYS
-CONTAINER_NAME = "neo4j"
+CONTAINER_NAME = getattr(settings, "NEO4J_CONTAINER_NAME", "neo4j")
 NEO4J_DB_NAME = "neo4j"
+BACKUP_VOLUME_NAME = getattr(settings, "NEO4J_DATA_VOLUME", "chickensoup_neo4j_data")
+
+
+def _get_data_volume() -> str:
+    """Resolve the data volume mount from the running container, or fall back to configured name."""
+    try:
+        result = subprocess.run(
+            ["docker", "inspect", CONTAINER_NAME, "--format",
+             "{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Name}}{{end}}{{end}}"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return BACKUP_VOLUME_NAME
 
 
 def _container_running() -> bool:
@@ -69,11 +85,12 @@ def _stop_container():
 def _run_dump(dump_path: Path) -> bool:
     logger.info(f"Running neo4j-admin database dump to {dump_path}")
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    volume = _get_data_volume()
     try:
         result = subprocess.run(
             ["docker", "run", "--rm",
-             "-v", f"{settings.NEO4J_URI_HOST_DATA}:/data",
-             "-v", f"{dump_path.parent}:/backups",
+             "-v", f"{volume}:/data",
+             "-v", f"{os.path.abspath(BACKUP_DIR)}:/backups",
              "neo4j:5.18.0",
              "neo4j-admin", "database", "dump", NEO4J_DB_NAME,
              "--to-path=/backups"],
@@ -95,11 +112,12 @@ def _run_dump(dump_path: Path) -> bool:
 
 def _run_restore(dump_path: Path) -> bool:
     logger.info(f"Restoring from {dump_path}")
+    volume = _get_data_volume()
     try:
         result = subprocess.run(
             ["docker", "run", "--rm",
-             "-v", f"{settings.NEO4J_URI_HOST_DATA}:/data",
-             "-v", f"{dump_path.parent}:/backups",
+             "-v", f"{volume}:/data",
+             "-v", f"{os.path.abspath(dump_path.parent)}:/backups",
              "neo4j:5.18.0",
              "neo4j-admin", "database", "load", NEO4J_DB_NAME,
              "--from-path=/backups", "--force"],

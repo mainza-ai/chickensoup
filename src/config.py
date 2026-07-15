@@ -62,6 +62,8 @@ class Settings(BaseSettings):
     NEO4J_BACKUP_RETENTION_DAYS: int = 30
     NEO4J_BACKUP_INTERVAL_HOURS: int = 24
     NEO4J_URI_HOST_DATA: str = "/var/lib/docker/volumes/chickensoup_neo4j_data/_data"
+    NEO4J_CONTAINER_NAME: str = "chickensoup-neo4j"
+    NEO4J_DATA_VOLUME: str = "chickensoup_neo4j_data"
 
     # Chat-to-wiki periodic conversion
     CHAT_WIKI_CONVERSION_ENABLED: bool = False
