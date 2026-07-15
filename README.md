@@ -238,16 +238,18 @@ Watch the Spacetime Navigation Engine & Lore Knowledge Graph in action:
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS & iOS, 50+ files), SwiftData, Swift Testing, os.Logger |
-| **API Layer** | FastAPI 40+ endpoints, FastMCP (Model Context Protocol), WebSockets, custom API Key Security Middleware |
+| **Frontend Client** | [SwiftUI](file:///Users/mck/Desktop/chickensoup/Project%20Chicken%20Soup) (macOS & iOS, 60+ files), SwiftData, Swift Testing, os.Logger |
+| **API Layer** | FastAPI 59 endpoints, FastMCP (Model Context Protocol), WebSockets, SSE, custom API Key Security Middleware |
 | **Agent AI** | Pydantic AI, `pydantic-graph`, LangGraph (checkpointing, human-in-the-loop, tribunal), Langchain |
-| **Quantum Credibility** | `quantum_credibility/wavefunction.py` (VQE over 3-basis), `divergence_engine.py` (tensor reuse), `entanglement_corr.py` (Meyer-Wallach), `vectorizer.py` (claims→tensor) |
+| **Quantum Credibility** | `wavefunction.py` (VQE over 3-basis), `divergence_engine.py` (tensor reuse), `entanglement_corr.py` (Meyer-Wallach), `vectorizer.py` (claims→tensor) |
 | **Quantum Tier** | Qiskit (Spacetime — AerEstimatorV2 pattern), CUDA-Q (Field), PennyLane (Pathfinding QML), Quantum Hardware Job Scheduler |
-| **Databases** | Neo4j (Knowledge Graph), Redis (Cache + Budget + Celery broker) |
+| **Databases** | Neo4j 5.18 (Knowledge Graph — 525 nodes, 5762 relationships, 8 dated events), Redis (Cache + Budget + Progress tracking) |
+| **LLM Providers** | NVIDIA cloud (116 models), oMLX local, Ollama, LM Studio — auto-discovery with circuit breaker and model fallback |
 | **Ingestion** | `pulse_agent.py` (last30days subprocess, budget-guarded), `last30days_adapter.py` (JSON+markdown normalization) |
-| **Wiki Layer** | `writer.py` (YAML CRUD), `paths.py` (central resolver), `pulse_writer.py` (immutable same-day snapshots, no counter suffix), `backup.py`, `cleanup.py`, `budget.py` (Lua atomic) |
-| **Observability** | OpenTelemetry tracing + 11 custom metrics: `agent_loop_executions`, `quantum_simulation_duration`, `pulse_runs_total`, `pulse_latency_seconds`, `budget_spent_usd`, `wavefunction_state_total{state,collapsed}`, `divergence_risk`, `tribunal_runs_total{trigger}`, `almanac_generated_total`, `almanac_generation_duration_seconds` |
-| **Infrastructure** | Docker, Celery (Asynchronous Ingestion Workers), pytest 75 passing, `uv` package manager |
+| **Wiki Layer** | `writer.py` (YAML CRUD), `paths.py` (central resolver), `pulse_writer.py` (immutable same-day snapshots), `backup.py`, `neo4j_backup.py` (database dump/restore via Git LFS), `cleanup.py`, `budget.py` (Lua atomic) |
+| **Observability** | OpenTelemetry tracing + 12 custom metrics: `agent_loop_executions`, `quantum_simulation_duration`, `pulse_runs_total`, `pulse_latency_seconds`, `budget_spent_usd`, `wavefunction_state_total{state,collapsed}`, `divergence_risk`, `tribunal_runs_total{trigger}`, `almanac_generated_total`, `almanac_generation_duration_seconds`, LLM calls/parse failures |
+| **Infrastructure** | Docker Compose (Neo4j 5.18 + Redis 7), Neo4j database backup via Docker with Git LFS seed distribution, `uv` package manager |
+| **CI** | GitHub Actions — pytest (102 passing) |
 
 ---
 
@@ -335,12 +337,14 @@ chickensoup/
 - **Python**: 3.12+ (managed with `uv` or `.python-version`)
 - **Xcode**: 16.0+ (for SwiftUI client)
 - **Services**: Docker (for Neo4j & Redis)
+- **Git LFS**: `git lfs install` (for Neo4j seed dump download)
 - **Optional (Living Almanac)**: `last30days-skill/` cloned repo (not an npm package). `npx last30days` returns E404. Script auto-resolved from repo. API keys for X, Reddit, YouTube, Brave optional (only if `LAST30DAYS_ENABLED=true`)
 
 ### 2. Backend Setup
 ```bash
 cp .env.example .env
-docker-compose up -d
+git lfs pull                  # downloads 11MB Neo4j seed dump
+docker-compose up -d          # starts Neo4j + Redis
 uv sync
 ```
 
@@ -348,6 +352,7 @@ uv sync
 ```bash
 uv run uvicorn src.main:app --reload
 ```
+> On first startup, if Neo4j is empty, the server automatically restores from `backups/neo4j/seed.dump` — the full knowledge graph (525 nodes, 5762 relationships, 8 dated events) is ready instantly. No 3-hour reconciliation needed.
 
 **Production** (no reload, multiple workers):
 ```bash
@@ -450,12 +455,12 @@ Pages are automatically created through:
 
 | Wiki Section | Count | Description |
 |:---|---:|:---|
-| [Entities](file:///Users/mck/Desktop/chickensoup/wiki/entities) | 65 | People, places, objects, events, programs (infrastructure pages moved to wiki/dev/) |
-| [Concepts](file:///Users/mck/Desktop/chickensoup/wiki/concepts) | ~90 | Theories, frameworks, ideas, claims |
-| [Projects](file:///Users/mck/Desktop/chickensoup/wiki/projects) | 6 | Engineering work, architecture, specifications |
-| [Raw](file:///Users/mck/Desktop/chickensoup/wiki/raw) | 60+ | Immutable source documents (PDFs, transcripts, Apple platform guides) |
-| [Dev](file:///Users/mck/Desktop/chickensoup/wiki/dev) | 70+ | INTERNAL — agent skills, dependency docs, API specs, implementation plans, pulse/almanac artifacts (excluded from user-facing ingestion) |
-| [Plan](file:///Users/mck/Desktop/chickensoup/wiki/plan) | 0 public | Internal implementation plans moved to wiki/plan/internal/ |
+| [Entities](file:///Users/mck/Desktop/chickensoup/wiki/entities) | 59 | People, places, objects, events, programs |
+| [Concepts](file:///Users/mck/Desktop/chickensoup/wiki/concepts) | 200+ | Theories, frameworks, ideas, claims |
+| [Projects](file:///Users/mck/Desktop/chickensoup/wiki/projects) | 80+ | Engineering work, architecture, specifications, research papers |
+| [Raw](file:///Users/mck/Desktop/chickensoup/wiki/raw) | 80+ | Immutable source documents (PDFs, transcripts, Apple platform guides) |
+| [Dev](file:///Users/mck/Desktop/chickensoup/wiki/dev) | 30+ | Agent skills, dependency docs, API specs, implementation plans, backup docs (excluded from Neo4j ingest) |
+| [Plan](file:///Users/mck/Desktop/chickensoup/wiki/plan) | 15+ | Implementation plans, audits, smoke tests |
 
 ### Advanced Capabilities & Services
 
