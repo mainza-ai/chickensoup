@@ -100,8 +100,9 @@ struct SettingsView: View {
                 backendPickerSection
                 llmConfigSection
                 chatToWikiSection
-                // Data store backup section (inline, ~lines 735-906)
-                neo4jBackupSection
+                // Data store backup section (inline)
+                Neo4jBackupSettingsView()
+                    .padding(.horizontal, DesignConstants.compactPadding)
                 livingAlmanacSection
                 apiTokenSection
             }
@@ -960,13 +961,6 @@ struct SettingsView: View {
             }
         }
     }
-
-    private var neo4jBackupSection: some View {
-        Neo4jBackupSettingsView()
-            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-            .listRowSeparator(.hidden)
-    }
-
     @ViewBuilder
     private var livingAlmanacSection: some View {
         VStack(alignment: .leading, spacing: 12) {
