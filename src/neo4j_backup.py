@@ -210,6 +210,18 @@ def cleanup_old_backups() -> int:
     return deleted
 
 
+def needs_restore(driver) -> bool:
+    """Check if Neo4j has any nodes — if not, a seed restore is needed."""
+    try:
+        with driver.session() as session:
+            result = session.run("MATCH (n) RETURN count(n) AS c")
+            count = result.single()["c"]
+            return count == 0
+    except Exception as e:
+        logger.warning(f"Could not probe Neo4j for seed restore: {e}")
+        return False
+
+
 def _human_size(bytes_: int) -> str:
     for unit in ("B", "KB", "MB", "GB"):
         if bytes_ < 1024:

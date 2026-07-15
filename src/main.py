@@ -69,6 +69,25 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Could not initialize Neo4j connection or schema on startup: {e}")
 
+    # Auto-restore Neo4j from seed dump if database is empty
+    if settings.NEO4J_BACKUP_ENABLED:
+        try:
+            from pathlib import Path
+            seed_path = Path(settings.NEO4J_BACKUP_DIR) / "seed.dump"
+            if seed_path.exists():
+                from src.neo4j_backup import needs_restore, restore_backup
+                if needs_restore(driver):
+                    logger.info("Neo4j database is empty — restoring from seed dump...")
+                    success = restore_backup("seed.dump")
+                    if success:
+                        logger.info("Neo4j restored from seed dump successfully")
+                        driver = neo4j_conn.connect()
+                        initialize_schema(driver)
+                    else:
+                        logger.warning("Neo4j seed restore failed — starting fresh")
+        except Exception as e:
+            logger.warning(f"Could not check/restore Neo4j seed: {e}")
+
     try:
         from src.scheduler import periodic_chat_ingest_loop
         scheduler_task = asyncio.create_task(periodic_chat_ingest_loop())
