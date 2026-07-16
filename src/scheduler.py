@@ -830,7 +830,8 @@ async def idle_ingestion_loop():
 
                     logger.info(f"Running idle pulse for '{entity_name}'")
                     progress_update("idle_ingestion", status="pulsing", current_slug=slug)
-                    result = pulse_agent.run_pulse(entity_name)
+                    loop = asyncio.get_event_loop()
+                    result = await loop.run_in_executor(None, pulse_agent.run_pulse, entity_name)
                     
                     # Compute divergence risk & state label if we got evidence
                     div_risk = 0.0
