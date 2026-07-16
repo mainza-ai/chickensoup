@@ -63,7 +63,7 @@ class IdleSentinel:
             logger.warning(f"Failed to update activity in IdleSentinel: {e}")
 
     @staticmethod
-    def is_idle(threshold_minutes: int = None) -> bool:
+    def is_idle(threshold_minutes: float = None) -> bool:
         """
         Checks if the system has been idle for the configured duration.
         """
@@ -107,7 +107,7 @@ class IdleSentinel:
     @staticmethod
     async def run_while_idle(
         work_unit_fn: Callable[[], Any],
-        threshold_minutes: int = None,
+        threshold_minutes: float = None,
         check_interval_seconds: int = 10,
     ) -> bool:
         """

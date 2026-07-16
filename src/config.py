@@ -120,7 +120,7 @@ class Settings(BaseSettings):
     LAST30DAYS_COST_PER_PULL_USD: float = 0.50
     FREE_TIER_REQUESTS_PER_HOUR: int = 60
     FREE_TIER_ENABLED: bool = True
-    IDLE_THRESHOLD_MINUTES: int = 5
+    IDLE_THRESHOLD_MINUTES: float = 0.5
     LAST30DAYS_PULSE_TIMEOUT_SECONDS: int = 300
 
     # Wiki reconciliation at startup: ingests existing pages into Neo4j/queue.
