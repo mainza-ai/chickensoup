@@ -53,10 +53,10 @@ def compute_staleness_score(slug: str) -> float:
         state_label = label_val if label_val else "unverified"
         contested_bonus = 5.0 if state_label == "contested" else 0.0
 
-        # Weights
+        # Weights — days_stale is the primary factor so entities cycle naturally
         w_t = 1.0
-        w_r = 2.0
-        w_d = 10.0
+        w_r = 1.0
+        w_d = 2.0
 
         score = (w_t * days_stale) + (w_r * reinforcement) + (w_d * divergence) + contested_bonus
         return float(score)
@@ -78,10 +78,9 @@ def record_pulse_completed(slug: str, divergence_risk: float = 0.0, state_label:
         cache_store.redis_client.set(_state_label_key(slug), state_label)
         
         # Recalculate score and update Redis sorted set
-        # Use a very low score so this entity sinks to the bottom of zrevrange
-        # preventing it from being re-pulsed until the queue is rebuilt
-        cache_store.redis_client.zadd(QUEUE_REDIS_KEY, {slug: -999999})
-        logger.info(f"Recorded pulse complete for '{slug}' — moved to bottom of queue")
+        new_score = compute_staleness_score(slug)
+        cache_store.redis_client.zadd(QUEUE_REDIS_KEY, {slug: new_score})
+        logger.info(f"Recorded pulse complete for '{slug}' with score {new_score:.2f}")
     except Exception as e:
         logger.warning(f"Failed to record pulse complete for '{slug}': {e}")
 
