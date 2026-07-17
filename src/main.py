@@ -184,9 +184,18 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Could not start Neo4j backup scheduler: {e}")
 
+    # Start automatic almanac generation loop
+    almanac_gen_task = None
+    try:
+        from src.scheduler import almanac_generation_loop
+        almanac_gen_task = asyncio.create_task(almanac_generation_loop())
+        logger.info(f"Almanac generation scheduler started ({settings.ALMANAC_GENERATION_INTERVAL_HOURS}h interval)")
+    except Exception as e:
+        logger.warning(f"Could not start almanac generation scheduler: {e}")
+
     yield
     logger.info("Shutting down chickensoup API...")
-    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task, neo4j_backup_task):
+    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task, neo4j_backup_task, almanac_gen_task):
         if task:
             task.cancel()
             try:

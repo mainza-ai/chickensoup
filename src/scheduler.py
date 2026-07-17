@@ -1023,14 +1023,16 @@ async def fallback_retry_loop():
 
 
 def stop():
-    global _RUNNING, _IDLE_INGESTION_RUNNING, _FALLBACK_RETRY_RUNNING, _NEO4J_BACKUP_RUNNING
+    global _RUNNING, _IDLE_INGESTION_RUNNING, _FALLBACK_RETRY_RUNNING, _NEO4J_BACKUP_RUNNING, _ALMANAC_RUNNING
     _RUNNING = False
     _IDLE_INGESTION_RUNNING = False
     _FALLBACK_RETRY_RUNNING = False
     _NEO4J_BACKUP_RUNNING = False
+    _ALMANAC_RUNNING = False
 
 
 _NEO4J_BACKUP_RUNNING = True
+_ALMANAC_RUNNING = True
 
 async def neo4j_backup_loop():
     """Periodically create Neo4j database dumps. Runs on configurable interval."""
@@ -1066,3 +1068,35 @@ async def neo4j_backup_loop():
             logger.error(f"Neo4j backup error: {e}")
 
     _NEO4J_BACKUP_RUNNING = False
+
+
+async def almanac_generation_loop():
+    """Automatically generate almanac briefs on a configurable interval."""
+    global _ALMANAC_RUNNING
+    _ALMANAC_RUNNING = True
+    interval = settings.ALMANAC_GENERATION_INTERVAL_HOURS * 3600
+    logger.info(f"Almanac generation loop started ({settings.ALMANAC_GENERATION_INTERVAL_HOURS}h interval)")
+
+    while _ALMANAC_RUNNING:
+        try:
+            await asyncio.sleep(interval)
+
+            from src.idle_sentinel import IdleSentinel
+            if not IdleSentinel.is_idle():
+                logger.info("Almanac generation deferred — system not idle")
+                continue
+
+            from src.almanac.almanac_generator import generate_daily_almanac
+            result = await generate_daily_almanac(dry_run=False)
+            if result.status == "success":
+                logger.info(f"Almanac generated: {result.html_path}")
+            elif result.status == "no_material_change":
+                logger.info("Almanac skipped — no material change since last brief")
+            else:
+                logger.warning(f"Almanac generation returned: {result.status}")
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Almanac generation error: {e}")
+
+    _ALMANAC_RUNNING = False
