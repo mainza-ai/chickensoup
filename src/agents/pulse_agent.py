@@ -188,49 +188,40 @@ class PulseAgent:
                 text=True,
                 env={**os.environ, "NO_COLOR": "1"},
             )
-            deadline = time.monotonic() + timeout
-            # Poll with 1s intervals to check for preemption while subprocess runs
-            while time.monotonic() < deadline:
-                from src.idle_sentinel import IdleSentinel
-                if not IdleSentinel.is_idle():
-                    proc.kill()
-                    logger.info(f"Pulse preempted by user activity for '{entity_name}'")
+            # Wait for process to finish (with timeout). Using proc.wait() avoids the
+            # pipe-buffer deadlock that can occur with repeated proc.communicate() calls.
+            # proc.communicate() can only be called once per process — calling it in a
+            # loop with timeout=1 would corrupt internal state on the second call.
+            proc.wait(timeout=timeout)
+            stdout, stderr = proc.communicate()
+            raw_output = stdout or ""
+
+            # Check for preemption after the subprocess finishes (during the 300s window,
+            # the system might have become non-idle; we accept this minor gap rather than
+            # risking the pipe-buffer deadlock that the 1s-polling pattern introduced).
+            from src.idle_sentinel import IdleSentinel
+            if not IdleSentinel.is_idle():
+                logger.info(f"Pulse preempted (post-hoc) for '{entity_name}'")
+                return PulseResult(
+                    entity_name=entity_name,
+                    status="preempted",
+                    evidence=[],
+                    raw_snapshot_path=None,
+                    budget_remaining=remaining,
+                    error="Preempted by user activity",
+                )
+
+            if proc.returncode != 0:
+                logger.warning(f"last30days CLI exited {proc.returncode} for '{entity_name}': stderr={stderr[:500] if stderr else ''}")
+                if not raw_output.strip():
                     return PulseResult(
                         entity_name=entity_name,
-                        status="preempted",
+                        status="error",
                         evidence=[],
                         raw_snapshot_path=None,
                         budget_remaining=remaining,
-                        error="Preempted by user activity",
+                        error=f"CLI exit {proc.returncode}: {stderr[:500] if stderr else ''}",
                     )
-                try:
-                    stdout, stderr = proc.communicate(timeout=1)
-                    raw_output = stdout or ""
-                    if proc.returncode != 0:
-                        logger.warning(f"last30days CLI exited {proc.returncode} for '{entity_name}': stderr={stderr[:500] if stderr else ''}")
-                        if not raw_output.strip():
-                            return PulseResult(
-                                entity_name=entity_name,
-                                status="error",
-                                evidence=[],
-                                raw_snapshot_path=None,
-                                budget_remaining=remaining,
-                                error=f"CLI exit {proc.returncode}: {stderr[:500] if stderr else ''}",
-                            )
-                    break
-                except subprocess.TimeoutExpired:
-                    # After the first communicate() call, subsequent calls may raise on concurrent reads.
-                    # Fall back to waiting for process completion.
-                    try:
-                        proc.wait(timeout=1)
-                        stdout, stderr = proc.communicate()
-                        raw_output = stdout or ""
-                        break
-                    except subprocess.TimeoutExpired:
-                        continue
-            else:
-                proc.kill()
-                raise subprocess.TimeoutExpired(cmd, timeout)
 
         except subprocess.TimeoutExpired:
             msg = f"last30days pulse timed out after {settings.LAST30DAYS_PULSE_TIMEOUT_SECONDS}s for '{entity_name}'"

@@ -32,7 +32,16 @@ def _page_path(slug: str, page_type: str = "entities") -> str:
 def read_page(slug: str, page_type: str = "entities") -> Optional[Dict[str, Any]]:
     path = _page_path(slug, page_type)
     if not os.path.isfile(path):
-        return None
+        # Fall back to other page types when the default type doesn't match
+        for alt_type in ("concepts", "projects", "entities"):
+            if alt_type == page_type:
+                continue
+            alt_path = _page_path(slug, alt_type)
+            if os.path.isfile(alt_path):
+                path = alt_path
+                break
+        else:
+            return None
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
     meta = {}
