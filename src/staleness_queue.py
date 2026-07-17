@@ -78,9 +78,10 @@ def record_pulse_completed(slug: str, divergence_risk: float = 0.0, state_label:
         cache_store.redis_client.set(_state_label_key(slug), state_label)
         
         # Recalculate score and update Redis sorted set
-        new_score = compute_staleness_score(slug)
-        cache_store.redis_client.zadd(QUEUE_REDIS_KEY, {slug: new_score})
-        logger.info(f"Recorded pulse complete for '{slug}' with score {new_score:.2f}")
+        # Use a very low score so this entity sinks to the bottom of zrevrange
+        # preventing it from being re-pulsed until the queue is rebuilt
+        cache_store.redis_client.zadd(QUEUE_REDIS_KEY, {slug: -999999})
+        logger.info(f"Recorded pulse complete for '{slug}' — moved to bottom of queue")
     except Exception as e:
         logger.warning(f"Failed to record pulse complete for '{slug}': {e}")
 

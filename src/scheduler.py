@@ -781,6 +781,10 @@ async def idle_ingestion_loop():
             if not batch:
                 _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
                 _IDLE_LAST_BATCH = None
+                # All entities have been pulsed — rebuild queue to recalculate scores
+                from src.staleness_queue import rebuild_queue
+                rebuild_queue()
+                logger.info("Idle queue empty — rebuilt for next pass")
                 continue
 
             # Detect consecutive identical batches (orphan spin)
@@ -789,8 +793,11 @@ async def idle_ingestion_loop():
                 if _IDLE_CONSECUTIVE_IDENTICAL_BATCHES >= 5:
                     logger.error(
                         f"Same batch returned {_IDLE_CONSECUTIVE_IDENTICAL_BATCHES}x consecutively — "
-                        f"orphaned slugs detected: {batch}. Run rebuild_queue() or check staleness queue."
+                        f"orphaned slugs detected: {batch}. Rebuilding queue."
                     )
+                    from src.staleness_queue import rebuild_queue
+                    rebuild_queue()
+                    _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
             else:
                 _IDLE_CONSECUTIVE_IDENTICAL_BATCHES = 0
             _IDLE_LAST_BATCH = batch
