@@ -60,7 +60,7 @@ orchestrator = Orchestrator()
 async def lifespan(app: FastAPI):
     logger.info("Starting up chickensoup API...")
     scheduler_task = None
-    almanac_task = None
+    idle_ingestion_task = None
     watcher_task = None
     daily_rebuild_task = None
     try:
@@ -97,7 +97,7 @@ async def lifespan(app: FastAPI):
 
     try:
         from src.scheduler import idle_ingestion_loop
-        almanac_task = asyncio.create_task(idle_ingestion_loop())
+        idle_ingestion_task = asyncio.create_task(idle_ingestion_loop())
         logger.info("Idle-driven ingestion loop started")
     except Exception as e:
         logger.warning(f"Could not start idle-driven ingestion loop: {e}")
@@ -195,7 +195,7 @@ async def lifespan(app: FastAPI):
 
     yield
     logger.info("Shutting down chickensoup API...")
-    for task in (scheduler_task, almanac_task, watcher_task, daily_rebuild_task, neo4j_backup_task, almanac_gen_task):
+    for task in (scheduler_task, idle_ingestion_task, watcher_task, daily_rebuild_task, neo4j_backup_task, almanac_gen_task):
         if task:
             task.cancel()
             try:

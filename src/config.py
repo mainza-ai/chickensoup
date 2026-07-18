@@ -137,13 +137,19 @@ class Settings(BaseSettings):
     ALMANAC_GENERATION_INTERVAL_HOURS: int = 3
     ALMANAC_DRY_RUN_DEFAULT: bool = True
     ALMANAC_MIN_ENTITIES: int = 2
+    ALMANAC_TIER_1_ENTITIES: str = (
+        "bob-lazar,element-115,roswell-crash,david-grusch,nikola-tesla,"
+        "uap-hearings,area-51,mauro-biglino,ufos,varginha-ufo-crash,"
+        "ariel-school-ufo-incident,project-serpo,lyn-buchanan,erik-verlinde,"
+        "juan-maldacena,stephen-hawking,ralph-larson"
+    )
 
     BUDGET_REDIS_KEY_PREFIX: str = "budget"
     BUDGET_HOLD_THRESHOLD_REMAINING: float = 2.0  # multiples of cost_per_pull
 
     # Quantum credibility
     WAVEFUNCTION_SCORING_VERSION: str = "v1-wavefunction"
-    DIVERGENCE_SPIKE_THRESHOLD: float = 0.7
+    DIVERGENCE_SPIKE_THRESHOLD: float = 0.5
 
     @property
     def fallback_chain_list(self) -> List[str]:

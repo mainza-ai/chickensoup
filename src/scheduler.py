@@ -813,7 +813,8 @@ async def idle_ingestion_loop():
                     break
 
                 try:
-                    from src.wiki.writer import read_page
+                    from src.wiki.writer import read_page, _page_path
+                    import os as _os
                     page_data = read_page(slug)
                     if not page_data or "frontmatter" not in page_data:
                         logger.warning(f"Page '{slug}' not found on disk — removing from staleness queue")
@@ -821,6 +822,13 @@ async def idle_ingestion_loop():
                             cache_store.redis_client.zrem("staleness:queue", slug)
                         continue
                     
+                    # Determine actual page_type by probing filesystem
+                    page_type = "entities"
+                    for pt in ("entities", "concepts", "projects"):
+                        if _os.path.isfile(_page_path(slug, pt)):
+                            page_type = pt
+                            break
+
                     entity_name = page_data["frontmatter"].get("title", slug)
 
                     # Skip pulse for engineering-only pages (no content tags)
@@ -881,7 +889,7 @@ async def idle_ingestion_loop():
                                         tags=page_data["frontmatter"].get("tags", []),
                                         sources=sources,
                                         related=page_data["frontmatter"].get("related", []),
-                                        page_type=page_data.get("page_type", "entities"),
+                                        page_type=page_type,
                                     )
                                     logger.info(f"Enriched wiki page '{slug}' with {len(top_claims)} external evidence items")
                             except Exception as enrich_err:

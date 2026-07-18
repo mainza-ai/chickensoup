@@ -114,8 +114,7 @@ def list_pulse_snapshots(entity_name: Optional[str] = None) -> List[Path]:
 
     if entity_name:
         slug = slugify(entity_name)
-        today_str = date.today().isoformat()
-        pattern = f"{slug}-{today_str}*.json"
+        pattern = f"{slug}-*.json"
         return sorted(pulse_dir.glob(pattern))
 
     return sorted(pulse_dir.glob("*.json"))

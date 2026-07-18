@@ -90,12 +90,22 @@ def _load_tier_entities() -> List[str]:
         tier1_explicit.sort(key=lambda x: (x.get("tier", 999), x["slug"]))
         return tier1_explicit
 
-    # Fallback: use a small hardcoded set of high-interest entities if no tier field found
-    return [
-        {"slug": "bob-lazar", "title": "Bob Lazar", "tier": 1, "handles": None},
-        {"slug": "element-115", "title": "Element 115", "tier": 1, "handles": None},
-        {"slug": "roswell-crash", "title": "Roswell Crash", "tier": 1, "handles": None},
-    ]
+    # Fallback: use configured tier-1 entity list
+    configured = settings.ALMANAC_TIER_1_ENTITIES
+    if configured:
+        result = []
+        for slug in configured.split(","):
+            slug = slug.strip()
+            if slug:
+                result.append({
+                    "slug": slug,
+                    "title": slug.replace("-", " ").title(),
+                    "tier": 1,
+                    "handles": None,
+                })
+        return result
+
+    return []
 
 
 def _compute_almanac_hash(claim_confs: List[ClaimConfidence]) -> str:
@@ -414,7 +424,7 @@ async def generate_daily_almanac(dry_run: bool = False) -> AlmanacResult:
             tier_results.append(result_entry)
             continue
 
-        evidence_list = pulse_result.evidence if pulse_result.status in ("success", "no_data") else []
+        evidence_list = pulse_result.evidence if pulse_result.status in ("success", "no_data", "error") else []
 
         if not evidence_list:
             # Try to load recent pulse evidence from disk as fallback
@@ -604,8 +614,9 @@ async def generate_daily_almanac(dry_run: bool = False) -> AlmanacResult:
     # Write to wiki/raw/almanac/
     try:
         almanac_dir = ensure_almanac_dir()
-        html_path = almanac_dir / f"{today}.html"
-        md_path = almanac_dir / f"{today}.md"
+        timestamp_suffix = datetime.now(timezone.utc).strftime("%H%M%S")
+        html_path = almanac_dir / f"{today}-{timestamp_suffix}.html"
+        md_path = almanac_dir / f"{today}-{timestamp_suffix}.md"
 
         with open(html_path, "w", encoding="utf-8") as f:
             f.write(html_content)

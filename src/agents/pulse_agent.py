@@ -226,6 +226,18 @@ class PulseAgent:
         except subprocess.TimeoutExpired:
             msg = f"last30days pulse timed out after {settings.LAST30DAYS_PULSE_TIMEOUT_SECONDS}s for '{entity_name}'"
             logger.warning(msg)
+            # Kill zombie process to prevent resource leak
+            try:
+                proc.kill()
+                proc.wait(timeout=5)
+            except Exception:
+                pass
+            # Mark the pulse as completed so the staleness queue doesn't re-queue infinitely
+            try:
+                from src.staleness_queue import record_pulse_completed as _rpc
+                _rpc(slug, divergence_risk=0.0, state_label="unverified")
+            except Exception:
+                pass
             return PulseResult(
                 entity_name=entity_name,
                 status="error",
@@ -274,13 +286,24 @@ class PulseAgent:
                     ent_words = [w for w in ent_words if w not in STOP_WORDS]
                 if not ent_words:
                     ent_words = [ent_lower]
-                match_count = sum(1 for w in ent_words if w in claim_lower or w in url_lower)
-                if len(ent_words) > 1:
-                    required = len(ent_words)
-                else:
-                    required = 1
-                if match_count < required:
+                # Use word-boundary token matching to avoid false positives (e.g., "element" in "elemental")
+                claim_tokens = set(re.findall(r"\b[a-z0-9]+\b", claim_lower))
+                url_tokens = set(re.findall(r"\b[a-z0-9]+\b", url_lower))
+                all_tokens = claim_tokens | url_tokens
+                match_count = sum(1 for w in ent_words if w in all_tokens)
+                # Fractional threshold: at least ceil(60%) of entity words must match
+                import math as _math
+                min_required = max(1, _math.ceil(len(ent_words) * 0.6))
+                if match_count < min_required:
                         logger.info(f"Filtering out cross-contamination candidate for '{entity_name}': {ev.claim_text}")
+                        continue
+
+                # 1b. Noise floor for single-word entities: require minimum engagement
+                if len(ent_words) <= 1:
+                    noise_floor = 5
+                    eng = getattr(ev, "engagement_count", 0) or 0
+                    if eng < noise_floor:
+                        logger.debug(f"Filtering low-engagement noise for single-word entity '{entity_name}': eng={eng}")
                         continue
 
                 # 2. Hiring/jobs check for non-organizations
