@@ -47,7 +47,7 @@ def test_different_entities_get_separate_files(tmp_path: Path):
         assert "entity-two" in r2["json_path"]
 
 
-def test_list_snapshots_returns_only_today_for_entity(tmp_path: Path):
+def test_list_snapshots_returns_all_dates_for_entity(tmp_path: Path):
     pulse_dir = tmp_path / "pulse"
     pulse_dir.mkdir()
 
@@ -57,14 +57,15 @@ def test_list_snapshots_returns_only_today_for_entity(tmp_path: Path):
     old_snap = pulse_dir / "project-serpo-2026-07-01.json"
     old_snap.write_text("{}")
 
+    other_entity = pulse_dir / "other-entity-2026-07-01.json"
+    other_entity.write_text("{}")
+
     with patch("src.wiki.pulse_writer.get_pulse_dir", return_value=pulse_dir), \
-         patch("src.wiki.pulse_writer.ensure_pulse_dir", return_value=pulse_dir), \
-         patch("src.wiki.pulse_writer.date") as mock_date:
-        mock_date.today.return_value = date.fromisoformat(FIXED_TODAY)
-        mock_date.isoformat = date.isoformat
+         patch("src.wiki.pulse_writer.ensure_pulse_dir", return_value=pulse_dir):
         results = list_pulse_snapshots("project-serpo")
-        assert len(results) == 1
-        assert FIXED_TODAY in results[0].name
+        assert len(results) == 2
+        assert FIXED_TODAY in results[0].name or FIXED_TODAY in results[1].name
+        assert "2026-07-01" in results[0].name or "2026-07-01" in results[1].name
 
 
 def test_list_all_snapshots_returns_everything(tmp_path: Path):
