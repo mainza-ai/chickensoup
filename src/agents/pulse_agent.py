@@ -186,7 +186,7 @@ class PulseAgent:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                env={**os.environ, "NO_COLOR": "1"},
+                env={**os.environ, "TERM": "dumb"},
             )
             # Wait for process to finish (with timeout). Using proc.wait() avoids the
             # pipe-buffer deadlock that can occur with repeated proc.communicate() calls.
