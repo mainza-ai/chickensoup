@@ -2776,7 +2776,7 @@ async def get_almanac_summary():
         if not ad.exists():
             return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
 
-        md_files = sorted(ad.glob("*.md"), reverse=True)
+        md_files = sorted(ad.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
         if not md_files:
             return {"date": None, "contested_claims": [], "newly_contested": 0, "entities_processed": []}
         latest = md_files[0]
@@ -2804,7 +2804,7 @@ async def get_almanac_history(limit: int = 20):
         if not ad.exists():
             return {"almanacs": [], "total": 0}
 
-        html_files = sorted(ad.glob("*.html"), reverse=True)
+        html_files = sorted(ad.glob("*.html"), key=lambda f: f.stat().st_mtime, reverse=True)
         results = []
         for f in html_files[:limit]:
             try:
