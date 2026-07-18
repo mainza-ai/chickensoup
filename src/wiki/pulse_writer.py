@@ -168,4 +168,18 @@ def load_recent_pulse_evidence(entity_name: str, max_age_days: int = 7) -> List[
                 logger.debug(f"Skipping invalid evidence in {snap_path}: {e}")
                 continue
 
-    return recent_evidence
+    # Deduplicate by claim_text across all files — keep the version with highest engagement
+    seen: Dict[str, int] = {}
+    deduped: List[ClaimEvidence] = []
+    for ev in recent_evidence:
+        key = ev.claim_text[:200]
+        idx = seen.get(key)
+        if idx is not None:
+            existing = deduped[idx]
+            if ev.engagement_count > existing.engagement_count:
+                deduped[idx] = ev
+        else:
+            seen[key] = len(deduped)
+            deduped.append(ev)
+
+    return deduped

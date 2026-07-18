@@ -310,7 +310,7 @@ class PulseAgent:
                 if not is_org:
                     hiring_domains = ("greenhouse.io", "ashbyhq.com", "lever.co", "workable.com", "apply.workable.com")
                     hiring_keywords = ("hiring", "careers", "database engineer", "business development executive", "job openings", "current openings")
-                    if (platform_lower in ("jobs-web", "careers") or
+                    if (platform_lower in ("jobs-web", "jobs", "careers") or
                         any(dom in url_lower for dom in hiring_domains) or
                         any(kw in claim_lower for kw in hiring_keywords)):
                         logger.debug(f"Filtering out hiring-signal/jobs evidence from non-org '{entity_name}': {ev.claim_text}")
@@ -322,6 +322,37 @@ class PulseAgent:
         except Exception as e:
             logger.error(f"Failed to parse last30days output for '{entity_name}': {e}")
             evidence = []
+
+        if not evidence:
+            logger.info(f"No evidence parsed for '{entity_name}' — trying DDGS fallback")
+            # Fallback: try direct DuckDuckGo search via ddgs package when CLI returns nothing
+            try:
+                from ddgs import DDGS
+                with DDGS() as ddgs:
+                    ddg_results = list(ddgs.text(f'\"{entity_name}\" {" ".join(ent_words[:3]) if ent_words else ""}', max_results=10))
+                if ddg_results:
+                    from src.models import ClaimEvidence as _CE
+                    from datetime import datetime as _dt, timezone as _tz
+                    ddg_evidence = []
+                    for r in ddg_results:
+                        title = (r.get("title") or "").strip()
+                        body = (r.get("body") or r.get("snippet") or "").strip()
+                        url = (r.get("href") or r.get("url") or "").strip()
+                        claim = f"{title}: {body}" if title and body else (title or body)
+                        if claim:
+                            ddg_evidence.append(_CE(
+                                claim_text=claim[:2000],
+                                source_platform="web",
+                                engagement_count=10,
+                                url=url,
+                                timestamp=_dt.now(_tz.utc).isoformat(),
+                                cluster_id=f"ddgs:{slug}:{len(ddg_evidence)}",
+                            ))
+                    if ddg_evidence:
+                        evidence = ddg_evidence
+                        logger.info(f"DDGS fallback found {len(evidence)} items for '{entity_name}'")
+            except Exception as ddgs_err:
+                logger.debug(f"DDGS fallback failed for '{entity_name}': {ddgs_err}")
 
         if not evidence:
             logger.info(f"No evidence parsed for '{entity_name}' — returning no_data")
