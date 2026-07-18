@@ -338,7 +338,7 @@ chickensoup/
 - **Xcode**: 16.0+ (for SwiftUI client)
 - **Services**: Docker (for Neo4j & Redis)
 - **Git LFS**: `git lfs install` (for Neo4j seed dump download)
-- **Optional (Living Almanac)**: `last30days-skill/` cloned repo. Most sources work with zero config — Reddit, Hacker News, Polymarket, GitHub, StockTwits are free. X needs a browser login cookie (free). YouTube needs `brew install yt-dlp` (free). Web search needs a Brave Search key (2K free queries/month). Social platforms (TikTok, Instagram, Threads, Pinterest, LinkedIn) need a ScrapeCreators key (10K free calls). See [last30days-skill](https://github.com/mvanhorn/last30days-skill) for the full source matrix.
+- **Optional (Living Almanac)**: `last30days-skill/` cloned repo. Most sources work with zero config — Reddit, Hacker News, Polymarket, GitHub, StockTwits are free. X needs a browser login cookie (free). YouTube needs `brew install yt-dlp` (free). Web search uses DuckDuckGo (free, no API key needed) via the `ddgs` Python package (bundled in `pyproject.toml`). Social platforms (TikTok, Instagram, Threads, Pinterest, LinkedIn) need a ScrapeCreators key (10K free calls). See [last30days-skill](https://github.com/mvanhorn/last30days-skill) for the full source matrix.
 
 ### 2. Backend Setup
 ```bash

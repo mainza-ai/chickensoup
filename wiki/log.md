@@ -3098,4 +3098,2287 @@ Updated [[production-implementation-plan]] with Phase 6 (AI Chat overhaul: appro
 ## [2026-07-14] ingest | Full backfill: vatican-ufo-program (projects)
 ## [2026-07-14] ingest | Full backfill: wardenclyffe-tower (projects)
 ## [2026-07-14] ingest | Watcher ingest: 2-design (concepts)
+## [2026-07-14] ingest | Watcher ingest: 2-design (concepts)
+## [2026-07-14] ingest | Watcher ingest: 7-46-hz (concepts)
+## [2026-07-15] ingest | pulse | Bob Lazar | 25 evidence | $0.00 | remaining=$2000.00 | bob-lazar
+## [2026-07-15] ingest | pulse | Roswell Crash | 14 evidence | $0.00 | remaining=$2000.00 | roswell-crash
+## [2026-07-15] ingest | Watcher ingest: 2-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: 7-46-hz (concepts)
+## [2026-07-15] ingest | Watcher ingest: 7.46-hz-frequency (concepts)
+## [2026-07-15] ingest | Watcher ingest: abduction-experience (concepts)
+## [2026-07-15] ingest | Watcher ingest: absolute-fep (concepts)
+## [2026-07-15] ingest | Watcher ingest: adaptive-zero-knowledge (concepts)
+## [2026-07-15] ingest | Watcher ingest: adm-decomposition (concepts)
+## [2026-07-15] ingest | Watcher ingest: ads-cft-correspondence (concepts)
+## [2026-07-15] ingest | Watcher ingest: advanced-propulsion-technology (concepts)
+## [2026-07-15] ingest | Watcher ingest: agent-architecture (concepts)
+## [2026-07-15] ingest | Watcher ingest: ai-alien-connection (concepts)
+## [2026-07-15] ingest | Watcher ingest: ai-as-maxwell's-demon (concepts)
+## [2026-07-15] ingest | Watcher ingest: ai-navigator (concepts)
+## [2026-07-15] ingest | Watcher ingest: alchemical-drug-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: alchemical-free-energy-calculations (concepts)
+## [2026-07-15] ingest | Watcher ingest: alchemical-transformations (concepts)
+## [2026-07-15] ingest | Watcher ingest: alcubierre-drive (concepts)
+## [2026-07-15] ingest | Watcher ingest: alcubierre-metric (concepts)
+## [2026-07-15] ingest | Watcher ingest: ancient-astronaut-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: antigravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: aqcat25-spin-aware-ml-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: aqvolt26-halide-dataset (concepts)
+## [2026-07-15] ingest | Watcher ingest: araki-quantum-relative-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: arrow-of-time (concepts)
+## [2026-07-15] ingest | Watcher ingest: assemblage-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: babbush-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: babylonian-exile (concepts)
+## [2026-07-15] ingest | Watcher ingest: backdoor-science (concepts)
+## [2026-07-15] ingest | Watcher ingest: barren-plateaus (concepts)
+## [2026-07-15] ingest | Watcher ingest: batch-signatures (concepts)
+## [2026-07-15] ingest | Watcher ingest: bdgl-lattice-sieving-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: bedside-magnetocardiography (concepts)
+## [2026-07-15] ingest | Watcher ingest: bekenstein-bound (concepts)
+## [2026-07-15] ingest | Watcher ingest: bekenstein-hawking-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: bgj1-lattice-sieving-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: bianconi's-entropic-action-gravity-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: bianconi's-g-field-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: bible-ufo-testimonies (concepts)
+## [2026-07-15] ingest | Watcher ingest: biblical-editing-after-the-babylonian-exile (concepts)
+## [2026-07-15] ingest | Watcher ingest: biblical-witnesses (concepts)
+## [2026-07-15] ingest | Watcher ingest: biefeld-brown-effect (concepts)
+## [2026-07-15] ingest | Watcher ingest: big-bang-low-entropy-state (concepts)
+## [2026-07-15] ingest | Watcher ingest: binding-free-energy (concepts)
+## [2026-07-15] ingest | Watcher ingest: black-hole-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: black-hole-interior (concepts)
+## [2026-07-15] ingest | Watcher ingest: bob-lazar's-claims (concepts)
+## [2026-07-15] ingest | Watcher ingest: book-of-enoch (concepts)
+## [2026-07-15] ingest | Watcher ingest: bootstrap-paradox (concepts)
+## [2026-07-15] ingest | Watcher ingest: brain-capacity (concepts)
+## [2026-07-15] ingest | Watcher ingest: brain-waves (concepts)
+## [2026-07-15] ingest | Watcher ingest: branching-timelines (concepts)
+## [2026-07-15] ingest | Watcher ingest: burns'-auroral-circuit-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: cake-provably-secure-pake (concepts)
+## [2026-07-15] ingest | Watcher ingest: canonical-quantization-of-the-g-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: canonical-quantization (concepts)
+## [2026-07-15] ingest | Watcher ingest: carbonate-polymer-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: cas-scf (concepts)
+## [2026-07-15] ingest | Watcher ingest: catalyst-design-and-optimization (concepts)
+## [2026-07-15] ingest | Watcher ingest: catalytic-processes (concepts)
+## [2026-07-15] ingest | Watcher ingest: category-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: cellular-intelligence-thesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: cellular-intelligence (concepts)
+## [2026-07-15] ingest | Watcher ingest: certificate-transparency (concepts)
+## [2026-07-15] ingest | Watcher ingest: chariot-vision (concepts)
+## [2026-07-15] ingest | Watcher ingest: classical-fisher-information-matrix (concepts)
+## [2026-07-15] ingest | Watcher ingest: classical-purification (concepts)
+## [2026-07-15] ingest | Watcher ingest: classified-development-pattern (concepts)
+## [2026-07-15] ingest | Watcher ingest: classified-technology-development (concepts)
+## [2026-07-15] ingest | Watcher ingest: clausius-entropy-relation (concepts)
+## [2026-07-15] ingest | Watcher ingest: clausius-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: closed-timelike-curves (concepts)
+## [2026-07-15] ingest | Watcher ingest: co-folded-complexes (concepts)
+## [2026-07-15] ingest | Watcher ingest: compactified-spacetime (concepts)
+## [2026-07-15] ingest | Watcher ingest: computational-complexity-in-spacetime (concepts)
+## [2026-07-15] ingest | Watcher ingest: computational-complexity (concepts)
+## [2026-07-15] ingest | Watcher ingest: computational-methods (concepts)
+## [2026-07-15] ingest | Watcher ingest: conformal-gravity-interview (concepts)
+## [2026-07-15] ingest | Watcher ingest: conscious-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: consciousness-first-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: consciousness-first (concepts)
+## [2026-07-15] ingest | Watcher ingest: consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: coordination-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: coupled-classical-oscillators (concepts)
+## [2026-07-15] ingest | Watcher ingest: coupled-harmonic-oscillators (concepts)
+## [2026-07-15] ingest | Watcher ingest: crypto-dark-matter-on-the-torus (concepts)
+## [2026-07-15] ingest | Watcher ingest: dark-era (concepts)
+## [2026-07-15] ingest | Watcher ingest: dark-matter-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: death-ray (concepts)
+## [2026-07-15] ingest | Watcher ingest: decoherence-as-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: decoherence-as-the-mechanism-of-time-flow (concepts)
+## [2026-07-15] ingest | Watcher ingest: deep-learning-for-binding-affinity-prediction (concepts)
+## [2026-07-15] ingest | Watcher ingest: dense-sub-lattice-hamiltonian (concepts)
+## [2026-07-15] ingest | Watcher ingest: density-functional-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: differential-privacy-traffic-classification (concepts)
+## [2026-07-15] ingest | Watcher ingest: diffusion-in-ionic-conductors (concepts)
+## [2026-07-15] ingest | Watcher ingest: dirac-kähler-formalism (concepts)
+## [2026-07-15] ingest | Watcher ingest: disclosure (concepts)
+## [2026-07-15] ingest | Watcher ingest: discrete-spectrum-of-ctc-configurations (concepts)
+## [2026-07-15] ingest | Watcher ingest: dmrg-orbital-optimization (concepts)
+## [2026-07-15] ingest | Watcher ingest: dmrg-quarter-petaflops-dgx-h100 (concepts)
+## [2026-07-15] ingest | Watcher ingest: dressed-einstein-hilbert-action (concepts)
+## [2026-07-15] ingest | Watcher ingest: duplex-sponge-fiat-shamir (concepts)
+## [2026-07-15] ingest | Watcher ingest: earth-as-conductor (concepts)
+## [2026-07-15] ingest | Watcher ingest: earth-as-space-craft (concepts)
+## [2026-07-15] ingest | Watcher ingest: ecosystem-intelligence (concepts)
+## [2026-07-15] ingest | Watcher ingest: einstein-equations (concepts)
+## [2026-07-15] ingest | Watcher ingest: electrogravitics (concepts)
+## [2026-07-15] ingest | Watcher ingest: electrostatic-induction (concepts)
+## [2026-07-15] ingest | Watcher ingest: elohim-as-advanced-civilization (concepts)
+## [2026-07-15] ingest | Watcher ingest: elohim (concepts)
+## [2026-07-15] ingest | Watcher ingest: embeddings (concepts)
+## [2026-07-15] ingest | Watcher ingest: emergent-cosmological-constant (concepts)
+## [2026-07-15] ingest | Watcher ingest: emergent-time-and-time-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropic-action-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropic-force (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropic-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-and-time-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-as-a-field-property (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-budget-of-the-universe (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-budget (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-gradients (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-leaking (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-reconfiguration-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy-reconfiguration (concepts)
+## [2026-07-15] ingest | Watcher ingest: entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: er-=-epr (concepts)
+## [2026-07-15] ingest | Watcher ingest: er=epr-conjecture (concepts)
+## [2026-07-15] ingest | Watcher ingest: evaluation-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: exotic-matter-and-consciousness-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: exotic-matter-and-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: exponential-memory-sievers (concepts)
+## [2026-07-15] ingest | Watcher ingest: exponential-quantum-speedup-for-coupled-classical-oscillators (concepts)
+## [2026-07-15] ingest | Watcher ingest: exponential-quantum-speedup (concepts)
+## [2026-07-15] ingest | Watcher ingest: faggin's-quantum-consciousness-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: faggin-quantum-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: failed-implicit-lattice-certificates (concepts)
+## [2026-07-15] ingest | Watcher ingest: faster-than-light-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: feistel-constructions (concepts)
+## [2026-07-15] ingest | Watcher ingest: feistel-tools-qrp (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-based-computation-thesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-based-computation (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-based-energy-transfer (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-based-physics (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-based-power-transmission (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-geometry-tensor (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-manipulation-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-manipulation-thesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-manipulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-manipulator (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-theory-and-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: field-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: fields-vs-particles (concepts)
+## [2026-07-15] ingest | Watcher ingest: free-energy-perturbation (concepts)
+## [2026-07-15] ingest | Watcher ingest: g-field-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: g-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: gaussian-leftover-hash-lemma (concepts)
+## [2026-07-15] ingest | Watcher ingest: general-relativity (concepts)
+## [2026-07-15] ingest | Watcher ingest: genesis-6-narrative (concepts)
+## [2026-07-15] ingest | Watcher ingest: genesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: genetic-engineering-by-the-elohim (concepts)
+## [2026-07-15] ingest | Watcher ingest: gibbs-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: governance-documents-as-technology-templates (concepts)
+## [2026-07-15] ingest | Watcher ingest: governance-documents-as-templates (concepts)
+## [2026-07-15] ingest | Watcher ingest: gradient-descent-optimization (concepts)
+## [2026-07-15] ingest | Watcher ingest: gradient-descent (concepts)
+## [2026-07-15] ingest | Watcher ingest: grandfather-paradox (concepts)
+## [2026-07-15] ingest | Watcher ingest: grover's-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: grover-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: grover-oracle-shortest-vector (concepts)
+## [2026-07-15] ingest | Watcher ingest: grovers-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: halide-solid-state-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: halide-systems-in-ml-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: hamiltonian-simulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: hard-problem-of-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: hawking-radiation (concepts)
+## [2026-07-15] ingest | Watcher ingest: heat-death-as-ultimate-entropy-reconfiguration (concepts)
+## [2026-07-15] ingest | Watcher ingest: heat-death-of-the-universe (concepts)
+## [2026-07-15] ingest | Watcher ingest: heat-death (concepts)
+## [2026-07-15] ingest | Watcher ingest: heavenly-army (concepts)
+## [2026-07-15] ingest | Watcher ingest: heterogeneous-catalysis-at-scale (concepts)
+## [2026-07-15] ingest | Watcher ingest: heterogeneous-catalysis (concepts)
+## [2026-07-15] ingest | Watcher ingest: hhl-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: hilbert-space (concepts)
+## [2026-07-15] ingest | Watcher ingest: hodge-dirac-operator (concepts)
+## [2026-07-15] ingest | Watcher ingest: holographic-principle (concepts)
+## [2026-07-15] ingest | Watcher ingest: human-engineering-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: hybrid-programs (concepts)
+## [2026-07-15] ingest | Watcher ingest: hybrid-query-bounds-metcr (concepts)
+## [2026-07-15] ingest | Watcher ingest: hybrid-signature-schemes (concepts)
+## [2026-07-15] ingest | Watcher ingest: hyperdeterminants-hardness (concepts)
+## [2026-07-15] ingest | Watcher ingest: hyperdeterminants (concepts)
+## [2026-07-15] ingest | Watcher ingest: idolpro-guided-drug-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: implicit-certificates (concepts)
+## [2026-07-15] ingest | Watcher ingest: inertia (concepts)
+## [2026-07-15] ingest | Watcher ingest: information-is-physical (concepts)
+## [2026-07-15] ingest | Watcher ingest: information-paradox (concepts)
+## [2026-07-15] ingest | Watcher ingest: integration-architecture (concepts)
+## [2026-07-15] ingest | Watcher ingest: interatomic-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: ion-transport-in-polymer-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: ion-transport-mechanisms (concepts)
+## [2026-07-15] ingest | Watcher ingest: ion-transport (concepts)
+## [2026-07-15] ingest | Watcher ingest: ion-wind (concepts)
+## [2026-07-15] ingest | Watcher ingest: jacobson's-1995-derivation (concepts)
+## [2026-07-15] ingest | Watcher ingest: jacobson's-entropic-gravity-derivation (concepts)
+## [2026-07-15] ingest | Watcher ingest: jacobson's-entropic-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: jacobson's-thermodynamic-derivation-of-einstein's-equations (concepts)
+## [2026-07-15] ingest | Watcher ingest: jacobson's-thermodynamic-derivation (concepts)
+## [2026-07-15] ingest | Watcher ingest: jfk-assassination-and-ufo-disclosure (concepts)
+## [2026-07-15] ingest | Watcher ingest: jfk-disclosure-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: knowledge-graph-schema (concepts)
+## [2026-07-15] ingest | Watcher ingest: landauer's-principle (concepts)
+## [2026-07-15] ingest | Watcher ingest: lattice-based-cryptography (concepts)
+## [2026-07-15] ingest | Watcher ingest: lattice-based-pki (concepts)
+## [2026-07-15] ingest | Watcher ingest: lattice-based-post-quantum-cryptography (concepts)
+## [2026-07-15] ingest | Watcher ingest: lattice-based-schemes (concepts)
+## [2026-07-15] ingest | Watcher ingest: lattice-sieving-algorithms (concepts)
+## [2026-07-15] ingest | Watcher ingest: li-ion-coordination-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: lithium-ion-carbonate-polymer-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: lithium-ion-coordination-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: lithium-ion-coordination (concepts)
+## [2026-07-15] ingest | Watcher ingest: llm-discovery (concepts)
+## [2026-07-15] ingest | Watcher ingest: llm-fallback-chain (concepts)
+## [2026-07-15] ingest | Watcher ingest: llm-inference (concepts)
+## [2026-07-15] ingest | Watcher ingest: local-first-architecture (concepts)
+## [2026-07-15] ingest | Watcher ingest: local-first-llm (concepts)
+## [2026-07-15] ingest | Watcher ingest: loschmidt's-paradox (concepts)
+## [2026-07-15] ingest | Watcher ingest: loss-landscape-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: machine-agnostic-iterative-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: machine-learning-guided-aqfep (concepts)
+## [2026-07-15] ingest | Watcher ingest: machine-learning-in-computational-methods (concepts)
+## [2026-07-15] ingest | Watcher ingest: machine-learning-interatomic-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: machine-learning-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: magic-and-entanglement-recovery (concepts)
+## [2026-07-15] ingest | Watcher ingest: magic-recovery-noisy-quantum-states (concepts)
+## [2026-07-15] ingest | Watcher ingest: magnav-navigation-accuracy-metric (concepts)
+## [2026-07-15] ingest | Watcher ingest: magnetocardiography (concepts)
+## [2026-07-15] ingest | Watcher ingest: malament-hogarth (concepts)
+## [2026-07-15] ingest | Watcher ingest: many-worlds-branching (concepts)
+## [2026-07-15] ingest | Watcher ingest: many-worlds-interpretation (concepts)
+## [2026-07-15] ingest | Watcher ingest: maxwell's-demon (concepts)
+## [2026-07-15] ingest | Watcher ingest: merkle-trees (concepts)
+## [2026-07-15] ingest | Watcher ingest: metric-perturbation (concepts)
+## [2026-07-15] ingest | Watcher ingest: ml-guided-aqfep (concepts)
+## [2026-07-15] ingest | Watcher ingest: modular-periods (concepts)
+## [2026-07-15] ingest | Watcher ingest: molecular-coherence (concepts)
+## [2026-07-15] ingest | Watcher ingest: molecular-simulation-of-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: molecular-simulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: monte-carlo-methods (concepts)
+## [2026-07-15] ingest | Watcher ingest: morphological-changes-in-polymer-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: morphological-properties (concepts)
+## [2026-07-15] ingest | Watcher ingest: morphological-structure-in-polymer-electrolytes (concepts)
+## [2026-07-15] ingest | Watcher ingest: morphological-structure (concepts)
+## [2026-07-15] ingest | Watcher ingest: morse-like-neural-signals (concepts)
+## [2026-07-15] ingest | Watcher ingest: mount-athos-time-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: multiple-arrows-of-time (concepts)
+## [2026-07-15] ingest | Watcher ingest: multivariate-quadratic-problem (concepts)
+## [2026-07-15] ingest | Watcher ingest: negative-energy-density (concepts)
+## [2026-07-15] ingest | Watcher ingest: negative-energy (concepts)
+## [2026-07-15] ingest | Watcher ingest: neo4j-knowledge-graph (concepts)
+## [2026-07-15] ingest | Watcher ingest: new-science-of-heaven (concepts)
+## [2026-07-15] ingest | Watcher ingest: nex-binding-free-energy (concepts)
+## [2026-07-15] ingest | Watcher ingest: nex-framework-(binding-free-energy-stabilization) (concepts)
+## [2026-07-15] ingest | Watcher ingest: nex-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: non-uniform-security (concepts)
+## [2026-07-15] ingest | Watcher ingest: non-unitary-coupled-cluster-quantum (concepts)
+## [2026-07-15] ingest | Watcher ingest: non-unitary-coupled-cluster (concepts)
+## [2026-07-15] ingest | Watcher ingest: nonequilibrium-chimeric-switching-(nex) (concepts)
+## [2026-07-15] ingest | Watcher ingest: nonphysical-intermediate-states (concepts)
+## [2026-07-15] ingest | Watcher ingest: orch-or-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: ostrogradsky-instability (concepts)
+## [2026-07-15] ingest | Watcher ingest: partially-oblivious-prfs-(poprfs) (concepts)
+## [2026-07-15] ingest | Watcher ingest: past-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: pauli-product-formulas (concepts)
+## [2026-07-15] ingest | Watcher ingest: period-detection (concepts)
+## [2026-07-15] ingest | Watcher ingest: pfas-correlated-electrons-breakdown (concepts)
+## [2026-07-15] ingest | Watcher ingest: pfas-massively-parallel-quantum-chemistry (concepts)
+## [2026-07-15] ingest | Watcher ingest: physics-informed-aeromagnetic-calibration (concepts)
+## [2026-07-15] ingest | Watcher ingest: plasma-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: plasma-science (concepts)
+## [2026-07-15] ingest | Watcher ingest: pointer-states (concepts)
+## [2026-07-15] ingest | Watcher ingest: polymer-electrolyte-morphology (concepts)
+## [2026-07-15] ingest | Watcher ingest: polymer-matrix-structure (concepts)
+## [2026-07-15] ingest | Watcher ingest: polymer-morphology (concepts)
+## [2026-07-15] ingest | Watcher ingest: post-quantum-cryptographic-assemblages (concepts)
+## [2026-07-15] ingest | Watcher ingest: post-quantum-cryptographic-governance (concepts)
+## [2026-07-15] ingest | Watcher ingest: post-quantum-cryptography (concepts)
+## [2026-07-15] ingest | Watcher ingest: pqc-benchmarking-arm (concepts)
+## [2026-07-15] ingest | Watcher ingest: predestination-paradox (concepts)
+## [2026-07-15] ingest | Watcher ingest: proper-time-as-cost-function (concepts)
+## [2026-07-15] ingest | Watcher ingest: proper-time (concepts)
+## [2026-07-15] ingest | Watcher ingest: propulsion-modalities (concepts)
+## [2026-07-15] ingest | Watcher ingest: propulsion-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: protein-ligand-binding-affinity (concepts)
+## [2026-07-15] ingest | Watcher ingest: proteochemometric-models (concepts)
+## [2026-07-15] ingest | Watcher ingest: proteochrometric-models (concepts)
+## [2026-07-15] ingest | Watcher ingest: provider-integration (concepts)
+## [2026-07-15] ingest | Watcher ingest: psychological-arrow-of-time (concepts)
+## [2026-07-15] ingest | Watcher ingest: qaoa (concepts)
+## [2026-07-15] ingest | Watcher ingest: qrpm (concepts)
+## [2026-07-15] ingest | Watcher ingest: qsvt-(quantum-singular-value-transformation) (concepts)
+## [2026-07-15] ingest | Watcher ingest: qsvt-based-hamiltonian-simulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: qsvt (concepts)
+## [2026-07-15] ingest | Watcher ingest: quadratic-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-algorithms (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-annealing-boolean-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-annealing-hamiltonian-embedding (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-annealing (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-arrow-of-time (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-chemistry-workflows (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-chemistry (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-coherence-in-biological-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-computation (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-computing-ecosystem (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-computing-in-drug-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-coupled-oscillator-simulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-darwinism (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-decoherence (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-entanglement (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-error-model (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-field-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-field-of-spacetime (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-field-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-fisher-information-matrix (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-fourier-transform (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-imaginary-time-evolution (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-information-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-information-transfer (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-lattice-enumeration (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-machine-learning (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-oracle (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-pes-via-adiabatic-transitions (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-phase-estimation (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-random-permutation-model (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-relative-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-simulation-tier (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-simulation-tiers (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-singular-value-transformation (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-state-representation (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-states (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-threat-as-socio-technical-construct (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-threat (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-to-classical-transition (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-vacuum-(faggin) (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-vacuum (concepts)
+## [2026-07-15] ingest | Watcher ingest: quantum-walk (concepts)
+## [2026-07-15] ingest | Watcher ingest: rapid-evolution (concepts)
+## [2026-07-15] ingest | Watcher ingest: remote-viewing (concepts)
+## [2026-07-15] ingest | Watcher ingest: retentive-neural-quantum-states (concepts)
+## [2026-07-15] ingest | Watcher ingest: return-of-sdith (concepts)
+## [2026-07-15] ingest | Watcher ingest: reversible-processes (concepts)
+## [2026-07-15] ingest | Watcher ingest: revisiting-key-decomposition-fhe (concepts)
+## [2026-07-15] ingest | Watcher ingest: rindler-horizons (concepts)
+## [2026-07-15] ingest | Watcher ingest: sair-binding-affinity-synthetic-data (concepts)
+## [2026-07-15] ingest | Watcher ingest: sair-dataset (concepts)
+## [2026-07-15] ingest | Watcher ingest: sair-fep-and-sair-ood-splits (concepts)
+## [2026-07-15] ingest | Watcher ingest: sair-protein-ligand-dataset (concepts)
+## [2026-07-15] ingest | Watcher ingest: scaling-lattice-sieves (concepts)
+## [2026-07-15] ingest | Watcher ingest: schumann-resonance (concepts)
+## [2026-07-15] ingest | Watcher ingest: science-reference-library (concepts)
+## [2026-07-15] ingest | Watcher ingest: sdhit-in-qrom (concepts)
+## [2026-07-15] ingest | Watcher ingest: second-law-of-thermodynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: second-law (concepts)
+## [2026-07-15] ingest | Watcher ingest: shallow-prfs (concepts)
+## [2026-07-15] ingest | Watcher ingest: shift-vector (concepts)
+## [2026-07-15] ingest | Watcher ingest: shor's-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: shor's-factorization (concepts)
+## [2026-07-15] ingest | Watcher ingest: shors-algorithm (concepts)
+## [2026-07-15] ingest | Watcher ingest: shortest-vector-problem-(svp) (concepts)
+## [2026-07-15] ingest | Watcher ingest: shortest-vector-problem (concepts)
+## [2026-07-15] ingest | Watcher ingest: simulation-escape (concepts)
+## [2026-07-15] ingest | Watcher ingest: simultaneous-time-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: slap-polynomial-commitments (concepts)
+## [2026-07-15] ingest | Watcher ingest: socio-technical-construct (concepts)
+## [2026-07-15] ingest | Watcher ingest: spacetime-as-memory (concepts)
+## [2026-07-15] ingest | Watcher ingest: spacetime-engine (concepts)
+## [2026-07-15] ingest | Watcher ingest: spacetime-manipulation-field (concepts)
+## [2026-07-15] ingest | Watcher ingest: spacetime (concepts)
+## [2026-07-15] ingest | Watcher ingest: spectre-rsb-cryptographic-code-protection (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-aware-interatomic-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-aware-machine-learning-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-aware-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-awareness-in-machine-learning-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-awareness-in-quantum-chemistry (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-dependent-effects (concepts)
+## [2026-07-15] ingest | Watcher ingest: spin-dependent-interactions (concepts)
+## [2026-07-15] ingest | Watcher ingest: starfighters-x-wing-general-applicability (concepts)
+## [2026-07-15] ingest | Watcher ingest: stargates-and-flying-objects-in-the-bible (concepts)
+## [2026-07-15] ingest | Watcher ingest: stargates (concepts)
+## [2026-07-15] ingest | Watcher ingest: statistical-mechanics-of-spacetime (concepts)
+## [2026-07-15] ingest | Watcher ingest: structure-of-meaning-category-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: structure-preserving-quantum-encodings (concepts)
+## [2026-07-15] ingest | Watcher ingest: surface-reactions (concepts)
+## [2026-07-15] ingest | Watcher ingest: suzuki-trotter-product-formula (concepts)
+## [2026-07-15] ingest | Watcher ingest: svp-hardness-assumptions (concepts)
+## [2026-07-15] ingest | Watcher ingest: swiftui-platform-strategy (concepts)
+## [2026-07-15] ingest | Watcher ingest: tangelo-quantum-chemistry (concepts)
+## [2026-07-15] ingest | Watcher ingest: technology-stack (concepts)
+## [2026-07-15] ingest | Watcher ingest: technology-transition-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: teleforce (concepts)
+## [2026-07-15] ingest | Watcher ingest: telegraph-cell-model (concepts)
+## [2026-07-15] ingest | Watcher ingest: telegraph-cells (concepts)
+## [2026-07-15] ingest | Watcher ingest: temple's-intelligence-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-anomaly-detection (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-causality (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-data-model (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-information-fusion (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-quantum-tomography (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-query-language (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-query-pipeline (concepts)
+## [2026-07-15] ingest | Watcher ingest: temporal-reasoning-engine (concepts)
+## [2026-07-15] ingest | Watcher ingest: tensor-isomorphism-cryptography (concepts)
+## [2026-07-15] ingest | Watcher ingest: tensor-product (concepts)
+## [2026-07-15] ingest | Watcher ingest: tesla-coil-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: tfhe-(fully-homomorphic-encryption) (concepts)
+## [2026-07-15] ingest | Watcher ingest: the-hard-problem-of-consciousness (concepts)
+## [2026-07-15] ingest | Watcher ingest: the-hard-problem (concepts)
+## [2026-07-15] ingest | Watcher ingest: the-one-(faggin) (concepts)
+## [2026-07-15] ingest | Watcher ingest: the-one (concepts)
+## [2026-07-15] ingest | Watcher ingest: the-past-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: thermodynamics-as-resource-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: three-layer-quantum-pipeline (concepts)
+## [2026-07-15] ingest | Watcher ingest: throne-vision (concepts)
+## [2026-07-15] ingest | Watcher ingest: tight-sp hin cs-proof (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-dilation (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-evolution-in-quantum-algorithms (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-as-entropy-reconfiguration (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery-architecture (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery-stack (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-paradoxes (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-path-search (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-through-field-reconfiguration (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel-via-decoherence-reversal (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travel (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travelers-hypothesis (concepts)
+## [2026-07-15] ingest | Watcher ingest: time-travelers (concepts)
+## [2026-07-15] ingest | Watcher ingest: timing-side-channel-attack (concepts)
+## [2026-07-15] ingest | Watcher ingest: tls-handshake-optimization (concepts)
+## [2026-07-15] ingest | Watcher ingest: topological-scalar-fields (concepts)
+## [2026-07-15] ingest | Watcher ingest: torus-based-cryptography (concepts)
+## [2026-07-15] ingest | Watcher ingest: trapped-ion-electronic-structure (concepts)
+## [2026-07-15] ingest | Watcher ingest: traversable-wormholes (concepts)
+## [2026-07-15] ingest | Watcher ingest: turbotls-round-trip-reduction (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-characteristics (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-energy-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-field-manipulation (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-hearings (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-like-energy-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-systems (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-technologies (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-theories (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-via-field-dynamics (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-research-ecosystem (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-research-program (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-technology-development-framework (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap-witnesses (concepts)
+## [2026-07-15] ingest | Watcher ingest: uap (concepts)
+## [2026-07-15] ingest | Watcher ingest: uaps-and-black-hole-entropy (concepts)
+## [2026-07-15] ingest | Watcher ingest: uaps-and-black-holes (concepts)
+## [2026-07-15] ingest | Watcher ingest: uaps-and-entropy-anomalies (concepts)
+## [2026-07-15] ingest | Watcher ingest: uaps-and-entropy-reversal (concepts)
+## [2026-07-15] ingest | Watcher ingest: uaps (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-frequency-theory (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-frequency (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-phenomena (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-uap-capabilities (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-uap-characteristics (concepts)
+## [2026-07-15] ingest | Watcher ingest: ufo-uap-phenomena (concepts)
+## [2026-07-15] ingest | Watcher ingest: ui-ux-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: universal-ml-potentials (concepts)
+## [2026-07-15] ingest | Watcher ingest: van-raamsdonk's-spacetime-emergence (concepts)
+## [2026-07-15] ingest | Watcher ingest: variational-quantum-circuit (concepts)
+## [2026-07-15] ingest | Watcher ingest: variational-quantum-eigensolver (concepts)
+## [2026-07-15] ingest | Watcher ingest: variational-quantum-solutions-to-the-shortest-vector-problem (concepts)
+## [2026-07-15] ingest | Watcher ingest: variational-quantum-svp (concepts)
+## [2026-07-15] ingest | Watcher ingest: verified-hash-based-signatures (concepts)
+## [2026-07-15] ingest | Watcher ingest: verlinde's-critique-of-jacobson (concepts)
+## [2026-07-15] ingest | Watcher ingest: verlinde's-critique (concepts)
+## [2026-07-15] ingest | Watcher ingest: verlinde's-entropic-gravity (concepts)
+## [2026-07-15] ingest | Watcher ingest: virtual-screening (concepts)
+## [2026-07-15] ingest | Watcher ingest: von-neumann-algebras (concepts)
+## [2026-07-15] ingest | Watcher ingest: vqe (concepts)
+## [2026-07-15] ingest | Watcher ingest: warp-bubble-formation (concepts)
+## [2026-07-15] ingest | Watcher ingest: warp-bubble (concepts)
+## [2026-07-15] ingest | Watcher ingest: wavefunction-collapse (concepts)
+## [2026-07-15] ingest | Watcher ingest: weak-key-attacks (concepts)
+## [2026-07-15] ingest | Watcher ingest: weak-measurement (concepts)
+## [2026-07-15] ingest | Watcher ingest: weight-space (concepts)
+## [2026-07-15] ingest | Watcher ingest: wireless-energy (concepts)
+## [2026-07-15] ingest | Watcher ingest: x-wing-hybrid-kem (concepts)
+## [2026-07-15] ingest | Watcher ingest: zwicky's-non-empty-space (concepts)
+## [2026-07-15] ingest | Watcher ingest: ai-navigator (projects)
+## [2026-07-15] ingest | Watcher ingest: albrecht-rowell-2022 (projects)
+## [2026-07-15] ingest | Watcher ingest: allam-jang-2025 (projects)
+## [2026-07-15] ingest | Watcher ingest: aqcat25-spin-aware-ml-potentials (projects)
+## [2026-07-15] ingest | Watcher ingest: aqcat25 (projects)
+## [2026-07-15] ingest | Watcher ingest: aqcata25 (projects)
+## [2026-07-15] ingest | Watcher ingest: aqfep-ml-approach (projects)
+## [2026-07-15] ingest | Watcher ingest: aqvolt26-halide-dataset (projects)
+## [2026-07-15] ingest | Watcher ingest: bindel-hale-hybrid-signature-scheme (projects)
+## [2026-07-15] ingest | Watcher ingest: brazil-ufo-program (projects)
+## [2026-07-15] ingest | Watcher ingest: chicken-soup-project (projects)
+## [2026-07-15] ingest | Watcher ingest: chicken-soup-spec (projects)
+## [2026-07-15] ingest | Watcher ingest: cuda-q (projects)
+## [2026-07-15] ingest | Watcher ingest: doe-ufo-crash-retrieval-programs (projects)
+## [2026-07-15] ingest | Watcher ingest: doe-ufo-crash-retrieval (projects)
+## [2026-07-15] ingest | Watcher ingest: field-based-power-transmission (projects)
+## [2026-07-15] ingest | Watcher ingest: field-geometry-tensor (projects)
+## [2026-07-15] ingest | Watcher ingest: field-manipulation (projects)
+## [2026-07-15] ingest | Watcher ingest: field-manipulator (projects)
+## [2026-07-15] ingest | Watcher ingest: galileo-project (projects)
+## [2026-07-15] ingest | Watcher ingest: general-atomics-(brown's-company) (projects)
+## [2026-07-15] ingest | Watcher ingest: general-atomics (projects)
+## [2026-07-15] ingest | Watcher ingest: hessdalen-uap-project (projects)
+## [2026-07-15] ingest | Watcher ingest: implementation-of-quantum-algorithms-for-simulating-coupled-oscillators (projects)
+## [2026-07-15] ingest | Watcher ingest: ionq (projects)
+## [2026-07-15] ingest | Watcher ingest: iwata-et-al.-2024-mcg-study (projects)
+## [2026-07-15] ingest | Watcher ingest: langgraph-workflows (projects)
+## [2026-07-15] ingest | Watcher ingest: lattice-based-pqc-schemes (projects)
+## [2026-07-15] ingest | Watcher ingest: llm-fallback-chain (projects)
+## [2026-07-15] ingest | Watcher ingest: molecular-simulation-of-electrolytes (projects)
+## [2026-07-15] ingest | Watcher ingest: mussolini's-ufo-recovery-program (projects)
+## [2026-07-15] ingest | Watcher ingest: mussolini-ufo-recovery-program (projects)
+## [2026-07-15] ingest | Watcher ingest: new-science-of-heaven (projects)
+## [2026-07-15] ingest | Watcher ingest: nex-framework (projects)
+## [2026-07-15] ingest | Watcher ingest: nist-pqc-standardization (projects)
+## [2026-07-15] ingest | Watcher ingest: non-human-craft-retrieval-(nhcr) (projects)
+## [2026-07-15] ingest | Watcher ingest: non-human-craft-retrieval-program (projects)
+## [2026-07-15] ingest | Watcher ingest: non-human-craft-retrieval (projects)
+## [2026-07-15] ingest | Watcher ingest: nonequilibrium-chimeric-switching-(nex) (projects)
+## [2026-07-15] ingest | Watcher ingest: nonequilibrium-chimeric-switching (projects)
+## [2026-07-15] ingest | Watcher ingest: operation-paperclip (projects)
+## [2026-07-15] ingest | Watcher ingest: pennylane (projects)
+## [2026-07-15] ingest | Watcher ingest: project-chicken-soup (projects)
+## [2026-07-15] ingest | Watcher ingest: project-hessdalen (projects)
+## [2026-07-15] ingest | Watcher ingest: project-serpo (projects)
+## [2026-07-15] ingest | Watcher ingest: qiskit (projects)
+## [2026-07-15] ingest | Watcher ingest: quantum-computing-applications-in-drug-design (projects)
+## [2026-07-15] ingest | Watcher ingest: quantum-computing-in-drug-design (projects)
+## [2026-07-15] ingest | Watcher ingest: quantum-cybersecurity (projects)
+## [2026-07-15] ingest | Watcher ingest: quantum-simulation-tiers (projects)
+## [2026-07-15] ingest | Watcher ingest: quantum-systems-comparison (projects)
+## [2026-07-15] ingest | Watcher ingest: reverse-engineering-program (projects)
+## [2026-07-15] ingest | Watcher ingest: sair-binding-affinity-with-synthetic-data (projects)
+## [2026-07-15] ingest | Watcher ingest: sair-dataset (projects)
+## [2026-07-15] ingest | Watcher ingest: sair-protein-ligand-dataset (projects)
+## [2026-07-15] ingest | Watcher ingest: sandboxaq-ecosystem (projects)
+## [2026-07-15] ingest | Watcher ingest: scientific-coalition-for-uap-studies (projects)
+## [2026-07-15] ingest | Watcher ingest: seti-kingsland (projects)
+## [2026-07-15] ingest | Watcher ingest: sol-foundation (projects)
+## [2026-07-15] ingest | Watcher ingest: spacetime-engine (projects)
+## [2026-07-15] ingest | Watcher ingest: tangelo (projects)
+## [2026-07-15] ingest | Watcher ingest: temporal-query-pipeline (projects)
+## [2026-07-15] ingest | Watcher ingest: temporal-reasoning-engine (projects)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery-architecture (projects)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery-stack (projects)
+## [2026-07-15] ingest | Watcher ingest: time-travel-machinery (projects)
+## [2026-07-15] ingest | Watcher ingest: turbotls (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-and-power-technologies (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-systems (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-propulsion-technologies (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-research-program (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-retrieval-program (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-retrieval-programs (projects)
+## [2026-07-15] ingest | Watcher ingest: uap-technology-development (projects)
+## [2026-07-15] ingest | Watcher ingest: ufo-retrieval-program (projects)
+## [2026-07-15] ingest | Watcher ingest: ufo-retrieval (projects)
+## [2026-07-15] ingest | Watcher ingest: universal-ml-potentials (projects)
+## [2026-07-15] ingest | Watcher ingest: vasco (projects)
+## [2026-07-15] ingest | Watcher ingest: vatican-ufo-program (projects)
+## [2026-07-15] ingest | Watcher ingest: wardenclyffe-tower (projects)
+## [2026-07-15] ingest | Watcher ingest: aldo-rebelo (entities)
+## [2026-07-15] ingest | Watcher ingest: area-51-and-s4 (entities)
+## [2026-07-15] ingest | Watcher ingest: area-51 (entities)
+## [2026-07-15] ingest | Watcher ingest: ariel-school-ufo-incident (entities)
+## [2026-07-15] ingest | Watcher ingest: beckenstein (entities)
+## [2026-07-15] ingest | Watcher ingest: bob-lazar (entities)
+## [2026-07-15] ingest | Watcher ingest: boltzmann (entities)
+## [2026-07-15] ingest | Watcher ingest: brazil (entities)
+## [2026-07-15] ingest | Watcher ingest: christopher-b-freedman (entities)
+## [2026-07-15] ingest | Watcher ingest: cuda-q (entities)
+## [2026-07-15] ingest | Watcher ingest: d-wave (entities)
+## [2026-07-15] ingest | Watcher ingest: daniel (entities)
+## [2026-07-15] ingest | Watcher ingest: david-grusch (entities)
+## [2026-07-15] ingest | Watcher ingest: element-115 (entities)
+## [2026-07-15] ingest | Watcher ingest: enoch (entities)
+## [2026-07-15] ingest | Watcher ingest: entropy (entities)
+## [2026-07-15] ingest | Watcher ingest: eric-burles (entities)
+## [2026-07-15] ingest | Watcher ingest: exponential-quantum-speedup (entities)
+## [2026-07-15] ingest | Watcher ingest: ezekiel (entities)
+## [2026-07-15] ingest | Watcher ingest: ginestra-bianconi (entities)
+## [2026-07-15] ingest | Watcher ingest: google-cirq (entities)
+## [2026-07-15] ingest | Watcher ingest: implementation-of-quantum-algorithms (entities)
+## [2026-07-15] ingest | Watcher ingest: ionq (entities)
+## [2026-07-15] ingest | Watcher ingest: italy (entities)
+## [2026-07-15] ingest | Watcher ingest: john (entities)
+## [2026-07-15] ingest | Watcher ingest: juan-maldacena (entities)
+## [2026-07-15] ingest | Watcher ingest: kordylewski-clouds (entities)
+## [2026-07-15] ingest | Watcher ingest: landauer (entities)
+## [2026-07-15] ingest | Watcher ingest: lyn-buchanan (entities)
+## [2026-07-15] ingest | Watcher ingest: magenta-ufo-crash (entities)
+## [2026-07-15] ingest | Watcher ingest: mauro-biglino (entities)
+## [2026-07-15] ingest | Watcher ingest: maxwells-demon (entities)
+## [2026-07-15] ingest | Watcher ingest: microsoft-q (entities)
+## [2026-07-15] ingest | Watcher ingest: mount-nyangani (entities)
+## [2026-07-15] ingest | Watcher ingest: mussolini (entities)
+## [2026-07-15] ingest | Watcher ingest: neil-turok (entities)
+## [2026-07-15] ingest | Watcher ingest: nephilim (entities)
+## [2026-07-15] ingest | Watcher ingest: nhcr (entities)
+## [2026-07-15] ingest | Watcher ingest: nikola-tesla (entities)
+## [2026-07-15] ingest | Watcher ingest: pennylane (entities)
+## [2026-07-15] ingest | Watcher ingest: physics-of-time-travel (entities)
+## [2026-07-15] ingest | Watcher ingest: post-quantum-cryptography-transition (entities)
+## [2026-07-15] ingest | Watcher ingest: primary-researcher (entities)
+## [2026-07-15] ingest | Watcher ingest: project-serpo (entities)
+## [2026-07-15] ingest | Watcher ingest: qiskit (entities)
+## [2026-07-15] ingest | Watcher ingest: ralph-larson (entities)
+## [2026-07-15] ingest | Watcher ingest: robert-temple (entities)
+## [2026-07-15] ingest | Watcher ingest: roswell-crash (entities)
+## [2026-07-15] ingest | Watcher ingest: s4 (entities)
+## [2026-07-15] ingest | Watcher ingest: t-t-brown (entities)
+## [2026-07-15] ingest | Watcher ingest: the-new-science-of-uap-paper (entities)
+## [2026-07-15] ingest | Watcher ingest: the-new-science-of-uap (entities)
+## [2026-07-15] ingest | Watcher ingest: the-thing (entities)
+## [2026-07-15] ingest | Watcher ingest: uap-hearings (entities)
+## [2026-07-15] ingest | Watcher ingest: uap (entities)
+## [2026-07-15] ingest | Watcher ingest: ufo-retrieval-program (entities)
+## [2026-07-15] ingest | Watcher ingest: ufos (entities)
+## [2026-07-15] ingest | Watcher ingest: varginha-ufo-crash (entities)
+## [2026-07-15] ingest | Watcher ingest: vatican (entities)
+## [2026-07-15] ingest | Watcher ingest: zimbabwe (entities)
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 6 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 5 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Varginha UFO Crash | 1 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 17 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 7 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 19 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 9 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | pulse | Vatican | 8 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-15] ingest | Watcher ingest: 2-design (concepts)
+## [2026-07-15] ingest | Watcher ingest: 7-46-hz (concepts)
+## [2026-07-15] ingest | Watcher ingest: 7.46-hz-frequency (concepts)
+## [2026-07-15] ingest | Watcher ingest: 7.46-hz (concepts)
+## [2026-07-15] ingest | almanac | 2026-07-15 | 3 entities | moved=0 collapsed=16 contested=0 | hash=bbdaeebaa02f86b5 | 2026-07-15.html
+## [2026-07-15] ingest | almanac | 2026-07-15 | 3 entities | moved=0 collapsed=14 contested=0 | hash=abf87a3687d53656 | 2026-07-15.html
+## [2026-07-15] ingest | pulse | Bob Lazar | 9 evidence | $0.00 | remaining=$2000.00 | bob-lazar
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 4 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 5 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 4 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 6 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 7 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | 5 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
+## [2026-07-15] ingest | pulse | Area 51 and S-4 | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Area 51 | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Ariel School UFO Incident | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Bekenstein | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Bob Lazar | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Boltzmann | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Brazil | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Christopher B. Freedman | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | CUDA-Q | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | Daniel | budget_exceeded | Free tier rate limit reached (60/60 reqs/hr)
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 1 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 3 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | David Grusch | 2 evidence | $0.00 | remaining=$2000.00 | david-grusch
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 2 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 2 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 2 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-15] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Element 115 | 4 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-16] ingest | pulse | Enoch | 2 evidence | $0.00 | remaining=$2000.00 | enoch
+## [2026-07-16] ingest | pulse | Exponential Quantum Speedup | 2 evidence | $0.00 | remaining=$2000.00 | exponential-quantum-speedup
+## [2026-07-16] ingest | pulse | Ezekiel | 6 evidence | $0.00 | remaining=$2000.00 | ezekiel
+## [2026-07-16] ingest | pulse | Ezekiel | 6 evidence | $0.00 | remaining=$2000.00 | ezekiel
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 5 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 10 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 4 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | 9 evidence | $0.00 | remaining=$2000.00 | italy
+## [2026-07-16] ingest | pulse | Italy | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | John | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Juan Maldacena | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Kordylewski Clouds | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Landauer | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Lyn Buchanan | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Magenta UFO Crash | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Mauro Biglino | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Maxwell's Demon | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Mount Nyangani | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Mussolini | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Neil Turok | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Nephilim | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | NHI | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Nikola Tesla | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | PennyLane | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Physics of Time Travel (Interview Transcript) | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Project Serpo | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Post-Quantum Cryptography Transition | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Ralph Moat Larson | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Robert Temple | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | Roswell Crash | budget_exceeded | Free tier rate limit reached (61/60 reqs/hr)
+## [2026-07-16] ingest | pulse | The New Science of UAP | 1 evidence | $0.00 | remaining=$2000.00 | the-new-science-of-uap
+## [2026-07-16] ingest | pulse | The New Science of UAP | 1 evidence | $0.00 | remaining=$2000.00 | the-new-science-of-uap
+## [2026-07-16] ingest | pulse | The New Science of UAP | 1 evidence | $0.00 | remaining=$2000.00 | the-new-science-of-uap
+## [2026-07-16] ingest | pulse | The New Science of UAP | 1 evidence | $0.00 | remaining=$2000.00 | the-new-science-of-uap
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-16] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 8 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 8 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 5 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 1 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | The Thing | 2 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-17] ingest | pulse | Alchemical Drug Design | 1 evidence | $0.00 | remaining=$2000.00 | alchemical-drug-design
+## [2026-07-17] ingest | pulse | Ancient Astronaut Hypothesis | 1 evidence | $0.00 | remaining=$2000.00 | ancient-astronaut-hypothesis
+## [2026-07-17] ingest | pulse | Antigravity | 4 evidence | $0.00 | remaining=$2000.00 | antigravity
+## [2026-07-17] ingest | pulse | Assemblage Theory | 2 evidence | $0.00 | remaining=$2000.00 | assemblage-theory
+## [2026-07-17] ingest | pulse | Babylonian Exile | 1 evidence | $0.00 | remaining=$2000.00 | babylonian-exile
+## [2026-07-17] ingest | pulse | Backdoor Science | 1 evidence | $0.00 | remaining=$2000.00 | backdoor-science
+## [2026-07-17] ingest | pulse | Barren Plateaus | 4 evidence | $0.00 | remaining=$2000.00 | barren-plateaus
+## [2026-07-17] ingest | pulse | Bekenstein Bound | 1 evidence | $0.00 | remaining=$2000.00 | bekenstein-bound
+## [2026-07-17] ingest | pulse | Bekenstein-Hawking entropy | 1 evidence | $0.00 | remaining=$2000.00 | bekenstein-hawking-entropy
+## [2026-07-17] ingest | pulse | Black Hole Entropy | 3 evidence | $0.00 | remaining=$2000.00 | black-hole-entropy
+## [2026-07-17] ingest | pulse | Bootstrap Paradox | 1 evidence | $0.00 | remaining=$2000.00 | bootstrap-paradox
+## [2026-07-17] ingest | pulse | Brain Waves | 2 evidence | $0.00 | remaining=$2000.00 | brain-waves
+## [2026-07-17] ingest | pulse | Branching Timelines | 1 evidence | $0.00 | remaining=$2000.00 | branching-timelines
+## [2026-07-17] ingest | pulse | Canonical Quantization | 1 evidence | $0.00 | remaining=$2000.00 | canonical-quantization
+## [2026-07-17] ingest | pulse | Certificate Transparency | 1 evidence | $0.00 | remaining=$2000.00 | certificate-transparency
+## [2026-07-17] ingest | pulse | Chariot Vision | 1 evidence | $0.00 | remaining=$2000.00 | chariot-vision
+## [2026-07-17] ingest | pulse | Classical Fisher Information Matrix | 1 evidence | $0.00 | remaining=$2000.00 | classical-fisher-information-matrix
+## [2026-07-17] ingest | pulse | Clausius entropy relation | 1 evidence | $0.00 | remaining=$2000.00 | clausius-entropy-relation
+## [2026-07-17] ingest | pulse | Clausius Entropy | 1 evidence | $0.00 | remaining=$2000.00 | clausius-entropy
+## [2026-07-17] ingest | pulse | Computational complexity | 4 evidence | $0.00 | remaining=$2000.00 | computational-complexity
+## [2026-07-17] ingest | pulse | Computational Methods | 3 evidence | $0.00 | remaining=$2000.00 | computational-methods
+## [2026-07-17] ingest | pulse | Conscious Field | 1 evidence | $0.00 | remaining=$2000.00 | conscious-field
+## [2026-07-17] ingest | pulse | Consciousness First Theory | 2 evidence | $0.00 | remaining=$2000.00 | consciousness-first-theory
+## [2026-07-17] ingest | pulse | Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | consciousness
+## [2026-07-17] ingest | pulse | Dark Era | 1 evidence | $0.00 | remaining=$2000.00 | dark-era
+## [2026-07-17] ingest | pulse | Disclosure | 7 evidence | $0.00 | remaining=$2000.00 | disclosure
+## [2026-07-17] ingest | pulse | Ecosystem Intelligence | 1 evidence | $0.00 | remaining=$2000.00 | ecosystem-intelligence
+## [2026-07-17] ingest | pulse | Bob Lazar | 5 evidence | $0.00 | remaining=$2000.00 | bob-lazar
+## [2026-07-17] ingest | pulse | Einstein Equations | 1 evidence | $0.00 | remaining=$2000.00 | einstein-equations
+## [2026-07-17] ingest | pulse | Element 115 | 3 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-17] ingest | almanac | 2026-07-17 | 3 entities | moved=0 collapsed=4 contested=0 | hash=c73ab9f34365ac2e | 2026-07-17.html
+## [2026-07-17] ingest | pulse | Elohim | 1 evidence | $0.00 | remaining=$2000.00 | elohim
+## [2026-07-17] ingest | pulse | Embeddings | 3 evidence | $0.00 | remaining=$2000.00 | embeddings
+## [2026-07-17] ingest | pulse | entropic gravity | 1 evidence | $0.00 | remaining=$2000.00 | entropic-gravity
+## [2026-07-17] ingest | pulse | Field Theory | 1 evidence | $0.00 | remaining=$2000.00 | field-theory
+## [2026-07-17] ingest | pulse | Free Energy Perturbation | 1 evidence | $0.00 | remaining=$2000.00 | free-energy-perturbation
+## [2026-07-17] ingest | pulse | General Relativity | 1 evidence | $0.00 | remaining=$2000.00 | general-relativity
+## [2026-07-17] ingest | pulse | Gibbs entropy | 1 evidence | $0.00 | remaining=$2000.00 | gibbs-entropy
+## [2026-07-17] ingest | pulse | Gradient Descent | 5 evidence | $0.00 | remaining=$2000.00 | gradient-descent
+## [2026-07-17] ingest | pulse | Grandfather Paradox | 2 evidence | $0.00 | remaining=$2000.00 | grandfather-paradox
+## [2026-07-17] ingest | pulse | Hamiltonian Simulation | 5 evidence | $0.00 | remaining=$2000.00 | hamiltonian-simulation
+## [2026-07-17] ingest | pulse | Heat Death | 1 evidence | $0.00 | remaining=$2000.00 | heat-death
+## [2026-07-17] ingest | pulse | Heterogeneous Catalysis | 1 evidence | $0.00 | remaining=$2000.00 | heterogeneous-catalysis
+## [2026-07-18] ingest | pulse | Hybrid Signature Schemes | 1 evidence | $0.00 | remaining=$2000.00 | hybrid-signature-schemes
+## [2026-07-18] ingest | pulse | Information Paradox | 3 evidence | $0.00 | remaining=$2000.00 | information-paradox
+## [2026-07-18] ingest | pulse | Element 115 | 1 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-18] ingest | almanac | 2026-07-18 | 3 entities | moved=0 collapsed=0 contested=0 | hash=b8723947501f7f23 | 2026-07-18.html
+## [2026-07-18] ingest | pulse | Lattice-based Post-Quantum Cryptography | 3 evidence | $0.00 | remaining=$2000.00 | lattice-based-post-quantum-cryptography
+## [2026-07-18] ingest | pulse | Machine Learning Guided AQFEP | 1 evidence | $0.00 | remaining=$2000.00 | machine-learning-guided-aqfep
+## [2026-07-18] ingest | pulse | Machine Learning Interatomic Potentials | 2 evidence | $0.00 | remaining=$2000.00 | machine-learning-interatomic-potentials
+## [2026-07-18] ingest | pulse | Many Worlds Interpretation | 1 evidence | $0.00 | remaining=$2000.00 | many-worlds-interpretation
+## [2026-07-18] ingest | pulse | Molecular Coherence | 1 evidence | $0.00 | remaining=$2000.00 | molecular-coherence
+## [2026-07-18] ingest | pulse | Molecular simulation | 3 evidence | $0.00 | remaining=$2000.00 | molecular-simulation
+## [2026-07-18] ingest | pulse | Non-Uniform Security | 1 evidence | $0.00 | remaining=$2000.00 | non-uniform-security
+## [2026-07-18] ingest | pulse | Orch-OR Theory | 1 evidence | $0.00 | remaining=$2000.00 | orch-or-theory
+## [2026-07-18] ingest | pulse | Plasma Science | 1 evidence | $0.00 | remaining=$2000.00 | plasma-science
+## [2026-07-18] ingest | pulse | Predestination Paradox | 2 evidence | $0.00 | remaining=$2000.00 | predestination-paradox
+## [2026-07-18] ingest | pulse | Protein-Ligand Binding Affinity | 3 evidence | $0.00 | remaining=$2000.00 | protein-ligand-binding-affinity
+## [2026-07-18] ingest | pulse | Psychological Arrow of Time | 9 evidence | $0.00 | remaining=$2000.00 | psychological-arrow-of-time
+## [2026-07-18] ingest | pulse | Quantum Algorithms | 3 evidence | $0.00 | remaining=$2000.00 | quantum-algorithms
+## [2026-07-18] ingest | pulse | Quantum Arrow of Time | 4 evidence | $0.00 | remaining=$2000.00 | quantum-arrow-of-time
+## [2026-07-18] ingest | pulse | Quantum Chemistry | 1 evidence | $0.00 | remaining=$2000.00 | quantum-chemistry
+## [2026-07-18] ingest | pulse | Quantum Computation | 1 evidence | $0.00 | remaining=$2000.00 | quantum-computation
+## [2026-07-18] ingest | pulse | Quantum Computing Ecosystem | 6 evidence | $0.00 | remaining=$2000.00 | quantum-computing-ecosystem
+## [2026-07-18] ingest | pulse | Quantum Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | quantum-consciousness
+## [2026-07-18] ingest | pulse | Quantum Decoherence | 1 evidence | $0.00 | remaining=$2000.00 | quantum-decoherence
+## [2026-07-18] ingest | pulse | Quantum entanglement | 1 evidence | $0.00 | remaining=$2000.00 | quantum-entanglement
+## [2026-07-18] ingest | pulse | Quantum Error Model | 4 evidence | $0.00 | remaining=$2000.00 | quantum-error-model
+## [2026-07-18] ingest | pulse | Quantum Field Dynamics | 4 evidence | $0.00 | remaining=$2000.00 | quantum-field-dynamics
+## [2026-07-18] ingest | pulse | Quantum Field of Spacetime | 1 evidence | $0.00 | remaining=$2000.00 | quantum-field-of-spacetime
+## [2026-07-18] ingest | pulse | Area 51 | 4 evidence | $0.00 | remaining=$2000.00 | area-51
+## [2026-07-18] ingest | pulse | Mauro Biglino | 1 evidence | $0.00 | remaining=$2000.00 | mauro-biglino
+## [2026-07-18] ingest | pulse | Stephen Hawking | 1 evidence | $0.00 | remaining=$2000.00 | stephen-hawking
+## [2026-07-18] ingest | pulse | Quantum information theory | 5 evidence | $0.00 | remaining=$2000.00 | quantum-information-theory
+## [2026-07-18] ingest | pulse | Quantum relative entropy | 2 evidence | $0.00 | remaining=$2000.00 | quantum-relative-entropy
+## [2026-07-18] ingest | pulse | Quantum-to-Classical Transition | 1 evidence | $0.00 | remaining=$2000.00 | quantum-to-classical-transition
+## [2026-07-18] ingest | pulse | Nikola Tesla | 2 evidence | $0.00 | remaining=$2000.00 | nikola-tesla
+## [2026-07-18] ingest | pulse | Uap Hearings | 3 evidence | $0.00 | remaining=$2000.00 | uap-hearings
+## [2026-07-18] ingest | pulse | Area 51 | 4 evidence | $0.00 | remaining=$2000.00 | area-51
+## [2026-07-18] ingest | pulse | Ufos | 4 evidence | $0.00 | remaining=$2000.00 | ufos
+## [2026-07-18] ingest | almanac | 2026-07-18 | 17 entities | moved=0 collapsed=49 contested=0 | hash=d4fe475a08e4d844 | 2026-07-18-094059.html
+## [2026-07-18] ingest | pulse | Bob Lazar | 1 evidence | $0.00 | remaining=$19.50 | bob-lazar
+## [2026-07-18] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-18] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-18] ingest | Uploaded test.md: 0 pages created, 1 updated
+## [2026-07-18] ingest | Uploaded test.md: 0 pages created, 1 updated
+## [2026-07-18] ingest | Uploaded a.md: 0 pages created, 1 updated
+## [2026-07-18] ingest | Uploaded b.md: 0 pages created, 1 updated
+## [2026-07-18] ingest | Uploaded valid.md: 0 pages created, 1 updated
+## [2026-07-18] ingest | Deleted wiki page: UFO Lazar (entities/lazar)
+## [2026-07-18] ingest | Deleted wiki page: Roswell Crash (entities/roswell-crash)
+## [2026-07-18] ingest | pulse | Simultaneous Time Travel | 3 evidence | $0.00 | remaining=$2000.00 | simultaneous-time-travel
+## [2026-07-18] ingest | pulse | Spacetime | 1 evidence | $0.00 | remaining=$2000.00 | spacetime
+## [2026-07-18] ingest | pulse | Spin-Dependent Interactions | 1 evidence | $0.00 | remaining=$2000.00 | spin-dependent-interactions
+## [2026-07-18] ingest | pulse | Statistical Mechanics of Spacetime | 2 evidence | $0.00 | remaining=$2000.00 | statistical-mechanics-of-spacetime
+## [2026-07-18] ingest | pulse | Surface Reactions | 1 evidence | $0.00 | remaining=$2000.00 | surface-reactions
+## [2026-07-18] ingest | pulse | Technology Transition Framework | 4 evidence | $0.00 | remaining=$2000.00 | technology-transition-framework
+## [2026-07-18] ingest | pulse | Teleforce | 2 evidence | $0.00 | remaining=$2000.00 | teleforce
+## [2026-07-18] ingest | pulse | The Hard Problem of Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | the-hard-problem-of-consciousness
+## [2026-07-18] ingest | pulse | The One | 5 evidence | $0.00 | remaining=$2000.00 | the-one
+## [2026-07-18] ingest | pulse | The Past Hypothesis | 1 evidence | $0.00 | remaining=$2000.00 | the-past-hypothesis
+## [2026-07-18] ingest | pulse | Time Evolution in Quantum Algorithms | 2 evidence | $0.00 | remaining=$2000.00 | time-evolution-in-quantum-algorithms
+## [2026-07-18] ingest | pulse | Time Travel Paradoxes | 2 evidence | $0.00 | remaining=$2000.00 | time-travel-paradoxes
+## [2026-07-18] ingest | pulse | Time Travel | 1 evidence | $0.00 | remaining=$2000.00 | time-travel
+## [2026-07-18] ingest | pulse | Timing Side-Channel Attack | 1 evidence | $0.00 | remaining=$2000.00 | timing-side-channel-attack
+## [2026-07-18] ingest | pulse | UAP Propulsion Theories | 1 evidence | $0.00 | remaining=$2000.00 | uap-propulsion-theories
+## [2026-07-18] ingest | pulse | UAP Propulsion | 1 evidence | $0.00 | remaining=$2000.00 | uap-propulsion
+## [2026-07-18] ingest | pulse | UAP Research Ecosystem | 1 evidence | $0.00 | remaining=$2000.00 | uap-research-ecosystem
+## [2026-07-18] ingest | pulse | Uap Hearings | 3 evidence | $0.00 | remaining=$2000.00 | uap-hearings
+## [2026-07-18] ingest | pulse | Variational Quantum Circuit | 5 evidence | $0.00 | remaining=$2000.00 | variational-quantum-circuit
+## [2026-07-18] ingest | pulse | Variational Quantum Eigensolver | 3 evidence | $0.00 | remaining=$2000.00 | variational-quantum-eigensolver
+## [2026-07-18] ingest | pulse | Ufos | 4 evidence | $0.00 | remaining=$2000.00 | ufos
+## [2026-07-18] ingest | pulse | Von Neumann algebras | 5 evidence | $0.00 | remaining=$2000.00 | von-neumann-algebras
+## [2026-07-18] ingest | pulse | Stephen Hawking | 1 evidence | $0.00 | remaining=$2000.00 | stephen-hawking
+## [2026-07-18] ingest | almanac | 2026-07-18 | 17 entities | moved=0 collapsed=60 contested=0 | hash=dca704aec7dfae44 | 2026-07-18-194042.html
+## [2026-07-18] ingest | pulse | Weight Space | 1 evidence | $0.00 | remaining=$2000.00 | weight-space
+## [2026-07-18] ingest | pulse | Wireless Energy | 1 evidence | $0.00 | remaining=$2000.00 | wireless-energy
+## [2026-07-18] ingest | pulse | Brazil UFO Program | 1 evidence | $0.00 | remaining=$2000.00 | brazil-ufo-program
+## [2026-07-18] ingest | pulse | DOE UFO Crash Retrieval | 1 evidence | $0.00 | remaining=$2000.00 | doe-ufo-crash-retrieval
+## [2026-07-18] ingest | pulse | Field Geometry Tensor | 1 evidence | $0.00 | remaining=$2000.00 | field-geometry-tensor
+## [2026-07-18] ingest | pulse | Galileo Project | 5 evidence | $0.00 | remaining=$2000.00 | galileo-project
+## [2026-07-18] ingest | pulse | Hessdalen UAP Project | 1 evidence | $0.00 | remaining=$2000.00 | hessdalen-uap-project
+## [2026-07-18] ingest | pulse | NIST PQC Standardization | 1 evidence | $0.00 | remaining=$2000.00 | nist-pqc-standardization
+## [2026-07-18] ingest | pulse | Non-Human Craft Retrieval | 1 evidence | $0.00 | remaining=$2000.00 | non-human-craft-retrieval
+## [2026-07-18] ingest | pulse | Quantum Simulation Tiers | 1 evidence | $0.00 | remaining=$2000.00 | quantum-simulation-tiers
+## [2026-07-18] ingest | pulse | Reverse-Engineering Program | 6 evidence | $0.00 | remaining=$2000.00 | reverse-engineering-program
+## [2026-07-18] ingest | pulse | Tangelo | 2 evidence | $0.00 | remaining=$2000.00 | tangelo
+## [2026-07-18] ingest | pulse | Time Travel Machinery | 3 evidence | $0.00 | remaining=$2000.00 | time-travel-machinery
+## [2026-07-18] ingest | pulse | UAP Propulsion Technologies | 1 evidence | $0.00 | remaining=$2000.00 | uap-propulsion-technologies
+## [2026-07-18] ingest | pulse | UAP Retrieval Program | 1 evidence | $0.00 | remaining=$2000.00 | uap-retrieval-program
+## [2026-07-18] ingest | pulse | Uap Hearings | 3 evidence | $0.00 | remaining=$2000.00 | uap-hearings
+## [2026-07-18] ingest | pulse | Area 51 | 4 evidence | $0.00 | remaining=$2000.00 | area-51
+## [2026-07-18] ingest | pulse | Ufos | 4 evidence | $0.00 | remaining=$2000.00 | ufos
+## [2026-07-18] ingest | pulse | UFOs | 4 evidence | $0.00 | remaining=$2000.00 | ufos
+## [2026-07-18] ingest | pulse | Zimbabwe | 2 evidence | $0.00 | remaining=$2000.00 | zimbabwe
+## [2026-07-18] ingest | pulse | Stephen Hawking | 1 evidence | $0.00 | remaining=$2000.00 | stephen-hawking
+## [2026-07-18] ingest | pulse | Vatican | 2 evidence | $0.00 | remaining=$2000.00 | vatican
+## [2026-07-18] ingest | pulse | Aldo Rebelo | 2 evidence | $0.00 | remaining=$2000.00 | aldo-rebelo
+## [2026-07-18] ingest | pulse | Area 51 and S-4 | 2 evidence | $0.00 | remaining=$2000.00 | area-51-and-s-4
 
+
+## 2026-07-18 — DuckDuckGo install + all fixes verified live
+
+- **Installed**: `ddgs==9.14.4` (DuckDuckGo search) in venv — provides web search for last30days CLI pulse agent
+- **Fixed**: Subprocess env changed from `NO_COLOR=1` to `TERM=dumb` — NO_COLOR was breaking DuckDuckGo search backend
+- **Verified live**: Almanac generation completed with 17 entities, 13 with evidence (Element 115: 545, Tesla: 56, Bob Lazar: 61, Grusch: 27, etc.)
+- **Cleaned**: 166 stale Redis key sets purged (609 now in sync with queue)
+- **Cleaned**: Old 3-entity almanac files removed (only 17-entity brief remains)
+- **All 11 fixes on main**: B1-B10 + DuckDuckGo search dependency

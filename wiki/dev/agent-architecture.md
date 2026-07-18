@@ -147,3 +147,10 @@ Conversation-aware LLM extraction for the chat-to-wiki pipeline. Scans conversat
 - [[langgraph-workflows]]
 - [[local-first-llm]]
 - [[multi-llm-consensus]]
+
+### Pulse Agent Fixes (July 2026)
+
+1. **Timeout handler**: `proc.kill()` + `record_pulse_completed()` in the `except subprocess.TimeoutExpired` block to prevent zombie accumulation.
+2. **Subprocess env**: Changed from `NO_COLOR=1` to `TERM=dumb` to avoid breaking the DuckDuckGo search backend.
+3. **Cross-contamination filter**: 60% word-match threshold (was 100%) with word-boundary token matching.
+4. **Single-word noise floor**: Minimum engagement ≥ 5 required for single-word entity names.
