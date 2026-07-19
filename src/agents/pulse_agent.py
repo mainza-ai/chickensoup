@@ -96,6 +96,101 @@ class PulseAgent:
 
         return cmd
 
+    def _apply_rule_filter(self, ev: ClaimEvidence, url_lower: str, claim_lower: str, platform_lower: str, entity_name: str, is_org: bool) -> bool:
+        """Apply rule-based filters to a single evidence item. Returns True to keep, False to discard."""
+        # 1. Semantic Disambiguation check
+        ent_lower = entity_name.lower()
+        ent_words = [w for w in re.split(r"[-_ ]+", ent_lower) if len(w) > 2]
+        if ent_words:
+            STOP_WORDS = {"the", "and", "for", "from", "with", "that", "this", "were", "was", "his", "her", "their"}
+            ent_words = [w for w in ent_words if w not in STOP_WORDS]
+        if not ent_words:
+            ent_words = [ent_lower]
+        claim_tokens = set(re.findall(r"\b[a-z0-9]+\b", claim_lower))
+        url_tokens = set(re.findall(r"\b[a-z0-9]+\b", url_lower))
+        all_tokens = claim_tokens | url_tokens
+        match_count = sum(1 for w in ent_words if w in all_tokens)
+        import math as _math
+        min_required = max(1, _math.ceil(len(ent_words) * 0.6))
+        if match_count < min_required:
+            logger.info(f"Filtering out cross-contamination candidate for '{entity_name}': {ev.claim_text}")
+            return False
+
+        # 1b. Noise floor for single-word entities
+        if len(ent_words) <= 1:
+            noise_floor = 5
+            eng = getattr(ev, "engagement_count", 0) or 0
+            if eng < noise_floor:
+                logger.debug(f"Filtering low-engagement noise for single-word entity '{entity_name}': eng={eng}")
+                return False
+
+        # 2. Hiring/jobs check for non-organizations
+        if not is_org:
+            hiring_domains = ("greenhouse.io", "ashbyhq.com", "lever.co", "workable.com", "apply.workable.com")
+            hiring_keywords = ("hiring", "careers", "database engineer", "business development executive", "job openings", "current openings")
+            if (platform_lower in ("jobs-web", "jobs", "careers") or
+                any(dom in url_lower for dom in hiring_domains) or
+                any(kw in claim_lower for kw in hiring_keywords)):
+                logger.debug(f"Filtering out hiring-signal/jobs evidence from non-org '{entity_name}': {ev.claim_text}")
+                return False
+
+        return True
+
+    def _apply_llm_relevance_filter(self, evidence: List[ClaimEvidence], entity_name: str, slug: str) -> List[ClaimEvidence]:
+        """Use LLM to filter evidence that is not semantically relevant to the entity.
+        
+        Catches cases that rule-based filters miss:
+        - Entity name shared with a company/band/product ("Element 115" the restaurant)
+        - Boilerplate Reddit metadata that happens to contain entity words
+        - Claims that pass word-boundary match but are about a different topic
+        """
+        if not evidence or len(evidence) < 2:
+            return evidence
+
+        try:
+            from src.llm_client import LLMClient
+            client = LLMClient(default_timeout=15)
+
+            lines = []
+            for i, ev in enumerate(evidence):
+                ct = (ev.claim_text or "")[:200].replace("\n", " ")
+                lines.append(f"[{i}] {ct}")
+
+            prompt = (
+                f"You are evaluating search results for the entity '{entity_name}'.\n"
+                f"Each result below is a claim found by searching for '{entity_name}'.\n"
+                f"Some results may be about a different thing that shares the same name.\n"
+                f"Mark each result as RELEVANT (actually about {entity_name}) or IRRELEVANT.\n"
+                f"Reply with one word per line: the index followed by RELEVANT or IRRELEVANT.\n\n"
+                + "\n".join(lines)
+            )
+
+            response = client.query_sync(prompt, max_tokens=len(evidence) * 20)
+            if not response:
+                return evidence
+
+            relevant_indices = set()
+            for line in response.strip().split("\n"):
+                line = line.strip()
+                if "RELEVANT" in line.upper() and not "IRRELEVANT" in line.upper():
+                    try:
+                        idx = int(line.split()[0].strip("[]"))
+                        relevant_indices.add(idx)
+                    except (ValueError, IndexError):
+                        pass
+
+            if relevant_indices:
+                filtered = [ev for i, ev in enumerate(evidence) if i in relevant_indices]
+                if filtered:
+                    removed = len(evidence) - len(filtered)
+                    logger.info(f"LLM relevance filter: kept {len(filtered)}/{len(evidence)} for '{entity_name}' (removed {removed})")
+                    return filtered
+
+            return evidence
+        except Exception as e:
+            logger.debug(f"LLM relevance filter failed for '{entity_name}': {e}")
+            return evidence
+
     def run_pulse(self, entity_name: str, handles: dict | None = None) -> PulseResult:
         t_start = time.perf_counter()
         entity_name = _sanitize_entity_name(entity_name)
@@ -319,6 +414,8 @@ class PulseAgent:
                 filtered_evidence.append(ev)
             evidence = filtered_evidence
             evidence = self.adapter.normalize_engagement(evidence)
+            # LLM relevance filter: catch multi-meaning entity names and boilerplate
+            evidence = self._apply_llm_relevance_filter(evidence, entity_name, slug)
         except Exception as e:
             logger.error(f"Failed to parse last30days output for '{entity_name}': {e}")
             evidence = []
@@ -350,7 +447,19 @@ class PulseAgent:
                             ))
                     if ddg_evidence:
                         evidence = ddg_evidence
-                        logger.info(f"DDGS fallback found {len(evidence)} items for '{entity_name}'")
+                        logger.info(f"DDGS fallback found {len(evidence)} raw items for '{entity_name}'")
+                        # Apply the same filtering pipeline as CLI-sourced evidence
+                        filtered: List[ClaimEvidence] = []
+                        for ev in evidence:
+                            url_lower = ev.url.lower() if ev.url else ""
+                            claim_lower = ev.claim_text.lower() if ev.claim_text else ""
+                            platform_lower = ev.source_platform.lower() if ev.source_platform else ""
+                            if self._apply_rule_filter(ev, url_lower, claim_lower, platform_lower, entity_name, is_org):
+                                filtered.append(ev)
+                        evidence = filtered
+                        evidence = self.adapter.normalize_engagement(evidence)
+                        evidence = self._apply_llm_relevance_filter(evidence, entity_name, slug)
+                        logger.info(f"DDGS fallback: {len(evidence)} items after filtering")
             except Exception as ddgs_err:
                 logger.debug(f"DDGS fallback failed for '{entity_name}': {ddgs_err}")
 
