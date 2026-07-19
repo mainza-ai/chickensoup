@@ -2,7 +2,7 @@
 title: "Pulse Agent"
 tags: [agent, living-almanac, last30days, pulse, budget]
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-07-18
 sources: [living-almanac]
 related: [agent-architecture, budget-tracking, credibility-scoring, api-design, frontend-settings-menu]
 ---
@@ -13,52 +13,104 @@ Entity-scoped ingestion that pulls fresh evidence for a wiki entity via the `las
 
 ## Class Shape
 
-Follows `chat_ingest_agent.py` — class with periodic entry point, not request-handler:
-
 ```python
 class PulseAgent:
     def run_pulse(self, entity_name: str, handles: dict | None = None) -> PulseResult:
-        # 1. Sanitize entity name (reject null bytes, newlines, cap 200)
-        # 2. Check LAST30DAYS_ENABLED — disabled returns clean no-op, not error
-        # 3. Budget check via budget_tracker (Lua atomic) — refusal logged, not throttled
-        # 4. Resolve binary: LAST30DAYS_BINARY_PATH → npx last30days → last30days
-        # 5. Build command list (never shell=True) + timeout 60s + catch degrade
-        # 6. Parse via last30days_adapter.py (JSON first, markdown fallback)
-        # 7. Normalize engagement (log-scaled, decayed with half-life 7d)
-        # 8. Write immutable dated snapshot to wiki/raw/pulse/{slug}-{date}.json+.md
-        # 9. Record spend, append to log.md, return structured evidence
 ```
+
+### Evidence Pipeline (execution order)
+
+1. **Entity sanitization** — reject null bytes, newlines, cap 200 chars
+2. **Wiki frontmatter read** — extract handles, tags, org flag
+3. **Disabled gate** — `LAST30DAYS_ENABLED=false` returns clean no-op
+4. **Budget check** via `ResourceLedger` (Lua atomic) — refusal logged
+5. **Binary resolution** — `LAST30DAYS_BINARY_PATH` → cloned script → `npx last30days` → `last30days`
+6. **Subprocess execution** with `TERM=dumb` (was `NO_COLOR=1`, changed to avoid breaking DuckDuckGo search)
+7. **CLI timeout** — `LAST30DAYS_PULSE_TIMEOUT_SECONDS` (300s). On timeout: `proc.kill()` + `record_pulse_completed()` to prevent zombie accumulation.
+8. **Parse via `last30days_adapter.py`** — JSON first (`ranked_candidates`/`claims`/`evidence`/`results`/`findings`), markdown fallback
+9. **Rule-based filters** (in order):
+   - Semantic disambiguation: word-boundary token matching, ≥60% of entity words must appear in claim
+   - Noise floor: single-word entities require `engagement_count ≥ 5`
+   - Hiring/jobs filter: blocks `jobs-web`, `jobs`, `careers` platforms + hiring keywords for non-org entities
+10. **LLM relevance gate** (NEW): batches all evidence into a single LLM call, classifies each as RELEVANT/IRRELEVANT to the entity. Catches multi-meaning entity names ("Element 115" the company vs the element), Reddit boilerplate, cross-topic claims. Graceful degradation on LLM failure.
+11. **DDGS fallback** (NEW): when CLI returns no evidence, queries DuckDuckGo directly via `ddgs` package. Results go through the same rule + LLM filter pipeline.
+12. **Engagement normalization** — log-scaled, decayed with half-life 7d
+13. **Max claims cap** — `LAST30DAYS_MAX_CLAIMS_PER_PULSE` (50)
+14. **Write immutable snapshot** — `wiki/raw/pulse/{slug}-{date}-{time}.json+.md` (timestamped to prevent overwrites)
+15. **Record spend**, append to log.md, return `PulseResult`
+
+## Rule-Based Filter Details
+
+### Semantic Disambiguation (`_apply_rule_filter`)
+
+```python
+ent_words = tokens from entity name, filtered to words > 2 chars, stop words removed
+claim_tokens = word-boundary tokens (\b) from claim text + URL
+match_count = count of ent_words appearing in claim_tokens
+min_required = max(1, ceil(len(ent_words) * 0.6))
+# Reject if match_count < min_required
+```
+
+Word-boundary matching prevents false positives ("element" in "elemental"). The 60% threshold allows some word variation while still requiring majority coverage.
+
+### Hiring/Jobs Filter
+
+Blocks evidence from `jobs-web`, `jobs`, or `careers` platforms for non-org entities. Also blocks hiring keywords (`hiring`, `careers`, `database engineer`, etc.) and known hiring domains (`greenhouse.io`, `ashbyhq.com`, `lever.co`, `workable.com`).
+
+### Single-Word Noise Floor
+
+Entities with names ≤1 word (e.g., "UFO", "UAP") require `engagement_count ≥ 5` to prevent noisy matches.
+
+## LLM Relevance Filter (`_apply_llm_relevance_filter`)
+
+```python
+def _apply_llm_relevance_filter(self, evidence, entity_name, slug):
+    # Batch all evidence into a single LLM prompt
+    # Classify each as RELEVANT or IRRELEVANT to the entity
+    # Only keep RELEVANT items
+    # Graceful: on LLM failure, return all evidence unchanged
+```
+
+Designed to catch cases that token-based filters cannot:
+- Entity name shared with a company/product ("Element 115" the restaurant vs Moscovium)
+- Boilerplate Reddit metadata containing entity keywords by accident
+- Claims from a different domain that happen to mention entity words
+
+Uses `LLMClient.query_sync()` with 15s timeout. Batches ALL evidence items for an entity into a single prompt to minimize LLM calls.
+
+## DDGS Fallback
+
+When the CLI returns no evidence, PulseAgent queries DuckDuckGo directly via the `ddgs` Python package (`ddgs>=9.14.4`). Results flow through the same filter pipeline (rule filters + LLM gate + engagement normalization). This provides a backup when the CLI's built-in DuckDuckGo client is rate-limited or unavailable.
+
+## Cross-File Deduplication
+
+`load_recent_pulse_evidence()` in `pulse_writer.py` deduplicates evidence across all pulse snapshot files:
+- Key: `claim_text[:200]`
+- Rule: keep the version with highest `engagement_count`
+- This prevents the 147-file × 4-items = "545 evidence" inflation bug
 
 ## Security
 
 - `shell=False` always — `run_pulse("Bob Lazar; rm -rf /")` passes malicious string as single arg, not executed
 - `_sanitize_entity_name`: rejects `\x00`, `\n`, `\r`, caps 200 chars
-- Subprocess timeout `LAST30DAYS_PULSE_TIMEOUT_SECONDS=60`
+- Subprocess timeout `LAST30DAYS_PULSE_TIMEOUT_SECONDS=300`
 - Config `LAST30DAYS_BINARY_PATH` + `shutil.which` resolution
+- Subprocess env uses `TERM=dumb` instead of `NO_COLOR=1` (NO_COLOR breaks DuckDuckGo search)
 
-## Budget Guardrails
+## Bug Fixes (July 2026)
 
-- `src/budget.py: BudgetTracker` with Redis Lua `BUDGET_LUA_CHECK` (atomic check+incr) + `BUDGET_HOLD_LUA`
-- `budget:YYYY-MM` hash {spent, pulls, last_pull, last_description}
-- HOLD when remaining < 2× cost (`BUDGET_HOLD_THRESHOLD_REMAINING=2.0`)
-- `POST /budget/approve` to clear HOLD — same shape as MilimoClaw SpendApprovalHandler
-- `PulseResult(status=budget_exceeded)` with reason, log.md entry — never silently throttled
-
-## Adapter
-
-`src/last30days_adapter.py: Last30daysAdapter`:
-
-- `parse_output(raw, entity_name) -> List[ClaimEvidence]`: tries `parse_json_output` (claims|evidence|results arrays, or single dict with claim-ish keys) first, then `parse_markdown_output` (## Claims/evidence bullet extraction, URL regex, engagement hints, polymarket % detection)
-- `normalize_engagement()`: `log1p(count)/log1p(max)` decayed
-- `_infer_platform()`: keyword map reddit/x/youtube/news/github/polymarket/perplexity/brave/podcast
-- Last resort: whole raw as single claim if >100 chars
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Zombie accumulation | `proc.communicate(timeout=1)` loop deadlocked on pipe buffer | Replaced with `proc.wait(timeout=timeout)` + single `proc.communicate()` |
+| 545 garbage evidence for Element 115 | 147 redundant snapshots × 4 garbage items, no dedup | Cross-file dedup by claim_text, "jobs" platform filter, LLM relevance gate |
+| DDGS fallback had zero filters | Evidence created directly without any filtering | Rerouted through full rule + LLM filter pipeline |
+| `NO_COLOR=1` broke search | Env var interfered with DuckDuckGo client | Changed to `TERM=dumb` |
+| Timeout didn't record completion | Missing `record_pulse_completed()` in timeout handler | Added `proc.kill()` + `record_pulse_completed()` |
 
 ## Snapshot Format
 
-- `wiki/raw/pulse/{slug}-{date}.json`: `{entity_name, slug, date, timestamp, evidence_count, evidence: [ClaimEvidence], raw_output_preview, meta: {handles, budget_remaining_before, binary, cost_usd}}`
-- `wiki/raw/pulse/{slug}-{date}.md`: human-readable per-claim sections with platform, engagement, decayed, market odds, url, cluster, quote
-- Collision handling: if file exists today, append `-2`, `-3`, etc.
-- Never touches index.md (pulse files are raw snapshots, not wiki pages)
+- `wiki/raw/pulse/{slug}-{date}-{time}.json`: timestamped to prevent same-day overwrites (was `{slug}-{date}.json`)
+- `wiki/raw/pulse/{slug}-{date}-{time}.md`: human-readable per-claim sections
 
 ## Endpoints
 
@@ -69,11 +121,13 @@ class PulseAgent:
 
 ## Acceptance
 
-- `run_pulse("Bob Lazar")` with `ENABLED=false` returns no-op, not error, no file, 0 evidence
-- With enabled, writes exactly one new immutable file to `wiki/raw/pulse/`, never touches `wiki/entities/` or `concepts/`
-- Budget ceiling checked before pull; refusal logged, not silently throttled; subprocess never called when budget exceeded (tested `mock_run.called` false)
-- `shell=False` always (tested `test_pulse_never_shell_true`)
+- `run_pulse("Bob Lazar")` with `ENABLED=false` returns no-op, not error
+- With enabled, writes one immutable file to `wiki/raw/pulse/`, never touches `wiki/entities/`
+- Budget ceiling checked before pull; subprocess never called when budget exceeded
+- `shell=False` always (tested)
 - Adapter handles both JSON and markdown output shapes
+- Zero zombie processes after timeout (verified: `proc.kill()` called)
+- Cross-file dedup prevents evidence inflation (verified: 147 snapshots → 5 unique claims)
 
 ## See Also
 
@@ -82,3 +136,5 @@ class PulseAgent:
 - [[agent-architecture]]
 - [[api-design]]
 - [[frontend-settings-menu]]
+- [[living-almanac-project]]
+- [[pydantic-settings]]

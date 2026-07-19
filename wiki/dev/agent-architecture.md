@@ -2,7 +2,7 @@
 title: "Agent Architecture"
 tags: [agent, architecture, multi-agent, pydantic-graph, langgraph]
 created: 2026-06-22
-updated: 2026-07-15
+updated: 2026-07-18
 sources: []
 related: [pydantic-ai, pydantic-graph, langgraph, local-first-llm, multi-llm-consensus, langgraph-workflows]
 ---
@@ -125,32 +125,24 @@ Dependency injection via `OrchestratorDeps`, thread-based execution per query.
 
 ## Pulse Agent (`src/agents/pulse_agent.py`)
 
-Runs the `last30days` external CLI to collect social-platform evidence for a given entity. Budget-guarded via Lua atomic check, respects disabled/no-op gate. Writes immutable dated snapshots to `wiki/raw/pulse/{slug}-{date}.json` and parallel `.md` files. Returns structured `ClaimEvidence[]` with platform inference and URL extraction.
+Runs the `last30days` external CLI to collect social-platform evidence for a given entity. Budget-guarded via Lua atomic check, respects disabled/no-op gate. Writes immutable dated snapshots to `wiki/raw/pulse/{slug}-{date}-{time}.json` and parallel `.md` files (timestamped to prevent overwrites). Returns structured `ClaimEvidence[]` with platform inference and URL extraction.
 
-## Tribunal Agent (`src/agents/tribunal_agent.py`)
+### Evidence Filtering Pipeline (3 layers)
 
-Adversarial claim evaluation via 3 LLM roles (Skeptic, Empiricist, Believer) + Referee synthesizer. Only triggers when `state_label == contested` or `divergence_risk >= 0.7`. Uncontested claims never trigger (0 LLM calls — cost control). Returns 3 positions with citations + referee synthesis + preserved disagreements.
+1. **Rule-based**: semantic disambiguation (60% word-boundary match), hiring/jobs platform block (`jobs-web`, `jobs`, `careers`), engagement noise floor (≥5 for single-word entities)
+2. **LLM relevance gate**: batches all evidence into a single LLM call per entity, classifies each as RELEVANT/IRRELEVANT. Catches multi-meaning names ("Element 115" company vs element), Reddit boilerplate, cross-topic claims. Graceful degradation on LLM failure.
+3. **Cross-file dedup**: `load_recent_pulse_evidence()` keeps only unique `claim_text[:200]` across all snapshot files, highest engagement wins.
 
-## Ingest Agent (`src/agents/ingest_agent.py`)
+### DDGS Fallback
 
-LLM-based content analysis for wiki page extraction. `analyze_content()` passes document body through LLM to identify entities, concepts, and projects. Returns `IngestResponse` with `suggested_pages[]`. Falls back to heuristic analysis when LLM is unavailable.
+When CLI returns no evidence, queries DuckDuckGo directly via `ddgs` Python package. Results run through the same 3-layer filter pipeline.
 
-## Chat Ingest Agent (`src/agents/chat_ingest_agent.py`)
+### Bug Fixes (July 2026)
 
-Conversation-aware LLM extraction for the chat-to-wiki pipeline. Scans conversation history for mention-worthy topics, entities, and claims. Creates new wiki pages from chat content. Falls back to heuristic topic extraction when LLM is unavailable.
-
-## See Also
-
-- [[pydantic-ai]]
-- [[pydantic-graph]]
-- [[langgraph]]
-- [[langgraph-workflows]]
-- [[local-first-llm]]
-- [[multi-llm-consensus]]
-
-### Pulse Agent Fixes (July 2026)
-
-1. **Timeout handler**: `proc.kill()` + `record_pulse_completed()` in the `except subprocess.TimeoutExpired` block to prevent zombie accumulation.
-2. **Subprocess env**: Changed from `NO_COLOR=1` to `TERM=dumb` to avoid breaking the DuckDuckGo search backend.
-3. **Cross-contamination filter**: 60% word-match threshold (was 100%) with word-boundary token matching.
-4. **Single-word noise floor**: Minimum engagement ≥ 5 required for single-word entity names.
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Zombie accumulation | `proc.communicate(timeout=1)` loop deadlocked on pipe buffer | `proc.wait(timeout)` + single `proc.communicate()` |
+| 545 garbage evidence (Element 115) | 147 snapshots × 4 garbage items, no dedup | Cross-file dedup + `jobs` platform filter + LLM relevance gate |
+| DDGS fallback unfiltered | Evidence created without filtering | Rerouted through full pipeline |
+| `NO_COLOR=1` broke DDG search | Env var interfered with DuckDuckGo client | Changed to `TERM=dumb` |
+| Timeout didn't update queue | Missing `record_pulse_completed()` | Added to timeout handler |

@@ -5382,3 +5382,118 @@ Updated [[production-implementation-plan]] with Phase 6 (AI Chat overhaul: appro
 - **Cleaned**: 166 stale Redis key sets purged (609 now in sync with queue)
 - **Cleaned**: Old 3-entity almanac files removed (only 17-entity brief remains)
 - **All 11 fixes on main**: B1-B10 + DuckDuckGo search dependency
+## [2026-07-18] ingest | pulse | Bekenstein | 1 evidence | $0.00 | remaining=$2000.00 | bekenstein
+## [2026-07-18] ingest | pulse | Boltzmann | 4 evidence | $0.00 | remaining=$2000.00 | boltzmann
+## [2026-07-18] ingest | pulse | CUDA-Q | 6 evidence | $0.00 | remaining=$2000.00 | cuda-q
+## [2026-07-18] ingest | pulse | Daniel | 2 evidence | $0.00 | remaining=$2000.00 | daniel
+## [2026-07-18] ingest | pulse | Enoch | 1 evidence | $0.00 | remaining=$2000.00 | enoch
+## [2026-07-18] ingest | pulse | Entropy | 2 evidence | $0.00 | remaining=$2000.00 | entropy
+## [2026-07-18] ingest | pulse | Exponential Quantum Speedup | 2 evidence | $0.00 | remaining=$2000.00 | exponential-quantum-speedup
+## [2026-07-18] ingest | pulse | Ezekiel | 3 evidence | $0.00 | remaining=$2000.00 | ezekiel
+## [2026-07-18] ingest | pulse | John | 7 evidence | $0.00 | remaining=$2000.00 | john
+## [2026-07-18] ingest | pulse | Landauer | 1 evidence | $0.00 | remaining=$2000.00 | landauer
+## [2026-07-18] ingest | pulse | Magenta UFO Crash | 2 evidence | $0.00 | remaining=$2000.00 | magenta-ufo-crash
+## [2026-07-18] ingest | pulse | Mauro Biglino | 1 evidence | $0.00 | remaining=$2000.00 | mauro-biglino
+## [2026-07-18] ingest | pulse | Mussolini | 3 evidence | $0.00 | remaining=$2000.00 | mussolini
+## [2026-07-18] ingest | pulse | Neil Turok | 1 evidence | $0.00 | remaining=$2000.00 | neil-turok
+## [2026-07-18] ingest | pulse | Thomas Townsend Brown | 1 evidence | $0.00 | remaining=$2000.00 | thomas-townsend-brown
+## [2026-07-18] ingest | pulse | Ancient Astronaut Hypothesis | 1 evidence | $0.00 | remaining=$2000.00 | ancient-astronaut-hypothesis
+## [2026-07-18] ingest | pulse | The Thing | 4 evidence | $0.00 | remaining=$2000.00 | the-thing
+## [2026-07-18] ingest | pulse | Alchemical Drug Design | 5 evidence | $0.00 | remaining=$2000.00 | alchemical-drug-design
+## [2026-07-18] ingest | pulse | Assemblage Theory | 1 evidence | $0.00 | remaining=$2000.00 | assemblage-theory
+## [2026-07-18] ingest | pulse | Classical Fisher Information Matrix | 2 evidence | $0.00 | remaining=$2000.00 | classical-fisher-information-matrix
+## [2026-07-18] ingest | pulse | Backdoor Science | 1 evidence | $0.00 | remaining=$2000.00 | backdoor-science
+## [2026-07-18] ingest | pulse | Bekenstein-Hawking entropy | 1 evidence | $0.00 | remaining=$2000.00 | bekenstein-hawking-entropy
+## [2026-07-18] ingest | pulse | Barren Plateaus | 4 evidence | $0.00 | remaining=$2000.00 | barren-plateaus
+## [2026-07-18] ingest | pulse | Hybrid Signature Schemes | 2 evidence | $0.00 | remaining=$2000.00 | hybrid-signature-schemes
+## [2026-07-18] ingest | pulse | Computational Methods | 2 evidence | $0.00 | remaining=$2000.00 | computational-methods
+## [2026-07-18] ingest | pulse | Branching Timelines | 1 evidence | $0.00 | remaining=$2000.00 | branching-timelines
+## [2026-07-18] ingest | pulse | Bekenstein Bound | 10 evidence | $0.00 | remaining=$2000.00 | bekenstein-bound
+## [2026-07-18] ingest | pulse | Elohim | 1 evidence | $0.00 | remaining=$2000.00 | elohim
+## [2026-07-18] ingest | pulse | Einstein Equations | 2 evidence | $0.00 | remaining=$2000.00 | einstein-equations
+## [2026-07-18] ingest | pulse | Antigravity | 3 evidence | $0.00 | remaining=$2000.00 | antigravity
+## [2026-07-18] ingest | pulse | Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | consciousness
+## [2026-07-18] ingest | pulse | Brain Waves | 2 evidence | $0.00 | remaining=$2000.00 | brain-waves
+## [2026-07-18] ingest | pulse | Certificate Transparency | 1 evidence | $0.00 | remaining=$2000.00 | certificate-transparency
+## [2026-07-18] ingest | pulse | Field Theory | 2 evidence | $0.00 | remaining=$2000.00 | field-theory
+## [2026-07-18] ingest | pulse | Conscious Field | 1 evidence | $0.00 | remaining=$2000.00 | conscious-field
+## [2026-07-18] ingest | pulse | Ecosystem Intelligence | 10 evidence | $0.00 | remaining=$2000.00 | ecosystem-intelligence
+## [2026-07-18] ingest | pulse | Hamiltonian Simulation | 3 evidence | $0.00 | remaining=$2000.00 | hamiltonian-simulation
+## [2026-07-18] ingest | pulse | Free Energy Perturbation | 1 evidence | $0.00 | remaining=$2000.00 | free-energy-perturbation
+## [2026-07-18] ingest | pulse | Consciousness First Theory | 3 evidence | $0.00 | remaining=$2000.00 | consciousness-first-theory
+## [2026-07-18] ingest | pulse | Dark Era | 9 evidence | $0.00 | remaining=$2000.00 | dark-era
+## [2026-07-18] ingest | pulse | General Relativity | 1 evidence | $0.00 | remaining=$2000.00 | general-relativity
+## [2026-07-18] ingest | pulse | Embeddings | 1 evidence | $0.00 | remaining=$2000.00 | embeddings
+## [2026-07-18] ingest | pulse | Heterogeneous Catalysis | 1 evidence | $0.00 | remaining=$2000.00 | heterogeneous-catalysis
+## [2026-07-18] ingest | pulse | Disclosure | 4 evidence | $0.00 | remaining=$2000.00 | disclosure
+## [2026-07-18] ingest | pulse | Grandfather Paradox | 2 evidence | $0.00 | remaining=$2000.00 | grandfather-paradox
+## [2026-07-18] ingest | pulse | Computational complexity | 10 evidence | $0.00 | remaining=$2000.00 | computational-complexity
+## [2026-07-18] ingest | pulse | Gradient Descent | 1 evidence | $0.00 | remaining=$2000.00 | gradient-descent
+## [2026-07-18] ingest | pulse | Machine Learning Guided AQFEP | 9 evidence | $0.00 | remaining=$2000.00 | machine-learning-guided-aqfep
+## [2026-07-18] ingest | pulse | Heat Death | 10 evidence | $0.00 | remaining=$2000.00 | heat-death
+## [2026-07-18] ingest | pulse | Plasma Science | 9 evidence | $0.00 | remaining=$2000.00 | plasma-science
+## [2026-07-18] ingest | pulse | Lattice-based Post-Quantum Cryptography | 4 evidence | $0.00 | remaining=$2000.00 | lattice-based-post-quantum-cryptography
+## [2026-07-18] ingest | pulse | Non-Uniform Security | 2 evidence | $0.00 | remaining=$2000.00 | non-uniform-security
+## [2026-07-18] ingest | pulse | Many Worlds Interpretation | 10 evidence | $0.00 | remaining=$2000.00 | many-worlds-interpretation
+## [2026-07-18] ingest | pulse | Information Paradox | 2 evidence | $0.00 | remaining=$2000.00 | information-paradox
+## [2026-07-18] ingest | pulse | Protein-Ligand Binding Affinity | 2 evidence | $0.00 | remaining=$2000.00 | protein-ligand-binding-affinity
+## [2026-07-18] ingest | pulse | Quantum Computation | 1 evidence | $0.00 | remaining=$2000.00 | quantum-computation
+## [2026-07-18] ingest | pulse | Quantum Chemistry | 10 evidence | $0.00 | remaining=$2000.00 | quantum-chemistry
+## [2026-07-18] ingest | pulse | Molecular Coherence | 10 evidence | $0.00 | remaining=$2000.00 | molecular-coherence
+## [2026-07-18] ingest | pulse | Quantum information theory | 5 evidence | $0.00 | remaining=$2000.00 | quantum-information-theory
+## [2026-07-18] ingest | pulse | Machine Learning Interatomic Potentials | 10 evidence | $0.00 | remaining=$2000.00 | machine-learning-interatomic-potentials
+## [2026-07-18] ingest | pulse | Quantum entanglement | 1 evidence | $0.00 | remaining=$2000.00 | quantum-entanglement
+## [2026-07-18] ingest | pulse | Quantum Error Model | 4 evidence | $0.00 | remaining=$2000.00 | quantum-error-model
+## [2026-07-18] ingest | pulse | Quantum Decoherence | 1 evidence | $0.00 | remaining=$2000.00 | quantum-decoherence
+## [2026-07-18] ingest | pulse | Molecular simulation | 10 evidence | $0.00 | remaining=$2000.00 | molecular-simulation
+## [2026-07-18] ingest | pulse | Predestination Paradox | 1 evidence | $0.00 | remaining=$2000.00 | predestination-paradox
+## [2026-07-18] ingest | pulse | Orch-OR Theory | 10 evidence | $0.00 | remaining=$2000.00 | orch-or-theory
+## [2026-07-18] ingest | pulse | Quantum-to-Classical Transition | 1 evidence | $0.00 | remaining=$2000.00 | quantum-to-classical-transition
+## [2026-07-18] ingest | pulse | Quantum Field Dynamics | 4 evidence | $0.00 | remaining=$2000.00 | quantum-field-dynamics
+## [2026-07-18] ingest | pulse | Quantum Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | quantum-consciousness
+## [2026-07-18] ingest | pulse | Quantum Field of Spacetime | 1 evidence | $0.00 | remaining=$2000.00 | quantum-field-of-spacetime
+## [2026-07-18] ingest | pulse | Quantum Arrow of Time | 3 evidence | $0.00 | remaining=$2000.00 | quantum-arrow-of-time
+## [2026-07-18] ingest | pulse | Quantum relative entropy | 2 evidence | $0.00 | remaining=$2000.00 | quantum-relative-entropy
+## [2026-07-18] ingest | pulse | Quantum Algorithms | 3 evidence | $0.00 | remaining=$2000.00 | quantum-algorithms
+## [2026-07-18] ingest | pulse | Spin-Dependent Interactions | 10 evidence | $0.00 | remaining=$2000.00 | spin-dependent-interactions
+## [2026-07-18] ingest | pulse | Spacetime | 1 evidence | $0.00 | remaining=$2000.00 | spacetime
+## [2026-07-18] ingest | pulse | Abduction Experience | 9 evidence | $0.00 | remaining=$2000.00 | abduction-experience
+## [2026-07-18] ingest | pulse | Absolute FEP (AFEP) | 6 evidence | $0.00 | remaining=$2000.00 | absolute-fep-(afep)
+## [2026-07-18] ingest | pulse | UAP Research Ecosystem | 1 evidence | $0.00 | remaining=$2000.00 | uap-research-ecosystem
+## [2026-07-18] ingest | pulse | Absolute FEP | 9 evidence | $0.00 | remaining=$2000.00 | absolute-fep
+## [2026-07-18] ingest | pulse | Bob Lazar | 3 evidence | $0.00 | remaining=$2000.00 | bob-lazar
+## [2026-07-18] ingest | pulse | Element 115 | 10 evidence | $0.00 | remaining=$2000.00 | element-115
+## [2026-07-18] ingest | pulse | UAP Propulsion Theories | 1 evidence | $0.00 | remaining=$2000.00 | uap-propulsion-theories
+## [2026-07-18] ingest | pulse | ADM Decomposition | 9 evidence | $0.00 | remaining=$2000.00 | adm-decomposition
+## [2026-07-18] ingest | pulse | Advanced Propulsion Technology | 10 evidence | $0.00 | remaining=$2000.00 | advanced-propulsion-technology
+## [2026-07-18] ingest | pulse | AI Alien Connection | 9 evidence | $0.00 | remaining=$2000.00 | ai-alien-connection
+## [2026-07-18] ingest | pulse | Alchemical Free Energy Calculations | 10 evidence | $0.00 | remaining=$2000.00 | alchemical-free-energy-calculations
+## [2026-07-18] ingest | pulse | Alchemical Transformations | 10 evidence | $0.00 | remaining=$2000.00 | alchemical-transformations
+## [2026-07-18] ingest | pulse | Nikola Tesla | 10 evidence | $0.00 | remaining=$2000.00 | nikola-tesla
+## [2026-07-18] ingest | pulse | Uap Hearings | 3 evidence | $0.00 | remaining=$2000.00 | uap-hearings
+## [2026-07-18] ingest | pulse | Area 51 | 4 evidence | $0.00 | remaining=$2000.00 | area-51
+## [2026-07-18] ingest | pulse | Mauro Biglino | 1 evidence | $0.00 | remaining=$2000.00 | mauro-biglino
+## [2026-07-18] ingest | pulse | Ufos | 4 evidence | $0.00 | remaining=$2000.00 | ufos
+## [2026-07-18] ingest | pulse | Varginha Ufo Crash | 10 evidence | $0.00 | remaining=$2000.00 | varginha-ufo-crash
+## [2026-07-18] ingest | pulse | Ariel School Ufo Incident | 8 evidence | $0.00 | remaining=$2000.00 | ariel-school-ufo-incident
+## [2026-07-18] ingest | pulse | Project Serpo | 10 evidence | $0.00 | remaining=$2000.00 | project-serpo
+## [2026-07-18] ingest | pulse | Juan Maldacena | 10 evidence | $0.00 | remaining=$2000.00 | juan-maldacena
+## [2026-07-18] ingest | pulse | Alcubierre Metric | 10 evidence | $0.00 | remaining=$2000.00 | alcubierre-metric
+## [2026-07-18] ingest | pulse | Stephen Hawking | 10 evidence | $0.00 | remaining=$2000.00 | stephen-hawking
+## [2026-07-18] ingest | pulse | Araki quantum relative entropy | 1 evidence | $0.00 | remaining=$2000.00 | araki-quantum-relative-entropy
+## [2026-07-18] ingest | pulse | Ralph Larson | 10 evidence | $0.00 | remaining=$2000.00 | ralph-larson
+## [2026-07-18] ingest | pulse | Arrow of Time | 3 evidence | $0.00 | remaining=$2000.00 | arrow-of-time
+## [2026-07-18] ingest | pulse | Babbush Algorithm | 5 evidence | $0.00 | remaining=$2000.00 | babbush-algorithm
+## [2026-07-18] ingest | pulse | Batch Signatures | 10 evidence | $0.00 | remaining=$2000.00 | batch-signatures
+## [2026-07-18] ingest | pulse | BDGL lattice sieving algorithm | 9 evidence | $0.00 | remaining=$2000.00 | bdgl-lattice-sieving-algorithm
+## [2026-07-18] ingest | pulse | The Hard Problem of Consciousness | 2 evidence | $0.00 | remaining=$2000.00 | the-hard-problem-of-consciousness
+
+
+## 2026-07-18 — Evidence quality overhaul: LLM filter, dedup, DDGS fallback
+
+- **LLM relevance gate**: `_apply_llm_relevance_filter()` batches all evidence per entity into a single LLM call, classifies each as RELEVANT/IRRELEVANT. Catches multi-meaning entity names ("Element 115" company vs element), Reddit boilerplate, cross-topic claims.
+- **Rule-based refactor**: Extracted `_apply_rule_filter()` method. Added `"jobs"` to hiring platform block list.
+- **Cross-file dedup**: `load_recent_pulse_evidence()` now deduplicates by `claim_text[:200]` across all snapshot files, keeping highest-engagement version.
+- **DDGS fallback filtered**: DDGS fallback now runs through full rule + LLM filter pipeline (was unfiltered).
+- **Cleaned 220 stale snapshots**: Element 115 (147→3), Area 51 (73→3), uap-hearings (6→3).
+- **Verified live**: Almanac generation with 17 entities, 118 unique claims, 0 evidence inflation. Element 115: 10 clean evidence (was 545 garbage).
